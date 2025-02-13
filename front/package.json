@@ -16,7 +16,6 @@
     "@tailwindcss/vite": "^4.0.6",
     "bootstrap": "^5.3.3",
     "flowbite": "^3.1.2",
-    "flowbite-react": "^0.10.2",
     "nouislider": "^15.8.1",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",

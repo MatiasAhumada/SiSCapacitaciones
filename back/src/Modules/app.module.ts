@@ -9,9 +9,10 @@ import { ProfesorModule } from './profesor/profesor.module';
 import { ServicioModule } from './servicio/servicio.module';
 import { VendedorModule } from './vendedor/vendedor.module';
 import { AlumnoModule } from './alumno/alumno.module';
+import { SucursalModule } from './sucursal/sucursal.module';
 
 @Module({
-  imports: [AlumnoModule, AdminModule, AbonoModule, CursoModule, ProfesorModule, ServicioModule, VendedorModule],
+  imports: [AlumnoModule, AdminModule, AbonoModule, CursoModule, ProfesorModule, ServicioModule, VendedorModule, SucursalModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,5 +1,5 @@
 import { Admins } from 'src/Modules/admin/entities/admin.entity';
-import { Alumno } from 'src/Modules/Alumno/entities/alumno.entity';
+import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
 import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';

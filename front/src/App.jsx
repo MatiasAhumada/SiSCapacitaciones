@@ -1,3 +1,4 @@
+import DashAdmin from "./components/admin/DashAdmin";
 import Home from "./components/Views/Home";
 import Login from "./components/Views/Login";
 
@@ -8,6 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login></Login>}></Route>
         <Route path="/inicio" element={<Home></Home>}></Route>
+        <Route path="/adm" element={<DashAdmin></DashAdmin>}></Route>
       </Routes>
     </BrowserRouter>
   );

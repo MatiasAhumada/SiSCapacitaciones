@@ -1,4 +1,5 @@
 import { Row, Col, Card, Button, Container } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
@@ -14,7 +15,7 @@ const Home = () => {
               <Card.Subtitle className="mb-3 text-muted">Alumnos: 200</Card.Subtitle>
 
               <div className="mt-4">
-                <Button variant="primary">Ingresar</Button>
+                <Button variant="primary" as={Link} to="/adm">Ingresar</Button>
               </div>
             </Card.Body>
           </Card>
@@ -29,7 +30,7 @@ const Home = () => {
               <Card.Subtitle className="mb-3 text-muted">Alumnos: 200</Card.Subtitle>
 
               <div className="mt-4">
-                <Button variant="primary">Ingresar</Button>
+                <Button variant="primary" as={Link} to="/adm">Ingresar</Button>
               </div>
             </Card.Body>
           </Card>
@@ -45,7 +46,7 @@ const Home = () => {
               <Card.Subtitle className="mb-3 text-muted">Alumnos: 200</Card.Subtitle>
 
               <div className="mt-4">
-                <Button variant="primary">Ingresar</Button>
+                <Button variant="primary" as={Link} to="/adm">Ingresar</Button>
               </div>
             </Card.Body>
           </Card>

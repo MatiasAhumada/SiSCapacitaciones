@@ -3,6 +3,7 @@ import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { Container } from "react-bootstrap";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import { Link, useNavigate } from "react-router-dom";
+import imagen from "../assets/simplificado_a_color.png";
 const Login = () => {
   const navigate = useNavigate();
   const handleClick = (e) => {
@@ -12,7 +13,14 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Iniciar sesión</h2>
+        <div className="flex items-center justify-center mb-3">
+          <div>
+            <img src={imagen} alt="logo" className="size-8 me-3" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Iniciar sesión</h2>
+          </div>
+        </div>
         <form>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-600">
@@ -40,11 +48,7 @@ const Login = () => {
             />
           </div>
 
-          <button
-            type="submit"
-            onClick={handleClick}
-            className="w-full py-3 bg-yellow-600 text-white font-semibold rounded hover:bg-yellow-700 transition duration-200 "
-          >
+          <button type="submit" onClick={handleClick} className="w-full py-3 btnAz text-white font-semibold rounded  transition duration-200 ">
             Iniciar sesión
           </button>
         </form>

@@ -2,17 +2,30 @@ import React from "react";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import simplificado from "../assets/simplificado_a_color.png";
+import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+
 const DashAdmin = () => {
+  const { id } = useParams();
+
   const navigation = [{ name: "Vendedores" }, { name: "Profesores" }, { name: "Alumnos" }, { name: "Comisiones" }, { name: "Metricas" }];
 
+  const navigate = useNavigate();
+
+  const clickBtn = (name) => {
+    navigate(`/adm/${id}/${name.toLowerCase()}`);
+  };
+  const handleClick = (e) => {
+    e.preventDefault();
+    navigate("/");
+  };
   return (
-    <div className="min-h-full principal">
-      <Disclosure as="nav" className="bg-blue-50">
+    <div className="min-h-full ">
+      <Disclosure as="nav" className="bg-blue-50 principal">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <div className="shrink-0">
-                <img alt="Your Company" src={simplificado}className="size-8" />
+                <img alt="Your Company" src={simplificado} className="size-8" onClick={() => navigate(`/adm/${id}`)} />
               </div>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
@@ -20,6 +33,7 @@ const DashAdmin = () => {
                     <button
                       key={item.name}
                       aria-current="page"
+                      onClick={() => clickBtn(item.name)}
                       className="btnAz
                           rounded px-4 py-2 me-2  text-sm font-medium"
                     >
@@ -32,6 +46,8 @@ const DashAdmin = () => {
             <div className="hidden md:block">
               <div className="ml-4 flex items-center md:ml-6">
                 <button
+                  type="submit"
+                  onClick={handleClick}
                   className="text-gray-50 bg-red-600 hover:bg-red-700 
                           rounded px-4 py-2 me-2  text-sm font-medium"
                 >
@@ -40,8 +56,8 @@ const DashAdmin = () => {
               </div>
             </div>
             <div className="mr-2 flex md:hidden rounded">
-              {/* Mobile menu button */}
-              <DisclosureButton className="group relative inline-flex items-center justify-center rounded bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+              {/* Boton para mobile */}
+              <DisclosureButton className="group relative inline-flex items-center justify-center rounded p-2  btnAz ">
                 <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
                 <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
               </DisclosureButton>
@@ -54,16 +70,18 @@ const DashAdmin = () => {
             {navigation.map((item) => (
               <button
                 key={item.name}
-                href={item.href}
-                aria-current={item.current ? "page" : undefined}
-                className="text-gray-300 bg-gray-700 rounded
+                onClick={() => clickBtn(item.name)}
+                aria-current={"page"}
+                className="btnAz rounded
                  px-3 py-2 mt-2 font-medium"
               >
                 {item.name}
               </button>
             ))}
             <button
-              className="text-gray-300 bg-red-500
+              type="submit"
+              onClick={handleClick}
+              className="text-gray-50 bg-red-600 hover:bg-red-700 
                           rounded px-4 py-2 mt-4  text-sm font-medium"
             >
               Cerrar Sesion
@@ -72,8 +90,8 @@ const DashAdmin = () => {
         </DisclosurePanel>
       </Disclosure>
 
-      <main>
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"></div>
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <Outlet />
       </main>
     </div>
   );

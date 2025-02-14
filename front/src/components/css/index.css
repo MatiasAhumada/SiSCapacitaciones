@@ -1,27 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
 @import "tailwindcss";
 
 .principal {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 .btnAz {
-    
-    background-color: rgba(0, 32, 255, 1);/* Equivalente a #052896 */
-    color: white; /* Ajusta el color del texto si es necesario */
-    padding: 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease-in-out;
-  }
-  
-  .btnAz:hover {
-    background-color: rgba(5, 40, 150, 1);  /* Equivalente a #0020FF */
-  }
-  
+  background-color: rgba(0, 32, 255, 1); /* Equivalente a #052896 */
+  color: white; /* Ajusta el color del texto si es necesario */
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease-in-out;
+}
 
-
-  
-  
- 
-  
- 
-  
+.btnAz:hover {
+  background-color: rgba(5, 40, 150, 1); /* Equivalente a #0020FF */
+}

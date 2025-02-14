@@ -1,1 +1,19 @@
-export class Admin {}
+import { Factura } from 'src/Modules/factura/entities/factura.entity';
+import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { v4 as uuid } from 'uuid';
+@Entity({
+  name: 'admin',
+})
+export class Admins {
+  @PrimaryGeneratedColumn('uuid')
+  id: string = uuid();
+  @Column()
+  nombre: string;
+  @Column()
+  password: string;
+  @OneToMany(()=>Factura, factura=>factura.admin)
+  facturas: Factura[];
+  @OneToMany(() => Sucursal, (sucursal) => sucursal.admin)
+  sucursales: Sucursal[];
+}

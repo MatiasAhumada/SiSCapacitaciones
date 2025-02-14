@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { SucursalService } from './sucursal.service';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { UpdateSucursalDto } from './dto/update-sucursal.dto';
@@ -14,15 +14,15 @@ export class SucursalController {
 
   @Get()
   findAll() {
-    return this.sucursalService.findAll();
+    return this.sucursalService.getSucursales();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.sucursalService.findOne(+id);
+    return this.sucursalService.getByIdSucursal(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateSucursalDto: UpdateSucursalDto) {
     return this.sucursalService.update(+id, updateSucursalDto);
   }

@@ -8,11 +8,20 @@ import { CursoModule } from './curso/curso.module';
 import { ProfesorModule } from './profesor/profesor.module';
 import { ServicioModule } from './servicio/servicio.module';
 import { VendedorModule } from './vendedor/vendedor.module';
-import { AlumnoModule } from './alumno/alumno.module';
 import { SucursalModule } from './sucursal/sucursal.module';
-
+import { FacturaModule } from './factura/factura.module';
 @Module({
-  imports: [AlumnoModule, AdminModule, AbonoModule, CursoModule, ProfesorModule, ServicioModule, VendedorModule, SucursalModule],
+  imports: [
+    AlumnoModule,
+    AdminModule,
+    AbonoModule,
+    CursoModule,
+    ProfesorModule,
+    ServicioModule,
+    VendedorModule,
+    SucursalModule,
+    FacturaModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

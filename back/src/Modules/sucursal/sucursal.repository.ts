@@ -1,5 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Profesor } from '../profesor/entities/profesor.entity';
+import {  Injectable } from '@nestjs/common';
+
 
 @Injectable()
 export class SucursalRepository {
@@ -116,7 +116,7 @@ export class SucursalRepository {
       ],
     },
   ];
-  async findAll() {
+  async getSucursales() {
     return this.sucursales;
   }
   create() {

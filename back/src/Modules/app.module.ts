@@ -10,6 +10,7 @@ import { ServicioModule } from './servicio/servicio.module';
 import { VendedorModule } from './vendedor/vendedor.module';
 import { SucursalModule } from './sucursal/sucursal.module';
 import { FacturaModule } from './factura/factura.module';
+import { ComisionModule } from './comision/comision.module';
 @Module({
   imports: [
     AlumnoModule,
@@ -21,6 +22,7 @@ import { FacturaModule } from './factura/factura.module';
     VendedorModule,
     SucursalModule,
     FacturaModule,
+    ComisionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

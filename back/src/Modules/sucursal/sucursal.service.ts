@@ -14,15 +14,15 @@ export class SucursalService {
   getByIdSucursal(id: number) {
     return `This action returns a #${id} sucursal`;
   }
-  create(createSucursalDto: CreateSucursalDto) {
+  createSuc(createSucursalDto: CreateSucursalDto) {
     return 'This action adds a new sucursal';
   }
 
-  update(id: number, updateSucursalDto: UpdateSucursalDto) {
+  updateSuc(id: number, updateSucursalDto: UpdateSucursalDto) {
     return `This action updates a #${id} sucursal`;
   }
 
-  remove(id: number) {
+  removeSuc(id: number) {
     return `This action removes a #${id} sucursal`;
   }
 }

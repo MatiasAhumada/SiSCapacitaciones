@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import { fetchSucursal } from "../queris/queris";
 import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 const AggVend = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -22,6 +23,12 @@ const AggVend = () => {
     e.preventDefault();
     //aqui ira la peticion al back asi crea un nuevo empleado
     console.log(formData);
+    Swal.fire({
+      title: "Vendedor Registrado",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 1500,
+    });
   };
   useEffect(() => {
     //aqui se hara la peticion al back para traer las sucursales

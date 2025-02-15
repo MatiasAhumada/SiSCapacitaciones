@@ -1,5 +1,6 @@
 import React from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const DashProfe = () => {
   const navigate = useNavigate();
@@ -14,6 +15,16 @@ const DashProfe = () => {
       state: { id: e.target.value },
     });
   };
+  const clickDelete = (e) => {
+    //aqui ira el fetch para eliminar el profesor
+    console.log(e.target.value);
+    Swal.fire({
+        title: "Profesor Eliminado",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+  }
   const tableItems = [
     {
       name: "Liam James",
@@ -73,6 +84,7 @@ const DashProfe = () => {
                   <th className="py-3 px-6">Email</th>
                   <th className="py-3 px-6">Número de telefono</th>
                   <th className="py-3 px-6">Curso</th>
+                  <th className="py-3 px-6"></th>
                 </tr>
               </thead>
               <tbody className="text-gray-600 divide-y">
@@ -82,6 +94,9 @@ const DashProfe = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.position}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.salary}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        <button value={idx} onClick={clickDelete} className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded">Eliminar</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -30,8 +30,8 @@ export class Sucursal {
   //   profesores: string;
   //   @OneToMany(()=>Curso, curso=>curso.sucursal)
   //   cursos: string;
-  //   @OneToMany(()=>Vendedor, vendedor=>vendedor.sucursal)
-  //   vendedores: string;
+  @ManyToOne(() => Vendedor, (vendedor) => vendedor.sucursales)
+  vendedores: Vendedor[];
   @ManyToOne(() => Admins, (admin) => admin.sucursales)
   admin: Admin;
 }

@@ -11,6 +11,7 @@ import { VendedorModule } from './vendedor/vendedor.module';
 import { SucursalModule } from './sucursal/sucursal.module';
 import { FacturaModule } from './factura/factura.module';
 import { ComisionModule } from './comision/comision.module';
+import { InscripcionModule } from './inscripcion/inscripcion.module';
 @Module({
   imports: [
     AlumnoModule,
@@ -23,6 +24,7 @@ import { ComisionModule } from './comision/comision.module';
     SucursalModule,
     FacturaModule,
     ComisionModule,
+    InscripcionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,5 +1,8 @@
+import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
+import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 @Entity({
   name: 'comisiones',
@@ -9,7 +12,18 @@ export class Comision {
   id: string = uuid();
   @Column()
   fecInit: Date;
+
   @ManyToOne(() => Curso, (curso) => curso.comisiones, { onDelete: 'SET NULL' })
   curso: Curso;
+
+  @ManyToOne(()=>Profesor,profesor=>profesor.comisiones,{onDelete:'SET NULL'})
+  profesor:Profesor
+
+  @OneToMany(()=>Inscripcion,inscripcion=>inscripcion.comision)
+  inscripciones:Inscripcion[]
+
+  @ManyToMany(()=>Alumno,alumno=>alumno.comisiones)
+  @JoinTable()
+  alumnos:Alumno[]
   
 }

@@ -1,3 +1,4 @@
+import { Comision } from "src/Modules/comision/entities/comision.entity";
 import { Curso } from "src/Modules/curso/entities/curso.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import {v4 as uuid} from "uuid"
@@ -14,5 +15,6 @@ export class Profesor {
     dni:number
     @OneToMany(()=>Curso,curso=>curso.profesores)
     cursos:Curso[]
-
+    @OneToMany(()=>Comision,comision=>comision.profesor)
+    comisiones:Comision[]
 }

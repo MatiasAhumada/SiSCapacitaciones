@@ -49,7 +49,7 @@ const InfoVendedor = () => {
       icon: "success",
       showConfirmButton: false,
       timer: 1500,
-    });
+    }); 
   };
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">

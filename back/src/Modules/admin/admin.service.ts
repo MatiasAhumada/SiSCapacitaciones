@@ -4,23 +4,23 @@ import { UpdateAdminDto } from './dto/update-admin.dto';
 
 @Injectable()
 export class AdminService {
-  createAdmin(createAdminDto: CreateAdminDto) {
+  createAdmSv(createAdminDto: CreateAdminDto) {
     return 'This action adds a new admin';
   }
 
-  findAllAdm() {
+  findAllAdmSv() {
     return `This action returns all admin`;
   }
 
-  findOneAdm(id: number) {
+  findOneAdmSv(id: number) {
     return `This action returns a #${id} admin`;
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
+  updateAdmSv(id: number, updateAdminDto: UpdateAdminDto) {
     return `This action updates a #${id} admin`;
   }
 
-  remove(id: number) {
+  removeAdmSv(id: number) {
     return `This action removes a #${id} admin`;
   }
 }

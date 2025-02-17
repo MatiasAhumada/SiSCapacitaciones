@@ -9,11 +9,22 @@ import { ProfesorModule } from './profesor/profesor.module';
 import { ServicioModule } from './servicio/servicio.module';
 import { VendedorModule } from './vendedor/vendedor.module';
 import { SucursalModule } from './sucursal/sucursal.module';
-import { FacturaModule } from './factura/factura.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ComisionModule } from './comision/comision.module';
 import { InscripcionModule } from './inscripcion/inscripcion.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import typeOrmConfig from '../config/configOrm';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [typeOrmConfig],
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({...configService.get("typeorm")})
+    }),
+
     AlumnoModule,
     AdminModule,
     AbonoModule,
@@ -22,7 +33,6 @@ import { InscripcionModule } from './inscripcion/inscripcion.module';
     ServicioModule,
     VendedorModule,
     SucursalModule,
-    FacturaModule,
     ComisionModule,
     InscripcionModule,
   ],

@@ -1,12 +1,16 @@
 import { Admins } from 'src/Modules/admin/entities/admin.entity';
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
+import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
+import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import {
   Admin,
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -24,14 +28,17 @@ export class Sucursal {
   localidad: string;
   @Column()
   provincia: string;
-  //   @OneToMany(()=>Alumno, alumno=>alumno.sucursal)
-  //   alumnos: string;
-  //   @OneToMany(()=>Profesor, profesor=>profesor.sucursal)
-  //   profesores: string;
-  //   @OneToMany(()=>Curso, curso=>curso.sucursal)
-  //   cursos: string;
-  @ManyToOne(() => Vendedor, (vendedor) => vendedor.sucursales)
+     @OneToMany(()=>Alumno, alumno=>alumno.sucursal)
+     alumnos: Alumno[];
+     @OneToMany(()=>Profesor, profesor=>profesor.sucursal)
+     profesores: Profesor[];
+  @OneToMany(()=>Comision,comisiones=>comisiones.sucursal)
+  comisiones:Comision[]
+  @ManyToMany(() => Vendedor, (vendedor) => vendedor.sucursales)
+  @JoinTable()
   vendedores: Vendedor[];
   @ManyToOne(() => Admins, (admin) => admin.sucursales)
   admin: Admin;
+  @OneToMany(()=>Inscripcion,inscripcion=>inscripcion.sucursal)
+  inscripciones:Inscripcion[]
 }

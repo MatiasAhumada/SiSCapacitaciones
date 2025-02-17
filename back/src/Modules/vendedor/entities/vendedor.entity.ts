@@ -7,12 +7,13 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-
+import { v4 as uuid } from 'uuid';
 @Entity('vendedor')
 export class Vendedor {
-  @PrimaryColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string = uuid();
   @Column()
   name: string;
   @Column()
@@ -22,6 +23,5 @@ export class Vendedor {
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.vendedor)
   inscripciones: Inscripcion[];
   @ManyToMany(() => Sucursal, (sucursal) => sucursal.vendedores)
-  @JoinTable()
   sucursales: Sucursal[];
 }

@@ -1,10 +1,21 @@
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
-import { Column, Entity, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
-
+import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { v4 as uuid } from 'uuid';
 @Entity({ name: 'alumnos' })
 export class Alumno {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
+  id: string = uuid();
+  @Column()
   dni: number;
   @Column()
   apeNom: string;
@@ -30,6 +41,8 @@ export class Alumno {
   gender: string;
   @ManyToMany(() => Comision, (comision) => comision.alumnos)
   comisiones: Comision[];
-  @OneToMany(()=>Inscripcion,inscripcion=>inscripcion.alumno)
+  @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno)
   inscripciones: Inscripcion[];
+  @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)
+  sucursal: Sucursal[];
 }

@@ -1,5 +1,6 @@
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
+import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -22,8 +23,8 @@ export class Inscripcion {
   @Column()
   fechaRegistro: Date;
 
-  @Column()
-  sucursal: string;
+  @ManyToOne(()=>Sucursal,sucursal=>sucursal.inscripciones)
+  sucursal: Sucursal;
 
   @Column()
   formaPago: string;

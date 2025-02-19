@@ -5,6 +5,8 @@ import DashProfe from "./components/profesor/DashProfe";
 import AggVend from "./components/vendedor/AggVend";
 import DashVendedor from "./components/vendedor/DashVendedor";
 import InfoVendedor from "./components/vendedor/InfoVendedor";
+import InfoIndexVend from "./components/vendedor/ventas/InfoIndexVend";
+import Inscripcion from "./components/vendedor/ventas/IndexVendedor";
 import Error404 from "./components/Views/Error404";
 import Home from "./components/Views/Home";
 import Login from "./components/Views/Login";
@@ -25,6 +27,9 @@ function App() {
           <Route path="profesores" element={<DashProfe></DashProfe>}>
             <Route path="crear" element={<CrearProfes></CrearProfes>}></Route>
           </Route>
+        </Route>
+        <Route path="/inicioVendedor" element={<Inscripcion></Inscripcion>}>
+          <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>

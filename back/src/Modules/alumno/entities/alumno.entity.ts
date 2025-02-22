@@ -44,5 +44,5 @@ export class Alumno {
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno)
   inscripciones: Inscripcion[];
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)
-  sucursal: Sucursal[];
+  sucursal: Sucursal;
 }

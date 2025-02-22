@@ -18,7 +18,7 @@ export class Alumno {
   @Column()
   dni: number;
   @Column()
-  apeNom: string;
+  name: string;
   @Column()
   fNac: Date;
   @Column()

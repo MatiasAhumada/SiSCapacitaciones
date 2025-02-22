@@ -20,6 +20,10 @@ export class Vendedor {
   email: string;
   @Column()
   tel: string;
+  @Column()
+  password: string;
+  @Column()
+  isAdmin: boolean;
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.vendedor)
   inscripciones: Inscripcion[];
   @ManyToMany(() => Sucursal, (sucursal) => sucursal.vendedores)

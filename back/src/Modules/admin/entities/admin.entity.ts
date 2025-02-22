@@ -8,10 +8,11 @@ export class Admins {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
   @Column()
-  nombre: string;
+  name: string;
   @Column()
   password: string;
-
+  @Column()
+  isAdmin: boolean;
   @OneToMany(() => Sucursal, (sucursal) => sucursal.admin)
   sucursales: Sucursal[];
 }

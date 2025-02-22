@@ -22,6 +22,8 @@ export class Comision {
   
   @Column()
   fecInit: Date;
+  @Column()
+  name: string;
 
   @ManyToOne(() => Curso, (curso) => curso.comisiones, { onDelete: 'SET NULL' })
   curso: Curso;

@@ -5,7 +5,9 @@ import { UpdateVendedorDto } from './dto/update-vendedor.dto';
 
 @Controller('vendedor')
 export class VendedorController {
-  constructor(private readonly vendedorService: VendedorService) {}
+  constructor(
+    
+    private readonly vendedorService: VendedorService) {}
 
   @Post()
   create(@Body() createVendedorDto: CreateVendedorDto) {
@@ -19,16 +21,16 @@ export class VendedorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.vendedorService.findOne(+id);
+    return this.vendedorService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateVendedorDto: UpdateVendedorDto) {
-    return this.vendedorService.update(+id, updateVendedorDto);
+    return this.vendedorService.update(id, updateVendedorDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.vendedorService.remove(+id);
+    return this.vendedorService.remove(id);
   }
 }

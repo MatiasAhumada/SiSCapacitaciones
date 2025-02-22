@@ -24,7 +24,7 @@ export class Sucursal {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
   @Column()
-  nombre: string;
+  name: string;
   @Column()
   localidad: string;
   @Column()
@@ -39,7 +39,7 @@ export class Sucursal {
   @JoinTable()
   vendedores: Vendedor[];
   @ManyToOne(() => Admins, (admin) => admin.sucursales)
-  admin: Admin;
+  admin: Admins;
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.sucursal)
   inscripciones: Inscripcion[];
   @OneToMany(() => Servicio, (servicio) => servicio.sucursal)

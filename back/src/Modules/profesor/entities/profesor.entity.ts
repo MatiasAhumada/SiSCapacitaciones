@@ -9,7 +9,7 @@ export class Profesor {
     @PrimaryGeneratedColumn("uuid")
     id: string=uuid();
     @Column()
-    nombre: string;
+    name: string;
     @Column()
     apellido: string;
     @Column()

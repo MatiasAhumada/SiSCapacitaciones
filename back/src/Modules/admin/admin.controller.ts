@@ -28,16 +28,16 @@ export class AdminController {
 
   @Get(':id')
   findOneAdmin(@Param('id') id: string) {
-    return this.adminService.findOneAdmSv(+id);
+    return this.adminService.findOneAdmSv(id);
   }
 
   @Put(':id')
   updateAdmin(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.updateAdmSv(+id, updateAdminDto);
+    return this.adminService.updateAdmSv(id, updateAdminDto);
   }
 
   @Delete(':id')
   removeAdmin(@Param('id') id: string) {
-    return this.adminService.removeAdmSv(+id);
+    return this.adminService.removeAdmSv(id);
   }
 }

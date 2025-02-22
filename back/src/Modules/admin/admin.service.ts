@@ -1,26 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Admins } from './entities/admin.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AdminService {
-  createAdmSv(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
+  constructor(
+    @InjectRepository(Admins)
+    private readonly admRepository: Repository<Admins>,
+  ) {}
+
+  async createAdmSv(createAdminDto: CreateAdminDto) {
+    const newAdmin = this.admRepository.create(createAdminDto);
+    await this.admRepository.save(newAdmin);
+    return { name: newAdmin.name, isAdmin: newAdmin.isAdmin };
   }
 
-  findAllAdmSv() {
-    return `This action returns all admin`;
+  async findAllAdmSv() {
+    return await this.admRepository.find();
   }
 
-  findOneAdmSv(id: number) {
-    return `This action returns a #${id} admin`;
+  async findOneAdmSv(id: string) {
+    return await this.admRepository.findOneBy({ id });
   }
 
-  updateAdmSv(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
+  async updateAdmSv(id: string, updateAdminDto: UpdateAdminDto) {
+    const admin=await this.admRepository.findOneBy({id});
+    if(!admin){
+      return null;
+    }
+    Object.assign(admin,updateAdminDto);
+    await this.admRepository.save(admin);
+    return admin;
   }
 
-  removeAdmSv(id: number) {
-    return `This action removes a #${id} admin`;
+  async removeAdmSv(id: string) {
+    const admin=await this.admRepository.findOneBy({id});
+    if(!admin){
+      return null;
+    }
+    await this.admRepository.remove(admin);
+    return admin;
   }
 }

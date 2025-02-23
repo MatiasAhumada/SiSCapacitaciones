@@ -45,15 +45,28 @@ export class AlumnoService {
     return this.alumnoRepository.find();
   }
 
-  findOne(id: string) {
-    return this.alumnoRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<Alumno | null> {
+    return this.alumnoRepository.findOne({
+      where: { id },
+      relations: ['sucursal', 'comisiones'],
+      select: {
+        sucursal: {
+          id: true,
+          name: true,
+        },
+        comisiones: {
+          id: true,
+          name: true,
+        },
+      },
+    });
   }
 
-  update(id: number, updateAlumnoDto: UpdateAlumnoDto) {
+  update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
     return `This action updates a #${id} alumno`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} alumno`;
   }
 }

@@ -3,6 +3,7 @@ import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
 import {
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -20,10 +21,9 @@ export class Curso {
   price: number;
   @Column()
   area: string;
-  @ManyToOne(() => Profesor, (profesor) => profesor.cursos, {
-    onDelete: 'SET NULL',
-  })
+  @ManyToMany(() => Profesor, (profesor) => profesor.cursos,{onDelete:'CASCADE'})
   profesores: Profesor[];
+
   @OneToMany(() => Comision, (comision) => comision.curso)
   comisiones: Comision[];
 }

@@ -1,7 +1,7 @@
 import { Comision } from "src/Modules/comision/entities/comision.entity";
 import { Curso } from "src/Modules/curso/entities/curso.entity";
 import { Sucursal } from "src/Modules/sucursal/entities/sucursal.entity";
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import {v4 as uuid} from "uuid"
 @Entity({ name: "profesores" })
 
@@ -14,7 +14,8 @@ export class Profesor {
     apellido: string;
     @Column()
     dni:number
-    @OneToMany(()=>Curso,curso=>curso.profesores)
+    @ManyToMany(()=>Curso,curso=>curso.profesores)
+    @JoinTable()
     cursos:Curso[]
     @OneToMany(()=>Comision,comision=>comision.profesor)
     comisiones:Comision[]

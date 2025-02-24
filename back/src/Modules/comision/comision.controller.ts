@@ -19,16 +19,16 @@ export class ComisionController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.comisionService.findOne(+id);
+    return this.comisionService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateComisionDto: UpdateComisionDto) {
-    return this.comisionService.update(+id, updateComisionDto);
+    return this.comisionService.update(id, updateComisionDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.comisionService.remove(+id);
+    return this.comisionService.remove(id);
   }
 }

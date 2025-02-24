@@ -10,7 +10,15 @@ import { v4 as uuid } from 'uuid';
 export class Inscripcion {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
-  
+
+  @Column()
+  fechaRegistro: Date;
+
+  @Column()
+  formaPago: string;
+
+  @Column()
+  cuotaIngreso: number;
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.inscripciones)
   vendedor: Vendedor;
 
@@ -20,15 +28,6 @@ export class Inscripcion {
   @ManyToOne(() => Comision, (comision) => comision.inscripciones)
   comision: Comision;
 
-  @Column()
-  fechaRegistro: Date;
-
-  @ManyToOne(()=>Sucursal,sucursal=>sucursal.inscripciones)
+  @ManyToOne(() => Sucursal, (sucursal) => sucursal.inscripciones)
   sucursal: Sucursal;
-
-  @Column()
-  formaPago: string;
-
-  @Column()
-  cuotaIngreso: number;
 }

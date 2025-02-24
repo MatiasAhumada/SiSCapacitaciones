@@ -21,7 +21,7 @@ export class Comision {
   id: string = uuid();
   
   @Column()
-  fecInit: Date;
+  fecInit: string;
   @Column()
   name: string;
 

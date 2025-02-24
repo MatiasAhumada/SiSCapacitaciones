@@ -41,9 +41,13 @@ export class CursoService {
   async findOne(id: string) {
     return this.cursoRepository.findOne({
       where: { id },
-      relations: ['profesores'],
+      relations: ['profesores',"comisiones"],
       select: {
         profesores: {
+          id: true,
+          name: true,
+        },
+        comisiones: {
           id: true,
           name: true,
         },

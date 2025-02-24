@@ -55,6 +55,10 @@ export class SucursalService {
         },
         inscripciones: {
           id: true,
+          vendedor: {
+            id: true,
+            name: true, 
+          }
         },
         servicios: {
           id: true,

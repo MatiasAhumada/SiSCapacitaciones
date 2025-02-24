@@ -19,16 +19,16 @@ export class InscripcionController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.inscripcionService.findOne(+id);
+    return this.inscripcionService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateInscripcionDto: UpdateInscripcionDto) {
-    return this.inscripcionService.update(+id, updateInscripcionDto);
+    return this.inscripcionService.update(id, updateInscripcionDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.inscripcionService.remove(+id);
+    return this.inscripcionService.remove(id);
   }
 }

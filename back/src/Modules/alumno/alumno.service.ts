@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -44,7 +44,22 @@ export class AlumnoService {
   findAll() {
     return this.alumnoRepository.find();
   }
+  async actualizarImgUrl(id: string, update: UpdateAlumnoDto): Promise<Alumno | null> {
+    const alumno = await this.alumnoRepository.findOne({ where: { id } });
 
+    if (!alumno) {
+      throw new NotFoundException(`Alumno con ID ${id} no encontrado`);
+    }
+
+    alumno.imgUrl = update.imgUrl;
+    const imgUpdt = await this.alumnoRepository.save(alumno);
+
+    if (!imgUpdt) {
+      throw new Error('Error al actualizar la imagen');
+    }
+
+    return await this.findOne(imgUpdt.id);
+  }
   async findOne(id: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
       where: { id },

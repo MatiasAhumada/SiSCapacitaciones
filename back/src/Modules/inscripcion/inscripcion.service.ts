@@ -1,26 +1,103 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { UpdateInscripcionDto } from './dto/update-inscripcion.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Vendedor } from '../vendedor/entities/vendedor.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
+import { Comision } from '../comision/entities/comision.entity';
+import { Sucursal } from '../sucursal/entities/sucursal.entity';
+import { In, Repository } from 'typeorm';
+import { Inscripcion } from './entities/inscripcion.entity';
 
 @Injectable()
 export class InscripcionService {
-  create(createInscripcionDto: CreateInscripcionDto) {
-    return 'This action adds a new inscripcion';
+  constructor(
+    @InjectRepository(Vendedor)
+    private readonly vendedorRepository: Repository<Vendedor>,
+    @InjectRepository(Alumno)
+    private readonly alumnoRepository: Repository<Alumno>,
+    @InjectRepository(Comision)
+    private readonly comisionRepository: Repository<Comision>,
+    @InjectRepository(Sucursal)
+    private readonly sucursalRepository: Repository<Sucursal>,
+    @InjectRepository(Inscripcion)
+    private readonly inscripcionRepository: Repository<Inscripcion>,
+  ) {}
+  async create(createInscripcionDto: CreateInscripcionDto) {
+    const {
+      vendedorId,
+      alumnoId,
+      comisionId,
+      sucursalId,
+      fechaRegistro,
+      formaPago,
+      cuotaIngreso,
+    } = createInscripcionDto;
+
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: vendedorId },
+    });
+    const alumno = await this.alumnoRepository.findOne({
+      where: { id: alumnoId },
+    });
+    const comision = await this.comisionRepository.findOne({
+      where: { id: comisionId },
+    });
+    const sucursal = await this.sucursalRepository.findOne({
+      where: { id: sucursalId },
+    });
+
+    if (!vendedor || !alumno || !comision || !sucursal) {
+      throw new NotFoundException('Uno o más IDs proporcionados no existen');
+    }
+
+    const inscripcion = this.inscripcionRepository.create({
+      fechaRegistro,
+      formaPago,
+      cuotaIngreso,
+      vendedor,
+      alumno,
+      comision,
+      sucursal,
+    });
+    const insc = await this.inscripcionRepository.save(inscripcion);
+    return await this.findOne(insc.id);
   }
 
-  findAll() {
-    return `This action returns all inscripcion`;
+  async findAll() {
+    return this.inscripcionRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inscripcion`;
+  async findOne(id: string) {
+    return this.inscripcionRepository.findOne({
+      where: { id },
+      relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
+      select: {
+        vendedor: {
+          id: true,
+          name: true,
+        },
+        alumno: {
+          id: true,
+          name: true,
+        },
+        comision: {
+          id: true,
+          name: true,
+        },
+        sucursal: {
+          id: true,
+          name: true,
+        },
+      },
+    });
   }
 
-  update(id: number, updateInscripcionDto: UpdateInscripcionDto) {
+  async update(id: string, updateInscripcionDto: UpdateInscripcionDto) {
     return `This action updates a #${id} inscripcion`;
   }
 
-  remove(id: number) {
+  async remove(id: string) {
     return `This action removes a #${id} inscripcion`;
   }
 }

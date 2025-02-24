@@ -39,6 +39,8 @@ export class Alumno {
   age: number;
   @Column()
   gender: string;
+  @Column({ nullable: true, default: 'https://example.com/default-image.jpg' })
+  imgUrl: string;
   @ManyToMany(() => Comision, (comision) => comision.alumnos)
   comisiones: Comision[];
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno)

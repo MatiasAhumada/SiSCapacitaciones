@@ -42,13 +42,27 @@ export class InscripcionService {
     });
     const comision = await this.comisionRepository.findOne({
       where: { id: comisionId },
+      relations: ['alumnos'], 
     });
+    
     const sucursal = await this.sucursalRepository.findOne({
       where: { id: sucursalId },
     });
 
     if (!vendedor || !alumno || !comision || !sucursal) {
       throw new NotFoundException('Uno o más IDs proporcionados no existen');
+    }
+    if (!comision.alumnos) {
+      comision.alumnos = [];
+    }
+    
+    if (
+      !comision.alumnos.some(
+        (existingAlumno) => existingAlumno.id === alumno.id,
+      )
+    ) {
+      comision.alumnos.push(alumno);
+      await this.comisionRepository.save(comision); // Guarda los cambios en la comisión
     }
 
     const inscripcion = this.inscripcionRepository.create({
@@ -98,6 +112,10 @@ export class InscripcionService {
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} inscripcion`;
+    const deleted=await this.inscripcionRepository.delete(id);
+    if(deleted.affected===0){
+      throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
+    }
+    return `Inscripción con ID ${id} eliminada`;
   }
 }

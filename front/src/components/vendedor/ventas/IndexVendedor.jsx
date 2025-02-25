@@ -3,7 +3,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import simplificado from "../../assets/simplificado_a_color.png";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
-const Inscripcion = () => {
+const IndexVendedor = () => {
   const { id } = useParams();
 
   const navigate = useNavigate();
@@ -45,4 +45,4 @@ const Inscripcion = () => {
   );
 };
 
-export default Inscripcion;
+export default IndexVendedor;

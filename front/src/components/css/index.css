@@ -15,3 +15,14 @@
 .btnAz:hover {
   background-color: rgba(5, 40, 150, 1); /* Equivalente a #0020FF */
 }
+
+.bgColor {
+  background-color: rgba(0, 32, 255, 1); /* Equivalente a #052896 */
+  color: white;
+}
+.textColor {
+  color: rgba(0, 32, 255, 1); /* Equivalente a #052896 */
+}
+.borderColor {
+  border-color: rgba(0, 32, 255, 1); /* Equivalente a #052896 */
+}

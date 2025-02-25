@@ -6,12 +6,12 @@ import AggVend from "./components/vendedor/AggVend";
 import DashVendedor from "./components/vendedor/DashVendedor";
 import InfoVendedor from "./components/vendedor/InfoVendedor";
 import InfoIndexVend from "./components/vendedor/ventas/InfoIndexVend";
-import Inscripcion from "./components/vendedor/ventas/IndexVendedor";
+import IndexVendedor from "./components/vendedor/ventas/IndexVendedor";
 import Error404 from "./components/Views/Error404";
 import Home from "./components/Views/Home";
 import Login from "./components/Views/Login";
-
 import { Route, BrowserRouter, Routes } from "react-router-dom";
+import Inscripcion from "./components/vendedor/ventas/Inscripcion";
 function App() {
   return (
     <BrowserRouter>
@@ -28,8 +28,9 @@ function App() {
             <Route path="crear" element={<CrearProfes></CrearProfes>}></Route>
           </Route>
         </Route>
-        <Route path="/inicioVendedor" element={<Inscripcion></Inscripcion>}>
+        <Route path="/inicioVendedor" element={<IndexVendedor></IndexVendedor>}>
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
+          <Route path="inscribir" element={<Inscripcion></Inscripcion>}></Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>

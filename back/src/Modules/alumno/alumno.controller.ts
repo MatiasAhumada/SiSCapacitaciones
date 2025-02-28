@@ -30,6 +30,10 @@ export class AlumnoController {
   findOne(@Param('id') id: string) {
     return this.alumnoService.findOne(id);
   }
+  @Post('login')
+  loginAlumno(@Body() body: { dni: number; password: string }) {
+    return this.alumnoService.loginAlumno(body.dni, body.password);
+  }
 
   // @Put(':id')
   // updateImgUrl(@Param('id') id: string, @Body() updateAlumnoDto: UpdateAlumnoDto) {

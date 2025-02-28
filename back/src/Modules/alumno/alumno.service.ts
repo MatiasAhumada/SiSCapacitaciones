@@ -44,7 +44,10 @@ export class AlumnoService {
   findAll() {
     return this.alumnoRepository.find();
   }
-  async actualizarImgUrl(id: string, update: UpdateAlumnoDto): Promise<Alumno | null> {
+  async actualizarImgUrl(
+    id: string,
+    update: UpdateAlumnoDto,
+  ): Promise<Alumno | null> {
     const alumno = await this.alumnoRepository.findOne({ where: { id } });
 
     if (!alumno) {
@@ -76,7 +79,15 @@ export class AlumnoService {
       },
     });
   }
-
+  async loginAlumno(dni: number, email: string) {
+    const alumno = await this.alumnoRepository.findOne({
+      where: { dni, email },
+    });
+    if (!alumno) {
+      throw new NotFoundException('Alumno no encontrado');
+    }
+    return { id: alumno.id };
+  }
   update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
     return `This action updates a #${id} alumno`;
   }

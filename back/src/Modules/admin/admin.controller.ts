@@ -16,6 +16,11 @@ import { UpdateAdminDto } from './dto/update-admin.dto';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Post('login')
+  login(@Body() body: { name: string; password: string }) {
+    console.log(body)
+    return this.adminService.login(body.name, body.password);
+  }
   @Post()
   createAdmin(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.createAdmSv(createAdminDto);
@@ -39,9 +44,5 @@ export class AdminController {
   @Delete(':id')
   removeAdmin(@Param('id') id: string) {
     return this.adminService.removeAdmSv(id);
-  }
-  @Post("login")
-  login(@Body() body:{name:string,password:string}){
-    return this.adminService.login(body.name,body.password);
   }
 }

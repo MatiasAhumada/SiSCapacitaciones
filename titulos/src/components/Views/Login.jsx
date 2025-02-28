@@ -4,7 +4,7 @@ import { login } from "../queries/queries";
 import { useState } from "react";
 import Swal from "sweetalert2";
 const Login = () => {
-  const [formData, setFormData] = useState({ name: "", password: "" });
+  const [formData, setFormData] = useState({ dni: 0, email: "" });
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -13,9 +13,10 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(formData);
     await login(formData).then((data) => {
-      if (data.isAdmin) {
+      if (data) {
+        localStorage.setItem("user", data.id);
         Swal.fire({
           icon: "success",
           title: "Inicio de sesión exitoso",
@@ -45,8 +46,8 @@ const Login = () => {
             </label>
             <input
               type="string"
-              id="name"
-              name="name"
+              id="email"
+              name="email"
               className="w-full p-3 border border-gray-300 rounded-md mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ingresa tu correo"
               onChange={handleChange}
@@ -58,9 +59,9 @@ const Login = () => {
               D.N.I
             </label>
             <input
-              type="password"
-              id="password"
-              name="password"
+              type="number"
+              id="dni"
+              name="dni"
               className="w-full p-3 border border-gray-300 rounded-md mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ingresa tu contraseña"
               onChange={handleChange}

@@ -31,8 +31,8 @@ export class AlumnoController {
     return this.alumnoService.findOne(id);
   }
   @Post('login')
-  loginAlumno(@Body() body: { dni: number; password: string }) {
-    return this.alumnoService.loginAlumno(body.dni, body.password);
+  loginAlumno(@Body() body: { dni: number; email: string }) {
+    return this.alumnoService.loginAlumno(body.dni, body.email);
   }
 
   // @Put(':id')

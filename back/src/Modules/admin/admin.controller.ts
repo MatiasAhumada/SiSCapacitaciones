@@ -40,4 +40,8 @@ export class AdminController {
   removeAdmin(@Param('id') id: string) {
     return this.adminService.removeAdmSv(id);
   }
+  @Post("login")
+  login(@Body() body:{name:string,password:string}){
+    return this.adminService.login(body.name,body.password);
+  }
 }

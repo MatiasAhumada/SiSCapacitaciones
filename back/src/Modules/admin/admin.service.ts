@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -43,5 +43,15 @@ export class AdminService {
     }
     await this.admRepository.remove(admin);
     return admin;
+  }
+  async login(name:string,password:string){
+    const admin=await this.admRepository.findOne({where:{name}});
+    if(!admin){
+      throw new UnauthorizedException('Usuario no encontrado')
+    }
+    if(admin.password!==password){
+      throw new UnauthorizedException('Credenciales inválidas')
+    }
+    return { id: admin.id, isAdmin: admin.isAdmin };
   }
 }

@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import Alumno from "./Alumno";
-import Curso from "./Curso";
+
 import Comision from "./Comision";
 import Confirmacion from "./Confirmacion";
+import Pago from "./Pago";
 
-const stepsItems = ["Alumno", "Curso", "Comision", "Confirmacion"];
+const stepsItems = ["Alumno", "Comision", "Pago", "Confirmacion"];
 const Manejador = () => {
-  
+  const idVend = localStorage.getItem("token");
+  const fecha = new Date().toISOString().split("T")[0];
   const [formData, setFormData] = useState({
-    fechaRegistro: "",
+    fechaRegistro: fecha,
     formaPago: "",
     cuotaIngreso: 0,
-    vendedorId: "",
+    vendedorId: idVend,
     alumnoId: "",
     comisionId: "",
     sucursalId: "",
@@ -28,7 +30,6 @@ const Manejador = () => {
   };
   return (
     <div className="max-w-2xl mx-auto px-4 md:px-0">
-      {/* 🔵 BANNER DE PASOS */}
       <ul aria-label="Steps" className="flex items-center  font-medium">
         {stepsItems.map((item, idx) => (
           <li key={idx} aria-current={currentStep === idx + 1 ? "step" : false} className="flex-1 flex gap-x-2 items-center">
@@ -62,12 +63,11 @@ const Manejador = () => {
         ))}
       </ul>
 
-      {/* 🔄 RENDERIZAR EL PASO ACTUAL */}
       <div className="mt-6  flex justify-center w-100">
-        {currentStep === 1 && <Alumno nextStep={nextStep}  formData={formData} setFormData={setFormData}/>}
-        {currentStep === 2 && <Curso nextStep={nextStep} prevStep={prevStep} formData={formData} setFormData={setFormData} />}
-        {currentStep === 3 && <Comision nextStep={nextStep} prevStep={prevStep}  formData={formData} setFormData={setFormData}/>}
-        {currentStep === 4 && <Confirmacion prevStep={prevStep} />}
+        {currentStep === 1 && <Alumno nextStep={nextStep} formData={formData} setFormData={setFormData} />}
+        {currentStep === 2 && <Comision nextStep={nextStep} prevStep={prevStep} formData={formData} setFormData={setFormData} />}
+        {currentStep === 3 && <Pago nextStep={nextStep} prevStep={prevStep} formData={formData} setFormData={setFormData} />}
+        {currentStep === 4 && <Confirmacion prevStep={prevStep} formData={formData} />}
       </div>
     </div>
   );

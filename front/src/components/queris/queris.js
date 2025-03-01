@@ -29,7 +29,7 @@ export const getVendID= async(id)=>{
   }
 }
 export const postAlu= async(alumno)=>{
-console.log(alumno)
+
   try {
     const response = await axios.post(`${URL}/alumno`,alumno);
     return response.data;
@@ -41,6 +41,51 @@ export const getSucursales= async()=>{
 
   try {
     const response = await axios.get(`${URL}/suc`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+}
+export const getSucursalId= async(id)=>{
+
+  try {
+    const response = await axios.get(`${URL}/suc/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+}
+export const getCursos= async()=>{
+
+  try {
+    const response = await axios.get(`${URL}/curso`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+}
+export const getComisiones= async()=>{
+
+  try {
+    const response = await axios.get(`${URL}/comision`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+}
+export const getComisionId= async(id)=>{
+
+  try {
+    const response = await axios.get(`${URL}/comision/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+}
+export const postInscripcion= async(datos)=>{
+
+  try {
+    const response = await axios.post(`${URL}/inscripcion`,datos);
     return response.data;
   } catch (error) {
     console.error("Error al obtener vendedor", error.response?.data);

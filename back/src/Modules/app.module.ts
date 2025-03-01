@@ -15,6 +15,7 @@ import { InscripcionModule } from './inscripcion/inscripcion.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeOrmConfig from '../config/configOrm';
 import { LoggerMiddleware } from 'src/Middleware/Peticiones.middleware';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,6 +37,7 @@ import { LoggerMiddleware } from 'src/Middleware/Peticiones.middleware';
     SucursalModule,
     ComisionModule,
     InscripcionModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

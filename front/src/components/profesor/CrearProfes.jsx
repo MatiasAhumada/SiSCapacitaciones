@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
-import { fetchSucursal } from "../queris/queris";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 const CrearProfes = () => {

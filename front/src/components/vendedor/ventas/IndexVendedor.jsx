@@ -10,6 +10,7 @@ const IndexVendedor = () => {
 
   const handleClick = (e) => {
     e.preventDefault();
+    localStorage.removeItem("token");
     navigate("/");
   };
   return (

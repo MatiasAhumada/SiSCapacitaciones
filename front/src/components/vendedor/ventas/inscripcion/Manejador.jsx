@@ -6,20 +6,16 @@ import Confirmacion from "./Confirmacion";
 
 const stepsItems = ["Alumno", "Curso", "Comision", "Confirmacion"];
 const Manejador = () => {
-  // const stepsItems = ["Alumno", "Comision", "Identity", "Passport"];
-  // const [currentStep, setCurrentStep] = useState(1);
-
-  // const nextStep = () => {
-  //     if (currentStep < stepsItems.length) {
-  //         setCurrentStep(currentStep + 1);
-  //     }
-  // };
-
-  // const prevStep = () => {
-  //     if (currentStep > 1) {
-  //         setCurrentStep(currentStep - 1);
-  //     }
-  // };
+  
+  const [formData, setFormData] = useState({
+    fechaRegistro: "",
+    formaPago: "",
+    cuotaIngreso: 0,
+    vendedorId: "",
+    alumnoId: "",
+    comisionId: "",
+    sucursalId: "",
+  });
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -68,9 +64,9 @@ const Manejador = () => {
 
       {/* 🔄 RENDERIZAR EL PASO ACTUAL */}
       <div className="mt-6  flex justify-center w-100">
-        {currentStep === 1 && <Alumno nextStep={nextStep} />}
-        {currentStep === 2 && <Curso nextStep={nextStep} prevStep={prevStep} />}
-        {currentStep === 3 && <Comision nextStep={nextStep} prevStep={prevStep} />}
+        {currentStep === 1 && <Alumno nextStep={nextStep}  formData={formData} setFormData={setFormData}/>}
+        {currentStep === 2 && <Curso nextStep={nextStep} prevStep={prevStep} formData={formData} setFormData={setFormData} />}
+        {currentStep === 3 && <Comision nextStep={nextStep} prevStep={prevStep}  formData={formData} setFormData={setFormData}/>}
         {currentStep === 4 && <Confirmacion prevStep={prevStep} />}
       </div>
     </div>

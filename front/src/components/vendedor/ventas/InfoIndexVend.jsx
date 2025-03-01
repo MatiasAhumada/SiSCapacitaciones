@@ -1,10 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getVendID } from "../../queris/queris";
+import Swal from "sweetalert2";
 
 const InfoIndexVend = () => {
+  const [vendedor, setVendedor] = useState(null);
+  useEffect(() => {
+    const id = localStorage.getItem("token");
+    getVendID(id).then((data) => {
+      if (data) {
+      console.log(data)  
+        Swal.fire({
+          icon: "success",
+          title: "Bienvenido!",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          setVendedor(data);
+        });
+      }
+    });
+  }, []);
   const links = [{ name: "Inscribir" }, { name: "Abono" }, { name: "Caja" }, { name: "Comisiones" }];
   const stats = [
-    { name: "Inscripciones realizadas", value: "12" },
+    { name: "Inscripciones realizadas", value: vendedor?.inscripciones?.length || "0" },
     { name: "Alumnos registrados", value: "300+" },
     { name: "Hours per week", value: "40" },
     { name: "Paid time off", value: "Unlimited" },
@@ -17,14 +36,14 @@ const InfoIndexVend = () => {
     <div className="relative isolate overflow-hidden  py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div>
-          <h2 className="principal text-5xl mb-3  sm:text-7xl">{"Nombre vendedor"}</h2>
-          <p className="mt-8 sm:text-xl/8">Nombre: {"Tadeo"}</p>
-          <p className="mt-8 sm:text-xl/8">Sucursal: {"Centro"}</p>
+          <h2 className="principal text-5xl mb-3  sm:text-7xl">{vendedor ? vendedor.name : "Cargando..."}</h2>
+
+          <p className="mt-8 sm:text-xl/8">  {vendedor && vendedor.sucursales.length > 0 ? vendedor.sucursales[0].name : "Sin sucursales"}</p>
         </div>
         <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
           <div className="grid grid-cols-1 mb-5 gap-x-8 gap-y-6 text-base/7 font-semibold sm:grid-cols-4 md:flex lg:gap-x-40 ">
             {links.map((link) => (
-              <button key={link.name} onClick={()=>click(link.name)} className="btnAz">
+              <button key={link.name} onClick={() => click(link.name)} className="btnAz">
                 {link.name} <span aria-hidden="true">&rarr;</span>
               </button>
             ))}

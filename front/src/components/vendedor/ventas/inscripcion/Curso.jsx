@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-const Curso = ({ nextStep, prevStep }) => {
+const Curso = ({ nextStep, prevStep,formData,setFormData }) => {
+    useEffect(() => {
+        console.log(formData);
+    }, []);
     return (
         <div className="p-4 border rounded-lg shadow-md">
         <h2 className="text-lg font-semibold">Step 2: curso</h2>

@@ -18,7 +18,7 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 @Entity({
-  name: 'sucursale',
+  name: 'sucursales',
 })
 export class Sucursal {
   @PrimaryGeneratedColumn('uuid')
@@ -42,6 +42,6 @@ export class Sucursal {
   admin: Admins;
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.sucursal)
   inscripciones: Inscripcion[];
-  @OneToMany(() => Servicio, (servicio) => servicio.sucursal)
+  @OneToMany(() => Servicio, (servicios) => servicios.sucursal)
   servicios: Servicio[];
 }

@@ -15,6 +15,6 @@ export class Servicio {
   monto: number;
   @Column()
   estado: string;
-  @ManyToOne(() => Sucursal, (sucursal) => sucursal.servicios)
+  @ManyToOne(() => Sucursal, (sucursal) => sucursal.servicios, { onDelete: 'CASCADE' })
   sucursal: Sucursal;
 }

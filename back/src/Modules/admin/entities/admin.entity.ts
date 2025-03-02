@@ -2,7 +2,7 @@ import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 @Entity({
-  name: 'admin',
+  name: 'admins',
 })
 export class Admins {
   @PrimaryGeneratedColumn('uuid')

@@ -79,15 +79,7 @@ export class AlumnoService {
       },
     });
   }
-  async loginAlumno(dni: number, email: string) {
-    const alumno = await this.alumnoRepository.findOne({
-      where: { dni, email },
-    });
-    if (!alumno) {
-      throw new NotFoundException('Alumno no encontrado');
-    }
-    return { id: alumno.id };
-  }
+
   update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
     return `This action updates a #${id} alumno`;
   }

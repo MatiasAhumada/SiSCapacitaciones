@@ -10,7 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-@Entity('vendedor')
+@Entity('vendedores')
 export class Vendedor {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();

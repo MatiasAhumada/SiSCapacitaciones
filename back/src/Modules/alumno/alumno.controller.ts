@@ -30,15 +30,14 @@ export class AlumnoController {
   findOne(@Param('id') id: string) {
     return this.alumnoService.findOne(id);
   }
-  @Post('login')
-  loginAlumno(@Body() body: { dni: number; email: string }) {
-    return this.alumnoService.loginAlumno(body.dni, body.email);
-  }
 
-  // @Put(':id')
-  // updateImgUrl(@Param('id') id: string, @Body() updateAlumnoDto: UpdateAlumnoDto) {
-  //   return this.alumnoService.update(id, updateAlumnoDto);
-  // }
+  @Put(':id')
+  updateImgUrl(
+    @Param('id') id: string,
+    @Body() updateAlumnoDto: UpdateAlumnoDto,
+  ) {
+    return this.alumnoService.update(id, updateAlumnoDto);
+  }
   @Put(':id')
   update(@Param('id') id: string, @Body() update: UpdateAlumnoDto) {
     return this.alumnoService.actualizarImgUrl(id, update);

@@ -1,5 +1,5 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { config } from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import { registerAs } from '@nestjs/config';
 import { Abono } from 'src/Modules/abono/entities/abono.entity';
 import { Admins } from 'src/Modules/admin/entities/admin.entity';
@@ -12,7 +12,7 @@ import { Servicio } from 'src/Modules/servicio/entities/servicio.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 
-config({ path: '.env' });
+dotenvConfig({ path: '.env' });
 
 const db_config = {
   type: 'postgres',
@@ -22,10 +22,11 @@ const db_config = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   autoLoadEntities: true,
-  synchronize: true,
-  dropSchema:false,
+  synchronize: false,
+  dropSchema: false,
   logging: false,
-  entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
+  entities: ['dist/**/*.entity.{ts,js}'],
+  // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
   migrations: ['dist/migrations/*.{js,ts}'],
 };
 

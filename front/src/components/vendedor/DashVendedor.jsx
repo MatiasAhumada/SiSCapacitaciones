@@ -1,52 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { getSucursalId, getVendedores, getVendID } from "../queris/queris";
 
 const DashVendedor = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  
+  const [tableItems, setTableItems] = useState([]);
+
   const location = useLocation();
 
   const isSubRoute = location.pathname.includes("crear") || location.pathname.includes("info");
-  
+
   const click = (e) => {
-    
-     navigate(`/adm/${id}/vendedores/info`,{
-     state:{id:e.target.value}
-   });
-}
-  const tableItems = [
-    {
-      name: "Liam James",
-      email: "liamjames@example.com",
-      position: "Software engineer",
-      salary: "$100K",
-    },
-    {
-      name: "Olivia Emma",
-      email: "oliviaemma@example.com",
-      position: "Product designer",
-      salary: "$90K",
-    },
-    {
-      name: "William Benjamin",
-      email: "william.benjamin@example.com",
-      position: "Front-end developer",
-      salary: "$80K",
-    },
-    {
-      name: "Henry Theodore",
-      email: "henrytheodore@example.com",
-      position: "Laravel engineer",
-      salary: "$120K",
-    },
-    {
-      name: "Amelia Elijah",
-      email: "amelia.elijah@example.com",
-      position: "Open source manager",
-      salary: "$75K",
-    },
-  ];
+    navigate(`/adm/${id}/vendedores/info`, {
+      state: { id: e.target.value },
+    });
+  };
+  useEffect(() => {
+    const peticion = async () => {
+      await getSucursalId(id).then((data) => {
+        setTableItems(data.vendedores);
+      });
+    };
+
+    peticion();
+  }, []);
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -78,14 +56,14 @@ const DashVendedor = () => {
                 </tr>
               </thead>
               <tbody className="text-gray-600 divide-y">
-                {tableItems.map((item, idx) => (
-                  <tr key={idx}>
+                {tableItems.map((item) => (
+                  <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.position}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.salary}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.tel}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.inscripciones?.length || 0}</td>
                     <td className="text-right px-6 whitespace-nowrap">
-                      <button onClick={click} value={idx} className="py-2 px-3 btnAz principal rounded-lg">
+                      <button onClick={click} value={item.id} className="py-2 px-3 btnAz principal rounded-lg">
                         Ver Más
                       </button>
                     </td>

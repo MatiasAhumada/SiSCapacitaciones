@@ -17,7 +17,24 @@ export class SucursalService {
   ) {}
 
   async getSucursales() {
-    return await this.sucRepository.find();
+    const sucursales = await this.sucRepository.find({
+      select: {
+        id: true,
+        name: true,
+      },
+      relations: ['alumnos', 'profesores', 'comisiones', 'vendedores'],
+    });
+
+    const result = sucursales.map((sucursal) => ({
+      id: sucursal.id,
+      name: sucursal.name,
+      alumnos: sucursal.alumnos.length,
+      profesores: sucursal.profesores.length,
+      comisiones: sucursal.comisiones.length,
+      vendedores: sucursal.vendedores.length,
+    }));
+
+    return result;
   }
 
   async getByIdSucursal(id: string): Promise<Sucursal | null> {
@@ -28,6 +45,7 @@ export class SucursalService {
         'profesores',
         'comisiones',
         'vendedores',
+        'vendedores.inscripciones',
         'admin',
         'inscripciones',
         'servicios',
@@ -48,6 +66,11 @@ export class SucursalService {
         vendedores: {
           id: true,
           name: true,
+          email: true,
+          tel: true,
+          inscripciones: {
+            id: true
+          },
         },
         admin: {
           id: true,
@@ -57,8 +80,8 @@ export class SucursalService {
           id: true,
           vendedor: {
             id: true,
-            name: true, 
-          }
+            name: true,
+          },
         },
         servicios: {
           id: true,

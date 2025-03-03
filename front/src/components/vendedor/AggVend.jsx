@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import { getSucursalId, postSucursal, postVend } from "../queris/queris";
 const AggVend = () => {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    telefono: "",
-    sucursal: "",
+    tel: "",
+    sucursal: [id],
+    isAdmin: false,
   });
-  const { id } = useParams();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -20,28 +22,33 @@ const AggVend = () => {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    //aqui ira la peticion al back asi crea un nuevo empleado
-    console.log(formData);
-    Swal.fire({
-      title: "Vendedor Registrado",
-      icon: "success",
-      showConfirmButton: false,
-      timer: 1500,
+    const updatedFormData = {
+      ...formData,
+      sucursal: [id], // Usa la constante del id
+    };
+    postVend(updatedFormData).then((data) => {
+      try {
+        console.log(data)
+        Swal.fire({
+          title: "Vendedor Registrado",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        console.log(error);
+      }
     });
   };
-  useEffect(() => {
-    //aqui se hara la peticion al back para traer las sucursales
 
-    // fetchSucursal(id).then((data) => {
-    //   setFormData((prev) => ({
-    //     ...prev,
-    //     sucursal: data.sucursal, // Asumiendo que la respuesta tenga una propiedad "sucursal"
-    //   }));
-    // });
-    setFormData((prev) => ({
-      ...prev,
-      sucursal: "sucursal del back", // Asumiendo que la respuesta tenga una propiedad "sucursal"
-    }));
+  useEffect(() => {
+    getSucursalId(id).then((data) => {
+      console.log(data.name);
+      setFormData((prev) => ({
+        ...prev,
+        sucursal: data.name,
+      }));
+    });
   }, []);
 
   return (
@@ -96,9 +103,9 @@ const AggVend = () => {
           <div className="relative text-gray-400">
             <input
               type="number"
-              name="telefono"
-              id="telefono"
-              value={formData.telefono}
+              name="tel"
+              id="tel"
+              value={formData.tel}
               onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               placeholder="3813528650"

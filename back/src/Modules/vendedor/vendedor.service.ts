@@ -55,6 +55,10 @@ export class VendedorService {
       select: {
         inscripciones: {
           id: true,
+          alumno: {
+            id: true,
+            name: true,
+          },
         },
         sucursales: {
           id: true,
@@ -79,6 +83,9 @@ export class VendedorService {
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} vendedor`;
+    const deleted = await this.vendedorRepository.delete(id);
+    if (deleted.affected === 0) {
+      throw new Error(`Vendedor con ID ${id} no encontrado`);
+    }
   }
 }

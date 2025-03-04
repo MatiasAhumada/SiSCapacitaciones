@@ -43,6 +43,7 @@ export class SucursalService {
       relations: [
         'alumnos',
         'profesores',
+        'profesores.cursos',
         'comisiones',
         'vendedores',
         'vendedores.inscripciones',
@@ -58,6 +59,8 @@ export class SucursalService {
         profesores: {
           id: true,
           name: true,
+          apellido:true,
+
         },
         comisiones: {
           id: true,

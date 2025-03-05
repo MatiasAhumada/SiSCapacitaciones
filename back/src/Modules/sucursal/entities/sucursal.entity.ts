@@ -1,7 +1,6 @@
 import { Admins } from 'src/Modules/admin/entities/admin.entity';
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
-import { Curso } from 'src/Modules/curso/entities/curso.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
 import { Servicio } from 'src/Modules/servicio/entities/servicio.entity';

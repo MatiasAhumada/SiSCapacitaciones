@@ -15,11 +15,7 @@ const Home = () => {
       console.log(data);
     });
   }, []);
-  // const sedes = [
-  //   { id: 1, title: "Sede Santiago", profesores: 5, vendedores: 3, alumnos: 200 },
-  //   { id: 2, title: "Sede Centro", profesores: 5, vendedores: 3, alumnos: 200 },
-  //   { id: 3, title: "Sede Tafi Viejo", profesores: 5, vendedores: 3, alumnos: 200 },
-  // ];
+ 
 
   return (
     <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>

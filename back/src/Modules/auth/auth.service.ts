@@ -21,6 +21,8 @@ export class AuthService {
     const admin = await this.adminsRepository.findOne({ where: { name } });
     if (admin && password === admin.password) {
       return { id: admin.id, isAdmin: admin.isAdmin };
+    }else{
+      console.log(admin)
     }
 
     const vendedor = await this.vendedorRepository.findOne({

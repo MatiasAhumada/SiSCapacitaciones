@@ -11,25 +11,11 @@ export class CursoService {
   constructor(
     @InjectRepository(Curso)
     private readonly cursoRepository: Repository<Curso>,
-    @InjectRepository(Profesor)
-    private readonly profesorRepository: Repository<Profesor>,
+
   ) {}
 
   async create(createCursoDto: CreateCursoDto): Promise<Curso> {
-    const { profesoresIds, ...cursoData } = createCursoDto;
-
-    const profesores = await this.profesorRepository.findBy({
-      id: In(profesoresIds),
-    });
-
-    if (profesores.length !== profesoresIds.length) {
-      throw new Error('Uno o más profesores no existen');
-    }
-
-    const curso = this.cursoRepository.create({
-      ...cursoData,
-      profesores,
-    });
+    const curso = this.cursoRepository.create(createCursoDto);
 
     return this.cursoRepository.save(curso);
   }
@@ -41,12 +27,8 @@ export class CursoService {
   async findOne(id: string) {
     return this.cursoRepository.findOne({
       where: { id },
-      relations: ['profesores',"comisiones"],
+      relations: ['comisiones'],
       select: {
-        profesores: {
-          id: true,
-          name: true,
-        },
         comisiones: {
           id: true,
           name: true,

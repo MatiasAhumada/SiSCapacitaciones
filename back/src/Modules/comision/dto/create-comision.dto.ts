@@ -4,8 +4,11 @@ export class CreateComisionDto {
   @IsString()
   name: string;
 
-  @IsDate()
-  fecInit: string;
+  @IsString()
+  day: string;
+  
+  @IsString()
+  hour: string;
 
   @IsUUID()
   cursoId: string;

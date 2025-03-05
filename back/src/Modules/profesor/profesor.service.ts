@@ -12,7 +12,7 @@ export class ProfesorService {
   constructor(
     @InjectRepository(Profesor)
     private readonly profesorRepository: Repository<Profesor>,
-    
+
     @InjectRepository(Sucursal)
     private readonly sucursalRepository: Repository<Sucursal>,
   ) {}
@@ -38,16 +38,13 @@ export class ProfesorService {
   async findOne(id: string) {
     return this.profesorRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'cursos', 'comisiones'],
+      relations: ['sucursal', 'comisiones'],
       select: {
         sucursal: {
           id: true,
           name: true,
         },
-        cursos: {
-          id: true,
-          name: true,
-        },
+
         comisiones: {
           id: true,
           name: true,

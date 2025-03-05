@@ -15,7 +15,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPause(true);
+    console.log(formData)
     await login(formData).then((data) => {
+      console.log(data)
       if (data) {
         localStorage.setItem("token", data.id);
         Swal.fire({

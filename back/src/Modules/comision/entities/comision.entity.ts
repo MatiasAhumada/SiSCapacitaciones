@@ -19,11 +19,16 @@ import { v4 as uuid } from 'uuid';
 export class Comision {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
-  
-  @Column()
-  fecInit: string;
+
+ 
   @Column()
   name: string;
+
+  @Column()
+  day: string;
+
+  @Column()
+  hour: string;
 
   @ManyToOne(() => Curso, (curso) => curso.comisiones, { onDelete: 'SET NULL' })
   curso: Curso;

@@ -22,7 +22,7 @@ export class ComisionService {
   ) {}
 
   async create(createComisionDto: CreateComisionDto): Promise<Comision> {
-    const { sucursalId, cursoId, name, fecInit, profesorId } =
+    const { sucursalId, cursoId, profesorId, name, day,hour } =
       createComisionDto;
 
     const profesor = await this.profesorRepository.findOne({
@@ -47,7 +47,8 @@ export class ComisionService {
 
     const nuevaComision = this.comisionRepository.create({
       name,
-      fecInit,
+      day,
+      hour,
       sucursal,
       profesor,
       curso,

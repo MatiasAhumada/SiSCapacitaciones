@@ -14,11 +14,10 @@ export class Profesor {
     apellido: string;
     @Column()
     dni:number
-    @ManyToMany(()=>Curso,curso=>curso.profesores)
-    @JoinTable()
-    cursos:Curso[]
+   
     @OneToMany(()=>Comision,comision=>comision.profesor)
     comisiones:Comision[]
+    
     @ManyToOne(()=>Sucursal,sucursal=>sucursal.profesores)
     sucursal:Sucursal
 }

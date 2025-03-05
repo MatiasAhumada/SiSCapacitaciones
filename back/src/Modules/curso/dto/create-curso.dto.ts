@@ -13,8 +13,6 @@ export class CreateCursoDto {
     @IsString()
     area: string;
   
-    @IsArray()
-    @IsUUID("4", { each: true })
-    profesoresIds: string[]; 
+    
   }
   

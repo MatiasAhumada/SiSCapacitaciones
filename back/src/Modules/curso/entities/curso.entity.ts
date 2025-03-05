@@ -21,9 +21,10 @@ export class Curso {
   price: number;
   @Column()
   area: string;
-  @ManyToMany(() => Profesor, (profesor) => profesor.cursos,{onDelete:'CASCADE'})
-  profesores: Profesor[];
-
+ 
+  @Column()
+  tipo: string;
+ 
   @OneToMany(() => Comision, (comision) => comision.curso)
   comisiones: Comision[];
 }

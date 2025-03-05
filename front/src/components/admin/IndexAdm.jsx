@@ -25,7 +25,7 @@ const IndexAdm = () => {
           </path>
         </svg>
       ) : (
-        <h1 className="text-center text-2xl font-bold">Información de {sede.name}</h1>
+        <h1 className="text-center text-2xl font-bold principal">Información de {sede.name}</h1>
       )}
       <CardInfo sede={sede}></CardInfo>
       <Metricas sede={sede}></Metricas>

@@ -46,7 +46,7 @@ const DashProfe = () => {
   useEffect(() => {
     const peticion = async () => {
       await getSucursalId(id).then((data) => {
-     
+   
         setTableItems(data.profesores);
       });
     };
@@ -78,7 +78,7 @@ console.log(tableItems)
                 <tr>
                   <th className="py-3 px-6">Nombre</th>
                   <th className="py-3 px-6">Apellido</th>
-                  <th className="py-3 px-6">Cursos</th>
+                  <th className="py-3 px-6">Comisiones</th>
                   {/* <th className="py-3 px-6">Curso</th> */}
                   <th className="py-3 px-6"></th>
                 </tr>
@@ -88,7 +88,7 @@ console.log(tableItems)
                   <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.apellido}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.cursos?.length}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.comisiones?.length}</td>
                     {/* <td className="px-6 py-4 whitespace-nowrap">{item.salary}</td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button

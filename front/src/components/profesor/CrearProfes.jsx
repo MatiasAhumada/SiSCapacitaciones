@@ -2,19 +2,18 @@ import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getCursos, postProfes } from "../queris/queris";
+import { getCursos, getSucursalId, postProfes } from "../queris/queris";
 const CrearProfes = () => {
   const { id } = useParams();
+  const [pause, setPause] = useState(false);
+  const [suc, setSuc] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     apellido: "",
     dni: "",
-    sucursal: id,
-    curso: "",
+    sucursalId: id,
+   
   });
-  const [pause, setPause] = useState(false);
-
-  const [cursos, setCursos] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,28 +22,33 @@ const CrearProfes = () => {
       [name]: value,
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setPause(true);
-    // await postProfes(formData).then(() => {
-    //   try {
-    //     Swal.fire({
-    //       title: "Profesor Registrado",
-    //       icon: "success",
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //     }).then(() => {
-    //       setPause(false);
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // });
-   
+    const updatedFormData = {
+      ...formData,
+      sucursalId: id,
+    };
+console.log(updatedFormData)
+     setPause(true);
+     await postProfes(updatedFormData).then(() => {
+       try {
+         Swal.fire({
+           title: "Profesor Registrado",
+           icon: "success",
+           showConfirmButton: false,
+           timer: 1500,
+         }).then(() => {
+           setPause(false);
+         });
+       } catch (error) {
+         console.log(error);
+       }
+     });
   };
   useEffect(() => {
-    getCursos().then((data) => {
-      setCursos(data);
+    getSucursalId(id).then((data) => {
+      setSuc(data.name);
     });
   }, []);
 
@@ -120,29 +124,13 @@ const CrearProfes = () => {
               name="sucursal"
               id="sucursal"
               disabled
-              value={id}
+              value={suc}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               autoComplete="off"
             />
           </div>
         </div>
-        {/* <div className="pb-6">
-          <label htmlFor="password" className="block mb-2 text-sm  text-[#111827] principal">
-            DNI
-          </label>
-          <div className="relative text-gray-400">
-            <input
-              type="number"
-              name="dni"
-              id="dni"
-              value={formData.dni}
-              onChange={handleChange}
-              placeholder="42499732"
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              autoComplete="new-password"
-            />
-          </div>
-        </div> */}
+       
         {/* <div className="pb-6">
           <label htmlFor="curso" className="block mb-2 text-sm text-[#111827] principal">
             Curso

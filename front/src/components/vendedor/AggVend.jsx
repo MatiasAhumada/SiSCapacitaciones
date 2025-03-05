@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getSucursalId, postSucursal, postVend } from "../queris/queris";
+import { getSucursalId, getVendID, postSucursal, postVend } from "../queris/queris";
 const AggVend = () => {
   const { id } = useParams();
   const [formData, setFormData] = useState({
@@ -10,7 +10,7 @@ const AggVend = () => {
     email: "",
     password: "",
     tel: "",
-    sucursal: [id],
+    sucursal: "",
     isAdmin: false,
   });
   const handleChange = (e) => {
@@ -20,15 +20,16 @@ const AggVend = () => {
       [name]: value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedFormData = {
       ...formData,
-      sucursal: [id], // Usa la constante del id
+      sucursal: [id],
     };
-    postVend(updatedFormData).then((data) => {
+
+    await postVend(updatedFormData).then((data) => {
       try {
-        console.log(data)
+        console.log(data);
         Swal.fire({
           title: "Vendedor Registrado",
           icon: "success",
@@ -43,7 +44,6 @@ const AggVend = () => {
 
   useEffect(() => {
     getSucursalId(id).then((data) => {
-      console.log(data.name);
       setFormData((prev) => ({
         ...prev,
         sucursal: data.name,

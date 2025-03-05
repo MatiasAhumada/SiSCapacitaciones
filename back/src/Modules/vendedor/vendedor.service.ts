@@ -19,11 +19,12 @@ export class VendedorService {
     private readonly inscripcionRepository: Repository<Inscripcion>,
   ) {}
   async create(createVendedorDto: CreateVendedorDto) {
-    const { sucursales, inscripciones, ...vendedorData } = createVendedorDto;
+    const { sucursal, inscripciones, ...vendedorData } = createVendedorDto;
 
     const sucursalesEntities = await this.sucursalRepository.findOne({
-      where: { id: sucursales },
+      where: { id: In(sucursal) },
     });
+   
     if (!sucursalesEntities) {
       throw new Error('Sucursal no encontrada');
     }

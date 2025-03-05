@@ -24,8 +24,12 @@ export class Vendedor {
   password: string;
   @Column()
   isAdmin: boolean;
-  @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.vendedor)
+  @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.vendedor, {
+    onDelete: 'CASCADE',
+  })
   inscripciones: Inscripcion[];
-  @ManyToMany(() => Sucursal, (sucursal) => sucursal.vendedores)
+  @ManyToMany(() => Sucursal, (sucursal) => sucursal.vendedores,{
+    onDelete: 'CASCADE',
+  })
   sucursales: Sucursal[];
 }

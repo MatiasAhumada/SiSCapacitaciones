@@ -22,6 +22,6 @@ export class CreateVendedorDto {
   inscripciones: string[];  
 
   
-  @IsUUID()  // Valida que cada sucursal sea un UUID
-  sucursales: string;  // Cambié esto para que sea un array de IDs
+  @IsUUID()  
+  sucursal: string[];  
 }

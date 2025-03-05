@@ -12,10 +12,8 @@ const Home = () => {
   useEffect(() => {
     getSucursales().then((data) => {
       setSedes(data);
-      console.log(data);
     });
   }, []);
- 
 
   return (
     <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>

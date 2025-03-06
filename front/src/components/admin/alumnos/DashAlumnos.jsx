@@ -1,41 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { deleteProfesId, getSucursalId } from "../queris/queris";
+import { deleteAlumnoId, getSucursalId } from "../../queris/queris";
 
-const DashProfe = () => {
+const DashAlumnos = () => {
   const [tableItems, setTableItems] = useState([]);
+
   const [pause, setPause] = useState({});
+
   const navigate = useNavigate();
 
   const { id } = useParams();
 
   const location = useLocation();
 
-  const isSubRoute = location.pathname.includes("crear") || location.pathname.includes("info");
+  const isSubRoute = location.pathname.includes("crear");
 
   const clickDelete = async (e) => {
     e.preventDefault();
-    const profesorId = e.target.value;
-    
-    setPause((prev) => ({ ...prev, [profesorId]: true }));
-  
-    await deleteProfesId(e.target.value).then(() => {
+    const alumnoId = e.target.value;
+
+    setPause((prev) => ({ ...prev, [alumnoId]: true }));
+
+    await deleteAlumnoId(e.target.value).then(() => {
       try {
         Swal.fire({
-          title: "Profesor Eliminado",
+          title: "Alumno Eliminado",
           icon: "success",
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
           setPause((prev) => {
             const newPause = { ...prev };
-            delete newPause[profesorId]; 
+            delete newPause[alumnoId];
             return newPause;
           });
-  
-          // Eliminar al profesor de la lista
-          setTableItems((prev) => prev.filter((item) => item.id !== profesorId));
+          setTableItems((prev) => prev.filter((item) => item.id !== alumnoId));
         });
       } catch (error) {
         console.log(error);
@@ -46,29 +46,24 @@ const DashProfe = () => {
   useEffect(() => {
     const peticion = async () => {
       await getSucursalId(id).then((data) => {
-   
-        setTableItems(data.profesores);
+        setTableItems(data.alumnos);
       });
     };
     peticion();
   }, []);
 
-  
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
         <>
           <div className="items-start justify-between md:flex">
             <div className="max-w-lg">
-              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Equipo de Profesores</h3>
-              <p className="text-gray-600 mt-2">En esta tabla estaran todos los profesores de esta sucursal</p>
+              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Listado de alumnos.</h3>
+              <p className="text-gray-600 mt-2">En esta tabla estaran todos los alumnos de esta sucursal</p>
             </div>
             <div className="mt-3 md:mt-0">
-              <button
-                onClick={() => navigate(`/adm/${id}/profesores/crear`)}
-                className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
-              >
-                Nuevo Profesor
+              <button onClick={() => navigate(`/adm/${id}/alumnos/crear`)} className="inline-block px-4 py-2 text-white principal btnAz md:text-sm">
+                Nuevo Alumno
               </button>
             </div>
           </div>
@@ -76,10 +71,11 @@ const DashProfe = () => {
             <table className="w-full table-auto text-sm  text-center">
               <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
                 <tr>
-                  <th className="py-3 px-6">Nombre</th>
-                  <th className="py-3 px-6">Apellido</th>
-                  <th className="py-3 px-6">Comisiones</th>
-                  {/* <th className="py-3 px-6">Curso</th> */}
+                  <th className="py-3 px-6">Nombre y Apellido</th>
+                  <th className="py-3 px-6">DNI</th>
+                  <th className="py-3 px-6">Telefono</th>
+                  <th className="py-3 px-6">Comision/s</th>
+
                   <th className="py-3 px-6"></th>
                 </tr>
               </thead>
@@ -87,9 +83,9 @@ const DashProfe = () => {
                 {tableItems.map((item) => (
                   <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.apellido}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.dni}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.tel}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.comisiones?.length}</td>
-                    {/* <td className="px-6 py-4 whitespace-nowrap">{item.salary}</td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         value={item.id}
@@ -125,4 +121,4 @@ const DashProfe = () => {
   );
 };
 
-export default DashProfe;
+export default DashAlumnos;

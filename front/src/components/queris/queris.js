@@ -20,6 +20,14 @@ export const getAluID = async (id) => {
     console.error("Error al obtener alumno", error.response?.data);
   }
 };
+export const getAlu = async (id) => {
+  try {
+    const response = await axios.get(`${URL}/alumno`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener alumno", error.response?.data);
+  }
+};
 
 export const postAlu = async (alumno) => {
   try {
@@ -27,6 +35,14 @@ export const postAlu = async (alumno) => {
     return response.data;
   } catch (error) {
     console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
+export const deleteAlumnoId = async (id) => {
+  try {
+    const response = await axios.delete(`${URL}/alumno/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
   }
 };
 

@@ -12,6 +12,13 @@ import Home from "./components/Views/Home";
 import Login from "./components/Views/Login";
 import { Route, BrowserRouter, Routes } from "react-router-dom";
 import Inscripcion from "./components/vendedor/ventas/Inscripcion";
+
+import DashAlumnos from "./components/admin/alumnos/DashAlumnos";
+import CreateAlumno from "./components/admin/alumnos/CreateAlumno";
+import DashCursos from "./components/admin/cursos/DashCursos";
+import CreateCurso from "./components/admin/cursos/CreateCurso";
+import DashComisiones from "./components/admin/comisiones/DashComisiones";
+import CreateComision from "./components/admin/comisiones/CreateComision";
 function App() {
   return (
     <BrowserRouter>
@@ -26,6 +33,15 @@ function App() {
           </Route>
           <Route path="profesores" element={<DashProfe></DashProfe>}>
             <Route path="crear" element={<CrearProfes></CrearProfes>}></Route>
+          </Route>
+          <Route path="alumnos" element={<DashAlumnos></DashAlumnos>}>
+            <Route path="crear" element={<CreateAlumno></CreateAlumno>}></Route>
+          </Route>
+          <Route path="cursos" element={<DashCursos></DashCursos>}>
+            <Route path="crear" element={<CreateCurso></CreateCurso>}></Route>
+          </Route>
+          <Route path="comisiones" element={<DashComisiones></DashComisiones>}>
+            <Route path="crear" element={<CreateComision></CreateComision>}></Route>
           </Route>
         </Route>
         <Route path="/inicioVendedor" element={<IndexVendedor></IndexVendedor>}>

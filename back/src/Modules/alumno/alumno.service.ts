@@ -84,7 +84,12 @@ export class AlumnoService {
     return `This action updates a #${id} alumno`;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} alumno`;
+  async remove(id: string) {
+    const alu = await this.alumnoRepository.findOneBy({ id });
+    if (!alu) {
+      return null;
+    }
+    await this.alumnoRepository.remove(alu);
+    return `${alu.name} deleted`;
   }
 }

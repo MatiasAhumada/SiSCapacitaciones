@@ -37,6 +37,7 @@ export const postAlu = async (alumno) => {
     console.error("Error al obtener vendedor", error.response?.data);
   }
 };
+
 export const deleteAlumnoId = async (id) => {
   try {
     const response = await axios.delete(`${URL}/alumno/${id}`);
@@ -113,6 +114,22 @@ export const getCursos = async () => {
   try {
     const response = await axios.get(`${URL}/curso`);
 
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
+export const deleteCurso = async (id) => {
+  try {
+    const response = await axios.delete(`${URL}/curso/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
+export const postCurso = async (curso) => {
+  try {
+    const response = await axios.post(`${URL}/curso`, curso);
     return response.data;
   } catch (error) {
     console.error("Error al obtener vendedor", error.response?.data);

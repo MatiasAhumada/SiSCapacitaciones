@@ -42,6 +42,11 @@ export class CursoService {
   }
 
   async remove(id: string) {
-    return this.cursoRepository.delete(id);
+    const cur = await this.cursoRepository.findOneBy({ id });
+    if (!cur) {
+      return null;
+    }
+    await this.cursoRepository.remove(cur);
+    return `${cur.name} deleted`;
   }
 }

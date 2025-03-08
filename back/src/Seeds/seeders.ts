@@ -14,17 +14,22 @@ async function seed() {
 
 //   // Hash de la contraseña
 //   const hashedPassword = await bcrypt.hash('javieradmin', 10);
-
-  // Crear Admin
+  // Verificar si el admin ya existe
+  let admin = await adminRepository.findOne({ where: { name: 'javier' } });
+  if (!admin) {
+    // Si no existe, lo creamos
   const admin = adminRepository.create({
     name: 'javier',
     password: 'javieradmin',
     isAdmin: true,
   });
-
   await adminRepository.save(admin);
-
   console.log(`Admin creado con ID: ${admin.id}`);
+} else {
+  console.log(`Admin ${admin.name} ya existe.`);
+}
+
+ 
 
   // Crear Sucursales
   const sucursalesData = [
@@ -33,13 +38,17 @@ async function seed() {
     { name: 'Sucursal Tafi', localidad: 'Tafi Viejo', provincia: 'Tucumán', admin: {id: admin.id} },
   ];
 
-  const sucursales = sucursalesData.map((sucursal) =>
-    sucursalRepository.create(sucursal)
-  );
+  for (const sucursalData of sucursalesData) {
+    const exists = await sucursalRepository.findOne({ where: { name: sucursalData.name } });
 
-  await sucursalRepository.save(sucursales);
-
-  console.log('Sucursales creadas');
+    if (!exists) {
+      const sucursal = sucursalRepository.create({ ...sucursalData, admin });
+      await sucursalRepository.save(sucursal);
+      console.log(`Sucursal ${sucursal.name} creada.`);
+    } else {
+      console.log(`Sucursal ${sucursalData.name} ya existe.`);
+    }
+  }
 
   await app.close();
 }

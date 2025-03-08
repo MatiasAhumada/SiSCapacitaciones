@@ -1,6 +1,6 @@
 import axios from "axios";
-//const URL = "http://82.29.62.125:4040";
-const URL = "http://localhost:4040";
+const URL = "http://82.29.62.125:4040";
+//const URL = "http://localhost:4040";
 
 export const login = async ({ name, password }) => {
   try {
@@ -148,6 +148,22 @@ export const getComisiones = async () => {
 export const getComisionId = async (id) => {
   try {
     const response = await axios.get(`${URL}/comision/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
+export const postComision = async (comision) => {
+  try {
+    const response = await axios.post(`${URL}/comision`,comision);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
+export const putComision = async (id,comision) => {
+  try {
+    const response = await axios.put(`${URL}/comision/${id}`,comision);
     return response.data;
   } catch (error) {
     console.error("Error al obtener vendedor", error.response?.data);

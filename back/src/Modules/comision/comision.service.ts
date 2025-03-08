@@ -77,6 +77,7 @@ export class ComisionService {
         profesor: {
           id: true,
           name: true,
+          apellido:true
         },
         curso: {
           id: true,
@@ -87,7 +88,16 @@ export class ComisionService {
   }
 
   async update(id: string, updateComisionDto: UpdateComisionDto) {
-    return `This action updates a #${id} comision`;
+    const comision = await this.comisionRepository.preload({
+      id,
+      ...updateComisionDto,
+    });
+  
+    if (!comision) {
+      throw new NotFoundException(`Comisión con ID ${id} no encontrada`);
+    }
+  
+    return this.comisionRepository.save(comision);
   }
 
   async remove(id: string) {

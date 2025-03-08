@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { ComisionService } from './comision.service';
 import { CreateComisionDto } from './dto/create-comision.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
@@ -22,7 +22,7 @@ export class ComisionController {
     return this.comisionService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateComisionDto: UpdateComisionDto) {
     return this.comisionService.update(id, updateComisionDto);
   }

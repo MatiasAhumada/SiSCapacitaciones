@@ -1,0 +1,67 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateCajaDto } from './dto/create-caja.dto';
+import { UpdateCajaDto } from './dto/update-caja.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Caja } from './entities/caja.entity';
+import { Repository } from 'typeorm';
+import { Vendedor } from '../vendedor/entities/vendedor.entity';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+@Injectable()
+export class CajaService {
+  constructor(
+    @InjectRepository(Caja)
+    private readonly cajaRepository: Repository<Caja>,
+    @InjectRepository(Vendedor)
+    private readonly vendedorRepository: Repository<Vendedor>,
+  ) {}
+  async create(createCajaDto: CreateCajaDto) {
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: createCajaDto.vendedorId },
+    });
+    if (!vendedor) {
+      throw new NotFoundException('Vendedor no encontrado');
+    }
+    const movimiento = this.cajaRepository.create({
+      ...createCajaDto,
+      vendedor: { id: createCajaDto.vendedorId },
+    });
+
+    return await this.cajaRepository.save(movimiento);
+  }
+
+  async findAll() {
+    return this.cajaRepository.find({
+      relations: ['vendedor'],
+      select: {
+        vendedor: {
+          id: true,
+          name: true,
+        },
+      },
+    });
+  }
+
+  async findByVendedor(vendedorId: string) {
+    const movimientos = await this.cajaRepository.find({
+      where: { vendedor: { id: vendedorId } },
+    
+    });
+    return movimientos.map((mov) => ({
+      ...mov,
+      fecha: format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm', { locale: es }),
+    }));
+  }
+
+  async findOne(id: string) {
+    return `This action returns a #${id} caja`;
+  }
+
+  async update(id: string, updateCajaDto: UpdateCajaDto) {
+    return `This action updates a #${id} caja`;
+  }
+
+  async remove(id: string) {
+    return this.cajaRepository.delete(id);
+  }
+}

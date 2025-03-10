@@ -1,3 +1,4 @@
+import { Caja } from 'src/Modules/caja/entities/caja.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import {
@@ -28,8 +29,10 @@ export class Vendedor {
     onDelete: 'CASCADE',
   })
   inscripciones: Inscripcion[];
-  @ManyToMany(() => Sucursal, (sucursal) => sucursal.vendedores,{
+  @ManyToMany(() => Sucursal, (sucursal) => sucursal.vendedores, {
     onDelete: 'CASCADE',
   })
   sucursales: Sucursal[];
+  @OneToMany(() => Caja, (caja) => caja.vendedor)
+  caja: Caja[];
 }

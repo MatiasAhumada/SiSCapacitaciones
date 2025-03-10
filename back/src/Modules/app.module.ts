@@ -17,6 +17,7 @@ import typeOrmConfig from '../config/configOrm';
 import { LoggerMiddleware } from 'src/Middleware/Peticiones.middleware';
 import { AuthModule } from './auth/auth.module';
 import { SeederModule } from 'src/Seeds/seeders.module';
+import { CajaModule } from './caja/caja.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -39,7 +40,8 @@ import { SeederModule } from 'src/Seeds/seeders.module';
     ComisionModule,
     InscripcionModule,
     AuthModule,
-    SeederModule
+    SeederModule,
+    CajaModule
   ],
   controllers: [AppController],
   providers: [AppService],

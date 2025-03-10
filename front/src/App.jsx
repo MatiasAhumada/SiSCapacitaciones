@@ -19,6 +19,8 @@ import DashCursos from "./components/admin/cursos/DashCursos";
 import CreateCurso from "./components/admin/cursos/CreateCurso";
 import DashComisiones from "./components/admin/comisiones/DashComisiones";
 import CreateComision from "./components/admin/comisiones/CreateComision";
+import DashCaja from "./components/caja/DashCaja";
+import CreateCaja from "./components/caja/CreateCaja";
 function App() {
   return (
     <BrowserRouter>
@@ -47,6 +49,9 @@ function App() {
         <Route path="/inicioVendedor" element={<IndexVendedor></IndexVendedor>}>
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
           <Route path="inscribir" element={<Inscripcion></Inscripcion>}></Route>
+          <Route path="caja" element={<DashCaja></DashCaja>}>
+            <Route path="crear" element={<CreateCaja></CreateCaja>}></Route>
+          </Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>

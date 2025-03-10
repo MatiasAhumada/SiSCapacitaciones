@@ -11,6 +11,7 @@ import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
 import { Servicio } from 'src/Modules/servicio/entities/servicio.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
+import { Caja } from 'src/Modules/caja/entities/caja.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -25,7 +26,7 @@ const db_config = {
   synchronize: true,
   dropSchema: false,
   logging: false,
-  entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
+  entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
   migrations: ['dist/migrations/*.{js,ts}'],

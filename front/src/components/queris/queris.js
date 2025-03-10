@@ -1,6 +1,6 @@
 import axios from "axios";
-const URL = "http://82.29.62.125:4040";
-//const URL = "http://localhost:4040";
+
+const URL = import.meta.env.VITE_APP_URL;
 
 export const login = async ({ name, password }) => {
   try {
@@ -210,6 +210,24 @@ export const postProfes = async (profesor) => {
 export const deleteProfesId = async (id) => {
   try {
     const response = await axios.delete(`${URL}/profesor/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//CAJA
+export const GetCajaByVendedor= async (id) => {
+  try {
+    const response = await axios.get(`${URL}/caja/vendedor/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const deleteMovCaja= async (id) => {
+  try {
+    const response = await axios.delete(`${URL}/caja/${id}`);
     return response.data;
   } catch (error) {
     console.log(error);

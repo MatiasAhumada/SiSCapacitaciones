@@ -14,7 +14,7 @@ const CreateCaja = () => {
   const idVend = localStorage.getItem("token");
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
-  const [alu, setAlu] = useState({});
+  const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
     fecha: "2024-03-09T10:00:00Z",
@@ -25,6 +25,7 @@ const CreateCaja = () => {
     alumnoId: "",
     monto: "",
   });
+
   useEffect(() => {
     const vendedor = async () => {
       await getVendID(idVend).then((data) => {
@@ -47,6 +48,7 @@ const CreateCaja = () => {
 
     vendedor();
     alumnos();
+
     const intervalId = setInterval(() => {
       setFecha(new Date());
     }, 60000);
@@ -60,6 +62,12 @@ const CreateCaja = () => {
       ...formData,
       [name]: value,
     });
+  };
+  const handleAlumnoChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      alumnoId: e.target.value,
+    }));
   };
   // Formato de fecha para mostrar (dd/mm/yyyy hh:mm)
   const formatToDisplay = (date) => {
@@ -176,9 +184,27 @@ const CreateCaja = () => {
             <option value="credito">Credito</option>
           </select>
         </div>
+
+        <div className="pb-2">
+          <label className="block mb-2 text-sm principal">Alumno</label>
+          <select
+            name="alumnoId"
+            value={formData.alumnoId}
+            onChange={handleAlumnoChange}
+            className="pl-12 mb-2 bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg block w-full p-2.5"
+          >
+            <option value="">Seleccione un alumno</option>
+            {alu.map((alumno) => (
+              <option key={alumno.id} value={alumno.id}>
+                {alumno.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="pb-2">
           <label
-            htmlFor="monto"
+            htmlFor="descripcion"
             className="block mb-2 text-sm  principal text-[#111827]"
           >
             Descripcion

@@ -2,11 +2,19 @@ import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getCursos, getSucursalId, getVendID, postProfes } from "../queris/queris";
+import {
+  getAlu,
+  getCursos,
+  getSucursalId,
+  getVendID,
+  postCaja,
+  postProfes,
+} from "../queris/queris";
 const CreateCaja = () => {
   const idVend = localStorage.getItem("token");
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
+  const [alu, setAlu] = useState({});
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
     fecha: "2024-03-09T10:00:00Z",
@@ -14,6 +22,7 @@ const CreateCaja = () => {
     tipo: "",
     descripcion: "",
     vendedorId: "",
+    alumnoId: "",
     monto: "",
   });
   useEffect(() => {
@@ -26,13 +35,23 @@ const CreateCaja = () => {
         }));
       });
     };
-    
+    const alumnos = async () => {
+      await getAlu().then((data) => {
+        try {
+          setAlu(data);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    };
+
     vendedor();
+    alumnos();
     const intervalId = setInterval(() => {
-        setFecha(new Date());
-      }, 60000);
-  
-      return () => clearInterval(intervalId); 
+      setFecha(new Date());
+    }, 60000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleChange = (e) => {
@@ -63,26 +82,23 @@ const CreateCaja = () => {
     e.preventDefault();
     const fechaISO = formatToBackend(formData.fecha);
     console.log(formData);
-    // const updatedFormData = {
-    //   ...formData,
-    //   sucursalId: id,
-    // };
-    // console.log(updatedFormData);
-    // setPause(true);
-    // await postProfes(updatedFormData).then(() => {
-    //   try {
-    //     Swal.fire({
-    //       title: "Profesor Registrado",
-    //       icon: "success",
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //     }).then(() => {
-    //       setPause(false);
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // });
+
+    setPause(true);
+    await postCaja(formData).then((data) => {
+      console.log(data);
+      try {
+        Swal.fire({
+          title: "Movimiento Registrado",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          setPause(false);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    });
   };
 
   return (
@@ -106,13 +122,16 @@ const CreateCaja = () => {
               name="fecha"
               id="fecha"
               disabled
-              defaultValue={formatToDisplay(fecha)||""}
+              defaultValue={formatToDisplay(fecha) || ""}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             />
           </div>
         </div>
         <div className="pb-2">
-          <label htmlFor="vendedor" className="block mb-2 text-sm  principal text-[#111827]">
+          <label
+            htmlFor="vendedor"
+            className="block mb-2 text-sm  principal text-[#111827]"
+          >
             Vendedor
           </label>
           <div className="relative text-gray-400">
@@ -127,7 +146,9 @@ const CreateCaja = () => {
           </div>
         </div>
         <div className="pb-2">
-          <label className="block mb-2 text-sm principal">Tipo de Movimiento</label>
+          <label className="block mb-2 text-sm principal">
+            Tipo de Movimiento
+          </label>
           <select
             name="tipo"
             value={formData.tipo}
@@ -156,8 +177,11 @@ const CreateCaja = () => {
           </select>
         </div>
         <div className="pb-2">
-          <label htmlFor="monto" className="block mb-2 text-sm  principal text-[#111827]">
-         Descripcion
+          <label
+            htmlFor="monto"
+            className="block mb-2 text-sm  principal text-[#111827]"
+          >
+            Descripcion
           </label>
           <div className="relative text-gray-400">
             <input
@@ -167,12 +191,14 @@ const CreateCaja = () => {
               value={formData.descripcion}
               onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-             
             />
           </div>
         </div>
         <div className="pb-2">
-          <label htmlFor="monto" className="block mb-2 text-sm  principal text-[#111827]">
+          <label
+            htmlFor="monto"
+            className="block mb-2 text-sm  principal text-[#111827]"
+          >
             Monto
           </label>
           <div className="relative text-gray-400">
@@ -183,7 +209,6 @@ const CreateCaja = () => {
               value={formData.monto}
               onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-             
             />
           </div>
         </div>
@@ -193,9 +218,20 @@ const CreateCaja = () => {
           className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
         >
           {pause ? (
-            <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              fill="white"
+              className="w-6 h-6 mx-auto"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  dur="0.75s"
+                  values="0 12 12;360 12 12"
+                  repeatCount="indefinite"
+                />
               </path>
             </svg>
           ) : (

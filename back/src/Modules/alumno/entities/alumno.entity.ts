@@ -1,4 +1,4 @@
-import { Abono } from 'src/Modules/abono/entities/abono.entity';
+import { Caja } from 'src/Modules/caja/entities/caja.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
@@ -49,6 +49,6 @@ export class Alumno {
   inscripciones: Inscripcion[];
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)
   sucursal: Sucursal;
-  @OneToMany(() => Abono, (abono) => abono.alumno)
-  abonos: Abono[];
+ @OneToMany(()=>Caja, (caja)=>caja.alumno)
+ pagos: Caja[]
 }

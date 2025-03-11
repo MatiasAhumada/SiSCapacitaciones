@@ -233,3 +233,11 @@ export const deleteMovCaja= async (id) => {
     console.log(error);
   }
 };
+export const postCaja= async (movimiento) => {
+  try {
+    const response = await axios.delete(`${URL}/caja`, movimiento);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

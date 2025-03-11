@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Alumno } from '../alumno/entities/alumno.entity';
 @Injectable()
 export class CajaService {
   constructor(
@@ -14,8 +15,10 @@ export class CajaService {
     private readonly cajaRepository: Repository<Caja>,
     @InjectRepository(Vendedor)
     private readonly vendedorRepository: Repository<Vendedor>,
+    @InjectRepository(Alumno)
+    private readonly AlumnoRepository: Repository<Alumno>,
   ) {}
-  
+
   async create(createCajaDto: CreateCajaDto) {
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: createCajaDto.vendedorId },
@@ -23,9 +26,16 @@ export class CajaService {
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
+    const alumno = await this.AlumnoRepository.find({
+      where: { id: createCajaDto.alumnoId },
+    });
+    if (!alumno) {
+      throw new NotFoundException('Alumno no encontrado');
+    }
     const movimiento = this.cajaRepository.create({
       ...createCajaDto,
       vendedor: { id: createCajaDto.vendedorId },
+      alumno: { id: createCajaDto.alumnoId },
     });
 
     return await this.cajaRepository.save(movimiento);
@@ -46,7 +56,6 @@ export class CajaService {
   async findByVendedor(vendedorId: string) {
     const movimientos = await this.cajaRepository.find({
       where: { vendedor: { id: vendedorId } },
-    
     });
     return movimientos.map((mov) => ({
       ...mov,

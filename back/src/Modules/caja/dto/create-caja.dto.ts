@@ -25,4 +25,6 @@ export class CreateCajaDto {
 
   @IsUUID()
   vendedorId: string;
+  @IsUUID()
+  alumnoId: string;
 }

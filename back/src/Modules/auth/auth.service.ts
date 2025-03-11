@@ -18,28 +18,29 @@ export class AuthService {
   ) {}
 
   async validateUser(name: string, password: string) {
-    const admin = await this.adminsRepository.findOne({ where: { name } });
-    if (admin && password === admin.password) {
-      return { id: admin.id, isAdmin: admin.isAdmin };
-    }else{
-      console.log(admin)
-    }
+    try {
+      const admin = await this.adminsRepository.findOne({ where: { name } });
+      if (admin && password === admin.password) {
+        return { id: admin.id, isAdmin: admin.isAdmin };
+      } else {
+        console.log(admin);
+      }
 
-    const vendedor = await this.vendedorRepository.findOne({
-      where: { email: name },
-    });
-    if (vendedor && password === vendedor.password) {
-      return { id: vendedor.id, isAdmin: vendedor.isAdmin };
-    }
+      const vendedor = await this.vendedorRepository.findOne({
+        where: { email: name },
+      });
+      if (vendedor && password === vendedor.password) {
+        return { id: vendedor.id, isAdmin: vendedor.isAdmin };
+      }
 
-   
-    const alumno = await this.alumnoRepository.findOne({
-      where: {  name },
-    });
-    if (alumno && alumno.dni === Number(password)) {
-      return { id: alumno.id};
+      const alumno = await this.alumnoRepository.findOne({
+        where: { name },
+      });
+      if (alumno && alumno.dni === Number(password)) {
+        return { id: alumno.id };
+      }
+    } catch (error) {
+      return null;
     }
-
-    return null;
   }
 }

@@ -1,3 +1,4 @@
+import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -37,4 +38,8 @@ export class Caja {
 
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
   vendedor: Vendedor;
+
+  @ManyToOne(()=>Alumno,(alumno)=>alumno.pagos)
+  alumno:Alumno
 }
+

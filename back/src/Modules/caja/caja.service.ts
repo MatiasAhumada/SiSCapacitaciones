@@ -15,6 +15,7 @@ export class CajaService {
     @InjectRepository(Vendedor)
     private readonly vendedorRepository: Repository<Vendedor>,
   ) {}
+  
   async create(createCajaDto: CreateCajaDto) {
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: createCajaDto.vendedorId },

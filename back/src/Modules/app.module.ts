@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AlumnoModule } from './alumno/alumno.module';
 import { AdminModule } from './admin/admin.module';
-import { AbonoModule } from './abono/abono.module';
 import { CursoModule } from './curso/curso.module';
 import { ProfesorModule } from './profesor/profesor.module';
 import { ServicioModule } from './servicio/servicio.module';
@@ -31,7 +30,7 @@ import { CajaModule } from './caja/caja.module';
 
     AlumnoModule,
     AdminModule,
-    AbonoModule,
+    
     CursoModule,
     ProfesorModule,
     ServicioModule,

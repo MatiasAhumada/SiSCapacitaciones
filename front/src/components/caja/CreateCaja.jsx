@@ -63,12 +63,14 @@ const CreateCaja = () => {
       [name]: value,
     });
   };
+
   const handleAlumnoChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       alumnoId: e.target.value,
     }));
   };
+
   // Formato de fecha para mostrar (dd/mm/yyyy hh:mm)
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -81,19 +83,11 @@ const CreateCaja = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
-  // Convertir a formato ISO 8601 para el backend (yyyy-mm-ddThh:mm:ssZ)
-  const formatToBackend = (date) => {
-    const d = new Date(date);
-    return d.toISOString(); // Devuelve en formato: yyyy-mm-ddThh:mm:ssZ
-  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const fechaISO = formatToBackend(formData.fecha);
-    console.log(formData);
 
     setPause(true);
     await postCaja(formData).then((data) => {
-      console.log(data);
       try {
         Swal.fire({
           title: "Movimiento Registrado",
@@ -196,7 +190,7 @@ const CreateCaja = () => {
             <option value="">Seleccione un alumno</option>
             {alu.map((alumno) => (
               <option key={alumno.id} value={alumno.id}>
-                {alumno.nombre}
+                {alumno.name}
               </option>
             ))}
           </select>

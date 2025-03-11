@@ -1,7 +1,6 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { config as dotenvConfig } from 'dotenv';
 import { registerAs } from '@nestjs/config';
-import { Abono } from 'src/Modules/abono/entities/abono.entity';
 import { Admins } from 'src/Modules/admin/entities/admin.entity';
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
@@ -26,7 +25,7 @@ const db_config = {
   synchronize: true,
   dropSchema: false,
   logging: false,
-  entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja],
+  entities: [Admins,Alumno,Caja,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
   migrations: ['dist/migrations/*.{js,ts}'],

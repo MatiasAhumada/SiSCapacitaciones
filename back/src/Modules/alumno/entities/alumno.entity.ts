@@ -1,4 +1,5 @@
 import { Caja } from 'src/Modules/caja/entities/caja.entity';
+import { Certificado } from 'src/Modules/certificado/entities/certificado.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
@@ -23,7 +24,7 @@ export class Alumno {
   name: string;
   @Column()
   fNac: Date;
-  @Column({ type: 'bigint', nullable: true  })
+  @Column({ type: 'bigint', nullable: true })
   tel: number;
   @Column()
   ocupation: string;
@@ -49,6 +50,8 @@ export class Alumno {
   inscripciones: Inscripcion[];
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)
   sucursal: Sucursal;
- @OneToMany(()=>Caja, (caja)=>caja.alumno)
- pagos: Caja[]
+  @OneToMany(() => Caja, (caja) => caja.alumno)
+  pagos: Caja[];
+  @OneToMany(()=> Certificado,(cert)=>cert.alumno)
+  certificados: Certificado[]
 }

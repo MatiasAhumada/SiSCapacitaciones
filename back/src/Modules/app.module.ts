@@ -17,6 +17,7 @@ import { LoggerMiddleware } from 'src/Middleware/Peticiones.middleware';
 import { AuthModule } from './auth/auth.module';
 import { SeederModule } from 'src/Seeds/seeders.module';
 import { CajaModule } from './caja/caja.module';
+import { CertificadoModule } from './certificado/certificado.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -40,7 +41,8 @@ import { CajaModule } from './caja/caja.module';
     InscripcionModule,
     AuthModule,
     SeederModule,
-    CajaModule
+    CajaModule,
+    CertificadoModule
   ],
   controllers: [AppController],
   providers: [AppService],

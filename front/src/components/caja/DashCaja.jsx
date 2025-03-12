@@ -69,6 +69,7 @@ const DashCaja = () => {
               <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
                 <tr>
                   <th className="py-3 px-6">Fecha</th>
+                  <th className="py-3 px-6">Alumno</th>
                   <th className="py-3 px-6">Tipo</th>
                   <th className="py-3 px-6">Metodo de Pago</th>
                   <th className="py-3 px-6">Descripcion</th>
@@ -80,10 +81,16 @@ const DashCaja = () => {
                 {tableItems.map((item) => (
                   <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">{item.fecha}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.alumno.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.tipo}</td>
+                   
                     <td className="px-6 py-4 whitespace-nowrap">{item.metodoPago}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.descripcion}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.monto}</td>
+                    {item.tipo == "transferencia" ? (
+                      <td className="px-6 py-4 whitespace-nowrap">-{item.monto}</td>
+                    ) : (
+                      <td className="px-6 py-4 whitespace-nowrap">{item.monto}</td>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         value={item.id}

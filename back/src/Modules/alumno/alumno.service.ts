@@ -41,9 +41,11 @@ export class AlumnoService {
       },
     });
   }
-  findAll() {
+
+  async findAll() {
     return this.alumnoRepository.find();
   }
+
   async actualizarImgUrl(
     id: string,
     update: UpdateAlumnoDto,
@@ -66,7 +68,7 @@ export class AlumnoService {
   async findOne(id: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'comisiones'],
+      relations: ['sucursal', 'comisiones', 'pagos'],
       select: {
         sucursal: {
           id: true,
@@ -76,11 +78,14 @@ export class AlumnoService {
           id: true,
           name: true,
         },
+        pagos: {
+          id: true,
+        },
       },
     });
   }
 
-  update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
+  async update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
     return `This action updates a #${id} alumno`;
   }
 

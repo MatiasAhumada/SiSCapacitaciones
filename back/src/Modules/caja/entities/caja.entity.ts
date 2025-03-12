@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 export enum TipoMovimiento {
   INGRESO = 'ingreso',
   EGRESO = 'egreso',
-  TRANSFERENCIA = 'trasferencia',
+  TRANSFERENCIA = 'transferencia',
 }
 export enum MetodoPago {
   EFECTIVO = 'efectivo',
@@ -39,7 +39,7 @@ export class Caja {
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
   vendedor: Vendedor;
 
-  @ManyToOne(()=>Alumno,(alumno)=>alumno.pagos)
-  alumno:Alumno
+  @ManyToOne(()=>Alumno,(alumno)=>alumno.pagos,{ nullable: true })
+  alumno?:Alumno
 }
 

@@ -56,6 +56,13 @@ export class CajaService {
   async findByVendedor(vendedorId: string) {
     const movimientos = await this.cajaRepository.find({
       where: { vendedor: { id: vendedorId } },
+      relations:["alumno"],
+      select:{
+        alumno:{
+          id:true,
+          name:true
+        }
+      }
     });
     return movimientos.map((mov) => ({
       ...mov,

@@ -1,10 +1,11 @@
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, Unique } from 'typeorm';
 
 @Entity({
   name: 'certificados',
 })
+@Unique(["numero"])
 export class Certificado {
   @PrimaryColumn()
   numero: number;

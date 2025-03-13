@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { CertificadoService } from './certificado.service';
 import { CreateCertificadoDto } from './dto/create-certificado.dto';
 import { UpdateCertificadoDto } from './dto/update-certificado.dto';
@@ -18,17 +18,17 @@ export class CertificadoController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.certificadoService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.certificadoService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateCertificadoDto: UpdateCertificadoDto) {
-    return this.certificadoService.update(+id, updateCertificadoDto);
+    return this.certificadoService.update(id, updateCertificadoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.certificadoService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.certificadoService.remove(id);
   }
 }

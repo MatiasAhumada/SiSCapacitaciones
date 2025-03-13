@@ -26,12 +26,13 @@ import { CertificadoModule } from './certificado/certificado.module';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({...configService.get("typeorm")})
+      useFactory: (configService: ConfigService) => ({
+        ...configService.get('typeorm'),
+      }),
     }),
 
     AlumnoModule,
     AdminModule,
-    
     CursoModule,
     ProfesorModule,
     ServicioModule,
@@ -42,12 +43,12 @@ import { CertificadoModule } from './certificado/certificado.module';
     AuthModule,
     SeederModule,
     CajaModule,
-    CertificadoModule
+    CertificadoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }

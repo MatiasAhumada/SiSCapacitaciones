@@ -3,8 +3,7 @@ import {
   IsNumber,
   IsString,
   IsDate,
-  IsEmail,
-  IsOptional,
+  IsEmail
 } from 'class-validator';
 
 export class CreateAlumnoDto {

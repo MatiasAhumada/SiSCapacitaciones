@@ -51,7 +51,7 @@ const DashAlumnos = () => {
     };
     peticion();
   }, []);
-
+console.log(tableItems)
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -75,6 +75,7 @@ const DashAlumnos = () => {
                   <th className="py-3 px-6">DNI</th>
                   <th className="py-3 px-6">Telefono</th>
                   <th className="py-3 px-6">Comision/s</th>
+                  <th className="py-3 px-6">Certificados</th>
 
                   <th className="py-3 px-6"></th>
                 </tr>
@@ -86,6 +87,7 @@ const DashAlumnos = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{item.dni}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.tel}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.comisiones?.length}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.certificados?.length}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         value={item.id}

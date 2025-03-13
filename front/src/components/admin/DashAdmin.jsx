@@ -7,7 +7,7 @@ import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 const DashAdmin = () => {
   const { id } = useParams();
 
-  const navigation = [{ name: "Vendedores" }, { name: "Profesores" }, { name: "Alumnos" }, { name: "Cursos" }, { name: "Comisiones" }, { name: "Caja" }];
+  const navigation = [{ name: "Vendedores" }, { name: "Profesores" }, { name: "Alumnos" }, { name: "Cursos" }, { name: "Comisiones" }, { name: "Caja" }, { name: "Certificados" }];
 
   const navigate = useNavigate();
 

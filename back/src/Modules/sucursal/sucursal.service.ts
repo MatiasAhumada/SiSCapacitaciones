@@ -43,6 +43,7 @@ export class SucursalService {
       relations: [
         'alumnos',
         'alumnos.comisiones',
+        'alumnos.certificados',
         'profesores',
         'profesores.comisiones',
         'comisiones',

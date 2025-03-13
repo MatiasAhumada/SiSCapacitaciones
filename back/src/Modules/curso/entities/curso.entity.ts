@@ -16,10 +16,13 @@ export class Curso {
   id: string;
   @Column()
   name: string;
+
   @Column()
   duration: number;
+
   @Column()
   price: number;
+
   @Column()
   area: string;
 

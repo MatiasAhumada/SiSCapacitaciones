@@ -241,3 +241,15 @@ export const postCaja= async (movimiento) => {
     console.log(error);
   }
 };
+
+//CERTIFICADOS
+
+export const postCert= async (cert) => {
+  try {
+    const response = await axios.post(`${URL}/certificado`, cert);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+

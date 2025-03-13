@@ -4,12 +4,17 @@ import { Repository } from 'typeorm';
 import { Admins } from '../Modules/admin/entities/admin.entity';
 import { Sucursal } from '../Modules/sucursal/entities/sucursal.entity';
 import * as bcrypt from 'bcrypt';
+import { Curso } from 'src/Modules/curso/entities/curso.entity';
 
 @Injectable()
 export class SeederService implements OnModuleInit {
   constructor(
-    @InjectRepository(Admins) private readonly adminRepository: Repository<Admins>,
-    @InjectRepository(Sucursal) private readonly sucursalRepository: Repository<Sucursal>,
+    @InjectRepository(Admins)
+    private readonly adminRepository: Repository<Admins>,
+    @InjectRepository(Sucursal)
+    private readonly sucursalRepository: Repository<Sucursal>,
+    @InjectRepository(Curso)
+    private readonly cursoRepository: Repository<Curso>,
   ) {}
 
   async onModuleInit() {
@@ -20,7 +25,9 @@ export class SeederService implements OnModuleInit {
     console.log('Ejecutando seeder...');
 
     // Verificar si el admin ya existe
-    let admin = await this.adminRepository.findOne({ where: { name: 'javier' } });
+    let admin = await this.adminRepository.findOne({
+      where: { name: 'javier' },
+    });
 
     if (!admin) {
       //const hashedPassword = await bcrypt.hash('javieradmin', 10);
@@ -38,23 +45,102 @@ export class SeederService implements OnModuleInit {
 
     // Datos de sucursales
     const sucursalesData = [
-      { name: 'Sucursal Santiago', localidad: 'Santiago Del Estero', provincia: 'Santiago del Estero' },
-      { name: 'Sucursal Centro', localidad: 'San Miguel de Tucumán', provincia: 'Tucumán' },
+      {
+        name: 'Sucursal Santiago',
+        localidad: 'Santiago Del Estero',
+        provincia: 'Santiago del Estero',
+      },
+      {
+        name: 'Sucursal Centro',
+        localidad: 'San Miguel de Tucumán',
+        provincia: 'Tucumán',
+      },
       { name: 'Sucursal Tafi', localidad: 'Tafi Viejo', provincia: 'Tucumán' },
     ];
 
     for (const sucursalData of sucursalesData) {
-      const exists = await this.sucursalRepository.findOne({ where: { name: sucursalData.name } });
+      const exists = await this.sucursalRepository.findOne({
+        where: { name: sucursalData.name },
+      });
 
       if (!exists) {
-        const sucursal = this.sucursalRepository.create({ ...sucursalData, admin });
+        const sucursal = this.sucursalRepository.create({
+          ...sucursalData,
+          admin,
+        });
         await this.sucursalRepository.save(sucursal);
         console.log(`Sucursal ${sucursal.name} creada.`);
       } else {
         console.log(`Sucursal ${sucursalData.name} ya existe.`);
       }
     }
+    const cursosDigitales = [  
+      // Área Digital (Distancia)  
+      { name: 'Programación', area: 'Digital', duration: 10, price: 25000, tipo: 'Distancia' },  
+      { name: 'Diseño Gráfico', area: 'Digital', duration: 10, price: 25000, tipo: 'Distancia' },  
+      { name: 'Excel Avanzado', area: 'Digital', duration: 10, price: 25000, tipo: 'Distancia' },  
+      { name: 'Marketing Digital', area: 'Digital', duration: 10, price: 25000, tipo: 'Distancia' },  
+      { name: 'Inteligencia Artificial', area: 'Digital', duration: 10, price: 25000, tipo: 'Distancia' },  
+      { name: 'Trading', area: 'Digital', duration: 10, price: 25000, tipo: 'Distancia' },  
+    
+      // Área Idiomas (Distancia)  
+      { name: 'Inglés', area: 'Idiomas', duration: 10, price: 25000, tipo: 'Distancia' },  
+      { name: 'Portugués', area: 'Idiomas', duration: 10, price: 25000, tipo: 'Distancia' },  
+      { name: 'Italiano', area: 'Idiomas', duration: 10, price: 25000, tipo: 'Distancia' },  
+    
+      // Área Administrativa (Presencial)  
+      { name: 'Cajero Comercial y Atención al Cliente', area: 'Administrativa', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Secretariado Administrativo, Jurídico y Médico', area: 'Administrativa', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Vendedor Profesional', area: 'Administrativa', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Auxiliar Impositivo Contable', area: 'Administrativa', duration: 10, price: 25000, tipo: 'Presencial' },  
+    
+      // Área Belleza (Presencial)  
+      { name: 'Peluquería Profesional', area: 'Belleza', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Estética Integral', area: 'Belleza', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Barbería y Corte Masculino', area: 'Belleza', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Cosmetología', area: 'Belleza', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Diseño de Modas', area: 'Belleza', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Peluquería y Cuidado de Mascotas', area: 'Belleza', duration: 10, price: 25000, tipo: 'Presencial' },  
+    
+      // Área Técnica (Presencial)  
+      { name: 'Técnico en Refrigeración', area: 'Técnica', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Electricidad Domiciliaria y Comercial', area: 'Técnica', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Técnico de Celulares', area: 'Técnica', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Reparador de PC', area: 'Técnica', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Mecánica de Motos', area: 'Técnica', duration: 10, price: 25000, tipo: 'Presencial' },  
+    
+      // Área Salud (Presencial)  
+      { name: 'Auxiliar de Farmacia', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Técnicas en Enfermería', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Auxiliar Veterinario', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Asistente en Estimulación Temprana', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Asistente en Rehabilitación Motriz', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Acompañante Terapéutico', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Auxiliar Materno Infantil', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Auxiliar en Rehabilitación Deportiva', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Asistente de Laboratorio', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Agente Sanitario', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Auxiliar en Higiene y Seguridad', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+      { name: 'Auxiliar en Nutrición', area: 'Salud', duration: 10, price: 25000, tipo: 'Presencial' },  
+    ];  
+    
 
+    for (const cursoData of cursosDigitales) {
+      const exists = await this.cursoRepository.findOne({
+        where: { name: cursoData.name },
+      });
+
+      if (!exists) {
+        const curso = this.cursoRepository.create({
+          ...cursoData,
+          
+        });
+        await this.cursoRepository.save(curso);
+        console.log(`Curso ${curso.name} creado.`);
+      } else {
+        console.log(`Curso ${cursoData.name} ya existe.`);
+      }
+    }
     console.log('Seeder ejecutado correctamente.');
   }
 }

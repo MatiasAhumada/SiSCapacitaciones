@@ -22,7 +22,7 @@ export class ComisionService {
   ) {}
 
   async create(createComisionDto: CreateComisionDto): Promise<Comision> {
-    const { sucursalId, cursoId, profesorId, name, day,hour } =
+    const { sucursalId, cursoId, profesorId, name, day, hour } =
       createComisionDto;
 
     const profesor = await this.profesorRepository.findOne({
@@ -77,7 +77,7 @@ export class ComisionService {
         profesor: {
           id: true,
           name: true,
-          apellido:true
+          apellido: true,
         },
         curso: {
           id: true,
@@ -92,11 +92,11 @@ export class ComisionService {
       id,
       ...updateComisionDto,
     });
-  
+
     if (!comision) {
       throw new NotFoundException(`Comisión con ID ${id} no encontrada`);
     }
-  
+
     return this.comisionRepository.save(comision);
   }
 
@@ -107,5 +107,11 @@ export class ComisionService {
     } else {
       return { message: 'Error en el borrado no se hizo' };
     }
+  }
+  async findBySucursal(sucursalId: string): Promise<Comision[]> {
+    return await this.comisionRepository.find({
+      where: { sucursal: { id: sucursalId } },
+      relations: ['curso', 'profesor', 'inscripciones', 'alumnos', 'sucursal'],
+    });
   }
 }

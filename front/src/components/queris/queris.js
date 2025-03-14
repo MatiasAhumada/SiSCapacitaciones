@@ -153,6 +153,22 @@ export const getComisionId = async (id) => {
     console.error("Error al obtener vendedor", error.response?.data);
   }
 };
+export const deleteComision = async (id) => {
+  try {
+    const response = await axios.delete(`${URL}/comision/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
+export const getComisionBySucursal = async (id) => {
+  try {
+    const response = await axios.get(`${URL}/comision/suc/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
 export const postComision = async (comision) => {
   try {
     const response = await axios.post(`${URL}/comision`,comision);

@@ -88,15 +88,36 @@ export class ComisionService {
   }
 
   async update(id: string, updateComisionDto: UpdateComisionDto) {
-    const comision = await this.comisionRepository.preload({
-      id,
-      ...updateComisionDto,
-    });
+    const { cursoId, profesorId, sucursalId, ...updateData } = updateComisionDto;
 
+    const comision = await this.comisionRepository.findOne({
+      where: { id },
+      relations: ['curso', 'profesor', 'sucursal'],
+    });
+  
     if (!comision) {
       throw new NotFoundException(`Comisión con ID ${id} no encontrada`);
     }
-
+  
+    // Cargar relaciones si se enviaron nuevos IDs
+    if (cursoId) {
+      const curso = await this.cursoRepository.findOne({ where: { id: cursoId } });
+      if (!curso) throw new NotFoundException(`Curso con ID ${cursoId} no encontrado`);
+      comision.curso = curso;
+    }
+    if (profesorId) {
+      const profesor = await this.profesorRepository.findOne({ where: { id: profesorId } });
+      if (!profesor) throw new NotFoundException(`Profesor con ID ${profesorId} no encontrado`);
+      comision.profesor = profesor;
+    }
+    if (sucursalId) {
+      const sucursal = await this.sucursalRepository.findOne({ where: { id: sucursalId } });
+      if (!sucursal) throw new NotFoundException(`Sucursal con ID ${sucursalId} no encontrada`);
+      comision.sucursal = sucursal;
+    }
+  
+    Object.assign(comision, updateData);
+  
     return this.comisionRepository.save(comision);
   }
 

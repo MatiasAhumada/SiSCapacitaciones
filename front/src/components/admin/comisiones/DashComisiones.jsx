@@ -74,7 +74,7 @@ const DashComisiones = () => {
   }, []);
 
   const handleEdit = (comision) => {
-    console.log(comision);
+    
     setEditing(comision.id);
     setEditData({
       name: comision.name,

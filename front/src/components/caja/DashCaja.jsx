@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { deleteMovCaja, editMovCaja, GetCajaByVendedor, getSucursalId, getVendedores, getVendID } from "../queris/queris";
+import { deleteMovCaja, editMovCaja, getAlu, GetCajaByVendedor, getSucursalId, getVendedores, getVendID } from "../queris/queris";
 import Swal from "sweetalert2";
 
 const DashCaja = () => {
@@ -8,6 +8,8 @@ const DashCaja = () => {
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [editMode, setEditMode] = useState(null);
+  const [alu, setAlu] = useState([]);
+  const [fecha, setFecha] = useState(new Date());
   const [formEdit, setFormEdit] = useState({
     fecha: "",
     tipo: "",
@@ -17,10 +19,38 @@ const DashCaja = () => {
     alumnoId: "",
     vendedorId: idVend,
   });
-  const [fecha, setFecha] = useState(new Date());
 
   const navigate = useNavigate();
   const isSubRoute = location.pathname.includes("crear");
+
+  const formatToDisplay = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
+  useEffect(() => {
+    const peticion = async () => {
+      await GetCajaByVendedor(idVend).then((data) => {
+        setTableItems(data);
+      });
+    };
+    const alumnos = async () => {
+      await getAlu().then((data) => {
+        try {
+          setAlu(data);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    };
+    alumnos();
+    peticion();
+  }, []);
 
   const clickDelete = async (e) => {
     e.preventDefault();
@@ -51,7 +81,6 @@ const DashCaja = () => {
   };
 
   const handleEdit = (mov) => {
-    console.log(mov.fecha);
     setEditMode(mov.id);
     setFormEdit({
       fecha: fecha,
@@ -63,13 +92,7 @@ const DashCaja = () => {
       vendedorId: idVend,
     });
   };
-  const handleSave = async (item) => {
-    await editMovCaja(item.id, formEdit).then((data) => {
-      console.log(data);
-    });
-    console.log("Guardando cambios:", formEdit);
-    setEditMode(null);
-  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormEdit({
@@ -78,25 +101,32 @@ const DashCaja = () => {
     });
   };
 
-  useEffect(() => {
-    const peticion = async () => {
-      await GetCajaByVendedor(idVend).then((data) => {
-        setTableItems(data);
-      });
-    };
-    peticion();
-  }, []);
-
-  const formatToDisplay = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  const handleAlumnoChange = (e) => {
+    setFormEdit((prev) => ({
+      ...prev,
+      alumnoId: e.target.value,
+    }));
   };
+
+  const handleSave = async (item) => {
+    setPause((prev) => ({ ...prev, [item.id]: true }));
+    await editMovCaja(item.id, formEdit).then((data) => {
+      try {
+        Swal.fire({
+          title: "Caja Editada",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        Swal.fire({ title: "Error al actualizar", icon: "error" });
+      } finally {
+        setPause((prev) => ({ ...prev, [item.id]: false }));
+        setEditMode(null);
+      }
+    });
+  };
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -146,21 +176,39 @@ const DashCaja = () => {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (
-                        <input type="text" name="alumnoId" value={item.alumno.name} onChange={handleChange} className="text-center" />
+                        <select name="alumnoId" value={formEdit.alumnoId} onChange={handleAlumnoChange}>
+                          <option value="">Seleccione un alumno</option>
+                          {alu.map((alumno) => (
+                            <option key={alumno.id} value={alumno.id}>
+                              {alumno.name}
+                            </option>
+                          ))}
+                        </select>
                       ) : (
                         item.alumno.name
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (
-                        <input type="text" name="tipo" value={formEdit.tipo || ""} onChange={handleChange} className="text-center" />
+                        <select name="tipo" value={formEdit.tipo} onChange={handleChange}>
+                          <option value="">Seleccione</option>
+                          <option value="ingreso">Ingreso</option>
+                          <option value="egreso">Egreso</option>
+                          <option value="transferencia">Transferencia de caja</option>
+                        </select>
                       ) : (
                         item.tipo
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (
-                        <input type="text" name="metodoPago" value={formEdit.metodoPago || ""} onChange={handleChange} className="text-center" />
+                        <select name="metodoPago" value={formEdit.metodoPago} onChange={handleChange}>
+                          <option value="">Seleccione</option>
+                          <option value="efectivo">Efectivo</option>
+                          <option value="transferencia">Transferencia</option>
+                          <option value="debito">Debito</option>
+                          <option value="credito">Credito</option>
+                        </select>
                       ) : (
                         item.metodoPago
                       )}
@@ -182,7 +230,21 @@ const DashCaja = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (
                         <button onClick={() => handleSave(item)} className="px-4 py-2 text-white me-2 bg-green-500 hover:bg-green-600 rounded">
-                          Guardar
+                          {pause[item.id] ? (
+                            <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                                <animateTransform
+                                  attributeName="transform"
+                                  type="rotate"
+                                  dur="0.75s"
+                                  values="0 12 12;360 12 12"
+                                  repeatCount="indefinite"
+                                />
+                              </path>
+                            </svg>
+                          ) : (
+                            "Guardar"
+                          )}
                         </button>
                       ) : (
                         <button onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded me-2">

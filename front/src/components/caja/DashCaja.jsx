@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { deleteMovCaja, GetCajaByVendedor, getSucursalId, getVendedores, getVendID } from "../queris/queris";
+import { deleteMovCaja, editMovCaja, GetCajaByVendedor, getSucursalId, getVendedores, getVendID } from "../queris/queris";
 import Swal from "sweetalert2";
 
 const DashCaja = () => {
+  const idVend = localStorage.getItem("token");
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
+  const [editMode, setEditMode] = useState(null);
+  const [formEdit, setFormEdit] = useState({
+    fecha: "",
+    tipo: "",
+    metodoPago: "",
+    monto: "",
+    dexcripcion: "",
+    alumnoId: "",
+    vendedorId: idVend,
+  });
+  const [fecha, setFecha] = useState(new Date());
+
   const navigate = useNavigate();
-
-  const idVend = localStorage.getItem("token");
-
   const isSubRoute = location.pathname.includes("crear");
 
   const clickDelete = async (e) => {
@@ -40,6 +50,34 @@ const DashCaja = () => {
     });
   };
 
+  const handleEdit = (mov) => {
+    console.log(mov.fecha);
+    setEditMode(mov.id);
+    setFormEdit({
+      fecha: fecha,
+      tipo: mov.tipo,
+      metodoPago: mov.metodoPago,
+      monto: mov.monto,
+      descripcion: mov.descripcion,
+      alumnoId: mov.alumno.id,
+      vendedorId: idVend,
+    });
+  };
+  const handleSave = async (item) => {
+    await editMovCaja(item.id, formEdit).then((data) => {
+      console.log(data);
+    });
+    console.log("Guardando cambios:", formEdit);
+    setEditMode(null);
+  };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormEdit({
+      ...formEdit,
+      [name]: value,
+    });
+  };
+
   useEffect(() => {
     const peticion = async () => {
       await GetCajaByVendedor(idVend).then((data) => {
@@ -49,6 +87,16 @@ const DashCaja = () => {
     peticion();
   }, []);
 
+  const formatToDisplay = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -77,21 +125,70 @@ const DashCaja = () => {
                   <th className="py-3 px-6"></th>
                 </tr>
               </thead>
-              <tbody className="text-gray-600 divide-y">
+              <tbody className="text-gray-600 divide-y text-center">
                 {tableItems.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.fecha}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.alumno.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.tipo}</td>
-                   
-                    <td className="px-6 py-4 whitespace-nowrap">{item.metodoPago}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.descripcion}</td>
-                    {item.tipo == "transferencia" ? (
-                      <td className="px-6 py-4 whitespace-nowrap">-{item.monto}</td>
-                    ) : (
-                      <td className="px-6 py-4 whitespace-nowrap">{item.monto}</td>
-                    )}
                     <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <input
+                          type="text"
+                          name="fecha"
+                          id="fecha"
+                          disabled
+                          value={formatToDisplay(fecha)}
+                          onChange={handleChange}
+                          className="text-center"
+                        />
+                      ) : (
+                        item.fecha
+                      )}
+                    </td>
+
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <input type="text" name="alumnoId" value={item.alumno.name} onChange={handleChange} className="text-center" />
+                      ) : (
+                        item.alumno.name
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <input type="text" name="tipo" value={formEdit.tipo || ""} onChange={handleChange} className="text-center" />
+                      ) : (
+                        item.tipo
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <input type="text" name="metodoPago" value={formEdit.metodoPago || ""} onChange={handleChange} className="text-center" />
+                      ) : (
+                        item.metodoPago
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <input type="text" name="descripcion" value={formEdit.descripcion || ""} onChange={handleChange} className="text-center" />
+                      ) : (
+                        item.descripcion
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <input type="number" name="monto" value={formEdit.monto || ""} onChange={handleChange} className="text-center" />
+                      ) : (
+                        item.monto
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <button onClick={() => handleSave(item)} className="px-4 py-2 text-white me-2 bg-green-500 hover:bg-green-600 rounded">
+                          Guardar
+                        </button>
+                      ) : (
+                        <button onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded me-2">
+                          Editar
+                        </button>
+                      )}
                       <button
                         value={item.id}
                         onClick={clickDelete}

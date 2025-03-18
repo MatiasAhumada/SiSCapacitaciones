@@ -249,6 +249,14 @@ export const deleteMovCaja= async (id) => {
     console.log(error);
   }
 };
+export const editMovCaja= async (id,mov) => {
+  try {
+    const response = await axios.put(`${URL}/caja/${id}`,mov);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 export const postCaja= async (movimiento) => {
   try {
     const response = await axios.post(`${URL}/caja`, movimiento);

@@ -18,6 +18,7 @@ const DashAdmin = () => {
     e.preventDefault();
     navigate("/");
   };
+  
   return (
     <div className="min-h-full ">
       <Disclosure as="nav" className="bg-blue-50 principal">
@@ -27,7 +28,7 @@ const DashAdmin = () => {
               <div className="shrink-0">
                 <img alt="Your Company" src={simplificado} className="size-8" onClick={() => navigate(`/adm/${id}`)} />
               </div>
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <div className="ml-10 flex items-baseline space-x-4">
                   {navigation.map((item) => (
                     <button
@@ -43,7 +44,7 @@ const DashAdmin = () => {
                 </div>
               </div>
             </div>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <div className="ml-4 flex items-center md:ml-6">
                 <button
                   type="submit"
@@ -55,7 +56,7 @@ const DashAdmin = () => {
                 </button>
               </div>
             </div>
-            <div className="mr-2 flex md:hidden rounded">
+            <div className="mr-2 flex lg:hidden rounded">
               {/* Boton para mobile */}
               <DisclosureButton className="group relative inline-flex items-center justify-center rounded p-2  btnAz ">
                 <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
@@ -65,7 +66,7 @@ const DashAdmin = () => {
           </div>
         </div>
 
-        <DisclosurePanel className="md:hidden">
+        <DisclosurePanel className="lg:hidden">
           <div className="flex flex-col items-center  space-y-1 px-2 pt-2 pb-3 sm:px-3">
             {navigation.map((item) => (
               <button

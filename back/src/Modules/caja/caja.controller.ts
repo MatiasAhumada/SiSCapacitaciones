@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { CajaService } from './caja.service';
 import { CreateCajaDto } from './dto/create-caja.dto';
@@ -35,7 +36,7 @@ export class CajaController {
     return this.cajaService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateCajaDto: UpdateCajaDto) {
     return this.cajaService.update(id, updateCajaDto);
   }

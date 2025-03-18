@@ -8,6 +8,7 @@ import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Alumno } from '../alumno/entities/alumno.entity';
+import { Comision } from '../comision/entities/comision.entity';
 @Injectable()
 export class CajaService {
   constructor(
@@ -56,13 +57,13 @@ export class CajaService {
   async findByVendedor(vendedorId: string) {
     const movimientos = await this.cajaRepository.find({
       where: { vendedor: { id: vendedorId } },
-      relations:["alumno"],
-      select:{
-        alumno:{
-          id:true,
-          name:true
-        }
-      }
+      relations: ['alumno'],
+      select: {
+        alumno: {
+          id: true,
+          name: true,
+        },
+      },
     });
     return movimientos.map((mov) => ({
       ...mov,
@@ -75,7 +76,38 @@ export class CajaService {
   }
 
   async update(id: string, updateCajaDto: UpdateCajaDto) {
-    return `This action updates a #${id} caja`;
+    const { alumnoId, vendedorId, ...updateData } = updateCajaDto;
+    const caja = await this.cajaRepository.findOne({
+      where: { id },
+      relations: ['alumno', 'vendedor'],
+    });
+    if (!caja) {
+      throw new NotFoundException(`Caja con ID ${id} no encontrada`);
+    }
+
+    if (alumnoId) {
+      const alumno = await this.AlumnoRepository.findOne({
+        where: { id: alumnoId },
+      });
+      if (!alumno)
+        throw new NotFoundException(`Alumno con ID ${alumnoId} no encontrado`);
+      caja.alumno = alumno;
+    }
+
+    if (vendedorId) {
+      const vendedor = await this.vendedorRepository.findOne({
+        where: { id: vendedorId },
+      });
+      if (!vendedor)
+        throw new NotFoundException(
+          `Alumno con ID ${vendedorId} no encontrado`,
+        );
+      caja.vendedor = vendedor;
+    }
+
+    Object.assign(caja, updateData);
+
+    return this.cajaRepository.save(caja);
   }
 
   async remove(id: string) {

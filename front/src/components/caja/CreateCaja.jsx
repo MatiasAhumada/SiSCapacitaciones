@@ -256,7 +256,7 @@ const CreateCaja = () => {
               </path>
             </svg>
           ) : (
-            "Registrar Profesor"
+            "Registrar Movimiento"
           )}
         </button>
       </form>

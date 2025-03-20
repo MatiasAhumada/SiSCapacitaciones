@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 const CardInfo = ({ sede }) => {
+
   return (
     <Row>
       <Col lg={3} sm={6} xs={12}>

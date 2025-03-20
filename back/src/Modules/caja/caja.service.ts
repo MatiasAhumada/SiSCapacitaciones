@@ -44,9 +44,13 @@ export class CajaService {
 
   async findAll() {
     return this.cajaRepository.find({
-      relations: ['vendedor'],
+      relations: ['vendedor', 'alumno'],
       select: {
         vendedor: {
+          id: true,
+          name: true,
+        },
+        alumno: {
           id: true,
           name: true,
         },

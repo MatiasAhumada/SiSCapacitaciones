@@ -22,6 +22,7 @@ import CreateComision from "./components/admin/comisiones/CreateComision";
 import DashCaja from "./components/caja/DashCaja";
 import CreateCaja from "./components/caja/CreateCaja";
 import Certificado from "./components/admin/certificados/Certificados";
+import DashCajas from "./components/admin/cajas/DashCajas";
 function App() {
   return (
     <BrowserRouter>
@@ -49,7 +50,7 @@ function App() {
               element={<CreateComision></CreateComision>}
             ></Route>
           </Route>
-          <Route path="caja" element={<DashCaja></DashCaja>}></Route>
+          <Route path="cajas" element={<DashCajas></DashCajas>}></Route>
           <Route
             path="certificados"
             element={<Certificado></Certificado>}

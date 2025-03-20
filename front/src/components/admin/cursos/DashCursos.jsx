@@ -123,7 +123,7 @@ const DashCursos = () => {
                       >
                         {item.tipo}
                       </span>
-                    </td>{" "}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       ${item.price}
                     </td>

@@ -8,10 +8,13 @@ import {v4 as uuid} from "uuid"
 export class Profesor {
     @PrimaryGeneratedColumn("uuid")
     id: string=uuid();
+
     @Column()
     name: string;
+    
     @Column()
     apellido: string;
+    
     @Column()
     dni:number
    

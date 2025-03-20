@@ -73,8 +73,7 @@ const DashComisiones = () => {
     sucursal();
   }, []);
 
-  const handleEdit = (comision) => {
-    
+  const handleEdit = (comision) => {    
     setEditing(comision.id);
     setEditData({
       name: comision.name,
@@ -116,7 +115,7 @@ const DashComisiones = () => {
       setEditing(null);
     }
   };
-
+console.log(tableItems)
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (

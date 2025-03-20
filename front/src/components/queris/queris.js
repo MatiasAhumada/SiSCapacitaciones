@@ -171,15 +171,15 @@ export const getComisionBySucursal = async (id) => {
 };
 export const postComision = async (comision) => {
   try {
-    const response = await axios.post(`${URL}/comision`,comision);
+    const response = await axios.post(`${URL}/comision`, comision);
     return response.data;
   } catch (error) {
     console.error("Error al obtener vendedor", error.response?.data);
   }
 };
-export const putComision = async (id,comision) => {
+export const putComision = async (id, comision) => {
   try {
-    const response = await axios.put(`${URL}/comision/${id}`,comision);
+    const response = await axios.put(`${URL}/comision/${id}`, comision);
     return response.data;
   } catch (error) {
     console.error("Error al obtener vendedor", error.response?.data);
@@ -216,7 +216,7 @@ export const getProfesId = async (id) => {
 };
 export const postProfes = async (profesor) => {
   try {
-    const response = await axios.post(`${URL}/profesor`,profesor);
+    const response = await axios.post(`${URL}/profesor`, profesor);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -233,7 +233,7 @@ export const deleteProfesId = async (id) => {
 };
 
 //CAJA
-export const GetCajaByVendedor= async (id) => {
+export const GetCajaByVendedor = async (id) => {
   try {
     const response = await axios.get(`${URL}/caja/vendedor/${id}`);
     return response.data;
@@ -241,7 +241,7 @@ export const GetCajaByVendedor= async (id) => {
     console.log(error);
   }
 };
-export const deleteMovCaja= async (id) => {
+export const deleteMovCaja = async (id) => {
   try {
     const response = await axios.delete(`${URL}/caja/${id}`);
     return response.data;
@@ -249,17 +249,25 @@ export const deleteMovCaja= async (id) => {
     console.log(error);
   }
 };
-export const editMovCaja= async (id,mov) => {
+export const editMovCaja = async (id, mov) => {
   try {
-    const response = await axios.put(`${URL}/caja/${id}`,mov);
+    const response = await axios.put(`${URL}/caja/${id}`, mov);
     return response.data;
   } catch (error) {
     console.log(error);
   }
 };
-export const postCaja= async (movimiento) => {
+export const postCaja = async (movimiento) => {
   try {
     const response = await axios.post(`${URL}/caja`, movimiento);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getCajas = async () => {
+  try {
+    const response = await axios.get(`${URL}/caja`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -268,7 +276,7 @@ export const postCaja= async (movimiento) => {
 
 //CERTIFICADOS
 
-export const postCert= async (cert) => {
+export const postCert = async (cert) => {
   try {
     const response = await axios.post(`${URL}/certificado`, cert);
     return response.data;
@@ -276,4 +284,3 @@ export const postCert= async (cert) => {
     console.log(error);
   }
 };
-

@@ -9,6 +9,7 @@ const DashCajas = () => {
   const [pause, setPause] = useState({});
   const [editMode, setEditMode] = useState(null);
   const [alu, setAlu] = useState([]);
+  const [vend, setVend] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [formEdit, setFormEdit] = useState({
     fecha: "",
@@ -35,8 +36,8 @@ const DashCajas = () => {
 
   useEffect(() => {
     const peticion = async () => {
-      await GetCajaByVendedor(idVend).then((data) => {
-        setTableItems(data);
+      await getVendedores().then((data) => {
+        setVend(data);
       });
     };
     const alumnos = async () => {
@@ -51,12 +52,11 @@ const DashCajas = () => {
 
     const totalCajas = async () => {
       await getCajas().then((data) => {
-        console.log(data);
+        setTableItems(data);
       });
     };
-    totalCajas()
+    totalCajas();
     alumnos();
-    peticion();
   }, []);
 
   const clickDelete = async (e) => {
@@ -96,7 +96,7 @@ const DashCajas = () => {
       monto: mov.monto,
       descripcion: mov.descripcion,
       alumnoId: mov.alumno.id,
-      vendedorId: idVend,
+      vendedorId: mov.vendedor.id,
     });
   };
 
@@ -112,6 +112,12 @@ const DashCajas = () => {
     setFormEdit((prev) => ({
       ...prev,
       alumnoId: e.target.value,
+    }));
+  };
+  const handleVendedorChange = (e) => {
+    setFormEdit((prev) => ({
+      ...prev,
+      vendedorId: e.target.value,
     }));
   };
 
@@ -182,6 +188,20 @@ const DashCajas = () => {
                       )}
                     </td>
 
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editMode === item.id ? (
+                        <select name="vendedorId" value={formEdit.vendedorId} onChange={handleVendedorChange}>
+                          <option value="">Seleccione un vendedor</option>
+                          {vend.map((vendedor) => (
+                            <option key={vendedor.id} value={vendedor.id}>
+                              {vendedor.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        item.vendedor.name
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (
                         <select name="alumnoId" value={formEdit.alumnoId} onChange={handleAlumnoChange}>
@@ -283,6 +303,15 @@ const DashCajas = () => {
                     </td>
                   </tr>
                 ))}
+                <tr>
+                  <th className="py-3 px-6">Ingresos</th>
+                </tr>
+                <tr>
+                  <th className="py-3 px-6">Egresos</th>
+                </tr>
+                <tr>
+                  <th className="py-3 px-6">Total</th>
+                </tr>
               </tbody>
             </table>
           </div>

@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Caja } from './entities/caja.entity';
-import { Repository } from 'typeorm';
+import { Caja, TipoMovimiento } from './entities/caja.entity';
+import { Between, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -116,5 +116,47 @@ export class CajaService {
 
   async remove(id: string) {
     return this.cajaRepository.delete(id);
+  }
+
+  async getMovimientosPorDia(fecha: string) {
+    const fechaInicio = new Date(fecha);
+  const fechaFin = new Date(fecha);
+  fechaFin.setHours(23, 59, 59, 999); 
+    return this.cajaRepository.find({
+      where: { fecha:Between(fechaInicio, fechaFin)  },
+      relations: ['vendedor', 'alumno'],
+      select:{
+        vendedor:{
+          id:true,
+          name:true
+        },
+        alumno:{
+          id:true,
+          name:true
+        }
+      }
+    });
+  }
+  
+  async getResumenPorDia(fecha: string) {
+    const movimientos = await this.getMovimientosPorDia(fecha);
+    const ingresos = movimientos
+      .filter(m => m.tipo === TipoMovimiento.INGRESO)
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+    const egresos = movimientos
+      .filter(m => m.tipo === TipoMovimiento.EGRESO)
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+    return { ingresos, egresos, total: ingresos - egresos };
+  }
+
+  async getResumenTotal() {
+    const movimientos = await this.cajaRepository.find();
+    const ingresos = movimientos
+      .filter(m => m.tipo === TipoMovimiento.INGRESO)
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+    const egresos = movimientos
+      .filter(m => m.tipo === TipoMovimiento.EGRESO)
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+    return { ingresos, egresos, total: ingresos - egresos };
   }
 }

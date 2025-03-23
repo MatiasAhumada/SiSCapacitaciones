@@ -6,9 +6,11 @@ import { Comision } from './entities/comision.entity';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Curso } from '../curso/entities/curso.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
+import { Asistencia } from './entities/asistencia.entity';
+import { AlumnoComision } from './entities/alumnocomision.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Comision,Sucursal,Curso,Profesor])],
+  imports:[TypeOrmModule.forFeature([Comision,Sucursal,Curso,Profesor,Asistencia,AlumnoComision])],
   controllers: [ComisionController],
   providers: [ComisionService],
 })

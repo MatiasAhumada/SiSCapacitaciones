@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/
 import { ComisionService } from './comision.service';
 import { CreateComisionDto } from './dto/create-comision.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
+import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
 
 @Controller('comision')
 export class ComisionController {
@@ -35,13 +36,19 @@ export class ComisionController {
   remove(@Param('id') id: string) {
     return this.comisionService.remove(id);
   }
-  // @Put(':idComision/alumnos/:idAlumno/estado/:estado')
-  // async cambiarEstadoAlumno(
-  //   @Param('idComision') idComision: string,
-  //   @Param('idAlumno') idAlumno: string,
-  //   @Param('estado') estado: string,
-  // ) {
-  //   const estadoBool = estado === 'true';  // Convertir el parámetro de estado a booleano
-  //   return this.comisionService.cambiarEstadoAlumno(idComision, idAlumno, estadoBool);
-  // }
+
+  @Post("/asistencia")
+  registrarAsistencia(@Body() dto: CreateAsistenciaDto) {
+    return this.comisionService.registrarAsistencia(dto);
+  }
+
+  @Put(':alumnoId/:comisionId')
+  cambiarEstado(
+    @Param('alumnoId') alumnoId: string,
+    @Param('comisionId') comisionId: string,
+    @Body('estado') estado: boolean,
+  ) {
+    return this.comisionService.cambiarEstadoAlumnoComision(alumnoId, comisionId, estado);
+  }
+
 }

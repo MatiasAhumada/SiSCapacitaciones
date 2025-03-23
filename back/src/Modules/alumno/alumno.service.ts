@@ -68,15 +68,15 @@ export class AlumnoService {
   async findOne(id: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'comisiones', 'pagos'],
+      relations: ['sucursal', 'alumnoComisiones', 'pagos'],
       select: {
         sucursal: {
           id: true,
           name: true,
         },
-        comisiones: {
+        alumnoComisiones: {
           id: true,
-          name: true,
+          state: true,
         },
         pagos: {
           id: true,
@@ -97,4 +97,14 @@ export class AlumnoService {
     await this.alumnoRepository.remove(alu);
     return `${alu.name} deleted`;
   }
+
+  // async cambiarEstado(id: string, nuevoEstado: boolean): Promise<Alumno> {
+  //   const alumno = await this.alumnoRepository.findOne({ where: { id } }); // Buscar el alumno por ID
+  //   if (!alumno) {
+  //     throw new Error('Alumno no encontrado');
+  //   }
+
+  //   alumno.state = nuevoEstado; // Cambiar el estado a true (activo) o false (inactivo)
+  //   return this.alumnoRepository.save(alumno); // Guardar los cambios
+  // }
 }

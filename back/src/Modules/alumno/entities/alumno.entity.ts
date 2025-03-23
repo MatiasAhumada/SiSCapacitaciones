@@ -1,5 +1,6 @@
 import { Caja } from 'src/Modules/caja/entities/caja.entity';
 import { Certificado } from 'src/Modules/certificado/entities/certificado.entity';
+import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
@@ -23,35 +24,35 @@ export class Alumno {
   @Column()
   name: string;
   @Column()
-  fNac: Date;
+  fNac?: Date;
   @Column({ type: 'bigint', nullable: true })
-  tel: number;
+  tel?: number;
   @Column()
-  ocupation: string;
+  ocupation?: string;
   @Column()
-  nationality: string;
+  nationality?: string;
   @Column()
-  address: string;
+  address?: string;
   @Column()
-  province: string;
+  province?: string;
   @Column()
-  locality: string;
+  locality?: string;
   @Column()
-  email: string;
+  email?: string;
   @Column()
-  age: number;
+  age?: number;
   @Column()
-  gender: string;
+  gender?: string;
   @Column({ nullable: true, default: 'https://example.com/default-image.jpg' })
-  imgUrl: string;
-  @ManyToMany(() => Comision, (comision) => comision.alumnos)
-  comisiones: Comision[];
+  imgUrl?: string;
+  @OneToMany(() => AlumnoComision, (alumnoComision) => alumnoComision.alumno)
+  alumnoComisiones: AlumnoComision[];
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno)
-  inscripciones: Inscripcion[];
+  inscripciones?: Inscripcion[];
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)
-  sucursal: Sucursal;
+  sucursal?: Sucursal;
   @OneToMany(() => Caja, (caja) => caja.alumno)
-  pagos: Caja[];
-  @OneToMany(()=> Certificado,(cert)=>cert.alumno)
-  certificados: Certificado[]
+  pagos?: Caja[];
+  @OneToMany(() => Certificado, (cert) => cert.alumno)
+  certificados?: Certificado[];
 }

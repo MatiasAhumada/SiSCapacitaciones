@@ -1,4 +1,4 @@
-import { IsUUID, IsDate, IsString, IsNumber } from 'class-validator';
+import { IsUUID, IsDate, IsString, IsNumber, IsBoolean } from 'class-validator';
 
 export class CreateInscripcionDto {
   @IsDate()
@@ -21,5 +21,7 @@ export class CreateInscripcionDto {
 
   @IsUUID()
   sucursalId: string;
+  @IsBoolean()
+  state: boolean;
 }
 

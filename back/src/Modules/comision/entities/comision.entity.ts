@@ -13,6 +13,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { AlumnoComision } from './alumnocomision.entity';
 @Entity({
   name: 'comisiones',
 })
@@ -41,9 +42,8 @@ export class Comision {
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.comision)
   inscripciones: Inscripcion[];
 
-  @ManyToMany(() => Alumno, (alumno) => alumno.comisiones)
-  @JoinTable()
-  alumnos: Alumno[];
+  @OneToMany(() => AlumnoComision, (alumnoComision) => alumnoComision.comision)
+  alumnoComisiones: AlumnoComision[];
 
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.comisiones)
   sucursal: Sucursal;

@@ -42,9 +42,18 @@ export class AlumnoController {
   update(@Param('id') id: string, @Body() update: UpdateAlumnoDto) {
     return this.alumnoService.actualizarImgUrl(id, update);
   }
+  // @Put(':id/estado/:nuevoEstado')
+  // async cambiarEstado(
+  //   @Param('id') id: string,
+  //   @Param('nuevoEstado') nuevoEstado: string,  
+  // ) {
+  //   const estadoBooleano = nuevoEstado === 'true';  
+  //   return this.alumnoService.cambiarEstado(id, estadoBooleano);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.alumnoService.remove(id);
   }
+
 }

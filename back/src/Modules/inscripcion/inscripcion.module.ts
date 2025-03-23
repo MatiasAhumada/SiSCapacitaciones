@@ -7,6 +7,7 @@ import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Comision } from '../comision/entities/comision.entity';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
+import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Sucursal } from '../sucursal/entities/sucursal.entity';
       Alumno,
       Comision,
       Sucursal,
+      AlumnoComision
     ]),
   ],
   controllers: [InscripcionController],

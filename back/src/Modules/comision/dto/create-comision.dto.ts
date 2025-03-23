@@ -1,4 +1,4 @@
-import { IsUUID, IsDate, IsString } from 'class-validator';
+import { IsUUID, IsDate, IsString, IsBoolean } from 'class-validator';
 
 export class CreateComisionDto {
   @IsString()
@@ -18,4 +18,6 @@ export class CreateComisionDto {
 
   @IsUUID()
   sucursalId: string;
+
+ 
 }

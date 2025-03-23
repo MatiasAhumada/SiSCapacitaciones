@@ -8,6 +8,7 @@ import { Comision } from '../comision/entities/comision.entity';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { In, Repository } from 'typeorm';
 import { Inscripcion } from './entities/inscripcion.entity';
+import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 
 @Injectable()
 export class InscripcionService {
@@ -22,6 +23,8 @@ export class InscripcionService {
     private readonly sucursalRepository: Repository<Sucursal>,
     @InjectRepository(Inscripcion)
     private readonly inscripcionRepository: Repository<Inscripcion>,
+    @InjectRepository(AlumnoComision)
+    private readonly alumnoComisionRepository: Repository<AlumnoComision>,
   ) {}
   async create(createInscripcionDto: CreateInscripcionDto) {
     const {
@@ -32,6 +35,7 @@ export class InscripcionService {
       fechaRegistro,
       formaPago,
       cuotaIngreso,
+      state,
     } = createInscripcionDto;
 
     const vendedor = await this.vendedorRepository.findOne({
@@ -42,9 +46,9 @@ export class InscripcionService {
     });
     const comision = await this.comisionRepository.findOne({
       where: { id: comisionId },
-      relations: ['alumnos'], 
+      relations: ['alumnoComisiones'],
     });
-    
+
     const sucursal = await this.sucursalRepository.findOne({
       where: { id: sucursalId },
     });
@@ -52,18 +56,22 @@ export class InscripcionService {
     if (!vendedor || !alumno || !comision || !sucursal) {
       throw new NotFoundException('Uno o más IDs proporcionados no existen');
     }
-    if (!comision.alumnos) {
-      comision.alumnos = [];
+    const alumnoComisionExistente = await this.alumnoComisionRepository.findOne(
+      {
+        where: { alumno: { id: alumnoId }, comision: { id: comisionId } },
+      },
+    );
+    if (!alumnoComisionExistente) {
+      // Si no existe, se crea una nueva relación entre el alumno y la comisión con el estado
+      const alumnoComision = this.alumnoComisionRepository.create({
+        alumno,
+        comision,
+        state: state || true, // Si no se pasa el estado, se considera activo por defecto
+      });
+      await this.alumnoComisionRepository.save(alumnoComision);
     }
+
     
-    if (
-      !comision.alumnos.some(
-        (existingAlumno) => existingAlumno.id === alumno.id,
-      )
-    ) {
-      comision.alumnos.push(alumno);
-      await this.comisionRepository.save(comision); // Guarda los cambios en la comisión
-    }
 
     const inscripcion = this.inscripcionRepository.create({
       fechaRegistro,
@@ -112,8 +120,8 @@ export class InscripcionService {
   }
 
   async remove(id: string) {
-    const deleted=await this.inscripcionRepository.delete(id);
-    if(deleted.affected===0){
+    const deleted = await this.inscripcionRepository.delete(id);
+    if (deleted.affected === 0) {
       throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
     }
     return `Inscripción con ID ${id} eliminada`;

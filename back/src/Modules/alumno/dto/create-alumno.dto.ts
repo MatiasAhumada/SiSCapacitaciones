@@ -3,7 +3,8 @@ import {
   IsNumber,
   IsString,
   IsDate,
-  IsEmail
+  IsEmail,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateAlumnoDto {
@@ -17,35 +18,38 @@ export class CreateAlumnoDto {
   name: string;
 
   @IsDate()
-  fNac: Date;
+  fNac?: Date;
+
+  @IsBoolean()
+  state?: boolean;
 
   @IsNumber()
-  tel: number;
+  tel?: number;
 
   @IsString()
-  ocupation: string;
+  ocupation?: string;
 
   @IsString()
-  nationality: string;
+  nationality?: string;
 
   @IsString()
-  address: string;
+  address?: string;
 
   @IsString()
-  province: string;
+  province?: string;
 
   @IsString()
-  locality: string;
+  locality?: string;
 
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsNumber()
-  age: number;
+  age?: number;
 
   @IsString()
-  gender: string;
+  gender?: string;
 
   @IsUUID()
-  sucursalId: string;
+  sucursalId?: string;
 }

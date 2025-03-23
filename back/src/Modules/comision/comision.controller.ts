@@ -35,4 +35,13 @@ export class ComisionController {
   remove(@Param('id') id: string) {
     return this.comisionService.remove(id);
   }
+  // @Put(':idComision/alumnos/:idAlumno/estado/:estado')
+  // async cambiarEstadoAlumno(
+  //   @Param('idComision') idComision: string,
+  //   @Param('idAlumno') idAlumno: string,
+  //   @Param('estado') estado: string,
+  // ) {
+  //   const estadoBool = estado === 'true';  // Convertir el parámetro de estado a booleano
+  //   return this.comisionService.cambiarEstadoAlumno(idComision, idAlumno, estadoBool);
+  // }
 }

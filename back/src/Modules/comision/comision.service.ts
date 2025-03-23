@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Curso } from '../curso/entities/curso.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
+import { AlumnoComision } from './entities/alumnocomision.entity';
 
 @Injectable()
 export class ComisionService {
@@ -19,6 +20,8 @@ export class ComisionService {
     private readonly cursoRepository: Repository<Curso>,
     @InjectRepository(Profesor)
     private readonly profesorRepository: Repository<Profesor>,
+    @InjectRepository(Profesor)
+    private readonly alumnoComisionRepository: Repository<AlumnoComision>,
   ) {}
 
   async create(createComisionDto: CreateComisionDto): Promise<Comision> {
@@ -64,15 +67,15 @@ export class ComisionService {
   async findOne(id: string) {
     return this.comisionRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'alumnos', 'profesor', 'curso'],
+      relations: ['sucursal', 'alumnoComisiones', 'profesor', 'curso'],
       select: {
         sucursal: {
           id: true,
           name: true,
         },
-        alumnos: {
+        alumnoComisiones: {
           id: true,
-          name: true,
+          state: true,
         },
         profesor: {
           id: true,
@@ -161,9 +164,26 @@ export class ComisionService {
         profesor: {
           id: true,
           name: true,
-          apellido:true
+          apellido: true,
         },
       },
     });
+  }
+
+  async cambiarEstadoAlumnoComision(
+    alumnoId: string,
+    comisionId: string,
+    estado: boolean,
+  ): Promise<AlumnoComision> {
+    const alumnoComision = await this.alumnoComisionRepository.findOne({
+      where: { alumno: { id: alumnoId }, comision: { id: comisionId } },
+    });
+
+    if (!alumnoComision) {
+      throw new Error('La relación alumno-comisión no existe.');
+    }
+
+    alumnoComision.state = estado;
+    return this.alumnoComisionRepository.save(alumnoComision);
   }
 }

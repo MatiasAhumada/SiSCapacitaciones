@@ -45,4 +45,19 @@ export class CajaController {
   remove(@Param('id') id: string) {
     return this.cajaService.remove(id);
   }
+
+  @Get("/movimientos/:fecha")
+  getMovimientosPorDia(@Param('fecha') fecha: string) {
+    return this.cajaService.getMovimientosPorDia(fecha);
+  }
+
+  @Get('/resumen/:fecha')
+   getResumenPorDia(@Param('fecha') fecha: string) {
+    return this.cajaService.getResumenPorDia(fecha);
+  }
+
+  @Get('/resumen-total')
+   getResumenTotal() {
+    return this.cajaService.getResumenTotal();
+  }
 }

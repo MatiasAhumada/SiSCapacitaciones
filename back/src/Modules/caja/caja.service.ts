@@ -119,32 +119,29 @@ export class CajaService {
   }
 
   async getMovimientosPorDia(fecha: string) {
-    const fechaInicio = new Date(fecha);
-  const fechaFin = new Date(fecha);
-  fechaFin.setHours(23, 59, 59, 999); 
     return this.cajaRepository.find({
-      where: { fecha:Between(fechaInicio, fechaFin)  },
+      where: { fecha: Between(new Date(`${fecha}T00:00:00`), new Date(`${fecha}T23:59:59.999`)) },
       relations: ['vendedor', 'alumno'],
-      select:{
-        vendedor:{
-          id:true,
-          name:true
+      select: {
+        vendedor: {
+          id: true,
+          name: true,
         },
-        alumno:{
-          id:true,
-          name:true
-        }
-      }
+        alumno: {
+          id: true,
+          name: true,
+        },
+      },
     });
   }
-  
+
   async getResumenPorDia(fecha: string) {
     const movimientos = await this.getMovimientosPorDia(fecha);
     const ingresos = movimientos
-      .filter(m => m.tipo === TipoMovimiento.INGRESO)
+      .filter((m) => m.tipo === TipoMovimiento.INGRESO)
       .reduce((sum, m) => sum + Number(m.monto), 0);
     const egresos = movimientos
-      .filter(m => m.tipo === TipoMovimiento.EGRESO)
+      .filter((m) => m.tipo === TipoMovimiento.EGRESO)
       .reduce((sum, m) => sum + Number(m.monto), 0);
     return { ingresos, egresos, total: ingresos - egresos };
   }
@@ -152,10 +149,10 @@ export class CajaService {
   async getResumenTotal() {
     const movimientos = await this.cajaRepository.find();
     const ingresos = movimientos
-      .filter(m => m.tipo === TipoMovimiento.INGRESO)
+      .filter((m) => m.tipo === TipoMovimiento.INGRESO)
       .reduce((sum, m) => sum + Number(m.monto), 0);
     const egresos = movimientos
-      .filter(m => m.tipo === TipoMovimiento.EGRESO)
+      .filter((m) => m.tipo === TipoMovimiento.EGRESO)
       .reduce((sum, m) => sum + Number(m.monto), 0);
     return { ingresos, egresos, total: ingresos - egresos };
   }

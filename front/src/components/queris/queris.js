@@ -273,6 +273,30 @@ export const getCajas = async () => {
     console.log(error);
   }
 };
+export const getMovimientosPorDia = async (fecha) => {
+  try {
+    const response = await axios.get(`${URL}/caja/movimientos/${fecha}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getResumenPorDia = async (fecha) => {
+  try {
+    const response = await axios.get(`${URL}/caja/resumen/${fecha}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getResumenTotal = async () => {
+  try {
+    const response = await axios.get(`${URL}/caja/resumen-total`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //CERTIFICADOS
 

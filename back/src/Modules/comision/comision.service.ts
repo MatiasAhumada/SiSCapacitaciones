@@ -67,7 +67,7 @@ export class ComisionService {
   async findOne(id: string) {
     return this.comisionRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'alumnoComisiones', 'profesor', 'curso'],
+      relations: ['sucursal', 'alumnoComisiones.alumno', 'profesor', 'curso'],
       select: {
         sucursal: {
           id: true,
@@ -76,6 +76,11 @@ export class ComisionService {
         alumnoComisiones: {
           id: true,
           state: true,
+          alumno:{
+            dni:true,
+            name:true,
+            tel:true
+          }
         },
         profesor: {
           id: true,

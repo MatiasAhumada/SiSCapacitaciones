@@ -23,6 +23,7 @@ import DashCaja from "./components/caja/DashCaja";
 import CreateCaja from "./components/caja/CreateCaja";
 import Certificado from "./components/admin/certificados/Certificados";
 import DashCajas from "./components/admin/cajas/DashCajas";
+import ListadoComisiones from "./components/admin/comisiones/ListadoComisiones";
 function App() {
   return (
     <BrowserRouter>
@@ -49,6 +50,7 @@ function App() {
               path="crear"
               element={<CreateComision></CreateComision>}
             ></Route>
+            <Route path=":comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
           </Route>
           <Route path="cajas" element={<DashCajas></DashCajas>}></Route>
           <Route

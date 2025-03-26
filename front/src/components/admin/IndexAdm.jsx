@@ -11,6 +11,7 @@ const IndexAdm = () => {
   useEffect(() => {
     setPause(true);
     getSucursalId(id).then((data) => {
+      console.log(data);
       setPause(false);
       setSede(data);
     });

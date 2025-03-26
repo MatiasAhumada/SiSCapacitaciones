@@ -98,13 +98,5 @@ export class AlumnoService {
     return `${alu.name} deleted`;
   }
 
-  // async cambiarEstado(id: string, nuevoEstado: boolean): Promise<Alumno> {
-  //   const alumno = await this.alumnoRepository.findOne({ where: { id } }); // Buscar el alumno por ID
-  //   if (!alumno) {
-  //     throw new Error('Alumno no encontrado');
-  //   }
 
-  //   alumno.state = nuevoEstado; // Cambiar el estado a true (activo) o false (inactivo)
-  //   return this.alumnoRepository.save(alumno); // Guardar los cambios
-  // }
 }

@@ -22,15 +22,13 @@ const DashComisiones = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
-  const isSubRoute = location.pathname.includes("crear");
+  const isSubRoute = location.pathname.includes("crear") || /\d+$/.test(location.pathname);
 
-  const clickDelete = async (e) => {
-    e.preventDefault();
-    const comisionId = e.target.value;
-
+  const clickDelete = async (id) => {
+    const comisionId = id;
+    console.log(id);
     setPause((prev) => ({ ...prev, [comisionId]: true }));
-
-    await deleteComision(e.target.value).then(() => {
+    await deleteComision(id).then(() => {
       try {
         Swal.fire({
           title: "Comision Eliminada",
@@ -43,7 +41,6 @@ const DashComisiones = () => {
             delete newPause[comisionId];
             return newPause;
           });
-
           setTableItems((prev) => prev.filter((item) => item.id !== comisionId));
         });
       } catch (error) {
@@ -73,7 +70,7 @@ const DashComisiones = () => {
     sucursal();
   }, []);
 
-  const handleEdit = (comision) => {    
+  const handleEdit = (comision) => {
     setEditing(comision.id);
     setEditData({
       name: comision.name,
@@ -94,8 +91,7 @@ const DashComisiones = () => {
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     try {
       await putComision(comisionId, editData);
-      Swal.fire({ title: "Comisión actualizada", icon: "success", timer: 1500 });
-
+      Swal.fire({ title: "Comisión actualizada", icon: "success", showConfirmButton: false, timer: 1500 });
       setTableItems((prev) =>
         prev.map((item) =>
           item.id === comisionId
@@ -115,7 +111,7 @@ const DashComisiones = () => {
       setEditing(null);
     }
   };
-console.log(tableItems)
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -126,7 +122,10 @@ console.log(tableItems)
               <p className="text-gray-600 mt-2">En esta tabla estaran las comisiones de esta sucursal</p>
             </div>
             <div className="mt-3 md:mt-0">
-              <button onClick={() => navigate(`/adm/${id}/cursos/crear`)} className="inline-block px-4 py-2 text-white principal btnAz md:text-sm">
+              <button
+                onClick={() => navigate(`/adm/${id}/comisiones/crear`)}
+                className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
+              >
                 Nueva Comision
               </button>
             </div>
@@ -214,11 +213,11 @@ console.log(tableItems)
                         `${item.profesor?.name} ${item.profesor?.apellido}`
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.alumnos?.length}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.alumnoComisiones?.length}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         value={item.id}
-                        onClick={clickDelete}
+                        onClick={() => navigate(`/adm/${id}/comisiones/${item.id}`)}
                         className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (
@@ -234,9 +233,10 @@ console.log(tableItems)
                             </path>
                           </svg>
                         ) : (
-                          "Eliminar"
+                          <i className="fa-solid fa-plus"></i>
                         )}
                       </button>
+
                       {editing === item.id ? (
                         <button onClick={() => handleSave(item.id)} className="px-4 py-2 text-white bg-green-500 rounded ms-3">
                           {pause[item.id] ? (
@@ -252,7 +252,7 @@ console.log(tableItems)
                               </path>
                             </svg>
                           ) : (
-                            "Guardar"
+                            <i className="fa-solid fa-floppy-disk"></i>
                           )}
                         </button>
                       ) : (
@@ -270,10 +270,31 @@ console.log(tableItems)
                               </path>
                             </svg>
                           ) : (
-                            "Editar"
+                            <i className="fa-solid fa-pen"></i>
                           )}
                         </button>
                       )}
+                      <button
+                        value={item.id}
+                        onClick={() => clickDelete(item.id)}
+                        className=" px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                      >
+                        {pause[item.id] ? (
+                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                              <animateTransform
+                                attributeName="transform"
+                                type="rotate"
+                                dur="0.75s"
+                                values="0 12 12;360 12 12"
+                                repeatCount="indefinite"
+                              />
+                            </path>
+                          </svg>
+                        ) : (
+                          <i className="fa-solid fa-x"></i>
+                        )}
+                      </button>
                     </td>
                   </tr>
                 ))}

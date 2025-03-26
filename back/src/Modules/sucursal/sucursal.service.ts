@@ -42,7 +42,7 @@ export class SucursalService {
       where: { id },
       relations: [
         'alumnos',
-        'alumnos.comisiones',
+        'alumnos.alumnoComisiones',
         'alumnos.certificados',
         'profesores',
         'profesores.comisiones',

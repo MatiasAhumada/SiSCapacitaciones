@@ -160,7 +160,7 @@ export class ComisionService {
   async findBySucursal(sucursalId: string): Promise<Comision[]> {
     return await this.comisionRepository.find({
       where: { sucursal: { id: sucursalId } },
-      relations: ['curso', 'profesor', 'alumnos', 'sucursal'],
+      relations: ['curso', 'profesor', 'alumnoComisiones', 'sucursal'],
       select: {
         curso: {
           id: true,

@@ -9,6 +9,7 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
     name: "",
     fNac: "",
     tel: "",
+    telex: "",
     ocupation: "",
     nationality: "",
     address: "",
@@ -38,7 +39,8 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
       timer: 1500,
     }).then(() => {
       setPause(false);
-      nextStep();
+      // nextStep();
+      console.log(formAlu);
     });
     // try {
     //   postAlu(formAlu).then((data) => {
@@ -64,18 +66,13 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
   };
 
   const fieldLabels = {
-    dni: "DNI",
-    name: "Nombre",
+    name: "Nombre Completo",
     fNac: "Fecha de Nacimiento",
-    tel: "Teléfono",
-    ocupation: "Ocupación",
     nationality: "Nacionalidad",
     address: "Dirección",
     province: "Provincia",
     locality: "Localidad",
     email: "Correo Electrónico",
-    age: "Edad",
-    gender: "Genero",
   };
   const genero = [
     { value: "Masculino" },
@@ -93,10 +90,27 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
       <h2 className="text-lg principal">Cargar Alumno</h2>
       <p>Ingrese Informacion del alumno.</p>
       <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="flex flex-col">
+          <label htmlFor="dni" className="mb-1 text-sm">
+            DNI
+          </label>
+          <input
+            type="number"
+            name="dni"
+            value={formAlu.dni}
+            placeholder="42499732"
+            onChange={handleChange}
+            className="p-2 border rounded"
+          />
+        </div>
         {Object.keys(formAlu).map(
           (key) =>
             key !== "sucursalId" &&
+            key !== "dni" &&
             key !== "gender" &&
+            key !== "tel" &&
+            key !== "telex" &&
+            key !== "age" &&
             key !== "ocupation" && (
               <div key={key} className="flex flex-col">
                 <label htmlFor={key} className="mb-1 text-sm">
@@ -113,6 +127,45 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
               </div>
             )
         )}
+        <div className="flex flex-col">
+          <label htmlFor="tel" className="mb-1 text-sm">
+            Telefono
+          </label>
+          <input
+            type="number"
+            name="tel"
+            value={formAlu.tel}
+            placeholder="3813528657"
+            onChange={handleChange}
+            className="p-2 border rounded"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="telex" className="mb-1 text-sm">
+            Telefono Alternativo
+          </label>
+          <input
+            type="number"
+            name="telex"
+            value={formAlu.telex}
+            placeholder="3813528655"
+            onChange={handleChange}
+            className="p-2 border rounded"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="age" className="mb-1 text-sm">
+            Edad
+          </label>
+          <input
+            type="number"
+            name="age"
+            value={formAlu.age}
+            placeholder="22"
+            onChange={handleChange}
+            className="p-2 border rounded"
+          />
+        </div>
         <div className="flex flex-col">
           <label htmlFor="gender" className="mb-1 text-sm">
             Genero

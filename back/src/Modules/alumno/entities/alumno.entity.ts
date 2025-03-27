@@ -27,6 +27,8 @@ export class Alumno {
   fNac?: Date;
   @Column({ type: 'bigint', nullable: true })
   tel?: number;
+  @Column({ type: 'bigint', nullable: true })
+  telex?: number;
   @Column()
   ocupation?: string;
   @Column()

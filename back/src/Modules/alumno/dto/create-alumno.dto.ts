@@ -25,6 +25,9 @@ export class CreateAlumnoDto {
 
   @IsNumber()
   tel?: number;
+  
+  @IsNumber()
+  telex?: number;
 
   @IsString()
   ocupation?: string;

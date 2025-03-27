@@ -71,7 +71,13 @@ export class ComisionService {
   async findOne(id: string) {
     return this.comisionRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'alumnoComisiones.alumno', 'profesor', 'curso'],
+      relations: [
+        'sucursal',
+        'alumnoComisiones.alumno',
+        'alumnoComisiones.asistencias',
+        'profesor',
+        'curso',
+      ],
       select: {
         sucursal: {
           id: true,
@@ -85,7 +91,13 @@ export class ComisionService {
             name: true,
             tel: true,
           },
+          asistencias: {
+            id: true,
+            presente: true,
+            fecha: true,
+          },
         },
+        
         profesor: {
           id: true,
           name: true,
@@ -215,6 +227,12 @@ export class ComisionService {
 
     return await this.asistenciaRepository.save(asistencia);
   }
-
-  
+  async obtenerAsistenciasPorComision(
+    comisionId: string,
+  ): Promise<Asistencia[]> {
+    return this.asistenciaRepository.find({
+      where: { alumnoComision: { comision: { id: comisionId } } },
+      relations: ['alumnoComision', 'alumnoComision.alumno'],
+    });
+  }
 }

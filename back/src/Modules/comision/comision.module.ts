@@ -10,7 +10,7 @@ import { Asistencia } from './entities/asistencia.entity';
 import { AlumnoComision } from './entities/alumnocomision.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Comision,Sucursal,Curso,Profesor,Asistencia,AlumnoComision])],
+  imports:[TypeOrmModule.forFeature([Comision,Sucursal,Curso,Profesor,Asistencia,AlumnoComision,Asistencia])],
   controllers: [ComisionController],
   providers: [ComisionService],
 })

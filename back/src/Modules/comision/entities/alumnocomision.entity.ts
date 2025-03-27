@@ -1,6 +1,13 @@
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Asistencia } from './asistencia.entity';
 
 @Entity('alumno_comision')
 export class AlumnoComision {
@@ -14,5 +21,7 @@ export class AlumnoComision {
   comision: Comision;
 
   @Column({ default: true })
-  state: boolean; 
+  state: boolean;
+  @OneToMany(() => Asistencia, (asistencia) => asistencia.alumnoComision)
+  asistencias: Asistencia[];
 }

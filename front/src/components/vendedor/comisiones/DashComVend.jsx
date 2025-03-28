@@ -94,7 +94,6 @@ const DashComVend = () => {
   };
 
   const handleSave = async (comisionId) => {
-    console.log(editData);
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     try {
       await putComision(comisionId, editData);
@@ -209,6 +208,7 @@ const DashComVend = () => {
                       {editing === item.id ? (
                         <>
                           <select name="start" value={editData.hour?.start || ""} onChange={handleChange} className="border rounded px-2">
+                            <option value=""> Inicio</option>
                             {horarios.map((horario, index) => (
                               <option key={index} value={horario}>
                                 {horario}
@@ -217,6 +217,7 @@ const DashComVend = () => {
                           </select>
                           <span>-</span>
                           <select name="end" value={editData.hour?.end || ""} onChange={handleChange} className="border rounded px-2">
+                           <option value=""> Fin</option>
                             {horarios.map((horario, index) => (
                               <option key={index} value={horario}>
                                 {horario}

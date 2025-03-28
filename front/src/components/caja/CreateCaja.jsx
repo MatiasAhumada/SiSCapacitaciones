@@ -112,7 +112,7 @@ const CreateCaja = () => {
           <img src={logo} alt="Logo" width="50" />
         </div>
 
-        <h2 className="my-auto principal">Creacion de Moviemiento</h2>
+        <h2 className="my-auto principal">Cobranzas</h2>
       </div>
 
       <form className="flex flex-col" onSubmit={handleSubmit}>

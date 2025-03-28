@@ -46,24 +46,19 @@ function App() {
             <Route path="crear" element={<CreateCurso></CreateCurso>}></Route>
           </Route>
           <Route path="comisiones" element={<DashComisiones></DashComisiones>}>
-            <Route
-              path="crear"
-              element={<CreateComision></CreateComision>}
-            ></Route>
+            <Route path="crear" element={<CreateComision></CreateComision>}></Route>
             <Route path=":comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
           </Route>
           <Route path="cajas" element={<DashCajas></DashCajas>}></Route>
-          <Route
-            path="certificados"
-            element={<Certificado></Certificado>}
-          ></Route>
+          <Route path="certificados" element={<Certificado></Certificado>}></Route>
         </Route>
         <Route path="/inicioVendedor" element={<IndexVendedor></IndexVendedor>}>
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
           <Route path="inscribir" element={<Inscripcion></Inscripcion>}></Route>
-          <Route path="caja" element={<DashCaja></DashCaja>}>
-            <Route path="crear" element={<CreateCaja></CreateCaja>}></Route>
-          </Route>
+          <Route path="caja" element={<DashCaja></DashCaja>}></Route>
+          <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
+          <Route path="cursos" element={<DashCursos></DashCursos>}></Route>
+          <Route path="comisiones" element={<DashComisiones></DashComisiones>}></Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>

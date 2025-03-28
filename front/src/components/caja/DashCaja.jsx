@@ -136,11 +136,7 @@ const DashCaja = () => {
               <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
               <p className="text-gray-600 mt-2">En esta tabla estaran los movimientos realizados.</p>
             </div>
-            <div className="mt-3 md:mt-0">
-              <button onClick={() => navigate(`/inicioVendedor/caja/crear`)} className="inline-block px-4 py-2 text-white principal btnAz md:text-sm">
-                Nuevo Movimiento
-              </button>
-            </div>
+            
           </div>
           <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
             <table className="w-full table-auto text-sm  text-center">

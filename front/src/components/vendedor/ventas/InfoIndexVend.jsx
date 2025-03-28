@@ -42,7 +42,7 @@ const InfoIndexVend = () => {
     vendedor();
     cajaVendedor();
   }, []);
-  const links = [{ name: "Inscribir" }, { name: "Abono" }, { name: "Caja" }, { name: "Comisiones" }];
+  
   const stats = [
     { name: "Inscripciones realizadas", value: vendedor?.inscripciones?.length || "0" },
     { name: "Alumnos registrados", value: "300+" },
@@ -65,13 +65,7 @@ const InfoIndexVend = () => {
           <p className="mt-8 sm:text-xl/8"> {vendedor && vendedor.sucursales.length > 0 ? vendedor.sucursales[0].name : "Sin sucursales"}</p>
         </div>
         <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-          <div className="grid grid-cols-1 mb-5 gap-x-8 gap-y-6 text-base/7 font-semibold sm:grid-cols-4 md:flex lg:gap-x-40 ">
-            {links.map((link) => (
-              <button key={link.name} onClick={() => click(link.name)} className="btnAz">
-                {link.name} <span aria-hidden="true">&rarr;</span>
-              </button>
-            ))}
-          </div>
+          
           <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat) => (
               <div key={stat.name} className="flex flex-col-reverse gap-1">

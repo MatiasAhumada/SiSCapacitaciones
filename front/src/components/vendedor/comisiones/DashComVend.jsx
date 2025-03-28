@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { deleteComision, deleteCurso, getComisionBySucursal, getCursos, getProfes, getSucursalId, putComision } from "../../queris/queris";
+import {
+  deleteComision,
+  deleteCurso,
+  getComisionBySucursal,
+  getComisiones,
+  getCursos,
+  getProfes,
+  getSucursalId,
+  putComision,
+} from "../../queris/queris";
 
-const DashComisiones = () => {
+const DashComVend = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -13,7 +22,7 @@ const DashComisiones = () => {
   const [editData, setEditData] = useState({
     name: "",
     day: "",
-    hour: "",
+    hour: { start: "", end: "" },
     cursoId: "",
     profesorId: "",
     sucursalId: id,
@@ -21,11 +30,11 @@ const DashComisiones = () => {
   const [cursos, setCursos] = useState([]);
   const [profesores, setProfesores] = useState([]);
 
-  const isSubRoute = location.pathname.includes("crear") || /\d+$/.test(location.pathname);
+  const isSubRoute = location.pathname.includes("crear");
 
   const clickDelete = async (id) => {
     const comisionId = id;
-    console.log(id);
+
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     await deleteComision(id).then(() => {
       try {
@@ -50,7 +59,7 @@ const DashComisiones = () => {
 
   useEffect(() => {
     const sucursal = async () => {
-      await getComisionBySucursal(id).then((data) => {
+      await getComisiones().then((data) => {
         setTableItems(data);
       });
     };
@@ -83,7 +92,14 @@ const DashComisiones = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditData({ ...editData, [name]: value });
+
+    setEditData((prevData) => ({
+      ...prevData,
+      hour: {
+        ...prevData.hour,
+        [name]: value,
+      },
+    }));
   };
 
   const handleSave = async (comisionId) => {
@@ -110,7 +126,20 @@ const DashComisiones = () => {
       setEditing(null);
     }
   };
-
+  const dias = [
+    { value: "Lunes" },
+    { value: "Martes" },
+    { value: "Miercoles" },
+    { value: "Jueves" },
+    { value: "Viernes" },
+    { value: "Sabado" },
+    { value: "Domingo" },
+  ];
+  const horarios = Array.from({ length: (22 - 8) * 2 + 1 }, (_, i) => {
+    const horas = Math.floor(8 + i / 2);
+    const minutos = i % 2 === 0 ? "00" : "30";
+    return `${horas}:${minutos}`;
+  });
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -122,7 +151,7 @@ const DashComisiones = () => {
             </div>
             <div className="mt-3 md:mt-0">
               <button
-                onClick={() => navigate(`/adm/${id}/comisiones/crear`)}
+                onClick={() => navigate(`/inicioVendedor/comisiones/crear`)}
                 className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
               >
                 Nueva Comision
@@ -136,7 +165,7 @@ const DashComisiones = () => {
                   <th className="py-3 px-6">Nombre</th>
                   <th className="py-3 px-6">Dia</th>
                   <th className="py-3 px-6">Hora</th>
-                  <th className="py-3 px-6">Curso</th>
+                  {/* <th className="py-3 px-6">Curso</th> */}
                   <th className="py-3 px-6">Profesor</th>
                   <th className="py-3 px-6">Alumnos</th>
                   <th className="py-3 px-6"></th>
@@ -171,7 +200,13 @@ const DashComisiones = () => {
                         }`}
                       >
                         {editing === item.id ? (
-                          <input type="text" value={editData.day} name="day" onChange={handleChange} className="border rounded px-2" />
+                          <select name="day" value={editData.day} onChange={handleChange} className="border rounded px-2">
+                            {dias.map((dia, index) => (
+                              <option key={index} value={dia.value}>
+                                {dia.value}
+                              </option>
+                            ))}
+                          </select>
                         ) : (
                           item.day
                         )}
@@ -179,12 +214,28 @@ const DashComisiones = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editing === item.id ? (
-                        <input type="text" value={editData.hour} name="hour" onChange={handleChange} className="border rounded px-2" />
+                        <>
+                          <select name="start" value={editData.hour.start} onChange={handleChange} className="border rounded px-2">
+                            {horarios.map((horario, index) => (
+                              <option key={index} value={horario}>
+                                {horario}
+                              </option>
+                            ))}
+                          </select>
+                          <span>-</span>
+                          <select name="end" value={editData.hour.end} onChange={handleChange} className="border rounded px-2">
+                            {horarios.map((horario, index) => (
+                              <option key={index} value={horario}>
+                                {horario}
+                              </option>
+                            ))}
+                          </select>
+                        </>
                       ) : (
-                        item.hour
+                        `${item.hour.start} - ${item.hour.end}`
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       {editing === item.id ? (
                         <select name="cursoId" onChange={handleChange} className="border rounded px-2">
                           <option value="">{item.curso?.name}</option>
@@ -197,7 +248,7 @@ const DashComisiones = () => {
                       ) : (
                         item.curso?.name
                       )}
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4">
                       {editing === item.id ? (
                         <select name="profesorId" onChange={handleChange} className="border rounded px-2">
@@ -307,4 +358,4 @@ const DashComisiones = () => {
   );
 };
 
-export default DashComisiones;
+export default DashComVend;

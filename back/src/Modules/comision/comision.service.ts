@@ -27,10 +27,20 @@ export class ComisionService {
     @InjectRepository(Asistencia)
     private readonly asistenciaRepository: Repository<Asistencia>,
   ) {}
-
+  private cleanHour(hour: any): { start: string, end: string } {
+    // Verifica si 'start' y 'end' existen y limpia los valores no deseados
+    if (hour && hour.start && hour.end) {
+      return {
+        start: hour.start,
+        end: hour.end
+      };
+    }
+    return { start: '', end: '' }; // Si no existen valores, devuelve vacíos
+  }
   async create(createComisionDto: CreateComisionDto): Promise<Comision> {
-    const { sucursalId, cursoId, profesorId, name, day, hour } =
-      createComisionDto;
+    const cleanedHour = this.cleanHour(createComisionDto.hour);
+    createComisionDto.hour = cleanedHour;
+    const { sucursalId, cursoId, profesorId, name, day, hour } =createComisionDto;
 
     const profesor = await this.profesorRepository.findOne({
       where: { id: profesorId },
@@ -65,7 +75,15 @@ export class ComisionService {
   }
 
   async findAll() {
-    return this.comisionRepository.find();
+    return this.comisionRepository.find({
+      relations: ['profesor', 'alumnoComisiones'],
+      select: {
+        alumnoComisiones: {
+          id: true,
+          state:true
+        },
+      },
+    });
   }
 
   async findOne(id: string) {
@@ -97,7 +115,7 @@ export class ComisionService {
             fecha: true,
           },
         },
-        
+
         profesor: {
           id: true,
           name: true,

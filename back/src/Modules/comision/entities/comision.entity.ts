@@ -21,15 +21,17 @@ export class Comision {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
 
- 
   @Column()
   name: string;
 
   @Column()
   day: string;
 
-  @Column()
-  hour: string;
+  @Column('json', { nullable: true })
+  hour: {
+    start: string;
+    end: string;
+  };
 
   @ManyToOne(() => Curso, (curso) => curso.comisiones, { onDelete: 'SET NULL' })
   curso: Curso;

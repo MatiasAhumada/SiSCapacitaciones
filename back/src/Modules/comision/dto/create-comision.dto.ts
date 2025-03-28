@@ -1,4 +1,15 @@
-import { IsUUID, IsDate, IsString, IsBoolean } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsUUID, IsDate, IsString, IsBoolean, IsNotEmpty, ValidateNested, IsObject } from 'class-validator';
+
+class HourDto {
+  @IsString()
+  @IsNotEmpty()
+  start: string;
+
+  @IsString()
+  @IsNotEmpty()
+  end: string;
+}
 
 export class CreateComisionDto {
   @IsString()
@@ -7,9 +18,10 @@ export class CreateComisionDto {
   @IsString()
   day: string;
   
-  @IsString()
-  hour: string;
-
+  @IsObject()
+  @ValidateNested()
+  @Type(() => HourDto) 
+  hour: HourDto;
   @IsUUID()
   cursoId: string;
 

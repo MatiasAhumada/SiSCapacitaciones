@@ -24,6 +24,8 @@ import CreateCaja from "./components/caja/CreateCaja";
 import Certificado from "./components/admin/certificados/Certificados";
 import DashCajas from "./components/admin/cajas/DashCajas";
 import ListadoComisiones from "./components/admin/comisiones/ListadoComisiones";
+import DashComVend from "./components/vendedor/comisiones/DashComVend";
+import CreateComVend from "./components/vendedor/comisiones/CreateComVend";
 function App() {
   return (
     <BrowserRouter>
@@ -58,7 +60,9 @@ function App() {
           <Route path="caja" element={<DashCaja></DashCaja>}></Route>
           <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
           <Route path="cursos" element={<DashCursos></DashCursos>}></Route>
-          <Route path="comisiones" element={<DashComisiones></DashComisiones>}></Route>
+          <Route path="comisiones" element={<DashComVend></DashComVend>}>
+            <Route path="crear" element={<CreateComVend></CreateComVend>}></Route>
+          </Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>

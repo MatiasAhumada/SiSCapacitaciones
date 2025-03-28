@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import {
-  deleteComision,
-  deleteCurso,
-  getComisionBySucursal,
-  getComisiones,
-  getCursos,
-  getProfes,
-  getSucursalId,
-  putComision,
-} from "../../queris/queris";
+import { deleteComision, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
 
 const DashComVend = () => {
   const { id } = useParams();
@@ -92,9 +83,9 @@ const DashComVend = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setEditData((prevData) => ({
       ...prevData,
+      [name]: value,
       hour: {
         ...prevData.hour,
         [name]: value,
@@ -103,6 +94,7 @@ const DashComVend = () => {
   };
 
   const handleSave = async (comisionId) => {
+    console.log(editData);
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     try {
       await putComision(comisionId, editData);
@@ -200,9 +192,10 @@ const DashComVend = () => {
                         }`}
                       >
                         {editing === item.id ? (
-                          <select name="day" value={editData.day} onChange={handleChange} className="border rounded px-2">
-                            {dias.map((dia, index) => (
-                              <option key={index} value={dia.value}>
+                          <select name="day" value={editData?.day || ""} onChange={handleChange} className="border rounded px-2">
+                            <option value="">Seleccionar</option>
+                            {dias.map((dia, idx) => (
+                              <option key={idx} value={dia.value}>
                                 {dia.value}
                               </option>
                             ))}
@@ -215,7 +208,7 @@ const DashComVend = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editing === item.id ? (
                         <>
-                          <select name="start" value={editData.hour.start} onChange={handleChange} className="border rounded px-2">
+                          <select name="start" value={editData.hour?.start || ""} onChange={handleChange} className="border rounded px-2">
                             {horarios.map((horario, index) => (
                               <option key={index} value={horario}>
                                 {horario}
@@ -223,7 +216,7 @@ const DashComVend = () => {
                             ))}
                           </select>
                           <span>-</span>
-                          <select name="end" value={editData.hour.end} onChange={handleChange} className="border rounded px-2">
+                          <select name="end" value={editData.hour?.end || ""} onChange={handleChange} className="border rounded px-2">
                             {horarios.map((horario, index) => (
                               <option key={index} value={horario}>
                                 {horario}
@@ -232,7 +225,7 @@ const DashComVend = () => {
                           </select>
                         </>
                       ) : (
-                        `${item.hour.start} - ${item.hour.end}`
+                        `${item?.hour?.start || "Hora no definida"} - ${item?.hour?.end || "Hora no definida"}`
                       )}
                     </td>
                     {/* <td className="px-6 py-4">

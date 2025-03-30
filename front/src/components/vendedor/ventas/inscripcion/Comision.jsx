@@ -97,7 +97,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
     const { name, value } = e.target;
     setNuevaComision((prevData) => ({
       ...prevData,
-      [name]: value,
+      // [name]: value,
       hour: {
         ...prevData.hour,
         [name]: value,
@@ -107,23 +107,24 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setPause(true);
-    await postComision(nuevaComision).then((data) => {
-      try {
-        Swal.fire({
-          icon: "success",
-          title: "Comision creada",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause(false);
-          setFormData({ ...formData, comisionId: data.id });
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    });
-    nextStep();
+    //console.log(nuevaComision);
+     setPause(true);
+     await postComision(nuevaComision).then((data) => {
+       try {
+         Swal.fire({
+           icon: "success",
+           title: "Comision creada",
+           showConfirmButton: false,
+           timer: 1500,
+         }).then(() => {
+           setPause(false);
+           setFormData({ ...formData, comisionId: data.id });
+         });
+       } catch (error) {
+         console.log(error);
+       }
+     });
+     nextStep();
   };
   const handleNextClick = () => {
     Swal.fire({
@@ -151,6 +152,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
     const minutos = i % 2 === 0 ? "00" : "30";
     return `${horas}:${minutos}`;
   });
+  console.log(comisionSeleccionada.alumnoComisiones);
   return (
     <div className="p-4 border rounded-lg shadow-md text-center w-96 mx-auto">
       <h2 className="text-lg font-bold">Seleccionar Comisión</h2>
@@ -186,7 +188,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
                 {editando ? (
                   <input type="text" name="hour" value={datosEditados.hour} onChange={handleChange} className="border p-1 rounded" />
                 ) : (
-                  `${comisionSeleccionada.hour} HS`
+                  `${comisionSeleccionada.hour.start} - ${comisionSeleccionada.hour.end}`
                 )}
               </p>
 
@@ -203,8 +205,8 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
                 <strong>Alumnos Inscritos:</strong>
               </p>
               <ul className="list-disc ml-4">
-                {comisionSeleccionada.alumnos.length > 0 ? (
-                  comisionSeleccionada.alumnos.map((alumno) => <li key={alumno.id}>{alumno.name}</li>)
+                {comisionSeleccionada.alumnoComisiones.length > 0 ? (
+                  comisionSeleccionada.alumnoComisiones.map((alumno) => <li key={alumno.id}>{alumno.alumno.name}</li>)
                 ) : (
                   <li>No hay alumnos inscritos</li>
                 )}
@@ -277,8 +279,8 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
             placeholder="Horario de la comisión"
           /> */}
           <div className="flex gap-2 w-full mt-2 mb-0">
-            <select name="start" value={nuevaComision.hour?.start || ""} onChange={handleChange} className="p-2 border rounded w-1/2">
-              <option value=""> Inicio</option>
+            <select name="start" value={nuevaComision.hour?.start || ""} onChange={handleInputChange} className="p-2 border rounded w-1/2">
+              <option value="">Inicio</option>
               {horarios.map((horario, index) => (
                 <option key={index} value={horario}>
                   {horario}
@@ -286,7 +288,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               ))}
             </select>
             <span>-</span>
-            <select name="end" value={nuevaComision.hour?.end || ""} onChange={handleChange} className="p-2 border rounded w-1/2">
+            <select name="end" value={nuevaComision.hour?.end || ""} onChange={handleInputChange} className="p-2 border rounded w-1/2">
               <option value=""> Fin</option>
               {horarios.map((horario, index) => (
                 <option key={index} value={horario}>

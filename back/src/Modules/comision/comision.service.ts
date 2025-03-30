@@ -28,14 +28,13 @@ export class ComisionService {
     private readonly asistenciaRepository: Repository<Asistencia>,
   ) {}
   private cleanHour(hour: any): { start: string, end: string } {
-    // Verifica si 'start' y 'end' existen y limpia los valores no deseados
     if (hour && hour.start && hour.end) {
       return {
         start: hour.start,
         end: hour.end
       };
     }
-    return { start: '', end: '' }; // Si no existen valores, devuelve vacíos
+    return { start: '', end: '' }; 
   }
   async create(createComisionDto: CreateComisionDto): Promise<Comision> {
     const cleanedHour = this.cleanHour(createComisionDto.hour);

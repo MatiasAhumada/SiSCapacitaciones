@@ -108,24 +108,25 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     //console.log(nuevaComision);
-     setPause(true);
-     await postComision(nuevaComision).then((data) => {
-       try {
-         Swal.fire({
-           icon: "success",
-           title: "Comision creada",
-           showConfirmButton: false,
-           timer: 1500,
-         }).then(() => {
-           setPause(false);
-           setFormData({ ...formData, comisionId: data.id });
-         });
-       } catch (error) {
-         console.log(error);
-       }
-     });
-     nextStep();
+    setPause(true);
+    await postComision(nuevaComision).then((data) => {
+      try {
+        Swal.fire({
+          icon: "success",
+          title: "Comision creada",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          setPause(false);
+          setFormData({ ...formData, comisionId: data.id });
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+    nextStep();
   };
+
   const handleNextClick = () => {
     Swal.fire({
       icon: "success",
@@ -138,6 +139,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
       nextStep();
     });
   };
+
   const dias = [
     { value: "Lunes" },
     { value: "Martes" },
@@ -147,12 +149,13 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
     { value: "Sabado" },
     { value: "Domingo" },
   ];
+
   const horarios = Array.from({ length: (22 - 8) * 2 + 1 }, (_, i) => {
     const horas = Math.floor(8 + i / 2);
     const minutos = i % 2 === 0 ? "00" : "30";
     return `${horas}:${minutos}`;
   });
-  console.log(comisionSeleccionada.alumnoComisiones);
+
   return (
     <div className="p-4 border rounded-lg shadow-md text-center w-96 mx-auto">
       <h2 className="text-lg font-bold">Seleccionar Comisión</h2>
@@ -173,7 +176,11 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
             <div className="mt-4 p-4 border rounded bg-gray-100 text-left">
               <p>
                 <strong>Nombre: </strong>
-                {`${comisionSeleccionada.name}`}
+                {editando ? (
+                  <input type="text" name="name" value={datosEditados.name} onChange={handleChange} className="border p-1 rounded" />
+                ) : (
+                  `${comisionSeleccionada.name}`
+                )}
               </p>
               <p>
                 <strong>Día:</strong>{" "}
@@ -186,14 +193,35 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               <p>
                 <strong>Horario:</strong>{" "}
                 {editando ? (
-                  <input type="text" name="hour" value={datosEditados.hour} onChange={handleChange} className="border p-1 rounded" />
+                  <>
+                    <select name="start" value={datosEditados.hour?.start || ""} onChange={handleChange} className="border p-1 rounded">
+                      <option value=""> Inicio</option>
+                      {horarios.map((horario, index) => (
+                        <option key={index} value={horario}>
+                          {horario}
+                        </option>
+                      ))}
+                    </select>
+                    <span>-</span>
+                    <select name="end" value={datosEditados.hour?.end || ""} onChange={handleChange} className="border p-1 rounded">
+                      <option value=""> Fin</option>
+                      {horarios.map((horario, index) => (
+                        <option key={index} value={horario}>
+                          {horario}
+                        </option>
+                      ))}
+                    </select>
+                  </>
                 ) : (
                   `${comisionSeleccionada.hour.start} - ${comisionSeleccionada.hour.end}`
                 )}
               </p>
 
               <p>
-                <strong>Sucursal:</strong> {comisionSeleccionada.sucursal.name}
+                <strong>Sucursal:</strong>   {editando ? (
+                  <input type="text" name="sucursalId" value={datosEditados.sucursalId} onChange={handleChange} className="border p-1 rounded" />
+                ) : (
+                comisionSeleccionada.sucursal.name)}
               </p>
               <p>
                 <strong>Curso:</strong> {comisionSeleccionada.curso.name}

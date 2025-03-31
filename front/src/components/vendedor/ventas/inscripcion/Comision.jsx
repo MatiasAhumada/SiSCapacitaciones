@@ -60,8 +60,8 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
   }, []);
 
   const handleSelectChange = (e) => {
+    setEditando(false);
     const comisionId = e.target.value;
-
     if (comisionId) {
       getComisionId(comisionId).then((data) => {
         setComisionSeleccionada(data);
@@ -71,7 +71,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
     }
     setDatosEditados({
       ...datosEditados,
-      sucursalId: comisionSeleccionada.sucursal.id,
+      sucursalId: comisionId,
     });
   };
 

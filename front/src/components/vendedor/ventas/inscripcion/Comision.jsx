@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  getComisiones,
-  getComisionId,
-  getCursos,
-  getProfes,
-  getSucursales,
-  postComision,
-  putComision,
-} from "../../../queris/queris";
+import { getComisiones, getComisionId, getCursos, getProfes, getSucursales, postComision, putComision } from "../../../queris/queris";
 import Swal from "sweetalert2";
 
 const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
@@ -135,7 +127,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
     const { name, value } = e.target;
     setNuevaComision((prevData) => ({
       ...prevData,
-      // [name]: value,
+
       hour: {
         ...prevData.hour,
         [name]: value,
@@ -145,7 +137,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    //console.log(nuevaComision);
+
     setPause(true);
     await postComision(nuevaComision).then((data) => {
       try {
@@ -201,10 +193,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
 
       {!mostrarFormulario ? (
         <>
-          <select
-            onChange={handleSelectChange}
-            className="mt-4 p-2 border rounded w-full"
-          >
+          <select onChange={handleSelectChange} className="mt-4 p-2 border rounded w-full">
             <option value="">Selecciona una comisión</option>
             {comisiones.map((comision) => (
               <option key={comision.id} value={comision.id}>
@@ -218,13 +207,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               <p>
                 <strong>Nombre: </strong>
                 {editando ? (
-                  <input
-                    type="text"
-                    name="name"
-                    value={datosEditados.name}
-                    onChange={handleChange}
-                    className="border p-1 rounded"
-                  />
+                  <input type="text" name="name" value={datosEditados.name} onChange={handleChange} className="border p-1 rounded" />
                 ) : (
                   `${comisionSeleccionada.name}`
                 )}
@@ -232,12 +215,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               <p>
                 <strong>Día: </strong>
                 {editando ? (
-                  <select
-                    name="day"
-                    value={datosEditados?.day || ""}
-                    onChange={handleChange}
-                    className="border p-1 rounded"
-                  >
+                  <select name="day" value={datosEditados?.day || ""} onChange={handleChange} className="border p-1 rounded">
                     <option value="">Seleccionar</option>
                     {dias.map((dia, idx) => (
                       <option key={idx} value={dia.value}>
@@ -250,15 +228,10 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
                 )}
               </p>
               <p>
-                <strong>Horario:</strong>{" "}
+                <strong>Horario: </strong>
                 {editando ? (
                   <>
-                    <select
-                      name="start"
-                      value={datosEditados.hour?.start || ""}
-                      onChange={handleChange}
-                      className="border p-1 rounded"
-                    >
+                    <select name="start" value={datosEditados.hour?.start || ""} onChange={handleChange} className="border p-1 rounded">
                       <option value=""> Inicio</option>
                       {horarios.map((horario, index) => (
                         <option key={index} value={horario}>
@@ -267,12 +240,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
                       ))}
                     </select>
                     <span>-</span>
-                    <select
-                      name="end"
-                      value={datosEditados.hour?.end || ""}
-                      onChange={handleChange}
-                      className="border p-1 rounded"
-                    >
+                    <select name="end" value={datosEditados.hour?.end || ""} onChange={handleChange} className="border p-1 rounded">
                       <option value=""> Fin</option>
                       {horarios.map((horario, index) => (
                         <option key={index} value={horario}>
@@ -293,11 +261,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               <p>
                 <strong>Curso: </strong>
                 {editando ? (
-                  <select
-                    name="cursoId"
-                    onChange={handleChange}
-                    className="border p-1 rounded"
-                  >
+                  <select name="cursoId" onChange={handleChange} className="border p-1 w-75 rounded">
                     <option value="">{comisionSeleccionada.curso.name}</option>
                     {cursos.map((curso) => (
                       <option key={curso.id} value={curso.id}>
@@ -312,11 +276,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               <p>
                 <strong>Profesor: </strong>
                 {editando ? (
-                  <select
-                    name="profesorId"
-                    onChange={handleChange}
-                    className="border p-1 rounded"
-                  >
+                  <select name="profesorId" onChange={handleChange} className="border p-1 rounded">
                     <option value="">Seleccionar</option>
                     {profesores.map((profesor) => (
                       <option key={profesor.id} value={profesor.id}>
@@ -325,11 +285,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
                     ))}
                   </select>
                 ) : (
-                  `${
-                    comisionSeleccionada.profesor.name +
-                    " " +
-                    comisionSeleccionada.profesor.apellido
-                  }`
+                  `${comisionSeleccionada.profesor.name + " " + comisionSeleccionada.profesor.apellido}`
                 )}
               </p>
               <p>
@@ -337,43 +293,26 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               </p>
               <ul className="list-disc ml-4">
                 {comisionSeleccionada.alumnoComisiones.length > 0 ? (
-                  comisionSeleccionada.alumnoComisiones.map((alumno) => (
-                    <li key={alumno.id}>{alumno.alumno.name}</li>
-                  ))
+                  comisionSeleccionada.alumnoComisiones.map((alumno) => <li key={alumno.id}>{alumno.alumno.name}</li>)
                 ) : (
                   <li>No hay alumnos inscritos</li>
                 )}
               </ul>
               <div className="flex justify-center mt-4">
-                <button
-                  onClick={handleEditClick}
-                  className="px-4 py-2 btnAz rounded m-3"
-                >
-                  Editar
-                </button>
                 {!next ? (
                   <>
-                    <button
-                      onClick={handleNextClick}
-                      className="px-4 py-2 btnAz rounded m-3"
-                    >
+                    <button onClick={handleEditClick} className="px-4 py-2 btnAz rounded m-3">
+                      Editar
+                    </button>
+                    <button onClick={handleNextClick} className="px-4 py-2 btnAz rounded m-3">
                       Siguiente
                     </button>
                   </>
                 ) : (
                   <>
-                    <button
-                      onClick={handleSaveClick}
-                      value={comisionSeleccionada.id}
-                      className="px-4 py-2 btnAz rounded m-3"
-                    >
+                    <button onClick={handleSaveClick} value={comisionSeleccionada.id} className="px-4 py-2 btnAz rounded m-3">
                       {pause ? (
-                        <svg
-                          fill="white"
-                          className="w-6 h-6 mx-auto"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"
@@ -393,10 +332,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               </div>
             </div>
           )}
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="px-4 py-2 btnAz rounded m-3"
-          >
+          <button onClick={() => setMostrarFormulario(true)} className="px-4 py-2 btnAz rounded m-3">
             Nueva Comision
           </button>
         </>
@@ -412,12 +348,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
             required
           />
 
-          <select
-            name="day"
-            value={nuevaComision?.day || ""}
-            onChange={handleInputChange}
-            className="p-2 border rounded w-full mt-2"
-          >
+          <select name="day" value={nuevaComision?.day || ""} onChange={handleInputChange} className="p-2 border rounded w-full mt-2">
             <option value="">Seleccionar Dia</option>
             {dias.map((dia, idx) => (
               <option key={idx} value={dia.value}>
@@ -435,12 +366,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
             placeholder="Horario de la comisión"
           /> */}
           <div className="flex gap-2 w-full mt-2 mb-0">
-            <select
-              name="start"
-              value={nuevaComision.hour?.start || ""}
-              onChange={handleInputChange}
-              className="p-2 border rounded w-1/2"
-            >
+            <select name="start" value={nuevaComision.hour?.start || ""} onChange={handleInputChange} className="p-2 border rounded w-1/2">
               <option value="">Inicio</option>
               {horarios.map((horario, index) => (
                 <option key={index} value={horario}>
@@ -449,12 +375,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               ))}
             </select>
             <span>-</span>
-            <select
-              name="end"
-              value={nuevaComision.hour?.end || ""}
-              onChange={handleInputChange}
-              className="p-2 border rounded w-1/2"
-            >
+            <select name="end" value={nuevaComision.hour?.end || ""} onChange={handleInputChange} className="p-2 border rounded w-1/2">
               <option value=""> Fin</option>
               {horarios.map((horario, index) => (
                 <option key={index} value={horario}>
@@ -463,12 +384,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               ))}
             </select>
           </div>
-          <select
-            name="sucursalId"
-            onChange={handleInputChange}
-            className="p-2 border rounded w-full mt-2"
-            required
-          >
+          <select name="sucursalId" onChange={handleInputChange} className="p-2 border rounded w-full mt-2" required>
             <option value="">Selecciona una sucursal</option>
             {sucursales.map((s) => (
               <option key={s.id} value={s.id}>
@@ -476,12 +392,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               </option>
             ))}
           </select>
-          <select
-            name="profesorId"
-            onChange={handleInputChange}
-            className="p-2 border rounded w-full mt-2"
-            required
-          >
+          <select name="profesorId" onChange={handleInputChange} className="p-2 border rounded w-full mt-2" required>
             <option value="">Selecciona un profesor</option>
             {profesores.map((p) => (
               <option key={p.id} value={p.id}>
@@ -489,12 +400,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               </option>
             ))}
           </select>
-          <select
-            name="cursoId"
-            onChange={handleInputChange}
-            className="p-2 border rounded w-full mt-2"
-            required
-          >
+          <select name="cursoId" onChange={handleInputChange} className="p-2 border rounded w-full mt-2" required>
             <option value="">Selecciona un curso</option>
             {cursos.map((c) => (
               <option key={c.id} value={c.id}>

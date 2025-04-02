@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { deleteComision, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
 
 const DashComVend = () => {
-  const { id } = useParams();
+  const { id,idVend } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
@@ -217,7 +217,7 @@ const DashComVend = () => {
                           </select>
                           <span>-</span>
                           <select name="end" value={editData.hour?.end || ""} onChange={handleChange} className="border rounded px-2">
-                           <option value=""> Fin</option>
+                            <option value=""> Fin</option>
                             {horarios.map((horario, index) => (
                               <option key={index} value={horario}>
                                 {horario}
@@ -259,9 +259,10 @@ const DashComVend = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.alumnoComisiones?.length}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      {/* BOTON VER MAS  */}
                       <button
                         value={item.id}
-                        onClick={() => navigate(`/adm/${id}/comisiones/${item.id}`)}
+                        onClick={() => navigate(`/${idVend}/comisiones/${item.id}`)}
                         className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (
@@ -282,6 +283,8 @@ const DashComVend = () => {
                       </button>
 
                       {editing === item.id ? (
+                        // BOTON GUARDAR
+
                         <button onClick={() => handleSave(item.id)} className="px-4 py-2 text-white bg-green-500 rounded ms-3">
                           {pause[item.id] ? (
                             <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -300,6 +303,7 @@ const DashComVend = () => {
                           )}
                         </button>
                       ) : (
+                        // BOTON EDITAR
                         <button onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded ms-3">
                           {pause[item.id] ? (
                             <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -318,6 +322,7 @@ const DashComVend = () => {
                           )}
                         </button>
                       )}
+                      {/* BOTON BORRAR */}
                       <button
                         value={item.id}
                         onClick={() => clickDelete(item.id)}

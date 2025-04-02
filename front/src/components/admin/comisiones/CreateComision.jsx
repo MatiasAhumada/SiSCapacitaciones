@@ -27,28 +27,33 @@ const CreateComision = () => {
     setFormData({
       ...formData,
       [name]: value,
+      hour: {
+        ...formData.hour,
+        start: value,
+        end: value,
+      },
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
-     setPause(true);
-     await postComision(formData).then(() => {
-       try {
-         Swal.fire({
-           title: "Comision Creada",
-           icon: "success",
-           showConfirmButton: false,
-           timer: 1500,
-         }).then(() => {
-           setPause(false);
-           navigate(`/adm/${id}/comisiones`);
-         });
-       } catch (error) {
-         console.log(error);
-       }
-     });
+    // setPause(true);
+    // await postComision(formData).then(() => {
+    //   try {
+    //     Swal.fire({
+    //       title: "Comision Creada",
+    //       icon: "success",
+    //       showConfirmButton: false,
+    //       timer: 1500,
+    //     }).then(() => {
+    //       setPause(false);
+    //       navigate(`/adm/${id}/comisiones`);
+    //     });
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // });
   };
   useEffect(() => {
     const alus = async () => {

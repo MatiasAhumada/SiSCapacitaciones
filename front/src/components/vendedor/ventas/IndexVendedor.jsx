@@ -4,7 +4,7 @@ import simplificado from "../../assets/simplificado_a_color.png";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 const IndexVendedor = () => {
-  const { id } = useParams();
+  const { idVend } = useParams();
 
   const navigate = useNavigate();
   const navigation = [{ name: "Inscribir" }, { name: "Caja" }, { name: "Cobrar" }, { name: "Cursos" }, { name: "Comisiones" }];
@@ -14,7 +14,7 @@ const IndexVendedor = () => {
     navigate("/");
   };
   const clickBtn = (name) => {
-    navigate(`/inicioVendedor/${name.toLowerCase()}`);
+    navigate(`/${idVend}/${name.toLowerCase()}`);
   };
   return (
     <div className="min-h-full ">
@@ -23,7 +23,7 @@ const IndexVendedor = () => {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <div className="shrink-0">
-                <img alt="Your Company" src={simplificado} className="size-8" onClick={() => navigate(`/adm/${id}`)} />
+                <img alt="Your Company" src={simplificado} className="size-8" onClick={() => navigate(`/${idVend}`)} />
               </div>
               <div className="hidden lg:block">
                 <div className="ml-10 flex items-baseline space-x-4">

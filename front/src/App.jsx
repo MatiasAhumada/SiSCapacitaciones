@@ -54,7 +54,7 @@ function App() {
           <Route path="cajas" element={<DashCajas></DashCajas>}></Route>
           <Route path="certificados" element={<Certificado></Certificado>}></Route>
         </Route>
-        <Route path="/inicioVendedor" element={<IndexVendedor></IndexVendedor>}>
+        <Route path="/:idVend" element={<IndexVendedor></IndexVendedor>}>
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
           <Route path="inscribir" element={<Inscripcion></Inscripcion>}></Route>
           <Route path="caja" element={<DashCaja></DashCaja>}></Route>

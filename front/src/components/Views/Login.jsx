@@ -28,7 +28,7 @@ const Login = () => {
           if (data.isAdmin) {
             navigate("/inicio");
           } else {
-            navigate("/inicioVendedor");
+            navigate(`/${data.id}`);
           }
         });
       } else {

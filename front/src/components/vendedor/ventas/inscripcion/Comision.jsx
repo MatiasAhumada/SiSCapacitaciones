@@ -356,15 +356,7 @@ const Comision = ({ nextStep, prevStep, formData, setFormData }) => {
               </option>
             ))}
           </select>
-          {/* <input
-            type="string"
-            name="hour"
-            value={nuevaComision.hour}
-            onChange={handleInputChange}
-            className="p-2 border rounded w-full mt-2"
-            required
-            placeholder="Horario de la comisión"
-          /> */}
+       
           <div className="flex gap-2 w-full mt-2 mb-0">
             <select name="start" value={nuevaComision.hour?.start || ""} onChange={handleInputChange} className="p-2 border rounded w-1/2">
               <option value="">Inicio</option>

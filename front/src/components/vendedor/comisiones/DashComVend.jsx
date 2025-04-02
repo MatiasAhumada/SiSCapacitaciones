@@ -229,24 +229,11 @@ const DashComVend = () => {
                         `${item?.hour?.start || "Hora no definida"} - ${item?.hour?.end || "Hora no definida"}`
                       )}
                     </td>
-                    {/* <td className="px-6 py-4">
-                      {editing === item.id ? (
-                        <select name="cursoId" onChange={handleChange} className="border rounded px-2">
-                          <option value="">{item.curso?.name}</option>
-                          {cursos.map((curso) => (
-                            <option key={curso.id} value={curso.id}>
-                              {curso.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        item.curso?.name
-                      )}
-                    </td> */}
+                   
                     <td className="px-6 py-4">
                       {editing === item.id ? (
                         <select name="profesorId" onChange={handleChange} className="border rounded px-2">
-                          <option value="">Seleccionar</option>
+                          {/* <option value="">Seleccionar</option> */}
                           {profesores.map((profesor) => (
                             <option key={profesor.id} value={profesor.id}>
                               {profesor.name} {profesor.apellido}

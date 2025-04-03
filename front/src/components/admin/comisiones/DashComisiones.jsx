@@ -181,7 +181,7 @@ const DashComisiones = () => {
                       {editing === item.id ? (
                         <input type="text" value={editData.hour} name="hour" onChange={handleChange} className="border rounded px-2" />
                       ) : (
-                        item.hour
+                        item.hour?.start
                       )}
                     </td>
                     <td className="px-6 py-4">

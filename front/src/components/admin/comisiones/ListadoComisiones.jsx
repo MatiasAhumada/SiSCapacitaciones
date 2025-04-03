@@ -1,27 +1,79 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getComisionId } from "../../queris/queris";
+import { jsPDF } from "jspdf";
+
+import autoTable from "jspdf-autotable";
 
 const ListadoComisiones = () => {
-  const [comision, setComision] = useState([]);
+  const [alumnosComision, setAlumnosComision] = useState([]);
+  const [comisionDate, setComisionDate] = useState([]);
+  const [asistencias, setAsintencias] = useState([
+    {
+      fecha: "",
+      presente: false,
+      alumnoComisionId: "",
+    },
+  ]);
   const { comId } = useParams();
 
   useEffect(() => {
     const alumnosCom = async () => {
       await getComisionId(comId).then((data) => {
-        setComision(data.alumnoComisiones);
+        setAlumnosComision(data.alumnoComisiones);
+        setComisionDate(data);
       });
     };
     alumnosCom();
   }, []);
-  console.log(comision);
-  const allDates = Array.from(new Set(comision.flatMap((item) => item.asistencias.map((asistencia) => asistencia.fecha.split("T")[0])))).sort();
+  console.log(alumnosComision);
+  const allDates = Array.from(
+    new Set(alumnosComision.flatMap((item) => item.asistencias.map((asistencia) => asistencia.fecha.split("T")[0])))
+  ).sort();
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    // Obtener todas las fechas únicas
+    const fechas = Array.from(new Set(alumnosComision.flatMap((item) => item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString()))));
+
+    // Crear encabezado con nombres de columnas
+    const headers = ["Alumno", ...fechas];
+
+    // Crear filas con datos de asistencia
+    const rows = alumnosComision.map((item) => {
+      const row = [item.alumno.name];
+      fechas.forEach((fecha) => {
+        const asistencia = item.asistencias.find((a) => new Date(a.fecha).toLocaleDateString() === fecha);
+        row.push(asistencia ? (asistencia.presente ? "P" : "A") : "A");
+      });
+      return row;
+    });
+
+    autoTable(doc, {
+      head: [headers],
+      body: rows,
+    });
+
+    doc.save(`Asistencia-${comisionDate.name}.pdf`);
+  };
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
-            <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Listado de Alumnos de la Comision</h3>
+            <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">{comisionDate.name}</h2>
+            <h4 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+              Dias {comisionDate.day} {comisionDate.hour?.start} - {comisionDate.hour?.end}
+            </h4>
+            <h5 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+              Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
+            </h5>
+          </div>
+          <div className="mt-3 md:mt-0">
+            <button onClick={generatePDF} className="inline-block px-4 py-2 text-white principal rounded bg-red-500 hover:bg-red-600 md:text-sm">
+              PDF
+            </button>
           </div>
         </div>
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
@@ -40,7 +92,7 @@ const ListadoComisiones = () => {
               </tr>
             </thead>
             <tbody className="text-gray-600 divide-y">
-              {comision?.map((item) => (
+              {alumnosComision?.map((item) => (
                 <tr key={item.id}>
                   <td className="px-6 py-4">{item.alumno.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>

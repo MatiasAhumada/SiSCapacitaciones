@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { deleteComision, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
 
 const DashComVend = () => {
-  const { id,idVend } = useParams();
+  const { id, idVend } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
@@ -229,11 +229,10 @@ const DashComVend = () => {
                         `${item?.hour?.start || "Hora no definida"} - ${item?.hour?.end || "Hora no definida"}`
                       )}
                     </td>
-                   
+
                     <td className="px-6 py-4">
                       {editing === item.id ? (
                         <select name="profesorId" onChange={handleChange} className="border rounded px-2">
-                          {/* <option value="">Seleccionar</option> */}
                           {profesores.map((profesor) => (
                             <option key={profesor.id} value={profesor.id}>
                               {profesor.name} {profesor.apellido}

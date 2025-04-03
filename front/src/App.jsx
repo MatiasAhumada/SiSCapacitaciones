@@ -63,6 +63,7 @@ function App() {
           <Route path="comisiones" element={<DashComVend></DashComVend>}>
             <Route path="crear" element={<CreateComVend></CreateComVend>}></Route>
           </Route>
+            <Route path="comisiones/:comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>

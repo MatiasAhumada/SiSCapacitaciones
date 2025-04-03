@@ -9,7 +9,7 @@ const CreateComVend = () => {
   const tipos = ["Presencial", "Distancia"];
 
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { idCom } = useParams();
   const [pause, setPause] = useState(false);
   const [profes, setProfes] = useState([]);
   const [cursos, setcursos] = useState([]);

@@ -81,6 +81,7 @@ const ListadoComisiones = () => {
           <table className="w-full table-auto text-sm  text-center">
             <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
               <tr>
+                <th className="py-3 px-6"></th>
                 <th className="py-3 px-6">Nombre</th>
                 <th className="py-3 px-6">DNI</th>
                 <th className="py-3 px-6">Telefono</th>
@@ -93,8 +94,10 @@ const ListadoComisiones = () => {
               </tr>
             </thead>
             <tbody className="text-gray-600 divide-y">
+
               {alumnosComision?.map((item) => (
                 <tr key={item.id}>
+                  <td className="px-6 py-4">botonera</td>
                   <td className="px-6 py-4">{item.alumno.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>

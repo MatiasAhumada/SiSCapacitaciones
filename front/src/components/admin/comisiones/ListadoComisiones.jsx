@@ -37,11 +37,12 @@ const ListadoComisiones = () => {
     const fechas = Array.from(new Set(alumnosComision.flatMap((item) => item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString()))));
 
     // Crear encabezado con nombres de columnas
-    const headers = ["Alumno", ...fechas];
+    const headers = ["Alumno", "DNI", "Telefono", ...fechas];
 
     // Crear filas con datos de asistencia
     const rows = alumnosComision.map((item) => {
-      const row = [item.alumno.name];
+      console.log(item);
+      const row = [item.alumno.name,item.alumno.dni, item.alumno.tel];
       fechas.forEach((fecha) => {
         const asistencia = item.asistencias.find((a) => new Date(a.fecha).toLocaleDateString() === fecha);
         row.push(asistencia ? (asistencia.presente ? "P" : "A") : "A");

@@ -8,6 +8,7 @@ import autoTable from "jspdf-autotable";
 const ListadoComisiones = () => {
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
+  const [pause, setPause] = useState({});
   const [asistencias, setAsintencias] = useState([
     {
       fecha: "",
@@ -26,7 +27,7 @@ const ListadoComisiones = () => {
     };
     alumnosCom();
   }, []);
-  console.log(alumnosComision);
+
   const allDates = Array.from(
     new Set(alumnosComision.flatMap((item) => item.asistencias.map((asistencia) => asistencia.fecha.split("T")[0])))
   ).sort();
@@ -42,7 +43,7 @@ const ListadoComisiones = () => {
     // Crear filas con datos de asistencia
     const rows = alumnosComision.map((item) => {
       console.log(item);
-      const row = [item.alumno.name,item.alumno.dni, item.alumno.tel];
+      const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
       fechas.forEach((fecha) => {
         const asistencia = item.asistencias.find((a) => new Date(a.fecha).toLocaleDateString() === fecha);
         row.push(asistencia ? (asistencia.presente ? "P" : "A") : "A");
@@ -57,7 +58,19 @@ const ListadoComisiones = () => {
 
     doc.save(`Asistencia-${comisionDate.name}.pdf`);
   };
-
+  const verMas = (e) => {
+    e.preventDefault();
+    const alumnoId = e.target.value;
+    setPause((prev) => ({ ...prev, [alumnoId]: true }));
+    const asistencia = alumnosComision.find((a) => a.id === alumnoId);
+    setAsintencias(asistencia.asistencias);
+    console.log(alumnosComision);
+    setPause((prev) => {
+      const newPause = { ...prev };
+      delete newPause[alumnoId];
+      return newPause;
+    });
+  };
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -94,10 +107,32 @@ const ListadoComisiones = () => {
               </tr>
             </thead>
             <tbody className="text-gray-600 divide-y">
-
               {alumnosComision?.map((item) => (
                 <tr key={item.id}>
-                  <td className="px-6 py-4">botonera</td>
+                  <td className="px-6 py-4">
+                    <button
+                      value={item.id}
+                      onClick={verMas}
+                      // () => navigate(`/adm/${id}/comisiones/${item.id}`)
+                      className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                    >
+                      {pause[item.id] ? (
+                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                            <animateTransform
+                              attributeName="transform"
+                              type="rotate"
+                              dur="0.75s"
+                              values="0 12 12;360 12 12"
+                              repeatCount="indefinite"
+                            />
+                          </path>
+                        </svg>
+                      ) : (
+                        <i className="fa-solid fa-plus"></i>
+                      )}
+                    </button>
+                  </td>
                   <td className="px-6 py-4">{item.alumno.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>

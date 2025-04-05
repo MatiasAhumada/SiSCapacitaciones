@@ -38,7 +38,7 @@ export class ComisionController {
   }
 
   @Post("/asistencia")
-  registrarAsistencia(@Body() dto: CreateAsistenciaDto) {
+  registrarAsistencia(@Body() dto: CreateAsistenciaDto[]) {
     return this.comisionService.registrarAsistencia(dto);
   }
 

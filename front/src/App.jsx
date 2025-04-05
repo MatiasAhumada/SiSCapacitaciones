@@ -66,6 +66,7 @@ function App() {
             <Route path="comisiones/:comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
+        <Route path="/alumno/:idAlu" element={<Error404></Error404>}></Route>
       </Routes>
     </BrowserRouter>
   );

@@ -225,25 +225,32 @@ export class ComisionService {
     return this.alumnoComisionRepository.save(alumnoComision);
   }
 
-  async registrarAsistencia(dto: CreateAsistenciaDto) {
-    const { alumnoComisionId, presente, fecha } = dto;
-
-    const alumnoComision = await this.alumnoComisionRepository.findOne({
-      where: { id: alumnoComisionId },
-    });
-    console.log(alumnoComision);
-    if (!alumnoComision) {
-      throw new NotFoundException('Alumno no encontrado en la comisión');
+  async registrarAsistencia(dtoArray: CreateAsistenciaDto[]): Promise<Asistencia[]> {
+    const asistenciasAGuardar: Asistencia[] = [];
+  
+    for (const dto of dtoArray) {
+      const { alumnoComisionId, presente, fecha } = dto;
+  
+      const alumnoComision = await this.alumnoComisionRepository.findOne({
+        where: { id: alumnoComisionId },
+      });
+  
+      if (!alumnoComision) {
+        throw new NotFoundException(`Alumno con ID ${alumnoComisionId} no encontrado en la comisión`);
+      }
+  
+      const asistencia = this.asistenciaRepository.create({
+        alumnoComision,
+        presente,
+        fecha: fecha ,
+      });
+  
+      asistenciasAGuardar.push(asistencia);
     }
-
-    const asistencia = this.asistenciaRepository.create({
-      alumnoComision,
-      presente,
-      fecha: fecha || new Date(),
-    });
-
-    return await this.asistenciaRepository.save(asistencia);
+  
+    return await this.asistenciaRepository.save(asistenciasAGuardar);
   }
+  
   async obtenerAsistenciasPorComision(
     comisionId: string,
   ): Promise<Asistencia[]> {

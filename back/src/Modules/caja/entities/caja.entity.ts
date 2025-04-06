@@ -36,10 +36,12 @@ export class Caja {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fecha: Date;
 
+  @Column({ type: 'decimal', nullable: true })
+  cuota: number;
+
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
   vendedor: Vendedor;
 
-  @ManyToOne(()=>Alumno,(alumno)=>alumno.pagos,{ nullable: true })
-  alumno?:Alumno
+  @ManyToOne(() => Alumno, (alumno) => alumno.pagos, { nullable: true })
+  alumno?: Alumno;
 }
-

@@ -22,6 +22,7 @@ export class AlumnoComision {
 
   @Column({ default: true })
   state: boolean;
+  
   @OneToMany(() => Asistencia, (asistencia) => asistencia.alumnoComision)
   asistencias: Asistencia[];
 }

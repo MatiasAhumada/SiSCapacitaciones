@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getComisionId } from "../../queris/queris";
+import { editStateComision, getComisionId } from "../../queris/queris";
 import { jsPDF } from "jspdf";
 
 import autoTable from "jspdf-autotable";
@@ -16,6 +16,7 @@ const ListadoComisiones = () => {
       alumnoComisionId: "",
     },
   ]);
+
   const { comId } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -29,23 +30,13 @@ const ListadoComisiones = () => {
   }, []);
 
   const allDates = Array.from(
-    new Set(
-      alumnosComision.flatMap((item) =>
-        item.asistencias.map((asistencia) => asistencia.fecha.split("T")[0])
-      )
-    )
+    new Set(alumnosComision.flatMap((item) => item.asistencias.map((asistencia) => asistencia.fecha.split("T")[0])))
   ).sort();
   const generatePDF = () => {
     const doc = new jsPDF();
 
     // Obtener todas las fechas únicas
-    const fechas = Array.from(
-      new Set(
-        alumnosComision.flatMap((item) =>
-          item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString())
-        )
-      )
-    );
+    const fechas = Array.from(new Set(alumnosComision.flatMap((item) => item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString()))));
 
     // Crear encabezado con nombres de columnas
     const headers = ["Alumno", "DNI", "Telefono", ...fechas];
@@ -55,9 +46,7 @@ const ListadoComisiones = () => {
       console.log(item);
       const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
       fechas.forEach((fecha) => {
-        const asistencia = item.asistencias.find(
-          (a) => new Date(a.fecha).toLocaleDateString() === fecha
-        );
+        const asistencia = item.asistencias.find((a) => new Date(a.fecha).toLocaleDateString() === fecha);
         row.push(asistencia ? (asistencia.presente ? "P" : "A") : "A");
       });
       return row;
@@ -83,28 +72,36 @@ const ListadoComisiones = () => {
       return newPause;
     });
   };
+  const clickEdit = async (e, alumnoId) => {
+    e.preventDefault();
+    const { id } = comisionDate;
+    const { name, value } = e.target;
+    console.log(name, value);
+    if (name === "activo") {
+      setPause((prev) => ({ ...prev, [alumnoId]: true }));
+      await editStateComision(alumnoId, id, { estado: false }).then(() => {});
+    }
+    if (name === "inactivo") {
+      setPause((prev) => ({ ...prev, [alumnoId]: false }));
+      await editStateComision(alumnoId, id, { estado: true }).then(() => {});
+    }
+ 
+  };
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
-            <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-              {comisionDate.name}
-            </h2>
+            <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">{comisionDate.name}</h2>
             <h4 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-              Dias {comisionDate.day} {comisionDate.hour?.start} -{" "}
-              {comisionDate.hour?.end}
+              Dias {comisionDate.day} {comisionDate.hour?.start} - {comisionDate.hour?.end}
             </h4>
             <h5 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-              Profesor {comisionDate.profesor?.name}{" "}
-              {comisionDate.profesor?.apellido}
+              Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
             </h5>
           </div>
           <div className="mt-3 md:mt-0">
-            <button
-              onClick={generatePDF}
-              className="inline-block px-4 py-2 text-white principal rounded bg-red-500 hover:bg-red-600 md:text-sm"
-            >
+            <button onClick={generatePDF} className="inline-block px-4 py-2 text-white principal rounded bg-red-500 hover:bg-red-600 md:text-sm">
               PDF
             </button>
           </div>
@@ -135,12 +132,7 @@ const ListadoComisiones = () => {
                       className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (
-                        <svg
-                          fill="white"
-                          className="w-6 h-6 mx-auto"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"
@@ -157,19 +149,45 @@ const ListadoComisiones = () => {
                     </button>
                   </td>
                   <td className="px-6 py-4">{item.alumno.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {item.alumno.dni}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {item.alumno.tel}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
                   <td className="px-6 py-4">
-                    {!item.alumno.state ? "Activo" : "Inactivo"}
+                    {item.state ? (
+                      <button
+                        name="activo"
+                        value={item.id}
+                        onClick={(e) => clickEdit(e, item.alumno.id)}
+                        className="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-0.5 rounded"
+                      >
+                        {pause[item.id] ? (
+                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                              <animateTransform
+                                attributeName="transform"
+                                type="rotate"
+                                dur="0.75s"
+                                values="0 12 12;360 12 12"
+                                repeatCount="indefinite"
+                              />
+                            </path>
+                          </svg>
+                        ) : (
+                          "Activo"
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        name="inactivo"
+                        value={item.state}
+                        onClick={clickEdit}
+                        className="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-0.5 rounded"
+                      >
+                        Inactivo
+                      </button>
+                    )}
                   </td>
                   {allDates.map((date) => {
-                    const asistencia = item.asistencias.find(
-                      (a) => a.fecha.split("T")[0] === date
-                    );
+                    const asistencia = item.asistencias.find((a) => a.fecha.split("T")[0] === date);
                     return (
                       <td key={date} className="px-6 py-4">
                         {asistencia ? (asistencia.presente ? "✔️" : "❌") : "-"}

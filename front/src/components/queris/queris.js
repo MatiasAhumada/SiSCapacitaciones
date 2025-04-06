@@ -186,6 +186,15 @@ export const putComision = async (id, comision) => {
   }
 };
 
+export const editStateComision = async (alumnoId, comisionId, state) => {
+  try {
+    const response = await axios.put(`${URL}/${alumnoId}/${comisionId}`, state);
+    return response.data;
+  } catch (error) {
+    console.error("Error al cambiar estado", error.response?.data);
+  }
+};
+
 //INSCRIPCIONES
 export const postInscripcion = async (datos) => {
   try {

@@ -222,6 +222,7 @@ export class ComisionService {
     }
 
     alumnoComision.state = estado;
+    
     return this.alumnoComisionRepository.save(alumnoComision);
   }
 

@@ -186,12 +186,13 @@ export const putComision = async (id, comision) => {
   }
 };
 
-export const editStateComision = async (alumnoId, comisionId, state) => {
+export const editStateComision = async (change) => {
+
   try {
-    const response = await axios.put(`${URL}/${alumnoId}/${comisionId}`, state);
+    const response = await axios.put(`${URL}/comision/estado`, change);
     return response.data;
   } catch (error) {
-    console.error("Error al cambiar estado", error.response?.data);
+    console.error("Error al cambiar estado", error);
   }
 };
 

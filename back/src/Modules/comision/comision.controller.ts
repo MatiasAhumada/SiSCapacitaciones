@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { ComisionService } from './comision.service';
 import { CreateComisionDto } from './dto/create-comision.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
+import { ChangeStateDto } from './dto/changeState.dto';
 
 @Controller('comision')
 export class ComisionController {
@@ -26,9 +36,16 @@ export class ComisionController {
   findOne(@Param('id') id: string) {
     return this.comisionService.findOne(id);
   }
-
+  @Put('/estado')
+  cambiarEstado(@Body() change: ChangeStateDto) {
+    console.log(change)
+    return this.comisionService.cambiarEstadoAlumnoComision(change);
+  }
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateComisionDto: UpdateComisionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateComisionDto: UpdateComisionDto,
+  ) {
     return this.comisionService.update(id, updateComisionDto);
   }
 
@@ -37,18 +54,10 @@ export class ComisionController {
     return this.comisionService.remove(id);
   }
 
-  @Post("/asistencia")
+  @Post('/asistencia')
   registrarAsistencia(@Body() dto: CreateAsistenciaDto[]) {
     return this.comisionService.registrarAsistencia(dto);
   }
 
-  @Put(':alumnoId/:comisionId')
-  cambiarEstado(
-    @Param('alumnoId') alumnoId: string,
-    @Param('comisionId') comisionId: string,
-    @Body('estado') estado: boolean,
-  ) {
-    return this.comisionService.cambiarEstadoAlumnoComision(alumnoId, comisionId, estado);
-  }
-
+ 
 }

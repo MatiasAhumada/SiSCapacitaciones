@@ -72,20 +72,24 @@ const ListadoComisiones = () => {
       return newPause;
     });
   };
-  const clickEdit = async (e, alumnoId) => {
+  const clickEdit = async (e, ID) => {
     e.preventDefault();
-    const { id } = comisionDate;
     const { name, value } = e.target;
-    console.log(name, value);
-    if (name === "activo") {
-      setPause((prev) => ({ ...prev, [alumnoId]: true }));
-      await editStateComision(alumnoId, id, { estado: false }).then(() => {});
+    setPause((prev) => ({ ...prev, [ID]: true }));
+
+    const nuevoEstado = name === "activo" ? false : true;
+    const change = {
+      estado: nuevoEstado,
+      alumnoCom: ID,
+    };
+
+    try {
+      await editStateComision(change).then(() => {});
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setPause((prev) => ({ ...prev, [ID]: false }));
     }
-    if (name === "inactivo") {
-      setPause((prev) => ({ ...prev, [alumnoId]: false }));
-      await editStateComision(alumnoId, id, { estado: true }).then(() => {});
-    }
- 
   };
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -152,39 +156,31 @@ const ListadoComisiones = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
                   <td className="px-6 py-4">
-                    {item.state ? (
-                      <button
-                        name="activo"
-                        value={item.id}
-                        onClick={(e) => clickEdit(e, item.alumno.id)}
-                        className="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-0.5 rounded"
-                      >
-                        {pause[item.id] ? (
-                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                              <animateTransform
-                                attributeName="transform"
-                                type="rotate"
-                                dur="0.75s"
-                                values="0 12 12;360 12 12"
-                                repeatCount="indefinite"
-                              />
-                            </path>
-                          </svg>
-                        ) : (
-                          "Activo"
-                        )}
-                      </button>
-                    ) : (
-                      <button
-                        name="inactivo"
-                        value={item.state}
-                        onClick={clickEdit}
-                        className="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-0.5 rounded"
-                      >
-                        Inactivo
-                      </button>
-                    )}
+                    <button
+                      name={item.state ? "activo" : "inactivo"}
+                      onClick={(e) => clickEdit(e, item.id)}
+                      className={`text-xs px-2 py-0.5 rounded text-white 
+      ${item.state ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"}`}
+                      disabled={pause[item.id]} // evita doble click
+                    >
+                      {pause[item.id] ? (
+                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                            <animateTransform
+                              attributeName="transform"
+                              type="rotate"
+                              dur="0.75s"
+                              values="0 12 12;360 12 12"
+                              repeatCount="indefinite"
+                            />
+                          </path>
+                        </svg>
+                      ) : item.state ? (
+                        "Activo"
+                      ) : (
+                        "Inactivo"
+                      )}
+                    </button>
                   </td>
                   {allDates.map((date) => {
                     const asistencia = item.asistencias.find((a) => a.fecha.split("T")[0] === date);

@@ -10,6 +10,7 @@ import { Profesor } from '../profesor/entities/profesor.entity';
 import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Asistencia } from './entities/asistencia.entity';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
+import { ChangeStateDto } from './dto/changeState.dto';
 
 @Injectable()
 export class ComisionService {
@@ -27,19 +28,20 @@ export class ComisionService {
     @InjectRepository(Asistencia)
     private readonly asistenciaRepository: Repository<Asistencia>,
   ) {}
-  private cleanHour(hour: any): { start: string, end: string } {
+  private cleanHour(hour: any): { start: string; end: string } {
     if (hour && hour.start && hour.end) {
       return {
         start: hour.start,
-        end: hour.end
+        end: hour.end,
       };
     }
-    return { start: '', end: '' }; 
+    return { start: '', end: '' };
   }
   async create(createComisionDto: CreateComisionDto): Promise<Comision> {
     const cleanedHour = this.cleanHour(createComisionDto.hour);
     createComisionDto.hour = cleanedHour;
-    const { sucursalId, cursoId, profesorId, name, day, hour } =createComisionDto;
+    const { sucursalId, cursoId, profesorId, name, day, hour } =
+      createComisionDto;
 
     const profesor = await this.profesorRepository.findOne({
       where: { id: profesorId },
@@ -79,7 +81,7 @@ export class ComisionService {
       select: {
         alumnoComisiones: {
           id: true,
-          state:true
+          state: true,
         },
       },
     });
@@ -209,12 +211,11 @@ export class ComisionService {
   }
 
   async cambiarEstadoAlumnoComision(
-    alumnoId: string,
-    comisionId: string,
-    estado: boolean,
+    change: ChangeStateDto,
   ): Promise<AlumnoComision> {
+    const { estado, alumnoCom } = change;
     const alumnoComision = await this.alumnoComisionRepository.findOne({
-      where: { alumno: { id: alumnoId }, comision: { id: comisionId } },
+      where: { id: alumnoCom },
     });
 
     if (!alumnoComision) {
@@ -222,36 +223,40 @@ export class ComisionService {
     }
 
     alumnoComision.state = estado;
-    
+
     return this.alumnoComisionRepository.save(alumnoComision);
   }
 
-  async registrarAsistencia(dtoArray: CreateAsistenciaDto[]): Promise<Asistencia[]> {
+  async registrarAsistencia(
+    dtoArray: CreateAsistenciaDto[],
+  ): Promise<Asistencia[]> {
     const asistenciasAGuardar: Asistencia[] = [];
-  
+
     for (const dto of dtoArray) {
       const { alumnoComisionId, presente, fecha } = dto;
-  
+
       const alumnoComision = await this.alumnoComisionRepository.findOne({
         where: { id: alumnoComisionId },
       });
-  
+
       if (!alumnoComision) {
-        throw new NotFoundException(`Alumno con ID ${alumnoComisionId} no encontrado en la comisión`);
+        throw new NotFoundException(
+          `Alumno con ID ${alumnoComisionId} no encontrado en la comisión`,
+        );
       }
-  
+
       const asistencia = this.asistenciaRepository.create({
         alumnoComision,
         presente,
-        fecha: fecha ,
+        fecha: fecha,
       });
-  
+
       asistenciasAGuardar.push(asistencia);
     }
-  
+
     return await this.asistenciaRepository.save(asistenciasAGuardar);
   }
-  
+
   async obtenerAsistenciasPorComision(
     comisionId: string,
   ): Promise<Asistencia[]> {

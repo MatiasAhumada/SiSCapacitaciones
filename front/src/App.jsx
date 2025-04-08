@@ -26,6 +26,7 @@ import DashCajas from "./components/admin/cajas/DashCajas";
 import ListadoComisiones from "./components/admin/comisiones/ListadoComisiones";
 import DashComVend from "./components/vendedor/comisiones/DashComVend";
 import CreateComVend from "./components/vendedor/comisiones/CreateComVend";
+import DashAlumno from "./components/vendedor/comisiones/DashAlumno";
 function App() {
   return (
     <BrowserRouter>
@@ -41,6 +42,10 @@ function App() {
           <Route path="profesores" element={<DashProfe></DashProfe>}>
             <Route path="crear" element={<CrearProfes></CrearProfes>}></Route>
           </Route>
+          <Route
+            path="alumno/:idAlu"
+            element={<DashAlumno></DashAlumno>}
+          ></Route>
           <Route path="alumnos" element={<DashAlumnos></DashAlumnos>}>
             <Route path="crear" element={<CreateAlumno></CreateAlumno>}></Route>
           </Route>
@@ -48,25 +53,47 @@ function App() {
             <Route path="crear" element={<CreateCurso></CreateCurso>}></Route>
           </Route>
           <Route path="comisiones" element={<DashComisiones></DashComisiones>}>
-            <Route path="crear" element={<CreateComision></CreateComision>}></Route>
-            <Route path=":comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
+            <Route
+              path="crear"
+              element={<CreateComision></CreateComision>}
+            ></Route>
+            <Route
+              path=":comId"
+              element={<ListadoComisiones></ListadoComisiones>}
+            ></Route>
           </Route>
           <Route path="cajas" element={<DashCajas></DashCajas>}></Route>
-          <Route path="certificados" element={<Certificado></Certificado>}></Route>
+          <Route
+            path="certificados"
+            element={<Certificado></Certificado>}
+          ></Route>
         </Route>
         <Route path="/:idVend" element={<IndexVendedor></IndexVendedor>}>
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
+          <Route
+            path="alumno/:idAlu"
+            element={<DashAlumno></DashAlumno>}
+          ></Route>
           <Route path="inscribir" element={<Inscripcion></Inscripcion>}></Route>
           <Route path="caja" element={<DashCaja></DashCaja>}></Route>
           <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
           <Route path="cursos" element={<DashCursos></DashCursos>}></Route>
           <Route path="comisiones" element={<DashComVend></DashComVend>}>
-            <Route path="crear" element={<CreateComVend></CreateComVend>}></Route>
+            <Route
+              path="crear"
+              element={<CreateComVend></CreateComVend>}
+            ></Route>
           </Route>
-            <Route path="comisiones/:comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
+          <Route
+            path="comisiones/:comId"
+            element={<ListadoComisiones></ListadoComisiones>}
+          ></Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
-        <Route path="/alumno/:idAlu" element={<Error404></Error404>}></Route>
+        <Route
+          path="/alumno/:idAlu"
+          element={<DashAlumno></DashAlumno>}
+        ></Route>
       </Routes>
     </BrowserRouter>
   );

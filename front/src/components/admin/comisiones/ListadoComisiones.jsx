@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { editStateComision, getComisionId } from "../../queris/queris";
 import { jsPDF } from "jspdf";
 
@@ -19,10 +19,25 @@ const ListadoComisiones = () => {
 
   const { comId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const navegacion = (idAlumno) => {
+    const currentPath = location.pathname;
+    const isAdmin = currentPath.startsWith("/adm");
+  
+    // Extraer ID del path actual
+    const pathSegments = currentPath.split("/"); // ['', 'adm', '123'] o ['', '456']
+    const userId = isAdmin ? pathSegments[2] : pathSegments[1]; // '123' o '456'
+  
+    const redirectionPath = isAdmin
+      ? `/adm/${userId}/alumno/${idAlumno}`
+      : `/${userId}/alumno/${idAlumno}`;
+  
+    navigate(redirectionPath);
+  };
+  
   useEffect(() => {
     const alumnosCom = async () => {
       await getComisionId(comId).then((data) => {
-  
         setAlumnosComision(data.alumnoComisiones);
         setComisionDate(data);
       });
@@ -31,13 +46,23 @@ const ListadoComisiones = () => {
   }, []);
 
   const allDates = Array.from(
-    new Set(alumnosComision.flatMap((item) => item.asistencias.map((asistencia) => asistencia.fecha.split("T")[0])))
+    new Set(
+      alumnosComision.flatMap((item) =>
+        item.asistencias.map((asistencia) => asistencia.fecha.split("T")[0])
+      )
+    )
   ).sort();
   const generatePDF = () => {
     const doc = new jsPDF();
 
     // Obtener todas las fechas únicas
-    const fechas = Array.from(new Set(alumnosComision.flatMap((item) => item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString()))));
+    const fechas = Array.from(
+      new Set(
+        alumnosComision.flatMap((item) =>
+          item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString())
+        )
+      )
+    );
 
     // Crear encabezado con nombres de columnas
     const headers = ["Alumno", "DNI", "Telefono", ...fechas];
@@ -47,7 +72,9 @@ const ListadoComisiones = () => {
       console.log(item);
       const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
       fechas.forEach((fecha) => {
-        const asistencia = item.asistencias.find((a) => new Date(a.fecha).toLocaleDateString() === fecha);
+        const asistencia = item.asistencias.find(
+          (a) => new Date(a.fecha).toLocaleDateString() === fecha
+        );
         row.push(asistencia ? (asistencia.presente ? "P" : "A") : "A");
       });
       return row;
@@ -87,14 +114,18 @@ const ListadoComisiones = () => {
     try {
       await editStateComision(change).then(() => {
         try {
-          setAlumnosComision((prev) => prev.map((item) => (item.id === ID ? { ...item, state: nuevoEstado } : item)));
+          setAlumnosComision((prev) =>
+            prev.map((item) =>
+              item.id === ID ? { ...item, state: nuevoEstado } : item
+            )
+          );
         } catch (error) {
           console.log(error);
         }
       });
     } catch (error) {
       console.log(error);
-    }finally {
+    } finally {
       setPause((prev) => ({ ...prev, [ID]: false }));
     }
   };
@@ -104,16 +135,23 @@ const ListadoComisiones = () => {
       <>
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
-            <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">{comisionDate.name}</h2>
+            <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+              {comisionDate.name}
+            </h2>
             <h4 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-              Dias {comisionDate.day} {comisionDate.hour?.start} - {comisionDate.hour?.end}
+              Dias {comisionDate.day} {comisionDate.hour?.start} -{" "}
+              {comisionDate.hour?.end}
             </h4>
             <h5 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-              Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
+              Profesor {comisionDate.profesor?.name}{" "}
+              {comisionDate.profesor?.apellido}
             </h5>
           </div>
           <div className="mt-3 md:mt-0">
-            <button onClick={generatePDF} className="inline-block px-4 py-2 text-white principal rounded bg-red-500 hover:bg-red-600 md:text-sm">
+            <button
+              onClick={generatePDF}
+              className="inline-block px-4 py-2 text-white principal rounded bg-red-500 hover:bg-red-600 md:text-sm"
+            >
               PDF
             </button>
           </div>
@@ -140,11 +178,16 @@ const ListadoComisiones = () => {
                   <td className="px-6 py-4">
                     <button
                       value={item.id}
-                      onClick={() => navigate(`/alumno/${item.alumno.id}`)}
+                      onClick={() => navegacion(item.alumno.id)}
                       className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (
-                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="white"
+                          className="w-6 h-6 mx-auto"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"
@@ -161,18 +204,31 @@ const ListadoComisiones = () => {
                     </button>
                   </td>
                   <td className="px-6 py-4">{item.alumno.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.alumno.dni}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.alumno.tel}
+                  </td>
                   <td className="px-6 py-4">
                     <button
                       name={item.state ? "activo" : "inactivo"}
                       onClick={(e) => clickEdit(e, item.id)}
                       className={`text-xs px-2 py-0.5 rounded text-white 
-      ${item.state ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"}`}
+      ${
+        item.state
+          ? "bg-green-500 hover:bg-green-600"
+          : "bg-red-500 hover:bg-red-600"
+      }`}
                       disabled={pause[item.id]} // evita doble click
                     >
                       {pause[item.id] ? (
-                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="white"
+                          className="w-6 h-6 mx-auto"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"
@@ -191,7 +247,9 @@ const ListadoComisiones = () => {
                     </button>
                   </td>
                   {allDates.map((date) => {
-                    const asistencia = item.asistencias.find((a) => a.fecha.split("T")[0] === date);
+                    const asistencia = item.asistencias.find(
+                      (a) => a.fecha.split("T")[0] === date
+                    );
                     return (
                       <td key={date} className="px-6 py-4">
                         {asistencia ? (asistencia.presente ? "✔️" : "❌") : "-"}

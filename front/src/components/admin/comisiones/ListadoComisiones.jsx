@@ -22,6 +22,7 @@ const ListadoComisiones = () => {
   useEffect(() => {
     const alumnosCom = async () => {
       await getComisionId(comId).then((data) => {
+  
         setAlumnosComision(data.alumnoComisiones);
         setComisionDate(data);
       });
@@ -97,7 +98,7 @@ const ListadoComisiones = () => {
       setPause((prev) => ({ ...prev, [ID]: false }));
     }
   };
-  console.log(alumnosComision)
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -139,7 +140,7 @@ const ListadoComisiones = () => {
                   <td className="px-6 py-4">
                     <button
                       value={item.id}
-                      onClick={() => navigate(`/alumno/${item.id}`)}
+                      onClick={() => navigate(`/alumno/${item.alumno.id}`)}
                       className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (

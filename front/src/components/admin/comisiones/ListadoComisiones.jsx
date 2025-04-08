@@ -84,10 +84,16 @@ const ListadoComisiones = () => {
     };
 
     try {
-      await editStateComision(change).then(() => {});
+      await editStateComision(change).then(() => {
+        try {
+          setAlumnosComision((prev) => prev.map((item) => (item.id === ID ? { ...item, state: nuevoEstado } : item)));
+        } catch (error) {
+          console.log(error);
+        }
+      });
     } catch (error) {
       console.log(error);
-    } finally {
+    }finally {
       setPause((prev) => ({ ...prev, [ID]: false }));
     }
   };
@@ -133,7 +139,7 @@ const ListadoComisiones = () => {
                     <button
                       value={item.id}
                       onClick={() => navigate(`/alumno/${item.id}`)}
-                      className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                      className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (
                         <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

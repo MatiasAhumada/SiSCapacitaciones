@@ -25,7 +25,7 @@ const DashComisiones = () => {
 
   const clickDelete = async (id) => {
     const comisionId = id;
-    console.log(id);
+
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     await deleteComision(id).then(() => {
       try {
@@ -83,7 +83,14 @@ const DashComisiones = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditData({ ...editData, [name]: value });
+    setEditData((prevData) => ({
+      ...prevData,
+      [name]: value,
+      hour: {
+        ...prevData.hour,
+        [name]: value,
+      },
+    }));
   };
 
   const handleSave = async (comisionId) => {
@@ -111,6 +118,20 @@ const DashComisiones = () => {
     }
   };
 
+  const horarios = Array.from({ length: (22 - 8) * 2 + 1 }, (_, i) => {
+    const horas = Math.floor(8 + i / 2);
+    const minutos = i % 2 === 0 ? "00" : "30";
+    return `${horas}:${minutos}`;
+  });
+  const dias = [
+    { value: "Lunes" },
+    { value: "Martes" },
+    { value: "Miercoles" },
+    { value: "Jueves" },
+    { value: "Viernes" },
+    { value: "Sabado" },
+    { value: "Domingo" },
+  ];
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -171,7 +192,14 @@ const DashComisiones = () => {
                         }`}
                       >
                         {editing === item.id ? (
-                          <input type="text" value={editData.day} name="day" onChange={handleChange} className="border rounded px-2" />
+                          <select name="day" value={editData?.day || ""} onChange={handleChange} className="border rounded px-2">
+                            <option value="">Seleccionar</option>
+                            {dias.map((dia, idx) => (
+                              <option key={idx} value={dia.value}>
+                                {dia.value}
+                              </option>
+                            ))}
+                          </select>
                         ) : (
                           item.day
                         )}
@@ -179,9 +207,27 @@ const DashComisiones = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editing === item.id ? (
-                        <input type="text" value={editData.hour} name="hour" onChange={handleChange} className="border rounded px-2" />
+                        <>
+                          <select name="start" value={editData.hour?.start || ""} onChange={handleChange} className="border rounded px-2">
+                            <option value=""> Inicio</option>
+                            {horarios.map((horario, index) => (
+                              <option key={index} value={horario}>
+                                {horario}
+                              </option>
+                            ))}
+                          </select>
+                          <span>-</span>
+                          <select name="end" value={editData.hour?.end || ""} onChange={handleChange} className="border rounded px-2">
+                            <option value=""> Fin</option>
+                            {horarios.map((horario, index) => (
+                              <option key={index} value={horario}>
+                                {horario}
+                              </option>
+                            ))}
+                          </select>
+                        </>
                       ) : (
-                        item.hour?.start
+                        `${item?.hour?.start || "Hora no definida"} - ${item?.hour?.end || "Hora no definida"}`
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -201,7 +247,6 @@ const DashComisiones = () => {
                     <td className="px-6 py-4">
                       {editing === item.id ? (
                         <select name="profesorId" onChange={handleChange} className="border rounded px-2">
-                          <option value="">Seleccionar</option>
                           {profesores.map((profesor) => (
                             <option key={profesor.id} value={profesor.id}>
                               {profesor.name} {profesor.apellido}

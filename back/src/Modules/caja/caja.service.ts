@@ -66,7 +66,7 @@ export class CajaService {
   async findByVendedor(vendedorId: string) {
     const movimientos = await this.cajaRepository.find({
       where: { vendedor: { id: vendedorId } },
-      relations: ['alumnoComision'],
+      relations: ['alumnoComision.alumno'],
       select: {
         alumnoComision: {
           id: true,
@@ -90,6 +90,7 @@ export class CajaService {
 
   async update(id: string, updateCajaDto: UpdateCajaDto) {
     const { alumnoComisionId, vendedorId, ...updateData } = updateCajaDto;
+
     const caja = await this.cajaRepository.findOne({
       where: { id },
       relations: ['alumnoComision', 'vendedor'],
@@ -99,7 +100,7 @@ export class CajaService {
     }
     if (alumnoComisionId) {
       const alumnoComision = await this.alumnoComisionRepository.findOne({
-        where: { id: alumnoComisionId },
+        where: { alumno: {id: alumnoComisionId} },
       });
       if (!alumnoComision) {
         throw new NotFoundException(

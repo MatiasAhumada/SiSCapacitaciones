@@ -16,7 +16,7 @@ const DashCaja = () => {
     metodoPago: "",
     monto: "",
     dexcripcion: "",
-    alumnoId: "",
+    alumnoComisionId: "",
     vendedorId: idVend,
   });
 
@@ -88,7 +88,7 @@ const DashCaja = () => {
       metodoPago: mov.metodoPago,
       monto: mov.monto,
       descripcion: mov.descripcion,
-      alumnoId: mov.alumno.id,
+      alumnoComisionId: mov.alumnoComisionId,
       vendedorId: idVend,
     });
   };
@@ -102,13 +102,15 @@ const DashCaja = () => {
   };
 
   const handleAlumnoChange = (e) => {
+    console.log(e.target.value);
     setFormEdit((prev) => ({
       ...prev,
-      alumnoId: e.target.value,
+      alumnoComisionId: e.target.value,
     }));
   };
 
   const handleSave = async (item) => {
+  
     setPause((prev) => ({ ...prev, [item.id]: true }));
     await editMovCaja(item.id, formEdit).then((data) => {
       try {
@@ -126,7 +128,6 @@ const DashCaja = () => {
       }
     });
   };
-
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -172,16 +173,16 @@ const DashCaja = () => {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (
-                        <select name="alumnoId" value={formEdit.alumnoId} onChange={handleAlumnoChange}>
+                        <select name="alumnoComisionId" value={formEdit.alumnoComisionId} onChange={handleAlumnoChange}>
                           <option value="">Seleccione un alumno</option>
-                          {alu.map((alumno) => (
-                            <option key={alumno.id} value={alumno.id}>
-                              {alumno.name}
+                          {alu.map((alumnoComision) => (
+                            <option key={alumnoComision.id} value={alumnoComision.id}>
+                              {alumnoComision.name}
                             </option>
                           ))}
                         </select>
                       ) : (
-                        item.alumno.name
+                        item.alumnoComision?.alumno.name
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

@@ -8,6 +8,7 @@ import { Curso } from '../curso/entities/curso.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { Asistencia } from './entities/asistencia.entity';
 import { AlumnoComision } from './entities/alumnocomision.entity';
+import { Caja } from '../caja/entities/caja.entity';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Comision,Sucursal,Curso,Profesor,Asistencia,AlumnoComision,Asistencia])],

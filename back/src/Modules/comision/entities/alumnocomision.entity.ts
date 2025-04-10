@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Asistencia } from './asistencia.entity';
+import { Caja } from 'src/Modules/caja/entities/caja.entity';
 
 @Entity('alumno_comision')
 export class AlumnoComision {
@@ -25,4 +26,7 @@ export class AlumnoComision {
   
   @OneToMany(() => Asistencia, (asistencia) => asistencia.alumnoComision)
   asistencias: Asistencia[];
+  
+  @OneToMany(() => Caja, (caja) => caja.alumnoComision)
+  pagos?: Caja[];
 }

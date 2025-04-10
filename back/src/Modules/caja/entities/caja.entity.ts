@@ -1,4 +1,6 @@
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
+import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
+import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -37,11 +39,12 @@ export class Caja {
   fecha: Date;
 
   @Column({ type: 'decimal', nullable: true })
-  cuota: number;
+  cuota?: number;
 
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
   vendedor: Vendedor;
 
-  @ManyToOne(() => Alumno, (alumno) => alumno.pagos, { nullable: true })
-  alumno?: Alumno;
+
+  @ManyToOne(() => AlumnoComision, (ac) => ac.pagos, { nullable: true })
+  alumnoComision?: AlumnoComision;
 }

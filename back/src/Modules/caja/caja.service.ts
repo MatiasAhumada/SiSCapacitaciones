@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Comision } from '../comision/entities/comision.entity';
+import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 @Injectable()
 export class CajaService {
   constructor(
@@ -16,8 +17,9 @@ export class CajaService {
     private readonly cajaRepository: Repository<Caja>,
     @InjectRepository(Vendedor)
     private readonly vendedorRepository: Repository<Vendedor>,
-    @InjectRepository(Alumno)
-    private readonly AlumnoRepository: Repository<Alumno>,
+
+    @InjectRepository(AlumnoComision)
+    private readonly alumnoComisionRepository: Repository<AlumnoComision>,
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
@@ -27,8 +29,8 @@ export class CajaService {
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
-    const alumno = await this.AlumnoRepository.find({
-      where: { id: createCajaDto.alumnoId },
+    const alumno = await this.alumnoComisionRepository.find({
+      where: { id: createCajaDto.alumnoComisionId },
     });
     if (!alumno) {
       throw new NotFoundException('Alumno no encontrado');
@@ -36,7 +38,7 @@ export class CajaService {
     const movimiento = this.cajaRepository.create({
       ...createCajaDto,
       vendedor: { id: createCajaDto.vendedorId },
-      alumno: { id: createCajaDto.alumnoId },
+      alumnoComision: { id: createCajaDto.alumnoComisionId },
     });
 
     return await this.cajaRepository.save(movimiento);
@@ -44,15 +46,18 @@ export class CajaService {
 
   async findAll() {
     return this.cajaRepository.find({
-      relations: ['vendedor', 'alumno'],
+      relations: ['vendedor', 'alumnoComision'],
       select: {
         vendedor: {
           id: true,
           name: true,
         },
-        alumno: {
+        alumnoComision: {
           id: true,
-          name: true,
+          alumno: {
+            id: true,
+            name: true,
+          },
         },
       },
     });
@@ -61,11 +66,15 @@ export class CajaService {
   async findByVendedor(vendedorId: string) {
     const movimientos = await this.cajaRepository.find({
       where: { vendedor: { id: vendedorId } },
-      relations: ['alumno'],
+      relations: ['alumnoComision'],
       select: {
-        alumno: {
+        alumnoComision: {
           id: true,
-          name: true,
+
+          alumno: {
+            id: true,
+            name: true,
+          },
         },
       },
     });
@@ -80,24 +89,25 @@ export class CajaService {
   }
 
   async update(id: string, updateCajaDto: UpdateCajaDto) {
-    const { alumnoId, vendedorId, ...updateData } = updateCajaDto;
+    const { alumnoComisionId, vendedorId, ...updateData } = updateCajaDto;
     const caja = await this.cajaRepository.findOne({
       where: { id },
-      relations: ['alumno', 'vendedor'],
+      relations: ['alumnoComision', 'vendedor'],
     });
     if (!caja) {
       throw new NotFoundException(`Caja con ID ${id} no encontrada`);
     }
-
-    if (alumnoId) {
-      const alumno = await this.AlumnoRepository.findOne({
-        where: { id: alumnoId },
+    if (alumnoComisionId) {
+      const alumnoComision = await this.alumnoComisionRepository.findOne({
+        where: { id: alumnoComisionId },
       });
-      if (!alumno)
-        throw new NotFoundException(`Alumno con ID ${alumnoId} no encontrado`);
-      caja.alumno = alumno;
+      if (!alumnoComision) {
+        throw new NotFoundException(
+          `AlumnoComision con ID ${alumnoComisionId} no encontrado`,
+        );
+      }
+      caja.alumnoComision = alumnoComision;
     }
-
     if (vendedorId) {
       const vendedor = await this.vendedorRepository.findOne({
         where: { id: vendedorId },
@@ -120,16 +130,24 @@ export class CajaService {
 
   async getMovimientosPorDia(fecha: string) {
     return this.cajaRepository.find({
-      where: { fecha: Between(new Date(`${fecha}T00:00:00`), new Date(`${fecha}T23:59:59.999`)) },
-      relations: ['vendedor', 'alumno'],
+      where: {
+        fecha: Between(
+          new Date(`${fecha}T00:00:00`),
+          new Date(`${fecha}T23:59:59.999`),
+        ),
+      },
+      relations: ['vendedor', 'alumnoComision'],
       select: {
         vendedor: {
           id: true,
           name: true,
         },
-        alumno: {
+        alumnoComision: {
           id: true,
-          name: true,
+          alumno: {
+            id: true,
+            name: true,
+          },
         },
       },
     });

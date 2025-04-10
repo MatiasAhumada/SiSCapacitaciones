@@ -2,6 +2,7 @@ import {
   IsDateString,
   IsEnum,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -18,17 +19,20 @@ export class CreateCajaDto {
   monto: number;
 
   @IsString()
-  descripcion: string;
+  @IsOptional()
+  descripcion?: string;
 
   @IsDateString()
   fecha: string;
 
   @IsUUID()
   vendedorId: string;
-  
+
   @IsUUID()
-  alumnoId: string;
+  @IsOptional()
+  alumnoComisionId: string;
 
   @IsNumber()
+  @IsOptional()
   cuota: number;
 }

@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { AlumnoComision } from './alumnocomision.entity';
+import { Caja } from 'src/Modules/caja/entities/caja.entity';
 @Entity({
   name: 'comisiones',
 })
@@ -49,4 +50,6 @@ export class Comision {
 
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.comisiones)
   sucursal: Sucursal;
+
+  
 }

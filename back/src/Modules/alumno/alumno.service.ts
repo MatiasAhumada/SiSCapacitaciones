@@ -43,7 +43,20 @@ export class AlumnoService {
   }
 
   async findAll() {
-    return this.alumnoRepository.find();
+    return this.alumnoRepository.find({
+      relations:["alumnoComisiones.pagos"],
+      select:{
+        alumnoComisiones:{
+          id:true,
+          state:true,
+          pagos:{
+            id:true,
+            fecha:true,
+            cuota:true,
+          }
+        }
+      }
+    });
   }
 
   async actualizarImgUrl(

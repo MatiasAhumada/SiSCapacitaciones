@@ -110,7 +110,6 @@ const DashCaja = () => {
   };
 
   const handleSave = async (item) => {
-  
     setPause((prev) => ({ ...prev, [item.id]: true }));
     await editMovCaja(item.id, formEdit).then((data) => {
       try {
@@ -128,6 +127,7 @@ const DashCaja = () => {
       }
     });
   };
+  console.log(tableItems);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -137,7 +137,6 @@ const DashCaja = () => {
               <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
               <p className="text-gray-600 mt-2">En esta tabla estaran los movimientos realizados.</p>
             </div>
-            
           </div>
           <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
             <table className="w-full table-auto text-sm  text-center">

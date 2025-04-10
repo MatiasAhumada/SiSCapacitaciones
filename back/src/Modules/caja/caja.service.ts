@@ -29,16 +29,17 @@ export class CajaService {
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
-    const alumno = await this.alumnoComisionRepository.find({
-      where: { id: createCajaDto.alumnoComisionId },
+    const alumnoComision = await this.alumnoComisionRepository.findOne({
+      where: { alumno: { id: createCajaDto.alumnoComisionId } },
+      relations:['alumno'],
     });
-    if (!alumno) {
+    if (!alumnoComision) {
       throw new NotFoundException('Alumno no encontrado');
     }
     const movimiento = this.cajaRepository.create({
       ...createCajaDto,
       vendedor: { id: createCajaDto.vendedorId },
-      alumnoComision: { id: createCajaDto.alumnoComisionId },
+      alumnoComision: { id: alumnoComision.id },
     });
 
     return await this.cajaRepository.save(movimiento);
@@ -100,7 +101,7 @@ export class CajaService {
     }
     if (alumnoComisionId) {
       const alumnoComision = await this.alumnoComisionRepository.findOne({
-        where: { alumno: {id: alumnoComisionId} },
+        where: { alumno: { id: alumnoComisionId } },
       });
       if (!alumnoComision) {
         throw new NotFoundException(

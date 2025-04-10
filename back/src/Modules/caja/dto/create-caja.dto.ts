@@ -32,7 +32,8 @@ export class CreateCajaDto {
   @IsOptional()
   alumnoComisionId: string;
 
-  @IsNumber()
   @IsOptional()
+  @IsNumber()
   cuota: number;
+  
 }

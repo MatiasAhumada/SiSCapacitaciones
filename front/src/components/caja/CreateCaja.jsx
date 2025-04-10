@@ -16,8 +16,9 @@ const CreateCaja = () => {
     tipo: "",
     descripcion: "",
     vendedorId: "",
-    alumnoId: "",
+    alumnoComisionId: "",
     monto: "",
+    cuota: "",
     vendTransId: "",
   });
 
@@ -66,13 +67,13 @@ const CreateCaja = () => {
   };
 
   const handleAlumnoChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      alumnoId: e.target.value,
+      [name]: value,
     }));
   };
 
-  // Formato de fecha para mostrar (dd/mm/yyyy hh:mm)
   const formatToDisplay = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -86,10 +87,8 @@ const CreateCaja = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     setPause(true);
     await postCaja(formData).then((data) => {
-      
       try {
         Swal.fire({
           title: "Movimiento Registrado",
@@ -198,8 +197,8 @@ const CreateCaja = () => {
             <div className="pb-2">
               <label className="block mb-2 text-sm principal">Alumno</label>
               <select
-                name="alumnoId"
-                value={formData.alumnoId}
+                name="alumnoComisionId"
+                value={formData.alumnoComisionId}
                 onChange={handleAlumnoChange}
                 className="pl-12 mb-2 bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg block w-full p-2.5"
               >
@@ -214,6 +213,21 @@ const CreateCaja = () => {
           </>
         )}
 
+        <div className="pb-2">
+          <label htmlFor="cuota" className="block mb-2 text-sm  principal text-[#111827]">
+            N° Cuota
+          </label>
+          <div className="relative text-gray-400">
+            <input
+              type="number"
+              name="cuota"
+              id="cuota"
+              value={formData.cuota}
+              onChange={handleChange}
+              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+            />
+          </div>
+        </div>
         <div className="pb-2">
           <label htmlFor="descripcion" className="block mb-2 text-sm  principal text-[#111827]">
             Descripcion

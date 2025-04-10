@@ -68,7 +68,7 @@ export class AlumnoService {
   async findOne(id: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'alumnoComisiones', 'pagos'],
+      relations: ['sucursal', 'alumnoComisiones'],
       select: {
         sucursal: {
           id: true,
@@ -78,9 +78,7 @@ export class AlumnoService {
           id: true,
           state: true,
         },
-        pagos: {
-          id: true,
-        },
+       
       },
     });
   }

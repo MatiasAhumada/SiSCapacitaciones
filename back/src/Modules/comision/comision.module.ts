@@ -11,7 +11,7 @@ import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Caja } from '../caja/entities/caja.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Comision,Sucursal,Curso,Profesor,Asistencia,AlumnoComision,Asistencia])],
+  imports:[TypeOrmModule.forFeature([Comision,Sucursal,Curso,Profesor,Asistencia,AlumnoComision,Asistencia,Caja])],
   controllers: [ComisionController],
   providers: [ComisionService],
 })

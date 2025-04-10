@@ -53,7 +53,6 @@ export class Alumno {
   inscripciones?: Inscripcion[];
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)
   sucursal?: Sucursal;
-  
   @OneToMany(() => Certificado, (cert) => cert.alumno)
   certificados?: Certificado[];
 }

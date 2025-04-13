@@ -11,6 +11,7 @@ import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Asistencia } from './entities/asistencia.entity';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
 import { ChangeStateDto } from './dto/changeState.dto';
+import { Tracing } from 'trace_events';
 
 @Injectable()
 export class ComisionService {
@@ -86,13 +87,44 @@ export class ComisionService {
       },
     });
   }
+  
+  async findOneAluCom(id: string) {
+    return this.alumnoComisionRepository.findOne({
+      where: { id },
+      relations: ['comision', 'alumno', 'pagos'],
+      select: {
+        comision: {
+          id: true,
+          name: true,
+          day: true,
+          hour: {
+            start: true,
+            end: true,
+          },
+        },
+        alumno: {
+          id: true,
+          dni: true,
+          name: true,
+          tel: true,
+        },
+        pagos: {
+          id: true,
+          monto: true,
+          metodoPago: true,
+          fecha: true,
+          cuota: true,
+        },
+      },
+    });
+  }
 
   async findOne(id: string) {
     return this.comisionRepository.findOne({
       where: { id },
       relations: [
         'sucursal',
-       
+
         'alumnoComisiones.alumno',
         'alumnoComisiones.asistencias',
         'profesor',

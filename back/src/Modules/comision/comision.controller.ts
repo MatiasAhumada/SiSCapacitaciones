@@ -27,6 +27,10 @@ export class ComisionController {
   findAll() {
     return this.comisionService.findAll();
   }
+  @Get("/aluCom/:idAluCom")
+  findAluCom(@Param('idAluCom') id: string) {
+    return this.comisionService.findOneAluCom(id);
+  }
 
   @Get('/suc/:id')
   findOneBySucursal(@Param('id') id: string) {

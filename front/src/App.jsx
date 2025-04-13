@@ -43,7 +43,7 @@ function App() {
             <Route path="crear" element={<CrearProfes></CrearProfes>}></Route>
           </Route>
           <Route
-            path="alumno/:idAlu"
+            path="alumno/:idAluCom"
             element={<DashAlumno></DashAlumno>}
           ></Route>
           <Route path="alumnos" element={<DashAlumnos></DashAlumnos>}>
@@ -71,7 +71,7 @@ function App() {
         <Route path="/:idVend" element={<IndexVendedor></IndexVendedor>}>
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
           <Route
-            path="alumno/:idAlu"
+            path="alumno/:idAluCom"
             element={<DashAlumno></DashAlumno>}
           ></Route>
           <Route path="inscribir" element={<Inscripcion></Inscripcion>}></Route>

@@ -185,6 +185,14 @@ export const putComision = async (id, comision) => {
     console.error("Error al obtener vendedor", error.response?.data);
   }
 };
+export const getAluCom = async (id) => {
+  try {
+    const response = await axios.get(`${URL}/comision/aluCom/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
 
 export const editStateComision = async (change) => {
 

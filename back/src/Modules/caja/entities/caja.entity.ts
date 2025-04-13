@@ -44,7 +44,6 @@ export class Caja {
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
   vendedor: Vendedor;
 
-
   @ManyToOne(() => AlumnoComision, (ac) => ac.pagos, { nullable: true })
   alumnoComision?: AlumnoComision;
 }

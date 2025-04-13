@@ -188,10 +188,10 @@ const CreateCaja = () => {
                 className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               >
                 <option value="">Seleccione</option>
-                <option value="efectivo">Efectivo</option>
-                <option value="transferencia">Transferencia</option>
-                <option value="debito">Debito</option>
-                <option value="credito">Credito</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia">Transferencia</option>
+                <option value="Debito">Debito</option>
+                <option value="Credito">Credito</option>
               </select>
             </div>
             <div className="pb-2">

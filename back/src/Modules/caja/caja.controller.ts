@@ -26,6 +26,7 @@ export class CajaController {
     return this.cajaService.findAll();
   }
 
+ 
   @Get('/vendedor/:id')
   findByVendedor(@Param('id') id: string) {
     return this.cajaService.findByVendedor(id);

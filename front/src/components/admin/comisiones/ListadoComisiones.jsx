@@ -20,7 +20,8 @@ const ListadoComisiones = () => {
   const { comId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const navegacion = (idAlumno) => {
+  const navegacion = (alumno) => {
+ 
     const currentPath = location.pathname;
     const isAdmin = currentPath.startsWith("/adm");
   
@@ -29,8 +30,8 @@ const ListadoComisiones = () => {
     const userId = isAdmin ? pathSegments[2] : pathSegments[1]; // '123' o '456'
   
     const redirectionPath = isAdmin
-      ? `/adm/${userId}/alumno/${idAlumno}`
-      : `/${userId}/alumno/${idAlumno}`;
+      ? `/adm/${userId}/alumno/${alumno.id}`
+      : `/${userId}/alumno/${alumno.id}`;
   
     navigate(redirectionPath);
   };
@@ -178,7 +179,7 @@ const ListadoComisiones = () => {
                   <td className="px-6 py-4">
                     <button
                       value={item.id}
-                      onClick={() => navegacion(item.alumno.id)}
+                      onClick={() => navegacion(item)}
                       className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (

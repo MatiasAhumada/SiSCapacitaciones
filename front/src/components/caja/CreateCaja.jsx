@@ -3,7 +3,119 @@ import logo from "../assets/simplificado_a_color.png";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { getAlu, getCursos, getSucursalId, getVendedores, getVendID, postCaja, postProfes } from "../queris/queris";
+import html2pdf from 'html2pdf.js';
+import { useRef } from "react";
+import jsPDF from "jspdf";
+
 const CreateCaja = () => {
+  const comprobanteBase = {
+    empresa: "Sis Capacitaciones",
+    direcciones: ["Junín 483 S.M. De Tucumán", "25 De Mayo 54 Santiago Del Estero"],
+    telefono: "3816669100",
+    email: "gruposis.srl@gmail.com",
+    sitioWeb: "siscursos.com",
+    titulo: "RECIBO DE COBRANZA",
+    numero: "X 0001-00015217",
+    fechaEmision: "12/04/2025",
+    cuit: "30-71724560-8",
+    ingresosBrutos: "30-71724560-8",
+    inicioActividades: "01/07/2021",
+    condicionIVA: "Responsable Inscripto",
+    cliente: {
+      nombre: "Lopez valentina alejandra",
+      dni: "47852290",
+      condicionIVA: "-",
+      domicilio: "Tucumán",
+    },
+    valoresRecibidos: [
+      {
+        fecha: "12/04/2025",
+        formaPago: "Banco",
+        observacion: "-",
+        monto: "$12.500,00",
+      },
+    ],
+    totalRecibido: "$12.500,00",
+    conceptoCancelacion: [
+      {
+        fechaEmision: "12/04/2025",
+        comprobante: "Factura de Venta",
+        numero: "-",
+        monto: "$12.500,00",
+      },
+    ],
+    totalCancelacion: "$12.500,00",
+    leyendaRecibido: "RECIBIDO",
+    pieFirma: {
+      firma: "....................................",
+      aclaracion: ".........................................",
+      dni: "......................................",
+      fecha: "....................",
+    },
+    leyendaPie: "Controle el proceso de sus ventas utilizando Contagram",
+    derechos: "2025 © Desarrollado por www.contagram.com Pág 1/1",
+    urlContagram: "https://www.contagram.com/?utm_source=google&utm_medium=organico&utm_campaign=VIRAL_TOOL",
+  };
+
+  const reciboRef = useRef(null);
+
+  const generateReceipt = () => {
+    const doc = new jsPDF();
+    
+    // Añadir el contenido HTML
+    const receiptHtml = document.getElementById('receipt').innerHTML;
+    
+    doc.html(receiptHtml, {
+      callback: function (doc) {
+        doc.save('recibo.pdf');
+      },
+      x: 10,
+      y: 10
+    });
+  };
+  const handleGenerarReciboPDF = () => {
+    console.log(reciboRef.current)
+    if (!reciboRef.current) return;
+
+    const alumno = alu.find((a) => a.id === formData.alumnoComisionId);
+
+    comprobanteBase.cliente.nombre = alumno?.name || "";
+    comprobanteBase.cliente.dni = alumno?.dni || "";
+    comprobanteBase.fechaEmision = formatToDisplay(fecha);
+
+    comprobanteBase.valoresRecibidos = [
+      {
+        fecha: formatToDisplay(fecha),
+        formaPago: formData.metodoPago,
+        observacion: formData.descripcion,
+        monto: `$${formData.monto}`,
+      },
+    ];
+
+    comprobanteBase.totalRecibido = `$${formData.monto}`;
+
+    comprobanteBase.conceptoCancelacion = [
+      {
+        fechaEmision: formatToDisplay(fecha),
+        comprobante: "Factura de Venta",
+        numero: "-",
+        monto: `$${formData.monto}`,
+      },
+    ];
+
+    comprobanteBase.totalCancelacion = `$${formData.monto}`;
+
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: "recibo.pdf",
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      })
+      .from(reciboRef.current)
+      .save();
+  };
+
   const idVend = localStorage.getItem("token");
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
@@ -273,7 +385,112 @@ const CreateCaja = () => {
             "Registrar Movimiento"
           )}
         </button>
+        <button type="button" onClick={generateReceipt}>Generar Recibo PDF</button>
       </form>
+      <div
+        ref={reciboRef}
+        style={{
+          visibility: "hidden",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: -1,
+          fontFamily: "Arial",
+          padding: "20px",
+          maxWidth: "800px",
+          margin: "0 auto",
+        }}
+        id="receipt"
+      >
+        {" "}
+        <h2>{comprobanteBase.empresa}</h2>
+        <p>
+          {comprobanteBase.direcciones[0]} - {comprobanteBase.direcciones[1]}
+        </p>
+        <p>Tel: {comprobanteBase.telefono}</p>
+        <p>Email: {comprobanteBase.email}</p>
+        <p>Web: {comprobanteBase.sitioWeb}</p>
+        <h3 style={{ marginTop: "20px", borderTop: "1px solid #000", paddingTop: "10px" }}>{comprobanteBase.titulo}</h3>
+        <p>
+          <strong>Numero:</strong> {comprobanteBase.numero}
+        </p>
+        <p>
+          <strong>Fecha de Emisión:</strong> {comprobanteBase.fechaEmision}
+        </p>
+        <p>
+          <strong>CUIT:</strong> {comprobanteBase.cuit}
+        </p>
+        <p>
+          <strong>Ingresos Brutos:</strong> {comprobanteBase.ingresosBrutos}
+        </p>
+        <p>
+          <strong>Inicio de Actividades:</strong> {comprobanteBase.inicioActividades}
+        </p>
+        <p>
+          <strong>Condición IVA:</strong> {comprobanteBase.condicionIVA}
+        </p>
+        <p>
+          <strong>Apellido y Nombre / Razón Social:</strong> {comprobanteBase.cliente.nombre}
+        </p>
+        <p>
+          <strong>DNI:</strong> {comprobanteBase.cliente.dni}
+        </p>
+        <p>
+          <strong>Domicilio Comercial:</strong> {comprobanteBase.cliente.domicilio}
+        </p>
+        <h4>Valores Recibidos</h4>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Forma de Pago</th>
+              <th>Observación</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {comprobanteBase.valoresRecibidos.map((item, index) => (
+              <tr key={index}>
+                <td>{item.fecha}</td>
+                <td>{item.formaPago}</td>
+                <td>{item.observacion}</td>
+                <td>{item.monto}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p style={{ textAlign: "right", fontWeight: "bold" }}>Total: {comprobanteBase.totalRecibido}</p>
+        <h4>Concepto de Cancelación</h4>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Comprobante</th>
+              <th>Número</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {comprobanteBase.conceptoCancelacion.map((item, index) => (
+              <tr key={index}>
+                <td>{item.fechaEmision}</td>
+                <td>{item.comprobante}</td>
+                <td>{item.numero}</td>
+                <td>{item.monto}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p style={{ textAlign: "right", fontWeight: "bold" }}>Total: {comprobanteBase.totalCancelacion}</p>
+        <h4>{comprobanteBase.leyendaRecibido}</h4>
+        <p style={{ marginTop: "40px" }}>
+          Firma: {comprobanteBase.pieFirma.firma} Aclaración: {comprobanteBase.pieFirma.aclaracion} DNI: {comprobanteBase.pieFirma.dni} Fecha:{" "}
+          {comprobanteBase.pieFirma.fecha}
+        </p>
+        <hr />
+        <p>{comprobanteBase.leyendaPie}</p>
+        <p>{comprobanteBase.derechos}</p>
+      </div>
     </div>
   );
 };

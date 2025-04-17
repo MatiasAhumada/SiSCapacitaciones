@@ -5,7 +5,9 @@ import flyonui from "flyonui";
 
 export default defineConfig({
   content: [],
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss({
+    config:"./tailwind.config.js",
+  })],
   server: {
     host: "0.0.0.0",
     port: 8080,

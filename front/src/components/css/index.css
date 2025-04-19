@@ -26,3 +26,7 @@
 .borderColor {
   border-color: rgba(0, 32, 255, 1); /* Equivalente a #052896 */
 }
+.bg-oklch-gray-400 {
+  background-color: rgb(180, 179, 189);
+}
+

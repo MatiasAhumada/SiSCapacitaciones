@@ -6,11 +6,12 @@ import { getAlu, getCursos, getSucursalId, getVendedores, getVendID, postCaja, p
 import html2pdf from "html2pdf.js";
 import { useRef } from "react";
 import jsPDF from "jspdf";
-
+import { Modal } from "antd";
+import ReciboComprobante from "./Comprobante";
 const CreateCaja = () => {
   const { idVend } = useParams();
   const navigate = useNavigate();
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const idVende = localStorage.getItem("token");
   const [pause, setPause] = useState(false);
@@ -112,6 +113,15 @@ const CreateCaja = () => {
     });
   };
 
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
       <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
@@ -284,13 +294,15 @@ const CreateCaja = () => {
         <button
           type="button"
           className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
-          onClick={()=>navigate(`/recibo`)}
+          onClick={showModal}
+          // () => navigate(`/recibo`)
         >
           Generar Recibo PDF
         </button>
       </form>
-
-   
+      <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
+       <ReciboComprobante  apellidoNombre="Matias Ahumada" dni="42499732" domicilioComercial="Juan XXII 199" iva="-" fecha="19/04/2025" formaPago="Banco" observacion="-" monto="25000"></ReciboComprobante>
+      </Modal>
     </div>
   );
 };

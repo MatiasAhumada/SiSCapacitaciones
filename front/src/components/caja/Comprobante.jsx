@@ -1,14 +1,20 @@
 import React, { useEffect, useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 import { jsPDF } from "jspdf";
-import completo from "../assets/Completo_a_color.png";
-import html2pdf from "html2pdf.js";
-import autoTable from "jspdf-autotable";
 import plantilla from "../assets/comprobanteSis.jpg";
-import html2canvas from "html2canvas";
 import { Button } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
-const ReciboComprobante = ({ open, onClose, apellidoNombre, dni, domicilioComercial, iva, fecha, formaPago, observacion, monto }) => {
+const ReciboComprobante = ({
+  numero,
+  comprobante,
+  apellidoNombre,
+  dni,
+  domicilioComercial,
+  iva,
+  fecha,
+  formaPago,
+  observacion,
+  monto,
+}) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -23,19 +29,54 @@ const ReciboComprobante = ({ open, onClose, apellidoNombre, dni, domicilioComerc
       ctx.drawImage(img, 0, 0);
 
       ctx.fillStyle = "#000";
-      ctx.font = "28px Arial";
-      ctx.textAlign = "left";
+      ctx.font = "20px Arial";
+      ctx.fillText(apellidoNombre, 400, 400);
 
-      // Ajustá coordenadas según el diseño
-      ctx.fillText(apellidoNombre, 100, 230);
-      ctx.fillText(dni, 630, 230);
-      ctx.fillText(domicilioComercial, 630, 270);
-      ctx.fillText(iva, 170, 270);
-      ctx.fillText(fecha, 670, 95);
-      ctx.fillText(formaPago, 170, 420);
-      ctx.fillText(observacion, 370, 420);
-      ctx.fillText(`$${monto}`, 740, 420);
-      ctx.fillText(`$${monto}`, 920, 470);
+      ctx.font = "20px Arial";
+      ctx.fillText(dni, 760, 400);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(domicilioComercial, 915, 433);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(iva, 205, 455);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(fecha, 60, 580);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(formaPago, 250, 580);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(observacion, 400, 580);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(`$${monto}`, 1120, 580);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(`$${monto}`, 1120, 622);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(fecha, 60, 755);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(comprobante, 380, 755);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(numero, 740, 755);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(`$${monto}`, 1120, 755);
+
+      ctx.font = "20px Arial";
+      ctx.fillText(`$${monto}`, 1120, 797);
+
+      ctx.fillStyle = "#5E5D6B";
+      ctx.font = "20px Arial";
+      ctx.fillText(`Controle el proceso de sus ventas utilizando SiSCapacitaciones`, 30, 1697);
+      ctx.fillStyle = "#5E5D6B";
+      ctx.font = "20px Arial";
+      ctx.fillText(`2025 © Desarrollado por Matias Ahumada FullStack Dev Tel: +54 9 381-352-8658`, 30, 1720);
     };
   }, [apellidoNombre, dni, domicilioComercial, iva, fecha, formaPago, observacion, monto]);
 
@@ -43,16 +84,27 @@ const ReciboComprobante = ({ open, onClose, apellidoNombre, dni, domicilioComerc
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const link = document.createElement("a");
-    link.download = `Recibo-${apellidoNombre}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+    pdf.save(`Recibo-${apellidoNombre}.pdf`);
   };
   return (
     <>
       <canvas ref={canvasRef} style={{ width: "100%", height: "auto", border: "1px solid #ccc" }} />
       <div className="flex justify-end mt-4">
-        <Button type="primary" icon={<DownloadOutlined/>} onClick={handleDownload}>
+        <Button type="primary" icon={<DownloadOutlined />} onClick={handleDownload}>
           Descargar
         </Button>
       </div>

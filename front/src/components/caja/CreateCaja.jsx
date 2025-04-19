@@ -301,7 +301,7 @@ const CreateCaja = () => {
         </button>
       </form>
       <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
-       <ReciboComprobante  apellidoNombre="Matias Ahumada" dni="42499732" domicilioComercial="Juan XXII 199" iva="-" fecha="19/04/2025" formaPago="Banco" observacion="-" monto="25000"></ReciboComprobante>
+       <ReciboComprobante  apellidoNombre="Matias Ahumada" dni="42499732" domicilioComercial="Juan XXII 199" iva="-" fecha="19/04/2025" formaPago="Banco" observacion="-" monto="25000" comprobante="Factura de venta" numero="-"></ReciboComprobante>
       </Modal>
     </div>
   );

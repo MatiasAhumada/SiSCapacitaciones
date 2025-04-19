@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getAlu, getCursos, getSucursalId, getVendedores, getVendID, postCaja, postProfes } from "../queris/queris";
+import { getAlu, getAluID, getCursos, getSucursalId, getVendedores, getVendID, postCaja, postProfes } from "../queris/queris";
 import html2pdf from "html2pdf.js";
 import { useRef } from "react";
 import jsPDF from "jspdf";
@@ -12,7 +12,20 @@ const CreateCaja = () => {
   const { idVend } = useParams();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [infoComprobante, setInfoComprobante] = useState({
+    apellidoNombre: "",
+    dni: "",
+    domicilioComercial: "",
+    iva: "",
+    fecha: "",
+    formaPago: "",
+    observacion: "",
+    monto: "",
+    comprobante: "",
+    numero: "",
+    numeroComprobante:""
+  });
+  const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const idVende = localStorage.getItem("token");
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
@@ -20,7 +33,7 @@ const CreateCaja = () => {
   const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
-    fecha: "2024-03-09T10:00:00Z",
+    fecha: "",
     metodoPago: "",
     tipo: "",
     descripcion: "",
@@ -81,6 +94,16 @@ const CreateCaja = () => {
       ...prev,
       [name]: value,
     }));
+
+    getAluID(value).then((data) => {
+      console.log(data);
+      setAlumnoSeleccionado({
+        apellidoNombre: data.name,
+        dni: data.dni,
+        domicilioComercial: `${data.address}, ${data.locality}`,
+        iva: "-",
+      });
+    });
   };
 
   const formatToDisplay = (date) => {
@@ -90,27 +113,49 @@ const CreateCaja = () => {
     const year = d.getFullYear();
     const hours = String(d.getHours()).padStart(2, "0");
     const minutes = String(d.getMinutes()).padStart(2, "0");
-
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
+   // ${hours}:${minutes}
+    return `${day}/${month}/${year} ${hours}:${minutes} `;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPause(true);
-    await postCaja(formData).then((data) => {
-      try {
-        Swal.fire({
-          title: "Movimiento Registrado",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause(false);
-        });
-      } catch (error) {
-        console.log(error);
-      }
+    const cargaComprobante = {
+      ...infoComprobante,
+      fecha: formatToDisplay(fecha),
+      metodoPago: formData.metodoPago,
+      observacion: formData.descripcion,
+      monto: formData.monto,
+      comprobante: "Factura de venta",
+      numero: "-",
+      numeroComprobante:"X 0001-00015217",
+      ...alumnoSeleccionado,
+    };
+    setInfoComprobante(cargaComprobante);
+    Swal.fire({
+      title: "Movimiento Registrado",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 1500,
+    }).then(() => {
+      console.log(cargaComprobante);
+      setPause(false);
     });
+
+    // await postCaja(formData).then((data) => {
+    //   try {
+    //     Swal.fire({
+    //       title: "Movimiento Registrado",
+    //       icon: "success",
+    //       showConfirmButton: false,
+    //       timer: 1500,
+    //     }).then(() => {
+    //       setPause(false);
+    //     });
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // });
   };
 
   const showModal = () => {
@@ -122,6 +167,7 @@ const CreateCaja = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
       <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
@@ -301,7 +347,7 @@ const CreateCaja = () => {
         </button>
       </form>
       <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
-       <ReciboComprobante  apellidoNombre="Matias Ahumada" dni="42499732" domicilioComercial="Juan XXII 199" iva="-" fecha="19/04/2025" formaPago="Banco" observacion="-" monto="25000" comprobante="Factura de venta" numero="-"></ReciboComprobante>
+        <ReciboComprobante {...infoComprobante}></ReciboComprobante>
       </Modal>
     </div>
   );

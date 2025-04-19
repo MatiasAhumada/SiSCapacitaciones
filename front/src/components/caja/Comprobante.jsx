@@ -14,6 +14,7 @@ const ReciboComprobante = ({
   formaPago,
   observacion,
   monto,
+  numeroComprobante,
 }) => {
   const canvasRef = useRef(null);
 
@@ -42,7 +43,12 @@ const ReciboComprobante = ({
       ctx.fillText(iva, 205, 455);
 
       ctx.font = "20px Arial";
-      ctx.fillText(fecha, 60, 580);
+      ctx.fillText(fecha, 30, 580);
+
+      ctx.font = "bold 20px Arial";
+      ctx.fillText(fecha, 900, 225);
+      ctx.font = "bold 20px Arial";
+      ctx.fillText(numeroComprobante, 800, 183);
 
       ctx.font = "20px Arial";
       ctx.fillText(formaPago, 250, 580);

@@ -69,7 +69,6 @@ function App() {
           </Route>
           <Route path="comisiones/:comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
         </Route>
-        <Route path="/recibo" element={<ReciboComprobante></ReciboComprobante>}></Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>
     </BrowserRouter>

@@ -23,7 +23,7 @@ const CreateCaja = () => {
     monto: "",
     comprobante: "",
     numero: "",
-    numeroComprobante:""
+    numeroComprobante: "",
   });
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const idVende = localStorage.getItem("token");
@@ -113,7 +113,7 @@ const CreateCaja = () => {
     const year = d.getFullYear();
     const hours = String(d.getHours()).padStart(2, "0");
     const minutes = String(d.getMinutes()).padStart(2, "0");
-   // ${hours}:${minutes}
+    // ${hours}:${minutes}
     return `${day}/${month}/${year} ${hours}:${minutes} `;
   };
 
@@ -123,47 +123,33 @@ const CreateCaja = () => {
     const cargaComprobante = {
       ...infoComprobante,
       fecha: formatToDisplay(fecha),
-      metodoPago: formData.metodoPago,
+      formaPago: formData.metodoPago,
       observacion: formData.descripcion,
       monto: formData.monto,
       comprobante: "Factura de venta",
       numero: "-",
-      numeroComprobante:"X 0001-00015217",
+      numeroComprobante: "X 0001-00015217",
       ...alumnoSeleccionado,
     };
     setInfoComprobante(cargaComprobante);
-    Swal.fire({
-      title: "Movimiento Registrado",
-      icon: "success",
-      showConfirmButton: false,
-      timer: 1500,
-    }).then(() => {
-      console.log(cargaComprobante);
-      setPause(false);
+
+    await postCaja(formData).then((data) => {
+      try {
+        Swal.fire({
+          title: "Movimiento Registrado",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          setPause(false);
+          setIsModalOpen(true);
+        });
+      } catch (error) {
+        console.log(error);
+      }
     });
-
-    // await postCaja(formData).then((data) => {
-    //   try {
-    //     Swal.fire({
-    //       title: "Movimiento Registrado",
-    //       icon: "success",
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //     }).then(() => {
-    //       setPause(false);
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // });
   };
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -336,14 +322,6 @@ const CreateCaja = () => {
           ) : (
             "Registrar Movimiento"
           )}
-        </button>
-        <button
-          type="button"
-          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
-          onClick={showModal}
-          // () => navigate(`/recibo`)
-        >
-          Generar Recibo PDF
         </button>
       </form>
       <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>

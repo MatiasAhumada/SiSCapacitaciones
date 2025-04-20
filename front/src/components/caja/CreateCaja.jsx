@@ -33,7 +33,7 @@ const CreateCaja = () => {
   const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
-    fecha: "",
+    fecha:"",
     metodoPago: "",
     tipo: "",
     descripcion: "",
@@ -43,6 +43,16 @@ const CreateCaja = () => {
     cuota: "",
     vendTransId: "",
   });
+  const formatToDisplay = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    // ${hours}:${minutes}
+    return `${day}/${month}/${year} ${hours}:${minutes} `;
+  };
 
   useEffect(() => {
     const vendedor = async () => {
@@ -85,14 +95,18 @@ const CreateCaja = () => {
     setFormData({
       ...formData,
       [name]: value,
+      fecha: fecha,
     });
+console.log(formData);
   };
 
   const handleAlumnoChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value, 
+
     }));
 
     getAluID(value).then((data) => {
@@ -106,16 +120,7 @@ const CreateCaja = () => {
     });
   };
 
-  const formatToDisplay = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-    // ${hours}:${minutes}
-    return `${day}/${month}/${year} ${hours}:${minutes} `;
-  };
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -132,7 +137,7 @@ const CreateCaja = () => {
       ...alumnoSeleccionado,
     };
     setInfoComprobante(cargaComprobante);
-    console.log(formData)
+
     await postCaja(formData).then((data) => {
       try {
         Swal.fire({
@@ -175,7 +180,7 @@ const CreateCaja = () => {
               name="fecha"
               id="fecha"
               disabled
-              defaultValue={formatToDisplay(fecha) || ""}
+              defaultValue={formatToDisplay(fecha) }
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             />
           </div>
@@ -204,9 +209,9 @@ const CreateCaja = () => {
             className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
           >
             <option value="">Seleccione</option>
-            <option value="ingreso">Ingreso</option>
-            <option value="egreso">Egreso</option>
-            <option value="transferencia">Transferencia de caja</option>
+            <option value="Ingreso">Ingreso</option>
+            <option value="Egreso">Egreso</option>
+            <option value="Transferencia">Transferencia de caja</option>
           </select>
         </div>
 

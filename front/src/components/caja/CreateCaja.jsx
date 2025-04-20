@@ -132,7 +132,7 @@ const CreateCaja = () => {
       ...alumnoSeleccionado,
     };
     setInfoComprobante(cargaComprobante);
-
+    console.log(formData)
     await postCaja(formData).then((data) => {
       try {
         Swal.fire({

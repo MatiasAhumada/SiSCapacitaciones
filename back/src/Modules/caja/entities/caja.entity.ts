@@ -5,15 +5,15 @@ import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 export enum TipoMovimiento {
-  INGRESO = 'ingreso',
-  EGRESO = 'egreso',
-  TRANSFERENCIA = 'transferencia',
+  INGRESO = 'Ingreso',
+  EGRESO = 'Egreso',
+  TRANSFERENCIA = 'Transferencia',
 }
 export enum MetodoPago {
-  EFECTIVO = 'efectivo',
-  DEBITO = 'debito',
-  CREDITO = 'credito',
-  TRANSFERENCIA = 'transferencia',
+  EFECTIVO = 'Efectivo',
+  DEBITO = 'Debito',
+  CREDITO = 'Credito',
+  TRANSFERENCIA = 'Transferencia',
 }
 
 @Entity({

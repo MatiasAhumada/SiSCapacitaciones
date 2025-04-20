@@ -11,6 +11,9 @@ import { Servicio } from 'src/Modules/servicio/entities/servicio.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import { Caja } from 'src/Modules/caja/entities/caja.entity';
+import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
+import { Asistencia } from 'src/Modules/comision/entities/asistencia.entity';
+import { Certificado } from 'src/Modules/certificado/entities/certificado.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -22,10 +25,10 @@ const db_config = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   autoLoadEntities: true,
-  synchronize: true,
+  synchronize: false,
   dropSchema: false,
   logging: false,
-  entities: [Admins,Alumno,Caja,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja],
+  entities: [Admins,Alumno,Caja,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja,AlumnoComision,Asistencia,Certificado],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
   migrations: ['dist/migrations/*.{js,ts}'],

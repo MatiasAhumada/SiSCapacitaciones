@@ -9,8 +9,7 @@ import jsPDF from "jspdf";
 import { Modal } from "antd";
 import ReciboComprobante from "./Comprobante";
 const CreateCaja = () => {
-  const { idVend } = useParams();
-  const navigate = useNavigate();
+  const idVende = localStorage.getItem("token");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [infoComprobante, setInfoComprobante] = useState({
     apellidoNombre: "",
@@ -25,15 +24,15 @@ const CreateCaja = () => {
     numero: "",
     numeroComprobante: "",
   });
+  const [generatePDF, setGeneratePDF] = useState(false);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
-  const idVende = localStorage.getItem("token");
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
   const [vendedores, setVendores] = useState([]);
   const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
-    fecha:"",
+    fecha: "",
     metodoPago: "",
     tipo: "",
     descripcion: "",
@@ -50,7 +49,6 @@ const CreateCaja = () => {
     const year = d.getFullYear();
     const hours = String(d.getHours()).padStart(2, "0");
     const minutes = String(d.getMinutes()).padStart(2, "0");
-    // ${hours}:${minutes}
     return `${day}/${month}/${year} ${hours}:${minutes} `;
   };
 
@@ -97,16 +95,13 @@ const CreateCaja = () => {
       [name]: value,
       fecha: fecha,
     });
-console.log(formData);
   };
 
   const handleAlumnoChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
-      [name]: value, 
-
+      [name]: value,
     }));
 
     getAluID(value).then((data) => {
@@ -119,8 +114,6 @@ console.log(formData);
       });
     });
   };
-
- 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -147,7 +140,7 @@ console.log(formData);
           timer: 1500,
         }).then(() => {
           setPause(false);
-          setIsModalOpen(true);
+          setGeneratePDF(true);
         });
       } catch (error) {
         console.log(error);
@@ -155,6 +148,9 @@ console.log(formData);
     });
   };
 
+  const handleOpen = () => {
+    setIsModalOpen(true);
+  };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -180,7 +176,7 @@ console.log(formData);
               name="fecha"
               id="fecha"
               disabled
-              defaultValue={formatToDisplay(fecha) }
+              defaultValue={formatToDisplay(fecha)}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             />
           </div>
@@ -328,6 +324,15 @@ console.log(formData);
             "Registrar Movimiento"
           )}
         </button>
+        {generatePDF && (
+          <button
+            type="button"
+            onClick={handleOpen}
+            className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6 mt-2"
+          >
+            Generar PDF
+          </button>
+        )}
       </form>
       <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
         <ReciboComprobante {...infoComprobante}></ReciboComprobante>

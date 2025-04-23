@@ -21,21 +21,19 @@ const ListadoComisiones = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const navegacion = (alumno) => {
- 
     const currentPath = location.pathname;
     const isAdmin = currentPath.startsWith("/adm");
-  
-    // Extraer ID del path actual
-    const pathSegments = currentPath.split("/"); // ['', 'adm', '123'] o ['', '456']
-    const userId = isAdmin ? pathSegments[2] : pathSegments[1]; // '123' o '456'
-  
+
+    const pathSegments = currentPath.split("/");
+    const userId = isAdmin ? pathSegments[2] : pathSegments[1];
+
     const redirectionPath = isAdmin
       ? `/adm/${userId}/alumno/${alumno.id}`
       : `/${userId}/alumno/${alumno.id}`;
-  
+
     navigate(redirectionPath);
   };
-  
+
   useEffect(() => {
     const alumnosCom = async () => {
       await getComisionId(comId).then((data) => {

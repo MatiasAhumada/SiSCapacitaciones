@@ -124,9 +124,9 @@ export class ComisionService {
       where: { id },
       relations: [
         'sucursal',
-
         'alumnoComisiones.alumno',
         'alumnoComisiones.asistencias',
+        "alumnoComisiones.pagos",
         'profesor',
         'curso',
       ],
@@ -149,6 +149,10 @@ export class ComisionService {
             presente: true,
             fecha: true,
           },
+          pagos:{
+            id:true,
+            fecha:true
+          }
         },
 
         profesor: {

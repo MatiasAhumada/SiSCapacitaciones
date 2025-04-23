@@ -128,6 +128,22 @@ const ListadoComisiones = () => {
       setPause((prev) => ({ ...prev, [ID]: false }));
     }
   };
+  const getRowBgColor = (alumno) => {
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+
+    const pagosEsteMes = alumno.pagos.some((pago) => {
+      const fechaPago = new Date(pago.fecha);
+      return fechaPago.getMonth() === month && fechaPago.getFullYear() === year;
+    });
+  
+    if (day < 10 || pagosEsteMes) return "bg-green-200";
+    if (day >= 11 && day <= 15 && !pagosEsteMes) return "bg-yellow-200";
+    if (day >= 16 && !pagosEsteMes) return "bg-red-200";
+    return ""; 
+  };
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -173,7 +189,7 @@ const ListadoComisiones = () => {
             </thead>
             <tbody className="text-gray-600 divide-y">
               {alumnosComision?.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.id} className={getRowBgColor(item)}>
                   <td className="px-6 py-4">
                     <button
                       value={item.id}
@@ -214,11 +230,11 @@ const ListadoComisiones = () => {
                       name={item.state ? "activo" : "inactivo"}
                       onClick={(e) => clickEdit(e, item.id)}
                       className={`text-xs px-2 py-0.5 rounded text-white 
-      ${
-        item.state
-          ? "bg-green-500 hover:bg-green-600"
-          : "bg-red-500 hover:bg-red-600"
-      }`}
+                        ${
+                          item.state
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-red-500 hover:bg-red-600"
+                        }`}
                       disabled={pause[item.id]} // evita doble click
                     >
                       {pause[item.id] ? (

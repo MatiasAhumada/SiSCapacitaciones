@@ -26,7 +26,11 @@ export class CajaController {
     return this.cajaService.findAll();
   }
 
- 
+  @Get('/resumen-total')
+   getResumenTotal() {
+    return this.cajaService.getResumenTotal();
+  }
+
   @Get('/vendedor/:id')
   findByVendedor(@Param('id') id: string) {
     return this.cajaService.findByVendedor(id);
@@ -57,8 +61,5 @@ export class CajaController {
     return this.cajaService.getResumenPorDia(fecha);
   }
 
-  @Get('/resumen-total')
-   getResumenTotal() {
-    return this.cajaService.getResumenTotal();
-  }
+ 
 }

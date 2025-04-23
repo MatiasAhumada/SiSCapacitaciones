@@ -310,6 +310,7 @@ export const getResumenPorDia = async (fecha) => {
 export const getResumenTotal = async () => {
   try {
     const response = await axios.get(`${URL}/caja/resumen-total`);
+ 
     return response.data;
   } catch (error) {
     console.log(error);

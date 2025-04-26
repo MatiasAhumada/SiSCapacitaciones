@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import logo from "../../assets/simplificado_a_color.png";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getAlu, getCursos, getProfes, getSucursalId, postCert, postComision, postCurso, postProfes } from "../../queris/queris";
+import { getAlu, getCursos, getProfes, getSucursalId, getVendID, postCert, postComision, postCurso, postProfes } from "../../queris/queris";
 
 const CreateComVend = () => {
   const areas = ["Digital", "Idiomas", "Salud", "Administrativa", "Belleza", "Técnica"];
   const tipos = ["Presencial", "Distancia"];
 
   const navigate = useNavigate();
-  const { idCom } = useParams();
+  const { idVend } = useParams();
+  const[idSuc, setIdSuc] = useState("")
   const [pause, setPause] = useState(false);
   const [profes, setProfes] = useState([]);
   const [cursos, setcursos] = useState([]);
@@ -22,41 +23,9 @@ const CreateComVend = () => {
     },
     cursoId: "",
     profesorId: "",
-    sucursalId: id,
+    sucursalId: idSuc,
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-      hour: {
-        ...prevData.hour,
-        [name]: value,
-      },
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(formData);
-    // setPause(true);
-    // await postComision(formData).then(() => {
-    //   try {
-    //     Swal.fire({
-    //       title: "Comision Creada",
-    //       icon: "success",
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //     }).then(() => {
-    //       setPause(false);
-    //       navigate(`/inicioVendedor/comisiones`);
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // });
-  };
+ 
   useEffect(() => {
     const alus = async () => {
       await getProfes().then((data) => {
@@ -68,9 +37,49 @@ const CreateComVend = () => {
         setcursos(data);
       });
     };
+    const idSuc= async()=>{
+      await getVendID(idVend).then((data) => {
+       setIdSuc(data.sucursales[0].id);
+      });
+    }
+    idSuc()
     alus();
     curs();
   }, []);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+      hour: {
+        ...prevData.hour,
+        [name]: value,
+      },
+      sucursalId: idSuc,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+     setPause(true);
+     await postComision(formData).then(() => {
+       try {
+         Swal.fire({
+           title: "Comision Creada",
+           icon: "success",
+           showConfirmButton: false,
+           timer: 1500,
+         }).then(() => {
+           setPause(false);
+          // navigate(`/${idVend}/comisiones`);
+         });
+       } catch (error) {
+         console.log(error);
+       }
+     });
+  };
+  
   const dias = [
     { value: "Lunes" },
     { value: "Martes" },
@@ -137,35 +146,34 @@ const CreateComVend = () => {
             Horario
           </label>
           <div className="flex items-center w-full space-x-2">
-  <select
-    name="start"
-    value={formData.hour.start || ""}
-    onChange={handleChange}
-    className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
-  >
-    <option value="">Inicio</option>
-    {horarios.map((horario, index) => (
-      <option key={index} value={horario}>
-        {horario}
-      </option>
-    ))}
-  </select>
-  <span className="font-bold text-lg">-</span>
-  <select
-    name="end"
-    value={formData.hour.end || ""}
-    onChange={handleChange}
-    className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
-  >
-    <option value="">Fin</option>
-    {horarios.map((horario, index) => (
-      <option key={index} value={horario}>
-        {horario}
-      </option>
-    ))}
-  </select>
-</div>
-
+            <select
+              name="start"
+              value={formData.hour.start || ""}
+              onChange={handleChange}
+              className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
+            >
+              <option value="">Inicio</option>
+              {horarios.map((horario, index) => (
+                <option key={index} value={horario}>
+                  {horario}
+                </option>
+              ))}
+            </select>
+            <span className="font-bold text-lg">-</span>
+            <select
+              name="end"
+              value={formData.hour.end || ""}
+              onChange={handleChange}
+              className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
+            >
+              <option value="">Fin</option>
+              {horarios.map((horario, index) => (
+                <option key={index} value={horario}>
+                  {horario}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="pb-2">
           <label className="block mb-2 text-sm principal">Profesor</label>

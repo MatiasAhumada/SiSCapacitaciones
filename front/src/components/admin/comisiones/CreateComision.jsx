@@ -16,7 +16,10 @@ const CreateComision = () => {
   const [formData, setFormData] = useState({
     name: "",
     day: "",
-    hour: "",
+    hour: {
+      start: "",
+      end: "",
+    },
     cursoId: "",
     profesorId: "",
     sucursalId: id,
@@ -24,36 +27,36 @@ const CreateComision = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
       hour: {
-        ...formData.hour,
-        start: value,
-        end: value,
+        ...prevData.hour,
+        [name]: value,
       },
-    });
+      sucursalId: id,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
-    // setPause(true);
-    // await postComision(formData).then(() => {
-    //   try {
-    //     Swal.fire({
-    //       title: "Comision Creada",
-    //       icon: "success",
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //     }).then(() => {
-    //       setPause(false);
-    //       navigate(`/adm/${id}/comisiones`);
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // });
+     setPause(true);
+     await postComision(formData).then(() => {
+       try {
+         Swal.fire({
+           title: "Comision Creada",
+           icon: "success",
+           showConfirmButton: false,
+           timer: 1500,
+         }).then(() => {
+           setPause(false);
+           navigate(`/adm/${id}/comisiones`);
+         });
+       } catch (error) {
+         console.log(error);
+       }
+     });
   };
   useEffect(() => {
     const alus = async () => {
@@ -69,7 +72,20 @@ const CreateComision = () => {
     alus();
     curs();
   }, []);
-
+  const dias = [
+    { value: "Lunes" },
+    { value: "Martes" },
+    { value: "Miercoles" },
+    { value: "Jueves" },
+    { value: "Viernes" },
+    { value: "Sabado" },
+    { value: "Domingo" },
+  ];
+  const horarios = Array.from({ length: (22 - 8) * 2 + 1 }, (_, i) => {
+    const horas = Math.floor(8 + i / 2);
+    const minutos = i % 2 === 0 ? "00" : "30";
+    return `${horas}:${minutos}`;
+  });
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
       <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
@@ -102,31 +118,53 @@ const CreateComision = () => {
             Dia de Dictado
           </label>
           <div className="relative text-gray-400">
-            <input
-              type="text"
+            <select
               name="day"
-              id="day"
-              value={formData.day}
+              value={formData.day || ""}
               onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="Lunes"
-            />
+            >
+              <option value="">Seleccionar</option>
+              {dias.map((dia, idx) => (
+                <option key={idx} value={dia.value}>
+                  {dia.value}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="pb-2">
           <label htmlFor="apellido" className="block mb-2 text-sm  principal text-[#111827]">
             Horario
           </label>
-          <div className="relative text-gray-400">
-            <input
-              type="texthour"
-              name="hour"
-              id="hour"
-              value={formData.hour}
+          <div className="flex items-center w-full space-x-2">
+            <select
+              name="start"
+              value={formData.hour.start || ""}
               onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="15:00"
-            />
+              className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
+            >
+              <option value="">Inicio</option>
+              {horarios.map((horario, index) => (
+                <option key={index} value={horario}>
+                  {horario}
+                </option>
+              ))}
+            </select>
+            <span className="font-bold text-lg">-</span>
+            <select
+              name="end"
+              value={formData.hour.end || ""}
+              onChange={handleChange}
+              className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
+            >
+              <option value="">Fin</option>
+              {horarios.map((horario, index) => (
+                <option key={index} value={horario}>
+                  {horario}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="pb-2">

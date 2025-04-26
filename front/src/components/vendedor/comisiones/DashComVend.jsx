@@ -142,7 +142,7 @@ const DashComVend = () => {
             </div>
             <div className="mt-3 md:mt-0">
               <button
-                onClick={() => navigate(`/inicioVendedor/comisiones/crear`)}
+                onClick={() => navigate(`/${idVend}/comisiones/crear`)}
                 className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
               >
                 Nueva Comision

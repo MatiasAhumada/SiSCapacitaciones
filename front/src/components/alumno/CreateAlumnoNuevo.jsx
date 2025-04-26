@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { getSucursales, postAlu } from "../../../queris/queris";
+import { getSucursales, postAlu } from "../queris/queris";
 
-const Alumno = ({ nextStep, formData, setFormData }) => {
+const CreateAlumnoNuevo = () => {
   const [pause, setPause] = useState(false);
   const [formAlu, setFormAlu] = useState({
     dni: "",
@@ -31,58 +31,48 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
   };
 
   const handleSubmit = () => {
-    setPause(true);
-    Swal.fire({
-      icon: "success",
-      title: "Alumno Cargado",
-      showConfirmButton: false,
-      timer: 1500,
-    }).then(() => {
-      setPause(false);
-      nextStep();
-    });
-    nextStep()
-    // try {
-    //   postAlu(formAlu).then((data) => {
-    //     if (data) {
-    //       console.log(data);
-    //       setFormData((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: "Alumno Cargado",
-    //         showConfirmButton: false,
-    //         timer: 1500,
-    //       }).then(() => {
-    //         setPause(false);
-    //         setFormAlu({
-    //           dni: "",
-    //           name: "",
-    //           fNac: "",
-    //           tel: "",
-    //           telex: "",
-    //           ocupation: "",
-    //           nationality: "",
-    //           address: "",
-    //           province: "",
-    //           locality: "",
-    //           email: "",
-    //           age: "",
-    //           gender: "",
-    //           sucursalId: "",
-    //         });
-    //         nextStep()});
-    //     }
-    //   });
-    // } catch (error) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Error al cargar alumno",
-    //     showConfirmButton: false,
-    //     timer: 1500,
-    //   }).then(()=>{
-    //     setPause(false);
-    //   });
-    // }
+    setPause(true);    
+     try {
+       postAlu(formAlu).then((data) => {
+         if (data) {
+           console.log(data);
+           setFormData((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
+           Swal.fire({
+             icon: "success",
+             title: "Alumno Cargado",
+             showConfirmButton: false,
+             timer: 1500,
+           }).then(() => {
+             setPause(false);
+             setFormAlu({
+               dni: "",
+               name: "",
+               fNac: "",
+               tel: "",
+               telex: "",
+               ocupation: "",
+               nationality: "",
+               address: "",
+               province: "",
+               locality: "",
+               email: "",
+               age: "",
+               gender: "",
+               sucursalId: "",
+             });
+             });
+         }
+       });
+     } catch (error) {
+       Swal.fire({
+         icon: "error",
+         title: "Error al cargar alumno",
+         showConfirmButton: false,
+         timer: 1500,
+       }).then(()=>{
+         setPause(false);
+       });
+     }
   };
 
   const fieldLabels = {
@@ -208,4 +198,4 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
   );
 };
 
-export default Alumno;
+export default CreateAlumnoNuevo;

@@ -23,32 +23,32 @@ export class Alumno {
   dni: number;
   @Column()
   name: string;
-  @Column()
+  @Column({ nullable: true,  type: 'timestamp' })
   fNac?: Date;
-  @Column({ type: 'bigint', nullable: true })
+  @Column({ type: 'bigint', nullable: true})
   tel?: number;
   @Column({ type: 'bigint', nullable: true })
   telex?: number;
-  @Column()
+  @Column({ nullable: true, default: '-' })
   ocupation?: string;
-  @Column()
+  @Column({ nullable: true, default: '-' })
   nationality?: string;
-  @Column()
+  @Column({ nullable: true, default: '-' })
   address?: string;
-  @Column()
+  @Column({ nullable: true, default: '-' })
   province?: string;
-  @Column()
+  @Column({ nullable: true, default: '-' })
   locality?: string;
-  @Column()
+  @Column({ nullable: true, default: '-' })
   email?: string;
-  @Column()
+  @Column({ nullable: true })
   age?: number;
-  @Column()
+  @Column({ nullable: true, default: '-' })
   gender?: string;
   @Column({ nullable: true, default: 'https://example.com/default-image.jpg' })
   imgUrl?: string;
   @OneToMany(() => AlumnoComision, (alumnoComision) => alumnoComision.alumno)
-  alumnoComisiones: AlumnoComision[];
+  alumnoComisiones?: AlumnoComision[];
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno)
   inscripciones?: Inscripcion[];
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)

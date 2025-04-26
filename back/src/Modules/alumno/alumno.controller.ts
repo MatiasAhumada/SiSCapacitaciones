@@ -20,6 +20,13 @@ export class AlumnoController {
   create(@Body() createAlumnoDto: CreateAlumnoDto) {
     return this.alumnoService.create(createAlumnoDto);
   }
+  @Post('simple')
+  createSimpleAlumno(
+    @Body() alumnoSimple:{dni: number, name: string}
+
+  ) {
+    return this.alumnoService.createSimpleAlumno(alumnoSimple.dni, alumnoSimple.name);
+  }
 
   @Get()
   findAll() {

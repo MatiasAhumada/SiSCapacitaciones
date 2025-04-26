@@ -28,6 +28,9 @@ import DashComVend from "./components/vendedor/comisiones/DashComVend";
 import CreateComVend from "./components/vendedor/comisiones/CreateComVend";
 import DashAlumno from "./components/vendedor/comisiones/DashAlumno";
 import ReciboComprobante from "./components/caja/Comprobante";
+import Alumno from "./components/vendedor/ventas/inscripcion/Alumno";
+import CreateAlumnoNuevo from "./components/alumno/CreateAlumnoNuevo";
+import CreateAlumnoViejo from "./components/alumno/CreateAlumnoViejo";
 function App() {
   return (
     <BrowserRouter>
@@ -68,6 +71,8 @@ function App() {
             <Route path="crear" element={<CreateComVend></CreateComVend>}></Route>
           </Route>
           <Route path="comisiones/:comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
+          <Route path="alu.nuevo" element={<Alumno></Alumno>}></Route>
+          <Route path="alu.viejo" element={<CreateAlumnoViejo></CreateAlumnoViejo>}></Route>
         </Route>
         <Route path="/error" element={<Error404></Error404>}></Route>
       </Routes>

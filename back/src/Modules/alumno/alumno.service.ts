@@ -41,6 +41,16 @@ export class AlumnoService {
       },
     });
   }
+  async createSimpleAlumno(dni: number, name: string): Promise<Alumno> {
+    const alumno = this.alumnoRepository.create({
+      dni,
+      name,
+    });
+  
+    await this.alumnoRepository.save(alumno);
+  
+    return alumno;
+  }
 
   async findAll() {
     return this.alumnoRepository.find({

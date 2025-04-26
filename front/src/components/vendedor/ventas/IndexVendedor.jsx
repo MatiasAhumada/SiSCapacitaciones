@@ -7,14 +7,15 @@ const IndexVendedor = () => {
   const { idVend } = useParams();
 
   const navigate = useNavigate();
-  const navigation = [{ name: "Inscribir" }, { name: "Caja" }, { name: "Cobrar" }, { name: "Cursos" }, { name: "Comisiones" }];
+  const navigation = [{ name: "Inscribir" }, { name: "Caja" }, { name: "Cobrar" }, { name: "Cursos" }, { name: "Comisiones" }, { name: "Alu. Nuevo" }, { name: "Alu. Viejo" }];
   const handleClick = (e) => {
     e.preventDefault();
     localStorage.removeItem("token");
     navigate("/");
   };
   const clickBtn = (name) => {
-    navigate(`/${idVend}/${name.toLowerCase()}`);
+    const formattedName = name.toLowerCase().replace(/\s+/g, '');
+    navigate(`/${idVend}/${formattedName}`);
   };
   return (
     <div className="min-h-full ">

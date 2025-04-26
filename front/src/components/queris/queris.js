@@ -37,6 +37,14 @@ export const postAlu = async (alumno) => {
     console.error("Error al obtener vendedor", error.response?.data);
   }
 };
+export const postAluSimple = async (alumno) => {
+  try {
+    const response = await axios.post(`${URL}/alumno/simple`, alumno);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
 
 export const deleteAlumnoId = async (id) => {
   try {

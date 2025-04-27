@@ -5,7 +5,7 @@ import { Button } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 const ReciboComprobante = ({
   numero,
-  comprobante,
+  tipoComprobante,
   apellidoNombre,
   dni,
   domicilioComercial,
@@ -75,7 +75,7 @@ const ReciboComprobante = ({
       ctx.fillText(formattedDate, 60, 755);
 
       ctx.font = "20px Arial";
-      ctx.fillText(comprobante, 380, 755);
+      ctx.fillText("Factura de venta", 380, 755);
 
       ctx.font = "20px Arial";
       ctx.fillText(numero, 740, 755);

@@ -12,7 +12,7 @@ const CreateCaja = () => {
   const idVende = localStorage.getItem("token");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imprimir, setImprimir] = useState({
-    comprobante:"Factura de venta"
+    tipoComprobante: "Factura de venta",
   });
   const [infoComprobante, setInfoComprobante] = useState({
     apellidoNombre: "",
@@ -160,9 +160,7 @@ const CreateCaja = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          setImprimir((prev)=>({
-            ...prev,
-            ...data.comprobante}));
+          setImprimir(data.comprobante);
           setPause(false);
           setGeneratePDF(true);
         });
@@ -178,7 +176,7 @@ const CreateCaja = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-console.log(imprimir)
+  console.log(imprimir);
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
       <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { deleteComision, getAluCom, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
+import ReciboComprobante from "../../caja/Comprobante";
+import { Modal } from "antd";
 
 const DashAlumno = () => {
   const {  idAluCom } = useParams();
@@ -12,6 +14,7 @@ const DashAlumno = () => {
   const [dataComision, setDataComision] = useState({});
   const [pause, setPause] = useState({});
   const [editing, setEditing] = useState(null);
+  const [fecha, setFecha] = useState(new Date());
   const [editData, setEditData] = useState({
     fecha: "",
     metodoPago: "",
@@ -20,6 +23,20 @@ const DashAlumno = () => {
     alumnoId: "",
     comisionId: "",
   });
+  const [infoComprobante, setInfoComprobante] = useState({
+    apellidoNombre: "",
+    dni: "",
+    domicilioComercial: "",
+    iva: "",
+    fecha: "",
+    formaPago: "",
+    observacion: "",
+    monto: "",
+    comprobante: "",
+    numero: "",
+    numeroComprobante: "",
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const isSubRoute = location.pathname.includes("crear");
 
   const clickDelete = async (id) => {
@@ -56,6 +73,19 @@ const DashAlumno = () => {
         setTableItems(data.pagos);
       });
     };
+    // const cargaComprobante = {
+    //   ...infoComprobante,
+    //   fecha: formatToDisplay(fecha),
+    //   formaPago: formData.metodoPago,
+    //   observacion: formData.descripcion,
+    //   monto: formData.monto,
+    //   comprobante: "Factura de venta",
+    //   numero: "-",
+    //   numeroComprobante: "X 0001-00015217",
+    //   ...alumnoSeleccionado,
+    // };
+    // setInfoComprobante(cargaComprobante);
+
 
     alucom();
   }, []);
@@ -108,7 +138,12 @@ const DashAlumno = () => {
       setEditing(null);
     }
   };
-
+  const handleOpen = () => {
+    setIsModalOpen(true);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   const formatToDisplay = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -218,10 +253,10 @@ const DashAlumno = () => {
 
                     <td className="px-6 py-4 whitespace-nowrap">{item.cuota}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {/* BOTON VER MAS  */}
+                      {/* BOTON IMPRIMIR  */}
                       <button
                         value={item.id}
-                        onClick={() => navigate(`/${idVend}/comisiones/${item.id}`)}
+                        onClick={handleOpen}
                         className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (
@@ -237,7 +272,7 @@ const DashAlumno = () => {
                             </path>
                           </svg>
                         ) : (
-                          <i className="fa-solid fa-plus"></i>
+                          <i className="fa-solid fa-print"></i>
                         )}
                       </button>
 
@@ -312,6 +347,9 @@ const DashAlumno = () => {
         </>
       )}
       <Outlet />
+      <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
+        <ReciboComprobante {...infoComprobante}></ReciboComprobante>
+      </Modal>
     </div>
   );
 };

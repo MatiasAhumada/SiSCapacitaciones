@@ -30,7 +30,7 @@ export class Caja {
   @Column({ type: 'enum', enum: MetodoPago })
   metodoPago: MetodoPago;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2 ,nullable:true})
   monto: number;
 
   @Column({ type: 'text', nullable: true })

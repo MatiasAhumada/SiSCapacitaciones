@@ -1,7 +1,7 @@
-import { Caja } from '@modules/Modules/caja/entities/caja.entity';
+import { Caja} from '@modules/Modules/caja/entities/caja.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-export enum FormaPago {
+export enum MetodoPago {
   EFECTIVO = 'Efectivo',
   DEBITO = 'Debito',
   CREDITO = 'Credito',
@@ -31,9 +31,9 @@ export class Comprobante {
 
   @Column({
     type: 'enum',
-    enum: FormaPago,
+    enum: MetodoPago,
   })
-  formaPago: FormaPago;
+  formaPago: MetodoPago;
 
   @Column()
   observacion: string;

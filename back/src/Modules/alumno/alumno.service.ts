@@ -96,6 +96,7 @@ export class AlumnoService {
         sucursal: {
           id: true,
           name: true,
+          numeroSucursal:true
         },
         alumnoComisiones: {
           id: true,

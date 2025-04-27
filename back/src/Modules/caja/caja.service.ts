@@ -3,7 +3,7 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Caja, TipoMovimiento } from './entities/caja.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -25,8 +25,15 @@ export class CajaService {
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
-    const { comprobante, tipo, vendedorId, alumnoComisionId, sucursal, ...restoCaja } =
-      createCajaDto;
+    const {
+      comprobante,
+      tipo,
+      vendedorId,
+      alumnoComisionId,
+      
+      ...restoCaja
+    } = createCajaDto;
+ 
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
@@ -41,30 +48,54 @@ export class CajaService {
       if (!alumnoComision) {
         throw new NotFoundException('Alumno no encontrado');
       }
-      // Buscamos el último comprobante de esa sucursal
-      const ultimoComprobante = await this.comprobanteRepository
-        .createQueryBuilder('comprobante')
-        .where('comprobante.numero = :sucursal', {
-          sucursal: sucursal.toString().padStart(4, '0'),
-        })
-        .orderBy('comprobante.numeroComprobante', 'DESC')
-        .getOne();
-
-      // Generamos el número de comprobante
-      let nuevoNumero = 1;
-      if (ultimoComprobante && ultimoComprobante.numeroComprobante) {
-        const partes = ultimoComprobante.numeroComprobante.split('-');
-        nuevoNumero = parseInt(partes[1]) + 1;
+      if (!comprobante) {
+        throw new NotFoundException('Comprobante no encontrado');
       }
+      const ultimoComprobante = await this.comprobanteRepository.findOne({
+        where: { numeroComprobante: Like(`X ${comprobante.numeroSucursal}-%`) }, // Filtrar por número de sucursal
+        order: { numeroComprobante: 'DESC' }, // Ordenar para obtener el último
+      });
+      console.log(ultimoComprobante)
+      let numeroLargo = 0;
+      if (ultimoComprobante) {
+        const partes = ultimoComprobante.numeroComprobante.split('-');
+        if (partes.length > 1) {
+          numeroLargo = parseInt(partes[1], 10);
+        }
+      }
+      numeroLargo += 1;
+      const numeroLargoFormateado = numeroLargo.toString().padStart(8, '0');
+      const numeroComprobante = `X ${comprobante.numeroSucursal}-${numeroLargoFormateado}`;
 
-      const numeroComprobante = `X ${sucursal.toString().padStart(4, '0')}-${nuevoNumero.toString().padStart(8, '0')}`;
+      const newComprobante = new Comprobante();
+      newComprobante.apellidoNombre = alumnoComision.alumno.name; // Nombre del alumno
+      newComprobante.dni = alumnoComision.alumno.dni; // DNI del alumno
+      newComprobante.domicilioComercial = alumnoComision.alumno.address ?? '-'; // Domicilio del alumno
+      newComprobante.iva = '-'; // Ajusta esto según sea necesario
+      newComprobante.fecha = new Date(); // Fecha actual
+      newComprobante.formaPago = comprobante.formaPago; // Forma de pago recibida en el DTO
+      newComprobante.observacion = comprobante.observacion; // Observación
+      newComprobante.monto = restoCaja.monto; // Monto de la caja
+      newComprobante.numero = comprobante.numero; // Número de comprobante
+      newComprobante.numeroComprobante = numeroComprobante; // Número del comprobante
+      
+      await this.comprobanteRepository.save(newComprobante);
+      
+      const newCaja = new Caja();
+      newCaja.tipo = tipo;
+      newCaja.metodoPago = comprobante.formaPago;
+      newCaja.monto = restoCaja.monto;
+      newCaja.descripcion = restoCaja.descripcion;
+      newCaja.fecha = new Date();
+      newCaja.cuota = restoCaja.cuota;
+      newCaja.vendedor = vendedor;
+      newCaja.comprobante = newComprobante;
+    
+      await this.cajaRepository.save(newCaja);
+    
+      return newCaja;
     }
-    const movimiento = this.cajaRepository.create({
-      ...createCajaDto,
-      vendedor: { id: vendedorId },
-      alumnoComision: { id: alumnoComision.id },
-    });
-    return await this.cajaRepository.save(movimiento);
+    
   }
 
   async findAll() {

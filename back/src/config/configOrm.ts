@@ -26,7 +26,7 @@ const db_config = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   autoLoadEntities: true,
-  synchronize: true,
+  synchronize: false ,
   dropSchema: false,
   logging: false,
   entities: [Admins,Alumno,Caja,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja,AlumnoComision,Asistencia,Certificado,Comprobante],

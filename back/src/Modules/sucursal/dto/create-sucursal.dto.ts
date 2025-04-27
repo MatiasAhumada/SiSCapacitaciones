@@ -1,4 +1,4 @@
-import { IsString, IsUUID, IsArray } from 'class-validator';
+import { IsString, IsUUID, IsArray, IsNumber } from 'class-validator';
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
@@ -10,6 +10,9 @@ import { Servicio } from 'src/Modules/servicio/entities/servicio.entity';
 export class CreateSucursalDto {
   @IsString()
   name: string;
+
+  @IsNumber()
+  numeroSucursal: number;
 
   @IsString()
   localidad: string;

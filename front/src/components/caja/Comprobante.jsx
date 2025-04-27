@@ -17,7 +17,16 @@ const ReciboComprobante = ({
   numeroComprobante,
 }) => {
   const canvasRef = useRef(null);
-
+  const formatToDisplay = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}:${minutes} `;
+  };
+  const formattedDate = formatToDisplay(fecha);
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -43,10 +52,10 @@ const ReciboComprobante = ({
       ctx.fillText(iva, 205, 455);
 
       ctx.font = "20px Arial";
-      ctx.fillText(fecha, 30, 580);
+      ctx.fillText(formattedDate, 30, 580);
 
       ctx.font = "bold 20px Arial";
-      ctx.fillText(fecha, 900, 225);
+      ctx.fillText(formattedDate, 900, 225);
       ctx.font = "bold 20px Arial";
       ctx.fillText(numeroComprobante, 800, 183);
 
@@ -63,7 +72,7 @@ const ReciboComprobante = ({
       ctx.fillText(`$${monto}`, 1120, 622);
 
       ctx.font = "20px Arial";
-      ctx.fillText(fecha, 60, 755);
+      ctx.fillText(formattedDate, 60, 755);
 
       ctx.font = "20px Arial";
       ctx.fillText(comprobante, 380, 755);
@@ -84,7 +93,7 @@ const ReciboComprobante = ({
       ctx.font = "20px Arial";
       ctx.fillText(`2025 © Desarrollado por Matias Ahumada FullStack Dev Tel: +54 9 381-352-8658`, 30, 1720);
     };
-  }, [apellidoNombre, dni, domicilioComercial, iva, fecha, formaPago, observacion, monto]);
+  }, [apellidoNombre, dni, domicilioComercial, iva, formattedDate, formaPago, observacion, monto]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;

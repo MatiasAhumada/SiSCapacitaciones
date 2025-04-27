@@ -11,19 +11,23 @@ import ReciboComprobante from "./Comprobante";
 const CreateCaja = () => {
   const idVende = localStorage.getItem("token");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imprimir, setImprimir] = useState({
+    comprobante:"Factura de venta"
+  });
   const [infoComprobante, setInfoComprobante] = useState({
     apellidoNombre: "",
     dni: "",
     domicilioComercial: "",
     iva: "",
+    numeroSucursal: "",
     fecha: "",
     formaPago: "",
     observacion: "",
     monto: "",
     comprobante: "",
     numero: "",
-    numeroComprobante: "",
   });
+
   const [generatePDF, setGeneratePDF] = useState(false);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [pause, setPause] = useState(false);
@@ -41,6 +45,19 @@ const CreateCaja = () => {
     monto: "",
     cuota: "",
     vendTransId: "",
+    comprobante: {
+      apellidoNombre: "",
+      dni: "",
+      domicilioComercial: "",
+      iva: "",
+      numeroSucursal: "",
+      fecha: "",
+      formaPago: "",
+      observacion: "",
+      monto: "",
+      comprobante: "",
+      numero: "",
+    },
   });
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -90,11 +107,11 @@ const CreateCaja = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+
+    setFormData((prevState) => ({
+      ...prevState,
       [name]: value,
-      fecha: fecha,
-    });
+    }));
   };
 
   const handleAlumnoChange = (e) => {
@@ -105,19 +122,19 @@ const CreateCaja = () => {
     }));
 
     getAluID(value).then((data) => {
-      console.log(data);
       setAlumnoSeleccionado({
         apellidoNombre: data.name,
         dni: data.dni,
         domicilioComercial: `${data.address}, ${data.locality}`,
         iva: "-",
+        numeroSucursal: "000" + data.sucursal.numeroSucursal,
       });
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setPause(true);
+    // setPause(true);
     const cargaComprobante = {
       ...infoComprobante,
       fecha: formatToDisplay(fecha),
@@ -126,10 +143,14 @@ const CreateCaja = () => {
       monto: formData.monto,
       comprobante: "Factura de venta",
       numero: "-",
-      numeroComprobante: "X 0001-00015217",
       ...alumnoSeleccionado,
     };
     setInfoComprobante(cargaComprobante);
+    const nuevoFormData = {
+      ...formData,
+      comprobante: cargaComprobante,
+    };
+    setFormData(nuevoFormData);
 
     await postCaja(formData).then((data) => {
       try {
@@ -139,6 +160,9 @@ const CreateCaja = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
+          setImprimir((prev)=>({
+            ...prev,
+            ...data.comprobante}));
           setPause(false);
           setGeneratePDF(true);
         });
@@ -154,7 +178,7 @@ const CreateCaja = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-
+console.log(imprimir)
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
       <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
@@ -335,7 +359,7 @@ const CreateCaja = () => {
         )}
       </form>
       <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
-        <ReciboComprobante {...infoComprobante}></ReciboComprobante>
+        <ReciboComprobante {...imprimir}></ReciboComprobante>
       </Modal>
     </div>
   );

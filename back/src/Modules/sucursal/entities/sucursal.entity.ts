@@ -23,6 +23,8 @@ export class Sucursal {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
   @Column()
+  numeroSucursal: number;
+  @Column()
   name: string;
   @Column()
   localidad: string;

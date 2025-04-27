@@ -10,6 +10,7 @@ import { es } from 'date-fns/locale';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Comision } from '../comision/entities/comision.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
+import { Comprobante } from '../comprobante/entities/comprobante.entity';
 @Injectable()
 export class CajaService {
   constructor(
@@ -17,31 +18,52 @@ export class CajaService {
     private readonly cajaRepository: Repository<Caja>,
     @InjectRepository(Vendedor)
     private readonly vendedorRepository: Repository<Vendedor>,
-
+    @InjectRepository(Comprobante)
+    private comprobanteRepository: Repository<Comprobante>,
     @InjectRepository(AlumnoComision)
     private readonly alumnoComisionRepository: Repository<AlumnoComision>,
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
+    const { comprobante, tipo, vendedorId, alumnoComisionId, sucursal, ...restoCaja } =
+      createCajaDto;
     const vendedor = await this.vendedorRepository.findOne({
-      where: { id: createCajaDto.vendedorId },
+      where: { id: vendedorId },
     });
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
-    const alumnoComision = await this.alumnoComisionRepository.findOne({
-      where: { alumno: { id: createCajaDto.alumnoComisionId } },
-      relations:['alumno'],
-    });
-    if (!alumnoComision) {
-      throw new NotFoundException('Alumno no encontrado');
+    if (tipo === TipoMovimiento.INGRESO) {
+      const alumnoComision = await this.alumnoComisionRepository.findOne({
+        where: { alumno: { id: alumnoComisionId } },
+        relations: ['alumno'],
+      });
+      if (!alumnoComision) {
+        throw new NotFoundException('Alumno no encontrado');
+      }
+      // Buscamos el último comprobante de esa sucursal
+      const ultimoComprobante = await this.comprobanteRepository
+        .createQueryBuilder('comprobante')
+        .where('comprobante.numero = :sucursal', {
+          sucursal: sucursal.toString().padStart(4, '0'),
+        })
+        .orderBy('comprobante.numeroComprobante', 'DESC')
+        .getOne();
+
+      // Generamos el número de comprobante
+      let nuevoNumero = 1;
+      if (ultimoComprobante && ultimoComprobante.numeroComprobante) {
+        const partes = ultimoComprobante.numeroComprobante.split('-');
+        nuevoNumero = parseInt(partes[1]) + 1;
+      }
+
+      const numeroComprobante = `X ${sucursal.toString().padStart(4, '0')}-${nuevoNumero.toString().padStart(8, '0')}`;
     }
     const movimiento = this.cajaRepository.create({
       ...createCajaDto,
-      vendedor: { id: createCajaDto.vendedorId },
+      vendedor: { id: vendedorId },
       alumnoComision: { id: alumnoComision.id },
     });
-
     return await this.cajaRepository.save(movimiento);
   }
 

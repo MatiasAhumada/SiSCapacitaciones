@@ -14,6 +14,7 @@ import { Caja } from 'src/Modules/caja/entities/caja.entity';
 import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
 import { Asistencia } from 'src/Modules/comision/entities/asistencia.entity';
 import { Certificado } from 'src/Modules/certificado/entities/certificado.entity';
+import { Comprobante } from '@modules/Modules/comprobante/entities/comprobante.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -28,7 +29,7 @@ const db_config = {
   synchronize: true,
   dropSchema: false,
   logging: false,
-  entities: [Admins,Alumno,Caja,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja,AlumnoComision,Asistencia,Certificado],
+  entities: [Admins,Alumno,Caja,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja,AlumnoComision,Asistencia,Certificado,Comprobante],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
   migrations: ['dist/migrations/*.{js,ts}'],

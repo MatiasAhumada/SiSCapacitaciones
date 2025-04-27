@@ -5,8 +5,12 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  ValidateNested,
 } from 'class-validator';
 import { MetodoPago, TipoMovimiento } from '../entities/caja.entity';
+import { Type } from 'class-transformer';
+import { Comprobante } from '@modules/Modules/comprobante/entities/comprobante.entity';
+import { CreateComprobanteDto } from '@modules/Modules/comprobante/dto/create-comprobante.dto';
 
 export class CreateCajaDto {
   @IsEnum(TipoMovimiento)
@@ -32,8 +36,16 @@ export class CreateCajaDto {
   @IsOptional()
   alumnoComisionId: string;
 
+  @IsNumber()
+  sucursal:number
+
+
   @IsOptional()
   @IsNumber()
   cuota: number;
-  
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(()=>Comprobante)
+  comprobante?: CreateComprobanteDto
 }

@@ -1,4 +1,4 @@
-import { Caja} from '@modules/Modules/caja/entities/caja.entity';
+import { Caja } from '@modules/Modules/caja/entities/caja.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 export enum MetodoPago {
@@ -44,9 +44,12 @@ export class Comprobante {
   @Column()
   numero: string;
 
+  @Column({nullable: true})
+  tipoComprobante: string;
+
   @Column()
   numeroComprobante: string;
-  
+
   @OneToOne(() => Caja, (caja) => caja.comprobante)
   caja: Caja;
 }

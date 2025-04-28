@@ -17,6 +17,9 @@ export class CreateComprobanteDto {
   @IsDateString()
   fecha: string;
 
+  @IsString()
+  tipoComprobante: string;
+
   @IsEnum(MetodoPago)
   formaPago: MetodoPago;
 

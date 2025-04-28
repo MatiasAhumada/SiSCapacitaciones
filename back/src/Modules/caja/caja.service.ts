@@ -30,10 +30,10 @@ export class CajaService {
       tipo,
       vendedorId,
       alumnoComisionId,
-      
+
       ...restoCaja
     } = createCajaDto;
- 
+
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
@@ -55,7 +55,7 @@ export class CajaService {
         where: { numeroComprobante: Like(`X ${comprobante.numeroSucursal}-%`) }, // Filtrar por número de sucursal
         order: { numeroComprobante: 'DESC' }, // Ordenar para obtener el último
       });
-      console.log(ultimoComprobante)
+
       let numeroLargo = 0;
       if (ultimoComprobante) {
         const partes = ultimoComprobante.numeroComprobante.split('-');
@@ -76,11 +76,12 @@ export class CajaService {
       newComprobante.formaPago = comprobante.formaPago; // Forma de pago recibida en el DTO
       newComprobante.observacion = comprobante.observacion; // Observación
       newComprobante.monto = restoCaja.monto; // Monto de la caja
+      newComprobante.tipoComprobante = comprobante.tipoComprobante; // Tipo de comprobante
       newComprobante.numero = comprobante.numero; // Número de comprobante
       newComprobante.numeroComprobante = numeroComprobante; // Número del comprobante
-      
+
       await this.comprobanteRepository.save(newComprobante);
-      
+
       const newCaja = new Caja();
       newCaja.tipo = tipo;
       newCaja.metodoPago = comprobante.formaPago;
@@ -90,12 +91,11 @@ export class CajaService {
       newCaja.cuota = restoCaja.cuota;
       newCaja.vendedor = vendedor;
       newCaja.comprobante = newComprobante;
-    
+
       await this.cajaRepository.save(newCaja);
-    
+
       return newCaja;
     }
-    
   }
 
   async findAll() {

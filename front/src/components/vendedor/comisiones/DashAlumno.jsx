@@ -124,9 +124,6 @@ const DashAlumno = () => {
       setEditing(null);
     }
   };
-  const handleOpen = () => {
-    setIsModalOpen(true);
-  };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -142,7 +139,6 @@ const DashAlumno = () => {
   const handlePrint = (item) => {
     setIsModalOpen(true);
     setInfoComprobante(item);
-    console.log(item);
   };
 
   return (

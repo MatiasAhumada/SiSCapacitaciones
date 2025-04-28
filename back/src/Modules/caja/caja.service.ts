@@ -91,6 +91,7 @@ export class CajaService {
       newCaja.cuota = restoCaja.cuota;
       newCaja.vendedor = vendedor;
       newCaja.comprobante = newComprobante;
+      newCaja.alumnoComision = alumnoComision;
 
       await this.cajaRepository.save(newCaja);
 

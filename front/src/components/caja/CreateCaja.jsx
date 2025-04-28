@@ -24,7 +24,7 @@ const CreateCaja = () => {
     formaPago: "",
     observacion: "",
     monto: "",
-    comprobante: "",
+    tipoComprobante: "",
     numero: "",
   });
 
@@ -55,7 +55,7 @@ const CreateCaja = () => {
       formaPago: "",
       observacion: "",
       monto: "",
-      comprobante: "",
+      tipoComprobante: "",
       numero: "",
     },
   });
@@ -141,7 +141,7 @@ const CreateCaja = () => {
       formaPago: formData.metodoPago,
       observacion: formData.descripcion,
       monto: formData.monto,
-      comprobante: "Factura de venta",
+      tipoComprobante: "Factura de venta",
       numero: "-",
       ...alumnoSeleccionado,
     };
@@ -150,24 +150,26 @@ const CreateCaja = () => {
       ...formData,
       comprobante: cargaComprobante,
     };
-    setFormData(nuevoFormData);
+    console.log(nuevoFormData)
+    
 
-    await postCaja(formData).then((data) => {
-      try {
-        Swal.fire({
-          title: "Movimiento Registrado",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setImprimir(data.comprobante);
-          setPause(false);
-          setGeneratePDF(true);
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    });
+     await postCaja(nuevoFormData).then((data) => {
+       try {
+         Swal.fire({
+           title: "Movimiento Registrado",
+           icon: "success",
+           showConfirmButton: false,
+           timer: 1500,
+         }).then(() => {
+           console.log(data.comprobante)
+           setImprimir(data.comprobante);
+           setPause(false);
+           setGeneratePDF(true);
+         });
+       } catch (error) {
+         console.log(error);
+       }
+     });
   };
 
   const handleOpen = () => {
@@ -176,7 +178,7 @@ const CreateCaja = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  console.log(imprimir);
+
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
       <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">

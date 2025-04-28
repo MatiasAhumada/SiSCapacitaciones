@@ -75,7 +75,7 @@ const ReciboComprobante = ({
       ctx.fillText(formattedDate, 60, 755);
 
       ctx.font = "20px Arial";
-      ctx.fillText("Factura de venta", 380, 755);
+      ctx.fillText(tipoComprobante, 380, 755);
 
       ctx.font = "20px Arial";
       ctx.fillText(numero, 740, 755);

@@ -6,7 +6,7 @@ import ReciboComprobante from "../../caja/Comprobante";
 import { Modal } from "antd";
 
 const DashAlumno = () => {
-  const {  idAluCom } = useParams();
+  const { idAluCom } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
@@ -18,8 +18,8 @@ const DashAlumno = () => {
   const [editData, setEditData] = useState({
     fecha: "",
     metodoPago: "",
-    monto:"",
-    cuota:"",
+    monto: "",
+    cuota: "",
     alumnoId: "",
     comisionId: "",
   });
@@ -67,25 +67,11 @@ const DashAlumno = () => {
   useEffect(() => {
     const alucom = async () => {
       await getAluCom(idAluCom).then((data) => {
-        console.log(data);
         setDataAlumno(data.alumno);
         setDataComision(data.comision);
         setTableItems(data.pagos);
       });
     };
-    // const cargaComprobante = {
-    //   ...infoComprobante,
-    //   fecha: formatToDisplay(fecha),
-    //   formaPago: formData.metodoPago,
-    //   observacion: formData.descripcion,
-    //   monto: formData.monto,
-    //   comprobante: "Factura de venta",
-    //   numero: "-",
-    //   numeroComprobante: "X 0001-00015217",
-    //   ...alumnoSeleccionado,
-    // };
-    // setInfoComprobante(cargaComprobante);
-
 
     alucom();
   }, []);
@@ -153,6 +139,12 @@ const DashAlumno = () => {
     const minutes = String(d.getMinutes()).padStart(2, "0");
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
+  const handlePrint = (item) => {
+    setIsModalOpen(true);
+    setInfoComprobante(item);
+    console.log(item);
+  };
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -255,8 +247,8 @@ const DashAlumno = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {/* BOTON IMPRIMIR  */}
                       <button
-                        value={item.id}
-                        onClick={handleOpen}
+                        value={item.comprobante}
+                        onClick={() => handlePrint(item.comprobante)}
                         className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (

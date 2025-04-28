@@ -91,7 +91,7 @@ export class ComisionService {
   async findOneAluCom(id: string) {
     return this.alumnoComisionRepository.findOne({
       where: { id },
-      relations: ['comision', 'alumno', 'pagos'],
+      relations: ['comision', 'alumno', 'pagos.comprobante'],
       select: {
         comision: {
           id: true,

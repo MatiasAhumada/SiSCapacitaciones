@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import imagen from "../assets/simplificado_a_color.png";
+import imagen from "../assets/logo.png";
 import { login } from "../queries/queries";
 import { useState } from "react";
 import Swal from "sweetalert2";
@@ -19,13 +19,13 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <div className="flex items-center justify-center mb-3">
+        <div className="flex flex-col items-center justify-center  mb-3">
           <div>
-            <img src={imagen} alt="logo" className="size-8 me-3" />
+            <img src={imagen} alt="logo" className="size-20 me-3" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">
-              Buscar mi Certificado
+            <h2 className="fs-4 font-bold text-center text-gray-700 mb-6">
+              Buscador de certificado avalado
             </h2>
           </div>
         </div>
@@ -36,7 +36,7 @@ const Login = () => {
               id="numero"
               name="numero"
               className="w-full p-3 border border-gray-300 rounded-md mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ingresa tu Numero de certificado"
+              placeholder="Ingresa tu Número de certificado"
               onChange={handleChange}
             />
           </div>

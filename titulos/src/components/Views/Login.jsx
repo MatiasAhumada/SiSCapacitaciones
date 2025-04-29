@@ -20,8 +20,8 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <div className="flex flex-col items-center justify-center  mb-3">
-          <div>
-            <img src={imagen} alt="logo" className="size-20 me-3" />
+          <div className="text-center">
+            <img src={imagen} alt="logo" className="w-1/2  inline-block" />
           </div>
           <div>
             <h2 className="fs-4 font-bold text-center text-gray-700 mb-6">

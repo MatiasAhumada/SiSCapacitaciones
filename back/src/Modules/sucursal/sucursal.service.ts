@@ -59,6 +59,7 @@ export class SucursalService {
           name: true,
           dni: true,
           tel: true,
+          
         },
         profesores: {
           id: true,

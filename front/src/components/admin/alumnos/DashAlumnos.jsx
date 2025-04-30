@@ -46,7 +46,7 @@ const DashAlumnos = () => {
   useEffect(() => {
     const peticion = async () => {
       await getSucursalId(id).then((data) => {
-        console.log(data.alumnos)
+        console.log(data)
         setTableItems(data.alumnos);
       });
     };

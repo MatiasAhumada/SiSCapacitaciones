@@ -41,10 +41,10 @@ export class CertificadoService {
     if (!curso) throw new NotFoundException('Curso no encontrado');
 
     const certificado = this.certificadoRepository.create({
-      numero,
-      link,
-      alumno,
-      curso,
+      numero: numero,
+      link: link,
+      alumno: alumno,
+      curso: curso,
     });
     return this.certificadoRepository.save(certificado);
   }
@@ -53,8 +53,8 @@ export class CertificadoService {
     return this.certificadoRepository.find();
   }
 
-  async findOne(numero: number) {
-    return this.certificadoRepository.findOne({ where: { numero } });
+  async findOneByNumber(numero: number) {
+    return this.certificadoRepository.find({ where: { numero: numero } });
   }
 
   async update(id: string, updateCertificadoDto: UpdateCertificadoDto) {

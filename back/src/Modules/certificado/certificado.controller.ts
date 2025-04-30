@@ -17,9 +17,9 @@ export class CertificadoController {
     return this.certificadoService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.certificadoService.findOne(id);
+  @Get(':number')
+  findOne(@Param('number') numero: number) {
+    return this.certificadoService.findOneByNumber(numero);
   }
 
   @Put(':id')

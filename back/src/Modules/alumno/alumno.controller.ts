@@ -45,7 +45,7 @@ export class AlumnoController {
   ) {
     return this.alumnoService.update(id, updateAlumnoDto);
   }
-  @Put(':id')
+  @Put('/img/:id')
   update(@Param('id') id: string, @Body() update: UpdateAlumnoDto) {
     return this.alumnoService.actualizarImgUrl(id, update);
   }

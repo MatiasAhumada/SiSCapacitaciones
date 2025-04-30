@@ -36,7 +36,7 @@ const CreateAlumnoNuevo = () => {
        postAlu(formAlu).then((data) => {
          if (data) {
            console.log(data);
-           setFormData((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
+           setFormAlu((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
            Swal.fire({
              icon: "success",
              title: "Alumno Cargado",

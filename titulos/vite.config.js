@@ -8,6 +8,6 @@ export default defineConfig({
     host: true,
     port: 8081,
     strictPort: true,
-    allowedHosts: ["certificacionnacional.org", "https://www.certificacionnacional.org"],
+    allowedHosts: ["certificacionnacional.org"],
   },
 });

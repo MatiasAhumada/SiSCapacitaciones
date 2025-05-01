@@ -18,7 +18,7 @@ export class CertificadoController {
   }
 
   @Get(':number')
-  findOne(@Param('number') numero: number) {
+  findOne(@Param('number') numero: string) {
     return this.certificadoService.findOneByNumber(numero);
   }
 

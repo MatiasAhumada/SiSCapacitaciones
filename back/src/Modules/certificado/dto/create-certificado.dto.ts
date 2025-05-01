@@ -1,8 +1,8 @@
 import { IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class CreateCertificadoDto {
-  @IsNumber()
-  numero: number;
+  @IsString()
+  numero: string;
   @IsString()
   link: string;
   @IsUUID()

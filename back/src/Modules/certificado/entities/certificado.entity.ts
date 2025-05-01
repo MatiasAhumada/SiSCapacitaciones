@@ -15,7 +15,7 @@ import {
 @Unique(['numero'])
 export class Certificado {
   @PrimaryColumn()
-  numero: number;
+  numero: string;
 
   @Column()
   link: string;

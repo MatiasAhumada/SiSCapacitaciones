@@ -4,25 +4,28 @@ import Swal from "sweetalert2";
 import { deleteVend, getVendID } from "../queris/queris";
 const InfoVendedor = () => {
   const location = useLocation();
-
   const { id } = location.state || {};
-
   const [pause, setPause] = useState(false);
-
   const [tableItems, setTableItems] = useState([]);
+  const [dataVend, setDataVend] = useState({
+    id: "",
+    name: "",
+  });
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const peticion = async () => {
       await getVendID(id).then((data) => {
-        setTableItems(data);
+        setTableItems(data.inscripciones);
+        setDataVend({
+          id: data.id,
+          name: data.name,
+        });
       });
     };
     peticion();
   }, []);
-
-  // console.log(tableItems);
 
   const handClick = async (e) => {
     e.preventDefault();
@@ -54,12 +57,12 @@ const InfoVendedor = () => {
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <div className="items-start justify-between md:flex mb-5">
         <div className="max-w-lg">
-          <h3 className="text-xl font-bold sm:text-2xl principal mt-4">{tableItems.name}</h3>
+          <h3 className="text-xl font-bold sm:text-2xl principal mt-4">{dataVend.name}</h3>
         </div>
         <div className="mt-3 md:mt-0">
           <button
             onClick={handClick}
-            value={tableItems.id}
+            value={dataVend.id}
             className="inline-block px-4 py-2 text-white bg-red-600 hover:bg-red-700 principal rounded md:text-sm"
           >
             {pause ? (
@@ -74,7 +77,7 @@ const InfoVendedor = () => {
           </button>
         </div>
       </div>
-      <h3 className="font-bold sm:text-2xl principal mt-4">Alumnos Vendidos</h3>
+      <h3 className="font-bold sm:text-2xl principal mt-4">Inscripciones Realizadas</h3>
       <div className="mt-3 shadow-sm border rounded-lg overflow-x-auto">
         <table className="w-full table-auto text-sm text-left">
           <thead className="bg-gray-50 text-gray-600 font-medium border-b principal text-center">
@@ -87,13 +90,13 @@ const InfoVendedor = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 divide-y">
-            {tableItems.inscripciones?.map((item, idx) => (
+            {tableItems.map((item, idx) => (
               <tr key={idx} className="text-center">
-                <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.position}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.salary}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.curse}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.alumno.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.comision.curso.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{item.comision.name}</td>
               </tr>
             ))}
           </tbody>

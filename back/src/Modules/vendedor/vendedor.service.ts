@@ -52,14 +52,23 @@ export class VendedorService {
   async findOne(id: string): Promise<VendedorResponseDto | undefined> {
     const vend = await this.vendedorRepository.findOne({
       where: { id },
-      relations: ['inscripciones', 'sucursales'],
+      relations: ['inscripciones.alumno','inscripciones.comision.curso', 'sucursales'],
       select: {
         inscripciones: {
           id: true,
           alumno: {
-            id: true,
+            //id: true,
             name: true,
+            dni:true,
+            tel:true,
           },
+          comision:{
+            //id: true,
+            name: true,
+            curso:{
+              name: true,
+            }
+          }
         },
         sucursales: {
           id: true,

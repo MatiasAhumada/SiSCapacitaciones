@@ -5,15 +5,17 @@ import { getSucursalId, getVendedores, getVendID } from "../queris/queris";
 const DashVendedor = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+
   const [tableItems, setTableItems] = useState([]);
 
   const location = useLocation();
 
   const isSubRoute = location.pathname.includes("crear") || location.pathname.includes("info");
 
-  const click = (e) => {
+  const click = (idVend) => {
+   
     navigate(`/adm/${id}/vendedores/info`, {
-      state: { id: e.target.value },
+      state: { id: idVend },
     });
   };
   useEffect(() => {
@@ -63,8 +65,8 @@ const DashVendedor = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{item.tel}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.inscripciones?.length || 0}</td>
                     <td className="text-right px-6 whitespace-nowrap">
-                      <button onClick={click} value={item.id} className="py-2 px-3 btnAz principal rounded-lg">
-                        Ver Más
+                      <button type="button" onClick={() => click(item.id)} className="py-2 px-3 btnAz principal rounded-lg">
+                        <i className="fa-solid fa-plus"></i>
                       </button>
                     </td>
                   </tr>

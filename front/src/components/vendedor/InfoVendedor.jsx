@@ -5,13 +5,14 @@ import { deleteVend, getVendID } from "../queris/queris";
 const InfoVendedor = () => {
   const location = useLocation();
   const { id } = location.state || {};
+  // location.state || {}
   const [pause, setPause] = useState(false);
   const [tableItems, setTableItems] = useState([]);
   const [dataVend, setDataVend] = useState({
     id: "",
     name: "",
   });
-
+console.log(id)
   const navigate = useNavigate();
 
   useEffect(() => {

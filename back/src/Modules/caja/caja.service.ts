@@ -145,6 +145,7 @@ export class CajaService {
 
   async update(id: string, updateCajaDto: UpdateCajaDto) {
     const { alumnoComisionId, vendedorId, ...updateData } = updateCajaDto;
+    console.log('Fecha recibida:',updateCajaDto.fecha);
 
     const caja = await this.cajaRepository.findOne({
       where: { id },

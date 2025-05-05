@@ -26,12 +26,12 @@ const DashCajas = () => {
   const [fechaFiltro, setFechaFiltro] = useState("");
   const [datosFiltro, setDatosFiltro] = useState({});
   const [formEdit, setFormEdit] = useState({
-    fecha: "",
+    fecha: fecha,
     tipo: "",
     metodoPago: "",
     monto: "",
-    dexcripcion: "",
-    alumnoId: "",
+    descripcion: "",
+    alumnoComisionId: "",
     vendedorId: idVend,
   });
 
@@ -95,7 +95,7 @@ const DashCajas = () => {
     await deleteMovCaja(e.target.value).then(() => {
       try {
         Swal.fire({
-          title: "Profesor Eliminado",
+          title: "Movimiento Eliminado",
           icon: "success",
           showConfirmButton: false,
           timer: 1500,
@@ -122,7 +122,7 @@ const DashCajas = () => {
       metodoPago: mov.metodoPago,
       monto: mov.monto,
       descripcion: mov.descripcion,
-      alumnoId: mov.alumno.id,
+      alumnoComisionId: mov.alumnoComision.alumno.id,
       vendedorId: mov.vendedor.id,
     });
   };
@@ -138,7 +138,7 @@ const DashCajas = () => {
   const handleAlumnoChange = (e) => {
     setFormEdit((prev) => ({
       ...prev,
-      alumnoId: e.target.value,
+      alumnoComisionId: e.target.value,
     }));
   };
 
@@ -150,47 +150,36 @@ const DashCajas = () => {
   };
 
   const handleSave = async (item) => {
-    setPause((prev) => ({ ...prev, [item.id]: true }));
-    await editMovCaja(item.id, formEdit).then((data) => {
-      try {
-        Swal.fire({
-          title: "Caja Editada",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      } catch (error) {
-        Swal.fire({ title: "Error al actualizar", icon: "error" });
-      } finally {
-        setPause((prev) => ({ ...prev, [item.id]: false }));
-        setEditMode(null);
-      }
-    });
+     setPause((prev) => ({ ...prev, [item.id]: true }));
+    console.log(formEdit);
+      await editMovCaja(item.id, formEdit).then((data) => {
+        try {
+          Swal.fire({
+            title: "Caja Editada",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } catch (error) {
+          Swal.fire({ title: "Error al actualizar", icon: "error" });
+        } finally {
+          setPause((prev) => ({ ...prev, [item.id]: false }));
+          setEditMode(null);
+        }
+      });
   };
- 
+  console.log(alu);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
-            <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-              Historial de cajas
-            </h3>
-            <p className="text-gray-600 mt-2">
-              En esta tabla estaran los movimientos realizados.
-            </p>
+            <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
+            <p className="text-gray-600 mt-2">En esta tabla estaran los movimientos realizados.</p>
           </div>
           <div className="mt-3 md:mt-0 flex items-center gap-3">
-            <input
-              type="date"
-              value={fechaFiltro}
-              onChange={(e) => setFechaFiltro(e.target.value)}
-              className="p-2 border rounded"
-            />
-            <button
-              onClick={onFiltrar}
-              className="px-4 py-2 text-white principal btnAz md:text-sm"
-            >
+            <input type="date" value={fechaFiltro} onChange={(e) => setFechaFiltro(e.target.value)} className="p-2 border rounded" />
+            <button onClick={onFiltrar} className="px-4 py-2 text-white principal btnAz md:text-sm">
               Filtrar
             </button>
           </div>
@@ -219,7 +208,7 @@ const DashCajas = () => {
                         name="fecha"
                         id="fecha"
                         disabled
-                        value={formatToDisplay(fecha)}
+                        defaultValue={formatToDisplay(fecha)}
                         onChange={handleChange}
                         className="text-center"
                       />
@@ -230,11 +219,7 @@ const DashCajas = () => {
 
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <select
-                        name="vendedorId"
-                        value={formEdit.vendedorId}
-                        onChange={handleVendedorChange}
-                      >
+                      <select name="vendedorId" value={formEdit.vendedorId} onChange={handleVendedorChange}>
                         <option value="">Seleccione un vendedor</option>
                         {vend.map((vendedor) => (
                           <option key={vendedor.id} value={vendedor.id}>
@@ -248,11 +233,7 @@ const DashCajas = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <select
-                        name="alumnoId"
-                        value={formEdit.alumnoId}
-                        onChange={handleAlumnoChange}
-                      >
+                      <select name="alumnoComisionId" value={formEdit.alumnoComisionId} onChange={handleAlumnoChange}>
                         <option value="">Seleccione un alumno</option>
                         {alu.map((alumno) => (
                           <option key={alumno.id} value={alumno.id}>
@@ -261,22 +242,16 @@ const DashCajas = () => {
                         ))}
                       </select>
                     ) : (
-                      item.alumnoComision.alumno.name
+                      item.alumnoComision?.alumno.name
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <select
-                        name="tipo"
-                        value={formEdit.tipo}
-                        onChange={handleChange}
-                      >
+                      <select name="tipo" value={formEdit.tipo} onChange={handleChange}>
                         <option value="">Seleccione</option>
-                        <option value="ingreso">Ingreso</option>
-                        <option value="egreso">Egreso</option>
-                        <option value="transferencia">
-                          Transferencia de caja
-                        </option>
+                        <option value="Ingreso">Ingreso</option>
+                        <option value="Egreso">Egreso</option>
+                        <option value="Transferencia">Transferencia de caja</option>
                       </select>
                     ) : (
                       item.tipo
@@ -284,16 +259,12 @@ const DashCajas = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <select
-                        name="metodoPago"
-                        value={formEdit.metodoPago}
-                        onChange={handleChange}
-                      >
+                      <select name="metodoPago" value={formEdit.metodoPago} onChange={handleChange}>
                         <option value="">Seleccione</option>
-                        <option value="efectivo">Efectivo</option>
-                        <option value="transferencia">Transferencia</option>
-                        <option value="debito">Debito</option>
-                        <option value="credito">Credito</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Transferencia">Transferencia</option>
+                        <option value="Debito">Debito</option>
+                        <option value="Credito">Credito</option>
                       </select>
                     ) : (
                       item.metodoPago
@@ -301,43 +272,23 @@ const DashCajas = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <input
-                        type="text"
-                        name="descripcion"
-                        value={formEdit.descripcion || ""}
-                        onChange={handleChange}
-                        className="text-center"
-                      />
+                      <input type="text" name="descripcion" value={formEdit.descripcion || ""} onChange={handleChange} className="text-center" />
                     ) : (
                       item.descripcion
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <input
-                        type="number"
-                        name="monto"
-                        value={formEdit.monto || ""}
-                        onChange={handleChange}
-                        className="text-center"
-                      />
+                      <input type="number" name="monto" value={formEdit.monto || ""} onChange={handleChange} className="text-center" />
                     ) : (
                       item.monto
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <button
-                        onClick={() => handleSave(item)}
-                        className="px-4 py-2 text-white me-2 bg-green-500 hover:bg-green-600 rounded"
-                      >
+                      <button onClick={() => handleSave(item)} className="px-4 py-2 text-white me-2 bg-green-500 hover:bg-green-600 rounded">
                         {pause[item.id] ? (
-                          <svg
-                            fill="white"
-                            className="w-6 h-6 mx-auto"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
+                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                               <animateTransform
                                 attributeName="transform"
@@ -353,10 +304,7 @@ const DashCajas = () => {
                         )}
                       </button>
                     ) : (
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="px-4 py-2 text-white btnAz rounded me-2"
-                      >
+                      <button value={item.id} onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded me-2">
                         Editar
                       </button>
                     )}
@@ -366,12 +314,7 @@ const DashCajas = () => {
                       className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (
-                        <svg
-                          fill="white"
-                          className="w-6 h-6 mx-auto"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"

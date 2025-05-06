@@ -25,7 +25,7 @@ export class Inscripcion {
   @ManyToOne(() => Alumno, (alumno) => alumno.inscripciones)
   alumno: Alumno;
 
-  @ManyToOne(() => Comision, (comision) => comision.inscripciones)
+  @ManyToOne(() => Comision, (comision) => comision.inscripciones,{onDelete:'CASCADE'})
   comision: Comision;
 
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.inscripciones)

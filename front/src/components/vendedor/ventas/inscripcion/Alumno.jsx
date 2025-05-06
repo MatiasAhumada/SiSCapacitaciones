@@ -41,7 +41,7 @@ const Alumno = ({ nextStep, formData, setFormData }) => {
       setPause(false);
       nextStep();
     });
-    nextStep()
+    //nextStep()
     // try {
     //   postAlu(formAlu).then((data) => {
     //     if (data) {

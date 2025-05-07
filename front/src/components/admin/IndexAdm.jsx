@@ -15,7 +15,7 @@ const IndexAdm = () => {
       setPause(false);
       setSede(data);
     });
-  }, []);
+  }, [id]);
 
   return (
     <div>

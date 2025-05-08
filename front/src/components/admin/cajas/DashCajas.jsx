@@ -16,6 +16,7 @@ import {
 import Swal from "sweetalert2";
 
 const DashCajas = () => {
+  const {id}=useParams()
   const idVend = localStorage.getItem("token");
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -84,7 +85,7 @@ const DashCajas = () => {
     todasCajas();
     alumnos();
     peticion();
-  }, []);
+  }, [id]);
 
   const clickDelete = async (e) => {
     e.preventDefault();

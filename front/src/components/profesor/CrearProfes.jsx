@@ -29,7 +29,7 @@ const CrearProfes = () => {
       ...formData,
       sucursalId: id,
     };
-console.log(updatedFormData)
+
      setPause(true);
      await postProfes(updatedFormData).then(() => {
        try {
@@ -50,7 +50,7 @@ console.log(updatedFormData)
     getSucursalId(id).then((data) => {
       setSuc(data.name);
     });
-  }, []);
+  }, [id]);
 
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">

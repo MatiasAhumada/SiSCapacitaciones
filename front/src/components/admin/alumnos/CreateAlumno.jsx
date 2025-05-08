@@ -32,7 +32,7 @@ const CreateAlumno = () => {
     getSucursales().then((data) => {
       setSucursales(data);
     });
-  }, []);
+  }, [id]);
   const handleChange = (e) => {
     setFormAlu({ ...formAlu, [e.target.name]: e.target.value });
   };
@@ -49,7 +49,7 @@ const CreateAlumno = () => {
             timer: 1500,
           }).then(() => {
             setPause(false);
-            navigate(`/adm/${id}`);
+            navigate(`/adm/${id}/alumnos`);
           });
         }
       });

@@ -51,7 +51,7 @@ const DashProfe = () => {
       });
     };
     peticion();
-  }, []);
+  }, [id]);
 
   
   return (

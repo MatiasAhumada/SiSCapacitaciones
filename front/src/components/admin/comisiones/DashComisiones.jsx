@@ -67,7 +67,7 @@ const DashComisiones = () => {
     profesores();
     cursos();
     sucursal();
-  }, []);
+  }, [id]);
 
   const handleEdit = (comision) => {
     setEditing(comision.id);

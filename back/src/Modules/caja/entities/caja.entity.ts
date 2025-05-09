@@ -3,7 +3,14 @@ import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { v4 as uuid } from 'uuid';
 export enum TipoMovimiento {
   INGRESO = 'Ingreso',
@@ -30,7 +37,7 @@ export class Caja {
   @Column({ type: 'enum', enum: MetodoPago })
   metodoPago: MetodoPago;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 ,nullable:true})
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   monto: number;
 
   @Column({ type: 'text', nullable: true })
@@ -45,10 +52,13 @@ export class Caja {
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
   vendedor: Vendedor;
 
-  @ManyToOne(() => AlumnoComision, (ac) => ac.pagos, { nullable: true })
+  @ManyToOne(() => AlumnoComision, (ac) => ac.pagos, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   alumnoComision?: AlumnoComision;
-  
-  @OneToOne(()=>Comprobante,{cascade:true})
+
+  @OneToOne(() => Comprobante, { cascade: true })
   @JoinColumn()
-  comprobante?: Comprobante;  
+  comprobante?: Comprobante;
 }

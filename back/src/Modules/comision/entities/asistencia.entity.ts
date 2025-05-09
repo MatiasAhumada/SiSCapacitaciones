@@ -6,7 +6,7 @@ export class Asistencia {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => AlumnoComision, (alumnoComision) => alumnoComision.id)
+  @ManyToOne(() => AlumnoComision, (alumnoComision) => alumnoComision.id,{onDelete:"CASCADE"})
   alumnoComision: AlumnoComision;
 
   @Column({ default: false }) 

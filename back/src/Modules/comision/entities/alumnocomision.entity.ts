@@ -18,7 +18,9 @@ export class AlumnoComision {
   @ManyToOne(() => Alumno, (alumno) => alumno.id)
   alumno: Alumno;
 
-  @ManyToOne(() => Comision, (comision) => comision.id)
+  @ManyToOne(() => Comision, (comision) => comision.id,{
+    onDelete:"CASCADE"
+  })
   comision: Comision;
 
   @Column({ default: true })

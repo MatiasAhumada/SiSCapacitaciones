@@ -12,8 +12,7 @@ const DashVendedor = () => {
 
   const isSubRoute = location.pathname.includes("crear") || location.pathname.includes("info");
 
-  const click = (idVend) => {
-   
+  const click = (idVend) => {   
     navigate(`/adm/${id}/vendedores/info`, {
       state: { id: idVend },
     });

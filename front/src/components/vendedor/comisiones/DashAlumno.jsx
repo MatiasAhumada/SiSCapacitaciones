@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { deleteComision, getAluCom, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
+import { deleteComision, getAlu, getAluCom, getAluID, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
 import ReciboComprobante from "../../caja/Comprobante";
 import { Modal } from "antd";
 
 const DashAlumno = () => {
-  const { idAluCom } = useParams();
+  const { idAluCom, idAlu } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
@@ -38,7 +38,11 @@ const DashAlumno = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isSubRoute = location.pathname.includes("crear");
+  const isDesdeVendedor = location.pathname.startsWith("/:idVend/alumno/:idAluCom");
+  const isDesdeAdmin = location.pathname.startsWith("/adm/");
+  const isEmpty = Object.keys(dataComision).length === 0 && dataComision.constructor === Object;
 
+  console.log(isEmpty);
   const clickDelete = async (id) => {
     const comisionId = id;
 
@@ -65,15 +69,25 @@ const DashAlumno = () => {
   };
 
   useEffect(() => {
-    const alucom = async () => {
-      await getAluCom(idAluCom).then((data) => {
-        setDataAlumno(data.alumno);
-        setDataComision(data.comision);
-        setTableItems(data.pagos);
-      });
-    };
-
-    alucom();
+    if (isDesdeVendedor) {
+      const alucom = async () => {
+        await getAluCom(idAluCom).then((data) => {
+          setDataAlumno(data.alumno);
+          setDataComision(data.comision);
+          setTableItems(data.pagos);
+        });
+      };
+      alucom();
+    }
+    if (isDesdeAdmin) {
+      const alu = async () => {
+        await getAluID(idAlu).then((data) => {
+          setDataAlumno(data);
+          console.log(data);
+        });
+      };
+      alu();
+    }
   }, []);
 
   const handleEdit = (comision) => {
@@ -151,9 +165,13 @@ const DashAlumno = () => {
               <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
                 Tel: {dataAlumno.tel} / D.N.I: {dataAlumno.dni}
               </h2>
-              <h3>
-                {dataComision.name}: {dataComision.day} {dataComision.hour?.start} - {dataComision.hour?.end}
-              </h3>
+              {isEmpty ? (
+                <></>
+              ) : (
+                <h3>
+                  {dataComision.name}: {dataComision.day} {dataComision.hour?.start} - {dataComision.hour?.end}
+                </h3>
+              )}
             </div>
             <div className="mt-3 md:mt-0">
               <button

@@ -46,7 +46,7 @@ function App() {
           <Route path="profesores" element={<DashProfe></DashProfe>}>
             <Route path="crear" element={<CrearProfes></CrearProfes>}></Route>
           </Route>
-          <Route path="alumno/:idAluCom" element={<DashAlumno></DashAlumno>}></Route>
+          <Route path="alumno/:idAlu" element={<DashAlumno></DashAlumno>}></Route>
           <Route path="alumnos" element={<DashAlumnos></DashAlumnos>}>
             <Route path="crear" element={<CreateAlumnoNuevo></CreateAlumnoNuevo>}></Route>
           </Route>

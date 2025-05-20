@@ -91,7 +91,7 @@ export class AlumnoService {
   async findOne(id: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
       where: { id },
-      relations: ['sucursal', 'alumnoComisiones'],
+      relations: ['sucursal', 'alumnoComisiones', 'alumnoComisiones.pagos'],
       select: {
         sucursal: {
           id: true,
@@ -101,6 +101,12 @@ export class AlumnoService {
         alumnoComisiones: {
           id: true,
           state: true,
+          pagos:{
+            id: true,
+            fecha: true,
+            cuota: true,
+            metodoPago: true,
+          }
         },
        
       },

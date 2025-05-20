@@ -15,14 +15,17 @@ const DashAlumnos = () => {
   const location = useLocation();
 
   const isSubRoute = location.pathname.includes("crear");
-
-  const clickDelete = async (e) => {
-    e.preventDefault();
-    const alumnoId = e.target.value;
+  const click = (idAlu) => {
+    navigate(`/adm/${id}/alumno/${idAlu}`, {
+      state: { id: idAlu },
+    });
+  };
+  const clickDelete = async (id) => {
+    const alumnoId = id;
 
     setPause((prev) => ({ ...prev, [alumnoId]: true }));
 
-    await deleteAlumnoId(e.target.value).then(() => {
+    await deleteAlumnoId(id).then(() => {
       try {
         Swal.fire({
           title: "Alumno Eliminado",
@@ -46,7 +49,6 @@ const DashAlumnos = () => {
   useEffect(() => {
     const peticion = async () => {
       await getSucursalId(id).then((data) => {
-        console.log(data)
         setTableItems(data.alumnos);
       });
     };
@@ -89,11 +91,18 @@ const DashAlumnos = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{item.tel}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.alumnoComisiones?.length}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.certificados?.length}</td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
+                      {/* BOTON VER MAS */}
+                      <button type="button" onClick={() => click(item.id)} className="px-4 py-2 ms-3 btnAz principal md:text-sm rounded">
+                        <i className="fa-solid fa-plus"></i>
+                      </button>
+
+                      {/* BOTON BORRAR */}
                       <button
                         value={item.id}
-                        onClick={clickDelete}
-                        className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                        onClick={() => clickDelete(item.id)}
+                        className=" px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (
                           <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -108,7 +117,7 @@ const DashAlumnos = () => {
                             </path>
                           </svg>
                         ) : (
-                          "Eliminar"
+                          <i className="fa-solid fa-x"></i>
                         )}
                       </button>
                     </td>

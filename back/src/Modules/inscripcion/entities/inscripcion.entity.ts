@@ -13,12 +13,7 @@ export class Inscripcion {
 
   @Column()
   fechaRegistro: Date;
-
-  @Column()
-  formaPago: string;
-
-  @Column()
-  cuotaIngreso: number;
+  
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.inscripciones)
   vendedor: Vendedor;
 

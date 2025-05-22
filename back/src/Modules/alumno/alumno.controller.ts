@@ -22,7 +22,7 @@ export class AlumnoController {
   }
   @Post('simple')
   createSimpleAlumno(
-    @Body() alumnoSimple:{dni: number, name: string}
+    @Body() alumnoSimple:{dni: string, name: string}
 
   ) {
     return this.alumnoService.createSimpleAlumno(alumnoSimple.dni, alumnoSimple.name);

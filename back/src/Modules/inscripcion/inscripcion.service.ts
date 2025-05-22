@@ -26,6 +26,7 @@ export class InscripcionService {
     @InjectRepository(AlumnoComision)
     private readonly alumnoComisionRepository: Repository<AlumnoComision>,
   ) {}
+
   async create(createInscripcionDto: CreateInscripcionDto) {
     const {
       vendedorId,
@@ -33,8 +34,6 @@ export class InscripcionService {
       comisionId,
       sucursalId,
       fechaRegistro,
-      formaPago,
-      cuotaIngreso,
       state,
     } = createInscripcionDto;
 
@@ -42,13 +41,12 @@ export class InscripcionService {
       where: { id: vendedorId },
     });
     const alumno = await this.alumnoRepository.findOne({
-      where: { id: alumnoId },
+      where: { dni: alumnoId },
     });
     const comision = await this.comisionRepository.findOne({
       where: { id: comisionId },
       relations: ['alumnoComisiones'],
     });
-
     const sucursal = await this.sucursalRepository.findOne({
       where: { id: sucursalId },
     });
@@ -56,11 +54,13 @@ export class InscripcionService {
     if (!vendedor || !alumno || !comision || !sucursal) {
       throw new NotFoundException('Uno o más IDs proporcionados no existen');
     }
+
     const alumnoComisionExistente = await this.alumnoComisionRepository.findOne(
       {
-        where: { alumno: { id: alumnoId }, comision: { id: comisionId } },
+        where: { alumno: { dni: alumnoId }, comision: { id: comisionId } },
       },
     );
+
     if (!alumnoComisionExistente) {
       // Si no existe, se crea una nueva relación entre el alumno y la comisión con el estado
       const alumnoComision = this.alumnoComisionRepository.create({
@@ -71,12 +71,8 @@ export class InscripcionService {
       await this.alumnoComisionRepository.save(alumnoComision);
     }
 
-    
-
     const inscripcion = this.inscripcionRepository.create({
       fechaRegistro,
-      formaPago,
-      cuotaIngreso,
       vendedor,
       alumno,
       comision,
@@ -87,7 +83,27 @@ export class InscripcionService {
   }
 
   async findAll() {
-    return this.inscripcionRepository.find();
+    return this.inscripcionRepository.find({
+      relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
+      select: {
+        vendedor: {
+          id: true,
+          name: true,
+        },
+        alumno: {
+          id: true,
+          name: true,
+        },
+        comision: {
+          id: true,
+          name: true,
+        },
+        sucursal: {
+          id: true,
+          name: true,
+        },
+      },
+    });
   }
 
   async findOne(id: string) {

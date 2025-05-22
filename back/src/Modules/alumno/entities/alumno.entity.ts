@@ -20,7 +20,7 @@ export class Alumno {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
   @Column()
-  dni: number;
+  dni: string;
   @Column()
   name: string;
   @Column({ nullable: true,  type: 'timestamp' })

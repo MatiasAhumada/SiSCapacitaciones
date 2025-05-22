@@ -4,11 +4,11 @@ export class CreateInscripcionDto {
   @IsDate()
   fechaRegistro: string;
 
-  @IsString()
-  formaPago: string;
+  // @IsString()
+  // formaPago: string;
 
-  @IsNumber()
-  cuotaIngreso: number;
+  // @IsNumber()
+  // cuotaIngreso: number;
 
   @IsUUID()
   vendedorId: string;
@@ -21,7 +21,7 @@ export class CreateInscripcionDto {
 
   @IsUUID()
   sucursalId: string;
-  @IsBoolean()
-  state: boolean;
-}
 
+   @IsBoolean()
+   state: boolean;
+}

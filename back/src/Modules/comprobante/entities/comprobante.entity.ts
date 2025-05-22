@@ -18,7 +18,7 @@ export class Comprobante {
   apellidoNombre: string;
 
   @Column()
-  dni: number;
+  dni: string;
 
   @Column()
   domicilioComercial: string;

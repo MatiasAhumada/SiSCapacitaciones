@@ -36,7 +36,7 @@ export class AuthService {
       const alumno = await this.alumnoRepository.findOne({
         where: { name },
       });
-      if (alumno && alumno.dni === Number(password)) {
+      if (alumno && alumno.dni === password) {
         return { id: alumno.id };
       }
     } catch (error) {

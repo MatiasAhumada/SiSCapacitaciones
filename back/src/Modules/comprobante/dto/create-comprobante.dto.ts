@@ -5,8 +5,8 @@ export class CreateComprobanteDto {
   @IsString()
   apellidoNombre: string;
 
-  @IsNumber()
-  dni: number;
+  @IsString()
+  dni: string;
 
   @IsString()
   domicilioComercial: string;

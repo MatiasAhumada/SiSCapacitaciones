@@ -11,8 +11,8 @@ export class CreateAlumnoDto {
   @IsUUID()
   id: string;
 
-  @IsNumber()
-  dni: number;
+  @IsString()
+  dni: string;
 
   @IsString()
   name: string;

@@ -12,7 +12,6 @@ import Home from "./components/Views/Home";
 import Login from "./components/Views/Login";
 import { Route, BrowserRouter, Routes } from "react-router-dom";
 import Inscribir from "./components/vendedor/ventas/inscripcion/Inscribir";
-
 import DashAlumnos from "./components/admin/alumnos/DashAlumnos";
 import CreateAlumno from "./components/admin/alumnos/CreateAlumno";
 import DashCursos from "./components/admin/cursos/DashCursos";
@@ -28,7 +27,7 @@ import DashComVend from "./components/vendedor/comisiones/DashComVend";
 import CreateComVend from "./components/vendedor/comisiones/CreateComVend";
 import DashAlumno from "./components/vendedor/comisiones/DashAlumno";
 import ReciboComprobante from "./components/caja/Comprobante";
-import Alumno from "./components/vendedor/ventas/inscripcion/Alumno";
+
 import CreateAlumnoNuevo from "./components/alumno/CreateAlumnoNuevo";
 import CreateAlumnoViejo from "./components/alumno/CreateAlumnoViejo";
 function App() {

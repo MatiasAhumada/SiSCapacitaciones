@@ -11,7 +11,7 @@ import Error404 from "./components/Views/Error404";
 import Home from "./components/Views/Home";
 import Login from "./components/Views/Login";
 import { Route, BrowserRouter, Routes } from "react-router-dom";
-import Inscripcion from "./components/vendedor/ventas/Inscripcion";
+import Inscribir from "./components/vendedor/ventas/inscripcion/Inscribir";
 
 import DashAlumnos from "./components/admin/alumnos/DashAlumnos";
 import CreateAlumno from "./components/admin/alumnos/CreateAlumno";
@@ -63,7 +63,7 @@ function App() {
         <Route path="/:idVend" element={<IndexVendedor></IndexVendedor>}>
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
           <Route path="alumno/:idAluCom" element={<DashAlumno></DashAlumno>}></Route>
-          <Route path="inscribir" element={<Inscripcion></Inscripcion>}></Route>
+          <Route path="inscribir" element={<Inscribir></Inscribir>}></Route>
           <Route path="caja" element={<DashCaja></DashCaja>}></Route>
           <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
           <Route path="cursos" element={<DashCursos></DashCursos>}></Route>

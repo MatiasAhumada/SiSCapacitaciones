@@ -19,10 +19,10 @@ const Inscribir = () => {
 
   const [dataInscripcion, setDataInscipcion] = useState({
     fecha: "",
-    vendedorId: "",
+    vendedorId: idVende,
     alumnoId: "",
     comisionId: "",
-    sucursalId: "",
+    sucursalId: sucursal.id,
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,19 +61,13 @@ const Inscribir = () => {
         setSucursal(data.sucursales[0]);
       });
     };
-    vendedor();
 
-    setDataInscipcion(()=>({
-      fecha: formatToDisplay(fecha),
-      vendedorId: idVende,
-      sucursalId: sucursal.id,
-    }));
+    vendedor();
 
     const intervalId = setInterval(() => {
       setFecha(new Date());
     }, 60000);
 
-   
     return () => clearInterval(intervalId);
   }, []);
 
@@ -86,7 +80,7 @@ const Inscribir = () => {
     }));
   };
 
-  const handleAlumnoChange = (e) => {
+  const handleAlumno = (e) => {
     const { name, value } = e.target;
     setAlu(value);
 
@@ -167,15 +161,24 @@ const Inscribir = () => {
           <label htmlFor="cuota" className="block mb-2 text-sm  principal text-[#111827]">
             Alumno
           </label>
+          
           <div className="relative text-gray-400">
             <input
               type="number"
               name="alumnoId"
               id="alumnoId"
               value={alu}
-              onChange={handleAlumnoChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+              onChange={handleAlumno}
+              className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400   p-3 pr-20"
+              placeholder="ID del alumno"
             />
+            <button
+              type="button"
+              onClick={handleAlumno}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 btnAz text-white text-sm px-4 py-1.5 rounded-md "
+            >
+              Buscar
+            </button>
           </div>
         </div>
         <div className="pb-2">

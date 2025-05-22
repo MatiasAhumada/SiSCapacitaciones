@@ -33,9 +33,9 @@ export class AlumnoController {
     return this.alumnoService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alumnoService.findOne(id);
+  @Get(':dni')
+  findOne(@Param('dni') dni: string) {
+    return this.alumnoService.findOne(dni);
   }
 
   @Put(':id')

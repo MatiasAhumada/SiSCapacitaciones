@@ -12,9 +12,9 @@ export const login = async ({ name, password }) => {
 };
 //ALUMNOS
 
-export const getAluID = async (id) => {
+export const getAluID = async (dni) => {
   try {
-    const response = await axios.get(`${URL}/alumno/${id}`);
+    const response = await axios.get(`${URL}/alumno/${dni}`);
     return response.data;
   } catch (error) {
     console.error("Error al obtener alumno", error.response?.data);

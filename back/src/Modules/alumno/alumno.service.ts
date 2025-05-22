@@ -88,9 +88,9 @@ export class AlumnoService {
 
     return await this.findOne(imgUpdt.id);
   }
-  async findOne(id: string): Promise<Alumno | null> {
+  async findOne(dni: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
-      where: { id },
+      where: { dni },
       relations: ['sucursal', 'alumnoComisiones', 'alumnoComisiones.pagos'],
       select: {
         sucursal: {

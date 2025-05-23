@@ -102,33 +102,32 @@ const Inscribir = () => {
   // };
 
   const handleAlumnoClick = async (e) => {
-   
     e.preventDefault();
-    console.log(dataInscripcion)
-     setPause(true);
-     await getAluID(alu)
-       .then((data) => {
-         if (data) {
-           setAlumnoSeleccionado(data);
-           setDataInscipcion((prevState) => ({
-             ...prevState,
-             fechaRegistro: fecha,
-             sucursalId: sucursal.id,
-             alumnoId: data.dni,
-           }));
-           setPause(false);
-         } else {
-           Swal.fire({
-             icon: "error",
-             title: "Error",
-             text: "No se encontró el alumno",
-           });
-           setPause(false);
-         }
-       })
-       .catch((error) => {
-         console.error("Error al obtener el alumno:", error);
-       });
+    console.log(dataInscripcion);
+    setPause(true);
+    await getAluID(alu)
+      .then((data) => {
+        if (data) {
+          setAlumnoSeleccionado(data);
+          setDataInscipcion((prevState) => ({
+            ...prevState,
+            fechaRegistro: fecha,
+            sucursalId: sucursal.id,
+            alumnoId: data.dni,
+          }));
+          setPause(false);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "No se encontró el alumno",
+          });
+          setPause(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener el alumno:", error);
+      });
   };
 
   const handleSubmit = async (e) => {
@@ -136,7 +135,20 @@ const Inscribir = () => {
     setPause(true);
     console.log(dataInscripcion);
     await postInscripcion(dataInscripcion).then((data) => {
-      console.log(data);
+      try {
+        Swal.fire({
+          icon: "success",
+          title: "Inscripción exitosa",
+          text: "El alumno ha sido inscrito correctamente.",
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo inscribir al alumno.",
+        });
+        console.log(error);
+      }
     });
     setPause(false);
   };

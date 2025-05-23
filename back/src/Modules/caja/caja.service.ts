@@ -30,10 +30,9 @@ export class CajaService {
       tipo,
       vendedorId,
       alumnoComisionId,
-
       ...restoCaja
     } = createCajaDto;
-
+console.log(restoCaja.fecha)
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });

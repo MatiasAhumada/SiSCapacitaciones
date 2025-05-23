@@ -161,7 +161,7 @@ const CreateCaja = () => {
       vendedorId: idVende,
       comprobante: cargaComprobante,
     };
-    //console.log(nuevoFormData);
+    console.log(nuevoFormData);
 
      await postCaja(nuevoFormData).then((data) => {
        try {

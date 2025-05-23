@@ -6,6 +6,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const ListadoComisiones = () => {
+  const { id } = useParams();
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
@@ -20,14 +21,15 @@ const ListadoComisiones = () => {
   const { comId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  console.log(id)
   const navegacion = (alumno) => {
     const currentPath = location.pathname;
-    const isAdmin = currentPath.startsWith("/adm");
+    const isAdmin = currentPath.includes("adm");
+    //console.log(isAdmin);isAdmin ? pathSegments[2] : 
 
     const pathSegments = currentPath.split("/");
-    const userId = isAdmin ? pathSegments[2] : pathSegments[1];
-
-    const redirectionPath = isAdmin ? `/adm/${userId}/alumno/${alumno.id}` : `/${userId}/alumno/${alumno.id}`;
+    const userId = pathSegments[1];
+    const redirectionPath = isAdmin ? `/adm/${id}/alumno/${alumno.id}` : `/${userId}/alumno/${alumno.id}`;
 
     navigate(redirectionPath);
   };
@@ -122,7 +124,7 @@ const ListadoComisiones = () => {
       setPause((prev) => ({ ...prev, [ID]: false }));
     }
   };
-  
+
   const getRowBgColor = (alumno) => {
     const now = new Date();
     const day = now.getDate();

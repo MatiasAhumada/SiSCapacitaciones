@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { deleteComision, deleteCurso, getComisionBySucursal, getCursos, getProfes, getSucursalId, putComision } from "../../queris/queris";
 
 const DashComisiones = () => {
-  const { id } = useParams();
+  const { id, comId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
@@ -20,8 +20,8 @@ const DashComisiones = () => {
   });
   const [cursos, setCursos] = useState([]);
   const [profesores, setProfesores] = useState([]);
-
-  const isSubRoute = location.pathname.includes("crear") || /\d+$/.test(location.pathname);
+  console.log(comId);
+  const isSubRoute = location.pathname.includes("crear") || /\d+$/.test(location.pathname) || location.pathname.includes(comId);
 
   const clickDelete = async (id) => {
     const comisionId = id;

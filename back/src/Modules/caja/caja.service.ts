@@ -32,7 +32,7 @@ export class CajaService {
       alumnoComisionId,
       ...restoCaja
     } = createCajaDto;
-console.log(restoCaja.fecha)
+console.log(createCajaDto)
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
@@ -71,7 +71,7 @@ console.log(restoCaja.fecha)
       newComprobante.dni = alumnoComision.alumno.dni; // DNI del alumno
       newComprobante.domicilioComercial = alumnoComision.alumno.address ?? '-'; // Domicilio del alumno
       newComprobante.iva = '-'; // Ajusta esto según sea necesario
-      newComprobante.fecha = new Date(); // Fecha actual
+      newComprobante.fecha = restoCaja.fecha; // Fecha actual
       newComprobante.formaPago = comprobante.formaPago; // Forma de pago recibida en el DTO
       newComprobante.observacion = comprobante.observacion; // Observación
       newComprobante.monto = restoCaja.monto; // Monto de la caja
@@ -86,7 +86,7 @@ console.log(restoCaja.fecha)
       newCaja.metodoPago = comprobante.formaPago;
       newCaja.monto = restoCaja.monto;
       newCaja.descripcion = restoCaja.descripcion;
-      newCaja.fecha = new Date();
+      newCaja.fecha = restoCaja.fecha;
       newCaja.cuota = restoCaja.cuota;
       newCaja.vendedor = vendedor;
       newCaja.comprobante = newComprobante;

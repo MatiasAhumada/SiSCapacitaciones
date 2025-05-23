@@ -27,7 +27,7 @@ export class CreateCajaDto {
   descripcion?: string;
 
   @IsDateString()
-  fecha: string;
+  fecha: Date ;
 
   @IsUUID()
   vendedorId: string;

@@ -15,7 +15,17 @@ const DashAlumnos = () => {
   const location = useLocation();
 
   const isSubRoute = location.pathname.includes("crear");
-  const click = (idAlu) => {
+  const click = (item) => {
+    const idAlu = item.alumnoComisiones[0]?.id;
+    if (!idAlu) {
+      Swal.fire({
+        title: "No hay comisiones asignadas",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
     navigate(`/adm/${id}/alumno/${idAlu}`, {
       state: { id: idAlu },
     });
@@ -94,7 +104,7 @@ const DashAlumnos = () => {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       {/* BOTON VER MAS */}
-                      <button type="button" onClick={() => click(item.id)} className="px-4 py-2 ms-3 btnAz principal md:text-sm rounded">
+                      <button type="button" value={item.id} onClick={() => click(item)} className="px-4 py-2 ms-3 btnAz principal md:text-sm rounded">
                         <i className="fa-solid fa-plus"></i>
                       </button>
 

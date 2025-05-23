@@ -31,48 +31,47 @@ const CreateAlumnoNuevo = () => {
   };
 
   const handleSubmit = () => {
-    setPause(true);    
-     try {
-       postAlu(formAlu).then((data) => {
-         if (data) {
-           console.log(data);
-           setFormAlu((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
-           Swal.fire({
-             icon: "success",
-             title: "Alumno Cargado",
-             showConfirmButton: false,
-             timer: 1500,
-           }).then(() => {
-             setPause(false);
-             setFormAlu({
-               dni: "",
-               name: "",
-               fNac: "",
-               tel: "",
-               telex: "",
-               ocupation: "",
-               nationality: "",
-               address: "",
-               province: "",
-               locality: "",
-               email: "",
-               age: "",
-               gender: "",
-               sucursalId: "",
-             });
-             });
-         }
-       });
-     } catch (error) {
-       Swal.fire({
-         icon: "error",
-         title: "Error al cargar alumno",
-         showConfirmButton: false,
-         timer: 1500,
-       }).then(()=>{
-         setPause(false);
-       });
-     }
+    setPause(true);
+    try {
+      postAlu(formAlu).then((data) => {
+        if (data) {
+          setPause(false);
+          setFormAlu((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
+          Swal.fire({
+            icon: "success",
+            title: "Alumno Cargado",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => {
+            setFormAlu({
+              dni: "",
+              name: "",
+              fNac: "",
+              tel: "",
+              telex: "",
+              ocupation: "",
+              nationality: "",
+              address: "",
+              province: "",
+              locality: "",
+              email: "",
+              age: "",
+              gender: "",
+              sucursalId: "",
+            });
+          });
+        }
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al cargar alumno",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        setPause(false);
+      });
+    }
   };
 
   const fieldLabels = {

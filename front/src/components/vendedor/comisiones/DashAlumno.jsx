@@ -154,7 +154,7 @@ const DashAlumno = () => {
     setIsModalOpen(true);
     setInfoComprobante(item);
   };
-
+console.log(dataAlumno)
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {/* {!isSubRoute && ( */}

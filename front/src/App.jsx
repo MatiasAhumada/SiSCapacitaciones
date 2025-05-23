@@ -27,7 +27,6 @@ import DashComVend from "./components/vendedor/comisiones/DashComVend";
 import CreateComVend from "./components/vendedor/comisiones/CreateComVend";
 import DashAlumno from "./components/vendedor/comisiones/DashAlumno";
 import ReciboComprobante from "./components/caja/Comprobante";
-
 import CreateAlumnoNuevo from "./components/alumno/CreateAlumnoNuevo";
 import CreateAlumnoViejo from "./components/alumno/CreateAlumnoViejo";
 function App() {
@@ -63,8 +62,10 @@ function App() {
           <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
           <Route path="alumno/:idAluCom" element={<DashAlumno></DashAlumno>}></Route>
           <Route path="inscribir" element={<Inscribir></Inscribir>}></Route>
+
           <Route path="caja" element={<DashCaja></DashCaja>}></Route>
           <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
+
           <Route path="cursos" element={<DashCursos></DashCursos>}></Route>
           <Route path="comisiones" element={<DashComVend></DashComVend>}>
             <Route path="crear" element={<CreateComVend></CreateComVend>}></Route>

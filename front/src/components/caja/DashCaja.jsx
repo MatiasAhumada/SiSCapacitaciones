@@ -5,11 +5,11 @@ import Swal from "sweetalert2";
 
 const DashCaja = () => {
   const idVend = localStorage.getItem("token");
+  const fecha = new Date();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [editMode, setEditMode] = useState(null);
   const [alu, setAlu] = useState([]);
-  const [fecha, setFecha] = useState(new Date());
   const [formEdit, setFormEdit] = useState({
     fecha: "",
     tipo: "",
@@ -135,9 +135,15 @@ const DashCaja = () => {
           <div className="items-start justify-between md:flex">
             <div className="max-w-lg">
               <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
-              <p className="text-gray-600 mt-2">En esta tabla estaran los movimientos realizados.</p>
+              <p className="text-gray-600 mt-2">En esta tabla estarán los movimientos realizados.</p>
+            </div>
+            <div className="mt-3 md:mt-0">
+              <button onClick={() => navigate(`/${idVend}/cobrar`)} className="inline-block px-4 py-2 text-white principal btnAz md:text-sm">
+                Cobrar
+              </button>
             </div>
           </div>
+
           <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
             <table className="w-full table-auto text-sm  text-center">
               <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">

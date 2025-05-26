@@ -335,9 +335,9 @@ const CreateCaja = () => {
                   >
                     <option value="">Seleccione</option>
                     <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Debito">Debito</option>
                     <option value="Credito">Credito</option>
+                    <option value="Digital Tobias">Digital Tobias</option>
+                    <option value="Digital Javier">Digital Javier</option>
                   </select>
                 </div>
                 <div className="pb-2">

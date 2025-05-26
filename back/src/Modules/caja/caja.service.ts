@@ -83,7 +83,7 @@ console.log(createCajaDto)
 
       const newCaja = new Caja();
       newCaja.tipo = tipo;
-      newCaja.metodoPago = comprobante.formaPago;
+      newCaja.metodoPago = restoCaja.metodoPago;
       newCaja.monto = restoCaja.monto;
       newCaja.descripcion = restoCaja.descripcion;
       newCaja.fecha = restoCaja.fecha;

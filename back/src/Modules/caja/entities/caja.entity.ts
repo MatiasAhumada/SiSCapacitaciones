@@ -17,11 +17,12 @@ export enum TipoMovimiento {
   EGRESO = 'Egreso',
   TRANSFERENCIA = 'Transferencia',
 }
+
 export enum MetodoPago {
   EFECTIVO = 'Efectivo',
-  DEBITO = 'Debito',
   CREDITO = 'Credito',
-  TRANSFERENCIA = 'Transferencia',
+  DIGITAL_TOBIAS = 'Digital Tobias',
+  DIGITAL_JAVIER = 'Digital Javier',
 }
 
 @Entity({

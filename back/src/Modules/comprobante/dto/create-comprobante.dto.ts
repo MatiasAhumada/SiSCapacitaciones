@@ -1,5 +1,5 @@
-import { MetodoPago } from '@modules/Modules/caja/entities/caja.entity';
 import { IsDateString, IsEnum, IsNumber, IsString } from 'class-validator';
+import { FormaPago } from '../entities/comprobante.entity';
 
 export class CreateComprobanteDto {
   @IsString()
@@ -20,8 +20,8 @@ export class CreateComprobanteDto {
   @IsString()
   tipoComprobante: string;
 
-  @IsEnum(MetodoPago)
-  formaPago: MetodoPago;
+  @IsEnum(FormaPago)
+  formaPago: FormaPago;
 
   @IsString()
   numero: string;

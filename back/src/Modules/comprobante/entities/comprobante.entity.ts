@@ -1,12 +1,18 @@
 import { Caja } from '@modules/Modules/caja/entities/caja.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-export enum MetodoPago {
-  EFECTIVO = 'Efectivo',
-  DEBITO = 'Debito',
-  CREDITO = 'Credito',
-  TRANSFERENCIA = 'Transferencia',
-}
+ export enum FormaPago {
+   EFECTIVO = 'Efectivo',
+   CREDITO = 'Credito',
+   DEBITO ='Digital Tobias' ,
+   TRANSFERENCIA = 'Digital Javier',
+ }
+// export enum MetodoPago {
+//   EFECTIVO = 'Efectivo',
+//   CREDITO = 'Credito',
+//   DIGITAL_TOBIAS = 'Digital Tobias',
+//   DIGITAL_JAVIER = 'Digital Javier',
+// }
 @Entity({
   name: 'comprobantes',
 })
@@ -31,9 +37,9 @@ export class Comprobante {
 
   @Column({
     type: 'enum',
-    enum: MetodoPago,
+    enum: FormaPago,
   })
-  formaPago: MetodoPago;
+  formaPago: FormaPago;
 
   @Column()
   observacion: string;
@@ -44,7 +50,7 @@ export class Comprobante {
   @Column()
   numero: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   tipoComprobante: string;
 
   @Column()

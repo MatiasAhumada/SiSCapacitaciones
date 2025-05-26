@@ -16,7 +16,7 @@ export class Profesor {
     apellido: string;
     
     @Column()
-    dni:number
+    tel:string
    
     @OneToMany(()=>Comision,comision=>comision.profesor)
     comisiones:Comision[]

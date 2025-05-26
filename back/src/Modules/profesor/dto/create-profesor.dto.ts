@@ -9,9 +9,9 @@ export class CreateProfesorDto {
   @IsNotEmpty()
   apellido: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  dni: number;
+  tel: string;
 
   @IsUUID()
   @IsNotEmpty()

@@ -23,9 +23,9 @@ export class Alumno {
   dni: string;
   @Column()
   name: string;
-  @Column({ nullable: true,  type: 'timestamp' })
+  @Column({ nullable: true, type: 'timestamp' })
   fNac?: Date;
-  @Column({ type: 'bigint', nullable: true})
+  @Column({ type: 'bigint', nullable: true })
   tel?: number;
   @Column({ type: 'bigint', nullable: true })
   telex?: number;
@@ -47,6 +47,8 @@ export class Alumno {
   gender?: string;
   @Column({ nullable: true, default: 'https://example.com/default-image.jpg' })
   imgUrl?: string;
+  @Column({ nullable: true, default: '0' })
+  descuento?: number;
   @OneToMany(() => AlumnoComision, (alumnoComision) => alumnoComision.alumno)
   alumnoComisiones?: AlumnoComision[];
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno)

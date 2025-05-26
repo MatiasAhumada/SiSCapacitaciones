@@ -53,6 +53,9 @@ export class CreateAlumnoDto {
   @IsString()
   gender?: string;
 
+  @IsNumber()
+  descuento?: number;
+
   @IsUUID()
   sucursalId?: string;
 }

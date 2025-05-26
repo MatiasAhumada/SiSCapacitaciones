@@ -49,6 +49,9 @@ export class Caja {
   @Column({ type: 'decimal', nullable: true })
   cuota?: number;
 
+  @Column({ default: '0', nullable: true })
+  descuento?: number;
+
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
   vendedor: Vendedor;
 

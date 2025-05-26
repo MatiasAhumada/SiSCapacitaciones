@@ -7,7 +7,7 @@ const IndexVendedor = () => {
   const { idVend } = useParams();
 
   const navigate = useNavigate();
-  const navigation = [{ name: "Inscribir" }, { name: "Caja" }, { name: "Cobrar" }, { name: "Cursos" }, { name: "Comisiones" }, { name: "Alu. Nuevo" }, { name: "Alu. Viejo" }];
+  const navigation = [{ name: "Inscribir" }, { name: "Caja" },  { name: "Cursos" }, { name: "Comisiones" }, { name: "Alu. Nuevo" }, { name: "Alu. Viejo" }];
   const handleClick = (e) => {
     e.preventDefault();
     localStorage.removeItem("token");

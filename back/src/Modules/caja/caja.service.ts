@@ -32,7 +32,7 @@ export class CajaService {
       alumnoComisionId,
       ...restoCaja
     } = createCajaDto;
-console.log(createCajaDto)
+// console.log(createCajaDto)
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });

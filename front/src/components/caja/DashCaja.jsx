@@ -127,19 +127,40 @@ const DashCaja = () => {
       }
     });
   };
-  console.log(tableItems);
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
         <>
-          <div className="items-start justify-between md:flex">
+          <div className="items-start justify-between flex flex-col md:flex-row ">
             <div className="max-w-lg">
               <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
               <p className="text-gray-600 mt-2">En esta tabla estarán los movimientos realizados.</p>
             </div>
-            <div className="mt-3 md:mt-0">
-              <button onClick={() => navigate(`/${idVend}/cobrar`)} className="inline-block px-4 py-2 text-white principal btnAz md:text-sm">
+            <div className="mt-3 md:mt-0 ">
+              <button
+                onClick={() => navigate(`/${idVend}/cobrar`)}
+                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
+              >
                 Cobrar
+              </button>
+              <button
+                onClick={() => navigate(`/${idVend}/cobrar`)}
+                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
+              >
+                Egreso
+              </button>
+              <button
+                onClick={() => navigate(`/${idVend}/cobrar`)}
+                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
+              >
+                Transferir
+              </button>
+              <button
+                onClick={() => navigate(`/${idVend}/cobrar`)}
+                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
+              >
+                Cerrar caja
               </button>
             </div>
           </div>
@@ -245,12 +266,12 @@ const DashCaja = () => {
                               </path>
                             </svg>
                           ) : (
-                            "Guardar"
+                            <i className="fa-solid fa-floppy-disk"></i>
                           )}
                         </button>
                       ) : (
                         <button onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded me-2">
-                          Editar
+                          <i className="fa-solid fa-pen"></i>
                         </button>
                       )}
                       <button
@@ -271,7 +292,7 @@ const DashCaja = () => {
                             </path>
                           </svg>
                         ) : (
-                          "Eliminar"
+                          <i className="fa-solid fa-x"></i>
                         )}
                       </button>
                     </td>

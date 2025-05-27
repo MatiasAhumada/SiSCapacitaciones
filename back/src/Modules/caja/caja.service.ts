@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Caja, TipoMovimiento } from './entities/caja.entity';
+import { Caja, MetodoPago, TipoMovimiento } from './entities/caja.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format } from 'date-fns';
@@ -25,14 +25,9 @@ export class CajaService {
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
-    const {
-      comprobante,
-      tipo,
-      vendedorId,
-      alumnoComisionId,
-      ...restoCaja
-    } = createCajaDto;
-// console.log(createCajaDto)
+    const { comprobante, tipo, vendedorId, alumnoComisionId, ...restoCaja } =
+      createCajaDto;
+    // console.log(createCajaDto)
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
@@ -131,6 +126,7 @@ export class CajaService {
           },
         },
       },
+      order: { fecha: 'DESC' },
     });
     return movimientos.map((mov) => ({
       ...mov,
@@ -144,7 +140,7 @@ export class CajaService {
 
   async update(id: string, updateCajaDto: UpdateCajaDto) {
     const { alumnoComisionId, vendedorId, ...updateData } = updateCajaDto;
-    console.log('Fecha recibida:',updateCajaDto.fecha);
+    console.log('Fecha recibida:', updateCajaDto.fecha);
 
     const caja = await this.cajaRepository.findOne({
       where: { id },
@@ -229,5 +225,19 @@ export class CajaService {
       .filter((m) => m.tipo === TipoMovimiento.EGRESO)
       .reduce((sum, m) => sum + Number(m.monto), 0);
     return { ingresos, egresos, total: ingresos - egresos };
+  }
+  async findByTobias(): Promise<Caja[]> {
+    return this.cajaRepository.find({
+      where: { metodoPago: MetodoPago.DIGITAL_TOBIAS },
+      relations: ['vendedor', 'alumnoComision.alumno', 'comprobante'],
+      order: { fecha: 'DESC' },
+    });
+  }
+  async findByJavier(): Promise<Caja[]> {
+    return this.cajaRepository.find({
+      where: { metodoPago: MetodoPago.DIGITAL_JAVIER },
+      relations: ['vendedor', 'alumnoComision.alumno', 'comprobante'],
+      order: { fecha: 'DESC' },
+    });
   }
 }

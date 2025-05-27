@@ -25,6 +25,14 @@ export class CajaController {
   findAll() {
     return this.cajaService.findAll();
   }
+  @Get("digita-tobias")
+  findDigitalTobias(){
+    return this.cajaService.findByTobias();
+  }
+  @Get("digita-javier")
+  findDigitalJavier(){
+    return this.cajaService.findByJavier();
+  }
 
   @Get('/resumen-total')
    getResumenTotal() {

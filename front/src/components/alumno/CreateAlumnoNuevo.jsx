@@ -21,11 +21,17 @@ const CreateAlumnoNuevo = () => {
     sucursalId: "",
   });
   const [sucursales, setSucursales] = useState([]);
+
   useEffect(() => {
-    getSucursales().then((data) => {
-      setSucursales(data);
-    });
+    const sucurs = async () => {
+      await getSucursales().then((data) => {
+        console.log(data);
+        setSucursales(data);
+      });
+    };
+    sucurs()
   }, []);
+  
   const handleChange = (e) => {
     setFormAlu({ ...formAlu, [e.target.name]: e.target.value });
   };

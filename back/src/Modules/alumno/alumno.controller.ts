@@ -21,11 +21,11 @@ export class AlumnoController {
     return this.alumnoService.create(createAlumnoDto);
   }
   @Post('simple')
-  createSimpleAlumno(
-    @Body() alumnoSimple:{dni: string, name: string}
-
-  ) {
-    return this.alumnoService.createSimpleAlumno(alumnoSimple.dni, alumnoSimple.name);
+  createSimpleAlumno(@Body() alumnoSimple: { dni: string; name: string }) {
+    return this.alumnoService.createSimpleAlumno(
+      alumnoSimple.dni,
+      alumnoSimple.name,
+    );
   }
 
   @Get()
@@ -52,9 +52,9 @@ export class AlumnoController {
   // @Put(':id/estado/:nuevoEstado')
   // async cambiarEstado(
   //   @Param('id') id: string,
-  //   @Param('nuevoEstado') nuevoEstado: string,  
+  //   @Param('nuevoEstado') nuevoEstado: string,
   // ) {
-  //   const estadoBooleano = nuevoEstado === 'true';  
+  //   const estadoBooleano = nuevoEstado === 'true';
   //   return this.alumnoService.cambiarEstado(id, estadoBooleano);
   // }
 
@@ -62,5 +62,4 @@ export class AlumnoController {
   remove(@Param('id') id: string) {
     return this.alumnoService.remove(id);
   }
-
 }

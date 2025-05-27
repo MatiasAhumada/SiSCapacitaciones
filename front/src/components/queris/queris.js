@@ -42,7 +42,7 @@ export const postAluSimple = async (alumno) => {
     const response = await axios.post(`${URL}/alumno/simple`, alumno);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 
@@ -97,7 +97,7 @@ export const getSucursales = async () => {
     const response = await axios.get(`${URL}/suc`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    console.error("Error al obtener sucursal", error.response?.data);
   }
 };
 export const getSucursalId = async (id) => {

@@ -14,32 +14,31 @@ const CreateAlumnoViejo = () => {
     setFormAlu({ ...formAlu, [name]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setPause(true);
     try {
-      postAluSimple(formAlu).then((data) => {
-        if (data) {
-          Swal.fire({
-            icon: "success",
-            title: "Alumno Cargado",
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => {
-            setFormAlu({ dni: "", name: "" });
-            setPause(false);
-          });
-        }
-      });
-    } catch (error) {
-      console.log(error);
+      const data = await postAluSimple(formAlu);
+      // .then((data) => {
+      //   if (data) {
+      //   }
+      // });
       Swal.fire({
-        icon: "error",
-        title: "Error al cargar alumno",
+        icon: "success",
+        title: "Alumno Cargado",
         showConfirmButton: false,
         timer: 1500,
-      }).then(()=>{
+      }).then(() => {
+        setFormAlu({ dni: "", name: "" });
         setPause(false);
       });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: error?.response?.data?.message || "Error al cargar alumno",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setPause(false);
     }
   };
 

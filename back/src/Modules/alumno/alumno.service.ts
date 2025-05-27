@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,12 +20,26 @@ export class AlumnoService {
     private readonly sucursalRepository: Repository<Sucursal>,
   ) {}
   async create(createAlumnoDto: CreateAlumnoDto): Promise<Alumno | null> {
+    const { sucursalId, dni } = createAlumnoDto;
+
+    if (!sucursalId || !dni) {
+      throw new BadRequestException(
+        'Datos incompletos: sucursalId o dni faltante',
+      );
+    }
     const sucursal = await this.sucursalRepository.findOne({
       where: { id: createAlumnoDto.sucursalId },
     });
 
     if (!sucursal) {
-      throw new Error('Sucursal no encontrada');
+      throw new NotFoundException('Sucursal no encontrada');
+    }
+    
+    const existingAlumno = await this.alumnoRepository.findOne({
+      where: { dni: createAlumnoDto.dni },
+    });
+    if (existingAlumno) {
+      throw new ConflictException('Alumno ya existente');
     }
 
     const alumno = this.alumnoRepository.create({
@@ -42,30 +61,36 @@ export class AlumnoService {
     });
   }
   async createSimpleAlumno(dni: string, name: string): Promise<Alumno> {
+    const existingAlumno = await this.alumnoRepository.findOne({
+      where: { dni: dni },
+    });
+    if (existingAlumno) {
+      throw new ConflictException('Alumno ya existente');
+    }
     const alumno = this.alumnoRepository.create({
       dni,
       name,
     });
-  
+
     await this.alumnoRepository.save(alumno);
-  
+
     return alumno;
   }
 
   async findAll() {
     return this.alumnoRepository.find({
-      relations:["alumnoComisiones.pagos"],
-      select:{
-        alumnoComisiones:{
-          id:true,
-          state:true,
-          pagos:{
-            id:true,
-            fecha:true,
-            cuota:true,
-          }
-        }
-      }
+      relations: ['alumnoComisiones.pagos'],
+      select: {
+        alumnoComisiones: {
+          id: true,
+          state: true,
+          pagos: {
+            id: true,
+            fecha: true,
+            cuota: true,
+          },
+        },
+      },
     });
   }
 
@@ -96,19 +121,18 @@ export class AlumnoService {
         sucursal: {
           id: true,
           name: true,
-          numeroSucursal:true
+          numeroSucursal: true,
         },
         alumnoComisiones: {
           id: true,
           state: true,
-          pagos:{
+          pagos: {
             id: true,
             fecha: true,
             cuota: true,
             metodoPago: true,
-          }
+          },
         },
-       
       },
     });
   }
@@ -125,6 +149,4 @@ export class AlumnoService {
     await this.alumnoRepository.remove(alu);
     return `${alu.name} deleted`;
   }
-
-
 }

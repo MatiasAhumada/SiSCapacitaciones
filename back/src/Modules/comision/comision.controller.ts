@@ -31,6 +31,11 @@ export class ComisionController {
   findAluCom(@Param('idAluCom') id: string) {
     return this.comisionService.findOneAluCom(id);
   }
+  @Get("sucursal/:id")
+  getComisionesBySucursal(@Param('id') sucursalId: string) {
+    return this.comisionService.getComisionesBySucursal(sucursalId);
+  }
+  
 
   @Get('/suc/:id')
   findOneBySucursal(@Param('id') id: string) {

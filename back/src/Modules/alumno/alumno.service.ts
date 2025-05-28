@@ -34,7 +34,7 @@ export class AlumnoService {
     if (!sucursal) {
       throw new NotFoundException('Sucursal no encontrada');
     }
-    
+
     const existingAlumno = await this.alumnoRepository.findOne({
       where: { dni: createAlumnoDto.dni },
     });
@@ -93,7 +93,12 @@ export class AlumnoService {
       },
     });
   }
-
+  async getAlumnosBySucursal(id: string) {
+    return this.alumnoRepository.find({
+      where: { sucursal: { id } },
+      select: ['id', 'name', 'dni', 'tel'],
+    });
+  }
   async actualizarImgUrl(
     id: string,
     update: UpdateAlumnoDto,

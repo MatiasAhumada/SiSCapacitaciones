@@ -34,7 +34,12 @@ export class ProfesorService {
   async findAll() {
     return this.profesorRepository.find();
   }
-
+  async getProfesoresBySucursal(id: string) {
+    return this.profesorRepository.find({
+      where: { sucursal: { id } },
+      select: ['id', 'name', 'apellido'],
+    });
+  }
   async findOne(id: string) {
     return this.profesorRepository.findOne({
       where: { id },

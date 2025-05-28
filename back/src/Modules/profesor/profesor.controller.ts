@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProfesorService } from './profesor.service';
 import { CreateProfesorDto } from './dto/create-profesor.dto';
 import { UpdateProfesorDto } from './dto/update-profesor.dto';
@@ -16,6 +24,10 @@ export class ProfesorController {
   findAll() {
     return this.profesorService.findAll();
   }
+  @Get('sucursal/:id')
+  getProfesoresBySucursal(@Param('id') sucursalId: string) {
+    return this.profesorService.getProfesoresBySucursal(sucursalId);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -23,7 +35,10 @@ export class ProfesorController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfesorDto: UpdateProfesorDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProfesorDto: UpdateProfesorDto,
+  ) {
     return this.profesorService.update(id, updateProfesorDto);
   }
 

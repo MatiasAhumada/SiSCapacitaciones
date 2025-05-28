@@ -18,6 +18,11 @@ export class VendedorController {
   findAll() {
     return this.vendedorService.findAll();
   }
+  @Get("sucursal/:id")
+  getVendedoresBySucursal(@Param('id') sucursalId: string) {
+    return this.vendedorService.getVendedoresBySucursal(sucursalId);
+  }  
+ 
 
   @Get(':id')
   findOne(@Param('id') id: string) {

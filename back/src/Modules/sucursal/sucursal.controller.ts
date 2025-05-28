@@ -25,6 +25,7 @@ export class SucursalController {
   findOneSuc(@Param('id') id: string) {
     return this.sucursalService.getByIdSucursal(id);
   }
+  
 
   @Post()
   createSuc(@Body() createSucursalDto: CreateSucursalDto) {

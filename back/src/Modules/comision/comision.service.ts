@@ -87,7 +87,7 @@ export class ComisionService {
       },
     });
   }
-  
+
   async findOneAluCom(id: string) {
     return this.alumnoComisionRepository.findOne({
       where: { id },
@@ -118,7 +118,12 @@ export class ComisionService {
       },
     });
   }
-
+  async getComisionesBySucursal(id: string) {
+    return this.comisionRepository.find({
+      where: { sucursal: { id } },
+      select: ['id', 'name'],
+    });
+  }
   async findOne(id: string) {
     return this.comisionRepository.findOne({
       where: { id },
@@ -126,7 +131,7 @@ export class ComisionService {
         'sucursal',
         'alumnoComisiones.alumno',
         'alumnoComisiones.asistencias',
-        "alumnoComisiones.pagos",
+        'alumnoComisiones.pagos',
         'profesor',
         'curso',
       ],
@@ -149,10 +154,10 @@ export class ComisionService {
             presente: true,
             fecha: true,
           },
-          pagos:{
-            id:true,
-            fecha:true
-          }
+          pagos: {
+            id: true,
+            fecha: true,
+          },
         },
 
         profesor: {

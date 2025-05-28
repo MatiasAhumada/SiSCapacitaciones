@@ -88,16 +88,16 @@ export class SucursalService {
       where: { id },
       relations: [
         'alumnos',
-        'alumnos.alumnoComisiones',
-        'alumnos.certificados',
+        //'alumnos.alumnoComisiones',
+        //'alumnos.certificados',
         'profesores',
         'profesores.comisiones',
         'comisiones',
         'vendedores',
         'vendedores.inscripciones',
-        'admin',
-        'inscripciones',
-        'servicios',
+        // 'admin',
+        // 'inscripciones',
+        // 'servicios',
       ],
       select: {
         alumnos: {
@@ -124,21 +124,21 @@ export class SucursalService {
             id: true,
           },
         },
-        admin: {
-          id: true,
-          name: true,
-        },
-        inscripciones: {
-          id: true,
-          vendedor: {
-            id: true,
-            name: true,
-          },
-        },
-        servicios: {
-          id: true,
-          name: true,
-        },
+        // admin: {
+        //   id: true,
+        //   name: true,
+        // },
+        // inscripciones: {
+        //   id: true,
+        //   vendedor: {
+        //     id: true,
+        //     name: true,
+        //   },
+        // },
+        // servicios: {
+        //   id: true,
+        //   name: true,
+        // },
       },
     });
   }

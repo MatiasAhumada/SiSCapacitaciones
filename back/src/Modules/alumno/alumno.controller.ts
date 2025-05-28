@@ -32,6 +32,11 @@ export class AlumnoController {
   findAll() {
     return this.alumnoService.findAll();
   }
+  @Get("sucursal/:id")
+  getAlumnosBySucursal(@Param('id') sucursalId: string) {
+    return this.alumnoService.getAlumnosBySucursal(sucursalId);
+  }
+  
 
   @Get(':dni')
   findOne(@Param('dni') dni: string) {

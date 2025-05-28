@@ -24,7 +24,7 @@ export class VendedorService {
     const sucursalesEntities = await this.sucursalRepository.findOne({
       where: { id: In(sucursal) },
     });
-   
+
     if (!sucursalesEntities) {
       throw new Error('Sucursal no encontrada');
     }
@@ -48,27 +48,36 @@ export class VendedorService {
   async findAll() {
     return this.vendedorRepository.find();
   }
-
+  async getVendedoresBySucursal(id: string) {
+    return this.vendedorRepository.find({
+      where: { sucursales: { id } },
+      select: ['id', 'name', 'email', 'tel'],
+    });
+  }
   async findOne(id: string): Promise<VendedorResponseDto | undefined> {
     const vend = await this.vendedorRepository.findOne({
       where: { id },
-      relations: ['inscripciones.alumno','inscripciones.comision.curso', 'sucursales'],
+      relations: [
+        'inscripciones.alumno',
+        'inscripciones.comision.curso',
+        'sucursales',
+      ],
       select: {
         inscripciones: {
           id: true,
           alumno: {
             //id: true,
             name: true,
-            dni:true,
-            tel:true,
+            dni: true,
+            tel: true,
           },
-          comision:{
+          comision: {
             //id: true,
             name: true,
-            curso:{
+            curso: {
               name: true,
-            }
-          }
+            },
+          },
         },
         sucursales: {
           id: true,

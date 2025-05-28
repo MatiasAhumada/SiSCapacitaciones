@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { deleteProfesId, getSucursalId } from "../queris/queris";
+import { deleteProfesId, getProfesSucId, getSucursalId } from "../queris/queris";
 
 const DashProfe = () => {
   const [tableItems, setTableItems] = useState([]);
@@ -45,9 +45,9 @@ const DashProfe = () => {
 
   useEffect(() => {
     const peticion = async () => {
-      await getSucursalId(id).then((data) => {
-   
-        setTableItems(data.profesores);
+      await getProfesSucId(id).then((data) => {   
+        console.log(data)
+        setTableItems(data);
       });
     };
     peticion();
@@ -88,7 +88,7 @@ const DashProfe = () => {
                   <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.apellido}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.comisiones?.length}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.cantidadComisiones}</td>
                     {/* <td className="px-6 py-4 whitespace-nowrap">{item.salary}</td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button

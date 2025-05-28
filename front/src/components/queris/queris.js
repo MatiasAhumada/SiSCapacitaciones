@@ -248,6 +248,14 @@ export const getProfesId = async (id) => {
     console.log(error);
   }
 };
+export const getProfesSucId = async (id) => {
+  try {
+    const response = await axios.get(`${URL}/profesor/sucursal/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 export const postProfes = async (profesor) => {
   try {
     const response = await axios.post(`${URL}/profesor`, profesor);

@@ -10,6 +10,8 @@ const IndexAdm = () => {
   const { id } = useParams();
   useEffect(() => {
     setPause(true);
+    console.log("cargando index admin")
+    
     getSucursalId(id).then((data) => {
       console.log(data);
       setPause(false);

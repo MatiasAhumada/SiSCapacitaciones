@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { getSucursalId, getVendedores, getVendID } from "../queris/queris";
+import { getSucursalId, getVendedores, getVendID, getVendSucID } from "../queris/queris";
 
 const DashVendedor = () => {
   const navigate = useNavigate();
@@ -19,11 +19,10 @@ const DashVendedor = () => {
   };
   useEffect(() => {
     const peticion = async () => {
-      await getSucursalId(id).then((data) => {
-        setTableItems(data.vendedores);
+      await getVendSucID(id).then((data) => {
+        setTableItems(data);
       });
     };
-
     peticion();
   }, [id]);
 

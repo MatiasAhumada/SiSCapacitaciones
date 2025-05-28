@@ -73,6 +73,14 @@ export const getVendID = async (id) => {
     console.error("Error al obtener vendedor", error.response?.data);
   }
 };
+export const getVendSucID = async (id) => {
+  try {
+    const response = await axios.get(`${URL}/vendedor/sucursal/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener vendedor", error.response?.data);
+  }
+};
 export const postVend = async (vendedor) => {
   try {
     const response = await axios.post(`${URL}/vendedor`, vendedor);

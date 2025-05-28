@@ -93,12 +93,25 @@ export class AlumnoService {
       },
     });
   }
+  
   async getAlumnosBySucursal(id: string) {
-    return this.alumnoRepository.find({
+    const alumnos = await this.alumnoRepository.find({
       where: { sucursal: { id } },
+      relations: ['alumnoComisiones', 'certificados'],
       select: ['id', 'name', 'dni', 'tel'],
     });
+  
+    return alumnos.map(alumno => ({
+      id: alumno.id,
+      name: alumno.name,
+      dni: alumno.dni,
+      tel: alumno.tel,
+      idAluCom:alumno.alumnoComisiones?.map(ac => ac.id) || [],
+      cantidadComisiones: alumno.alumnoComisiones?.length || 0,
+      cantidadCertificados: alumno.certificados?.length || 0,
+    }));
   }
+  
   async actualizarImgUrl(
     id: string,
     update: UpdateAlumnoDto,

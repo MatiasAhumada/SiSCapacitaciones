@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { deleteAlumnoId, getSucursalId } from "../../queris/queris";
+import { deleteAlumnoId, getAluSucID, getSucursalId } from "../../queris/queris";
 
 const DashAlumnos = () => {
   const [tableItems, setTableItems] = useState([]);
@@ -16,7 +16,8 @@ const DashAlumnos = () => {
 
   const isSubRoute = location.pathname.includes("crear");
   const click = (item) => {
-    const idAlu = item.alumnoComisiones[0]?.id;
+    console.log(item.idAluCom[0])
+    const idAlu = item.idAluCom[0];
     if (!idAlu) {
       Swal.fire({
         title: "No hay comisiones asignadas",
@@ -26,9 +27,9 @@ const DashAlumnos = () => {
       });
       return;
     }
-    navigate(`/adm/${id}/alumno/${idAlu}`, {
-      state: { id: idAlu },
-    });
+     navigate(`/adm/${id}/alumno/${idAlu}`, {
+       state: { id: idAlu },
+     });
   };
   const clickDelete = async (id) => {
     const alumnoId = id;
@@ -58,8 +59,8 @@ const DashAlumnos = () => {
 
   useEffect(() => {
     const peticion = async () => {
-      await getSucursalId(id).then((data) => {
-        setTableItems(data.alumnos);
+      await getAluSucID(id).then((data) => {
+        setTableItems(data);
       });
     };
     peticion();
@@ -99,8 +100,8 @@ const DashAlumnos = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.dni}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.tel}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.alumnoComisiones?.length}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.certificados?.length}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.cantidadComisiones}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.cantidadCertificados}</td>
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       {/* BOTON VER MAS */}

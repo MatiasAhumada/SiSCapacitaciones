@@ -12,7 +12,6 @@ const CrearProfes = () => {
     apellido: "",
     dni: "",
     sucursalId: id,
-   
   });
 
   const handleChange = (e) => {
@@ -30,26 +29,30 @@ const CrearProfes = () => {
       sucursalId: id,
     };
 
-     setPause(true);
-     await postProfes(updatedFormData).then(() => {
-       try {
-         Swal.fire({
-           title: "Profesor Registrado",
-           icon: "success",
-           showConfirmButton: false,
-           timer: 1500,
-         }).then(() => {
-           setPause(false);
-         });
-       } catch (error) {
-         console.log(error);
-       }
-     });
+    setPause(true);
+    await postProfes(updatedFormData).then(() => {
+      try {
+        Swal.fire({
+          title: "Profesor Registrado",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          setPause(false);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    });
   };
   useEffect(() => {
-    getSucursalId(id).then((data) => {
-      setSuc(data.name);
-    });
+    const profes = async () => {
+      await getSucursalId(id).then((data) => {
+        console.log(data);
+        setSuc(data.name);
+      });
+    };
+    profes;
   }, [id]);
 
   return (
@@ -130,7 +133,7 @@ const CrearProfes = () => {
             />
           </div>
         </div>
-       
+
         {/* <div className="pb-6">
           <label htmlFor="curso" className="block mb-2 text-sm text-[#111827] principal">
             Curso

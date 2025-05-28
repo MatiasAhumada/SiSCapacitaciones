@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { deleteMovCaja, editMovCaja, getAlu, GetCajaByVendedor, getSucursalId, getVendedores, getVendID } from "../queris/queris";
+import { deleteMovCaja, editMovCaja, getAlu, GetCajaByVendedor, getVendedores, getVendID } from "../queris/queris";
 import Swal from "sweetalert2";
 
 const DashCaja = () => {

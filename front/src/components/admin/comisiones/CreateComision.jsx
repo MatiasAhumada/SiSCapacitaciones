@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "../../assets/simplificado_a_color.png";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getAlu, getCursos, getProfes, getSucursalId, postCert, postComision, postCurso, postProfes } from "../../queris/queris";
+import { getAlu, getCursos, getProfes, postComision } from "../../queris/queris";
 
 const CreateComision = () => {
   const areas = ["Digital", "Idiomas", "Salud", "Administrativa", "Belleza", "Técnica"];
@@ -41,22 +41,22 @@ const CreateComision = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
-     setPause(true);
-     await postComision(formData).then(() => {
-       try {
-         Swal.fire({
-           title: "Comision Creada",
-           icon: "success",
-           showConfirmButton: false,
-           timer: 1500,
-         }).then(() => {
-           setPause(false);
-           navigate(`/adm/${id}/comisiones`);
-         });
-       } catch (error) {
-         console.log(error);
-       }
-     });
+    setPause(true);
+    await postComision(formData).then(() => {
+      try {
+        Swal.fire({
+          title: "Comision Creada",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          setPause(false);
+          navigate(`/adm/${id}/comisiones`);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    });
   };
   useEffect(() => {
     const alus = async () => {

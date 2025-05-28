@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "../../assets/simplificado_a_color.png";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getCursos, getSucursalId, postCurso, postProfes } from "../../queris/queris";
+import { getCursos, postCurso, postProfes } from "../../queris/queris";
 
 const CreateCurso = () => {
   const areas = ["Digital", "Idiomas", "Salud", "Administrativa", "Belleza", "Técnica"];

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { getSucursalId, getVendedores, getVendID, getVendSucID } from "../queris/queris";
+import { getVendedores, getVendID, getVendSucID } from "../queris/queris";
 
 const DashVendedor = () => {
   const navigate = useNavigate();

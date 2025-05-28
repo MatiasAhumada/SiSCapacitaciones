@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getAlu, getAluID, getCursos, getSucursalId, getVendedores, getVendID, postCaja, postProfes } from "../queris/queris";
+import { getAlu, getAluID, getCursos, getVendedores, getVendID, postCaja, postProfes } from "../queris/queris";
 import html2pdf from "html2pdf.js";
 import { useRef } from "react";
 import jsPDF from "jspdf";

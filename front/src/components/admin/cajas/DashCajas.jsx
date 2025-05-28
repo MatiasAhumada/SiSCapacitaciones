@@ -4,19 +4,16 @@ import {
   deleteMovCaja,
   editMovCaja,
   getAlu,
-  GetCajaByVendedor,
   getCajas,
   getMovimientosPorDia,
   getResumenPorDia,
   getResumenTotal,
-  getSucursalId,
   getVendedores,
-  getVendID,
 } from "../../queris/queris";
 import Swal from "sweetalert2";
 
 const DashCajas = () => {
-  const {id}=useParams()
+  const { id } = useParams();
   const idVend = localStorage.getItem("token");
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -151,23 +148,23 @@ const DashCajas = () => {
   };
 
   const handleSave = async (item) => {
-     setPause((prev) => ({ ...prev, [item.id]: true }));
+    setPause((prev) => ({ ...prev, [item.id]: true }));
     console.log(formEdit);
-      await editMovCaja(item.id, formEdit).then((data) => {
-        try {
-          Swal.fire({
-            title: "Caja Editada",
-            icon: "success",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        } catch (error) {
-          Swal.fire({ title: "Error al actualizar", icon: "error" });
-        } finally {
-          setPause((prev) => ({ ...prev, [item.id]: false }));
-          setEditMode(null);
-        }
-      });
+    await editMovCaja(item.id, formEdit).then((data) => {
+      try {
+        Swal.fire({
+          title: "Caja Editada",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (error) {
+        Swal.fire({ title: "Error al actualizar", icon: "error" });
+      } finally {
+        setPause((prev) => ({ ...prev, [item.id]: false }));
+        setEditMode(null);
+      }
+    });
   };
   console.log(alu);
   return (

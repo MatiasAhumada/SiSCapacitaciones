@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { deleteProfesId, getProfesSucId, getSucursalId } from "../queris/queris";
+import { deleteProfesId, getProfesSucId } from "../queris/queris";
 
 const DashProfe = () => {
   const [tableItems, setTableItems] = useState([]);

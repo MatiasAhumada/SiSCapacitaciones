@@ -34,19 +34,8 @@ export class SucursalService {
         id: true,
         name: true,
       },
-      //relations: ['alumnos', 'profesores', 'comisiones', 'vendedores'],
     });
 
-    // const result = sucursales.map((sucursal) => ({
-    //   id: sucursal.id,
-    //   name: sucursal.name,
-    //   alumnos: sucursal.alumnos.length,
-    //   profesores: sucursal.profesores.length,
-    //   comisiones: sucursal.comisiones.length,
-    //   vendedores: sucursal.vendedores.length,
-    // }));
-
-    // return result;
     const result = await Promise.all(
       sucursales.map(async (sucursal) => {
         const [
@@ -83,65 +72,137 @@ export class SucursalService {
     return result;
   }
 
-  async getByIdSucursal(id: string): Promise<Sucursal | null> {
-    return this.sucRepository.findOne({
+  // async getByIdSucursal(id: string): Promise<Sucursal | null> {
+  //   return this.sucRepository.findOne({
+  //     where: { id },
+  //     relations: [
+  //       'alumnos',
+  //       'alumnos.alumnoComisiones',
+  //       'alumnos.certificados',
+  //       'profesores',
+  //       'profesores.comisiones',
+  //       'comisiones',
+  //       'vendedores',
+  //       'vendedores.inscripciones',
+  //       'admin',
+  //       'inscripciones',
+  //       'servicios',
+  //     ],
+  //     select: {
+  //       alumnos: {
+  //         id: true,
+  //         name: true,
+  //         dni: true,
+  //         tel: true,
+  //       },
+  //       profesores: {
+  //         id: true,
+  //         name: true,
+  //         apellido: true,
+  //       },
+  //       comisiones: {
+  //         id: true,
+  //         name: true,
+  //       },
+  //       vendedores: {
+  //         id: true,
+  //         name: true,
+  //         email: true,
+  //         tel: true,
+  //         inscripciones: {
+  //           id: true,
+  //         },
+  //       },
+  //       admin: {
+  //         id: true,
+  //         name: true,
+  //       },
+  //       inscripciones: {
+  //         id: true,
+  //         vendedor: {
+  //           id: true,
+  //           name: true,
+  //         },
+  //       },
+  //       servicios: {
+  //         id: true,
+  //         name: true,
+  //       },
+  //     },
+  //   });
+  // }
+  async getByIdSucursal(id: string) {
+   
+    const sucursal = await this.sucRepository.findOne({
       where: { id },
-      relations: [
-        'alumnos',
-        //'alumnos.alumnoComisiones',
-        //'alumnos.certificados',
-        'profesores',
-        'profesores.comisiones',
-        'comisiones',
-        'vendedores',
-        'vendedores.inscripciones',
-        // 'admin',
-        // 'inscripciones',
-        // 'servicios',
-      ],
       select: {
-        alumnos: {
-          id: true,
-          name: true,
-          dni: true,
-          tel: true,
-        },
-        profesores: {
-          id: true,
-          name: true,
-          apellido: true,
-        },
-        comisiones: {
-          id: true,
-          name: true,
-        },
-        vendedores: {
-          id: true,
-          name: true,
-          email: true,
-          tel: true,
-          inscripciones: {
-            id: true,
-          },
-        },
-        // admin: {
-        //   id: true,
-        //   name: true,
-        // },
-        // inscripciones: {
-        //   id: true,
-        //   vendedor: {
-        //     id: true,
-        //     name: true,
-        //   },
-        // },
-        // servicios: {
-        //   id: true,
-        //   name: true,
-        // },
+        id: true,
+        name: true,
       },
     });
+  
+    if (!sucursal) return null;
+  
+ 
+    const [
+      alumnosCount,
+      certificadosCount,
+      alumnoComisionesCount,
+      profesoresCount,
+      profesorComisionesCount,
+      comisionesCount,
+      vendedoresCount,
+      //serviciosCount,
+      //inscripcionesCount,
+    ] = await Promise.all([
+      this.alumnoRepository.count({ where: { sucursal: { id } } }),
+      this.alumnoRepository
+        .createQueryBuilder('alumno')
+        .leftJoin('alumno.certificados', 'cert')
+        .where('alumno.sucursalId = :id', { id })
+        .select('COUNT(cert.numero)', 'count')
+        .getRawOne()
+        .then((res) => Number(res.count) || 0),
+      this.alumnoRepository
+        .createQueryBuilder('alumno')
+        .leftJoin('alumno.alumnoComisiones', 'ac')
+        .where('alumno.sucursalId = :id', { id })
+        .select('COUNT(ac.id)', 'count')
+        .getRawOne()
+        .then((res) => Number(res.count) || 0),
+      this.profesorRepository.count({ where: { sucursal: { id } } }),
+      this.profesorRepository
+        .createQueryBuilder('profesor')
+        .leftJoin('profesor.comisiones', 'c')
+        .where('profesor.sucursalId = :id', { id })
+        .select('COUNT(c.id)', 'count')
+        .getRawOne()
+        .then((res) => Number(res.count) || 0),
+      this.comisionRepository.count({ where: { sucursal: { id } } }),
+      this.vendedorRepository
+        .createQueryBuilder('v')
+        .leftJoin('v.sucursales', 's')
+        .where('s.id = :id', { id })
+        .getCount(),
+      
+      //this.inscripcionRepository.count({ where: { sucursal: { id } } }),
+    ]);
+  
+    return {
+      id: sucursal.id,
+      name: sucursal.name,
+      alumnos: alumnosCount,
+      certificados: certificadosCount,
+      alumnoComisiones: alumnoComisionesCount,
+      profesores: profesoresCount,
+      profesorComisiones: profesorComisionesCount,
+      comisiones: comisionesCount,
+      vendedores: vendedoresCount,
+      //servicios: serviciosCount,
+      //inscripciones: inscripcionesCount,
+    };
   }
+  
 
   async createSuc(createSucursalDto: CreateSucursalDto) {
     const {

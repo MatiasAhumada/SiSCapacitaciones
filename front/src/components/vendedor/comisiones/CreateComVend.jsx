@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "../../assets/simplificado_a_color.png";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getAlu, getCursos, getProfes, getSucursalId, getVendID, postCert, postComision, postCurso, postProfes } from "../../queris/queris";
+import { getAlu, getCursos, getProfes, getVendID, postCert, postComision, postCurso, postProfes } from "../../queris/queris";
 
 const CreateComVend = () => {
   const areas = ["Digital", "Idiomas", "Salud", "Administrativa", "Belleza", "Técnica"];

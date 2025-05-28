@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { deleteAlumnoId, getAluSucID, getSucursalId } from "../../queris/queris";
+import { deleteAlumnoId } from "../../queris/queris";
 
 const DashAlumnos = () => {
   const [tableItems, setTableItems] = useState([]);
@@ -16,7 +16,7 @@ const DashAlumnos = () => {
 
   const isSubRoute = location.pathname.includes("crear");
   const click = (item) => {
-    console.log(item.idAluCom[0])
+    console.log(item.idAluCom[0]);
     const idAlu = item.idAluCom[0];
     if (!idAlu) {
       Swal.fire({
@@ -27,9 +27,9 @@ const DashAlumnos = () => {
       });
       return;
     }
-     navigate(`/adm/${id}/alumno/${idAlu}`, {
-       state: { id: idAlu },
-     });
+    navigate(`/adm/${id}/alumno/${idAlu}`, {
+      state: { id: idAlu },
+    });
   };
   const clickDelete = async (id) => {
     const alumnoId = id;

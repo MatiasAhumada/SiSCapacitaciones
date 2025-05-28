@@ -6,6 +6,10 @@ import { Repository } from 'typeorm';
 import { Sucursal } from './entities/sucursal.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Admins } from '../admin/entities/admin.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
+import { Profesor } from '../profesor/entities/profesor.entity';
+import { Comision } from '../comision/entities/comision.entity';
+import { Vendedor } from '../vendedor/entities/vendedor.entity';
 
 @Injectable()
 export class SucursalService {
@@ -14,6 +18,14 @@ export class SucursalService {
     private readonly sucRepository: Repository<Sucursal>,
     @InjectRepository(Admins)
     private readonly adminRepository: Repository<Admins>,
+    @InjectRepository(Alumno)
+    private readonly alumnoRepository: Repository<Alumno>,
+    @InjectRepository(Profesor)
+    private readonly profesorRepository: Repository<Profesor>,
+    @InjectRepository(Comision)
+    private readonly comisionRepository: Repository<Comision>,
+    @InjectRepository(Vendedor)
+    private readonly vendedorRepository: Repository<Vendedor>,
   ) {}
 
   async getSucursales() {
@@ -22,17 +34,51 @@ export class SucursalService {
         id: true,
         name: true,
       },
-      relations: ['alumnos', 'profesores', 'comisiones', 'vendedores'],
+      //relations: ['alumnos', 'profesores', 'comisiones', 'vendedores'],
     });
 
-    const result = sucursales.map((sucursal) => ({
-      id: sucursal.id,
-      name: sucursal.name,
-      alumnos: sucursal.alumnos.length,
-      profesores: sucursal.profesores.length,
-      comisiones: sucursal.comisiones.length,
-      vendedores: sucursal.vendedores.length,
-    }));
+    // const result = sucursales.map((sucursal) => ({
+    //   id: sucursal.id,
+    //   name: sucursal.name,
+    //   alumnos: sucursal.alumnos.length,
+    //   profesores: sucursal.profesores.length,
+    //   comisiones: sucursal.comisiones.length,
+    //   vendedores: sucursal.vendedores.length,
+    // }));
+
+    // return result;
+    const result = await Promise.all(
+      sucursales.map(async (sucursal) => {
+        const [
+          alumnosCount,
+          profesoresCount,
+          comisionesCount,
+          vendedoresCount,
+        ] = await Promise.all([
+          this.alumnoRepository.count({
+            where: { sucursal: { id: sucursal.id } },
+          }),
+          this.profesorRepository.count({
+            where: { sucursal: { id: sucursal.id } },
+          }),
+          this.comisionRepository.count({
+            where: { sucursal: { id: sucursal.id } },
+          }),
+          this.vendedorRepository.count({
+            where: { sucursales: { id: sucursal.id } },
+          }),
+        ]);
+
+        return {
+          id: sucursal.id,
+          name: sucursal.name,
+          alumnos: alumnosCount,
+          profesores: profesoresCount,
+          comisiones: comisionesCount,
+          vendedores: vendedoresCount,
+        };
+      }),
+    );
 
     return result;
   }
@@ -59,7 +105,6 @@ export class SucursalService {
           name: true,
           dni: true,
           tel: true,
-          
         },
         profesores: {
           id: true,

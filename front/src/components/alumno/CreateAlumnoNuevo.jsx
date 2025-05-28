@@ -23,15 +23,13 @@ const CreateAlumnoNuevo = () => {
   const [sucursales, setSucursales] = useState([]);
 
   useEffect(() => {
-    const sucurs = async () => {
-      await getSucursales().then((data) => {
-        console.log(data);
-        setSucursales(data);
-      });
-    };
-    sucurs()
+    console.log("Cargando Sucursales...");
+    getSucursales().then((data) => {
+      console.log("Sucursales cargadas:", data);
+      setSucursales(data);
+    });
   }, []);
-  
+
   const handleChange = (e) => {
     setFormAlu({ ...formAlu, [e.target.name]: e.target.value });
   };

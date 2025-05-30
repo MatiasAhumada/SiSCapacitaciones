@@ -1,3 +1,4 @@
+import { Caja } from "@modules/Modules/caja/entities/caja.entity";
 import { Comision } from "src/Modules/comision/entities/comision.entity";
 import { Curso } from "src/Modules/curso/entities/curso.entity";
 import { Sucursal } from "src/Modules/sucursal/entities/sucursal.entity";
@@ -23,4 +24,7 @@ export class Profesor {
     
     @ManyToOne(()=>Sucursal,sucursal=>sucursal.profesores)
     sucursal:Sucursal
+
+    @OneToMany(()=>Caja,(caja)=>caja.profesor)
+    pagos:Caja[]
 }

@@ -1,4 +1,5 @@
 import { Comprobante } from '@modules/Modules/comprobante/entities/comprobante.entity';
+import { Profesor } from '@modules/Modules/profesor/entities/profesor.entity';
 import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
@@ -12,6 +13,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { Subcategoria } from './subcategoria.entity';
 export enum TipoMovimiento {
   INGRESO = 'Ingreso',
   EGRESO = 'Egreso',
@@ -65,4 +67,12 @@ export class Caja {
   @OneToOne(() => Comprobante, { cascade: true })
   @JoinColumn()
   comprobante?: Comprobante;
+
+  @ManyToOne(() => Profesor, (profesor) => profesor.pagos, { nullable: true })
+  @JoinColumn()
+  profesor?: Profesor;
+
+  @ManyToOne(() => Subcategoria, (sub) => sub.cajas, { nullable: true })
+  @JoinColumn()
+  subcategoria: Subcategoria;
 }

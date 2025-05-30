@@ -42,7 +42,7 @@ import { ComprobanteModule } from './comprobante/comprobante.module';
     ComisionModule,
     InscripcionModule,
     AuthModule,
-    SeederModule,
+    //SeederModule,
     CajaModule,
     CertificadoModule,
     ComprobanteModule,

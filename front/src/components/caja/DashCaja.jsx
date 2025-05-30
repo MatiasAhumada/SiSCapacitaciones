@@ -145,18 +145,19 @@ const DashCaja = () => {
                 Cobrar
               </button>
               <button
-                onClick={() => navigate(`/${idVend}/cobrar`)}
+                onClick={() => navigate(`/${idVend}/egreso`)}
                 className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
               >
                 Egreso
               </button>
               <button
-                onClick={() => navigate(`/${idVend}/cobrar`)}
+                onClick={() => navigate(`/${idVend}/transferencia`)}
                 className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
               >
                 Transferir
               </button>
               <button
+              disabled
                 onClick={() => navigate(`/${idVend}/cobrar`)}
                 className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
               >

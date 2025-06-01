@@ -372,4 +372,24 @@ export class CajaService {
 
     return await this.cajaRepository.save(caja);
   }
+  async createEgresoSimple(dto: EgresoCajaDTO) {
+    const subcategoria = await this.subcategoriaRepository.findOne({
+      where: { id: dto.subcategoriaId },
+    });
+  
+    if (!subcategoria)
+      throw new HttpException('Subcategoría no encontrada', HttpStatus.BAD_REQUEST);
+  
+    const caja = this.cajaRepository.create({
+      tipo: TipoMovimiento.EGRESO,
+      metodoPago: dto.metodoPago,
+      monto: dto.monto,
+      descripcion: dto.descripcion || `Egreso por ${subcategoria.nombre}`,
+      subcategoria,
+      fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
+    });
+  
+    return await this.cajaRepository.save(caja);
+  }
+  
 }

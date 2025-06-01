@@ -60,11 +60,19 @@ export class CajaController {
     return this.cajaService.getResumenPorDia(fecha);
   }
 
+  @Post('egreso')
+  createEgreso(@Body() data: EgresoCajaDTO) {
+    return this.cajaService.createEgresoSimple(data);
+  }
   @Post('egreso/profesor')
   createEgresoProfesor(@Body() data: EgresoCajaDTO) {
     return this.cajaService.createEgresoProfesor(data);
   }
-  
+  @Post('egreso/vendedor')
+  createEgresoVendedor(@Body() data: EgresoCajaDTO) {
+    return this.cajaService.createEgresoVendedor(data);
+  }
+
   @Post('/crear-categoria')
   createCategoria(@Body('nombre') nombre: string) {
     return this.cajaService.createCategoria(nombre);

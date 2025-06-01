@@ -141,24 +141,25 @@ const CreateCaja = () => {
       vendedorId: idVende,
       comprobante: cargaComprobante,
     };
-
-    await postCaja(nuevoFormData).then((data) => {
-      try {
-        Swal.fire({
-          title: "Movimiento Registrado",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setImprimir(data.comprobante);
-          setPause(false);
-          setGeneratePDF(true);
-        });
-      } catch (error) {
-        console.log(error);
-        setPause(false);
-      }
-    });
+// console.log(nuevoFormData)
+// console.log(alumnoSeleccionado)
+     await postCaja(nuevoFormData).then((data) => {
+       try {
+         Swal.fire({
+           title: "Movimiento Registrado",
+           icon: "success",
+           showConfirmButton: false,
+           timer: 1500,
+         }).then(() => {
+           setImprimir(data.comprobante);
+           setPause(false);
+           setGeneratePDF(true);
+         });
+       } catch (error) {
+         console.log(error);
+         setPause(false);
+       }
+     });
   };
 
   const handleOpen = () => {

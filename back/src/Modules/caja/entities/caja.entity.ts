@@ -64,7 +64,9 @@ export class Caja {
   })
   alumnoComision?: AlumnoComision;
 
-  @OneToOne(() => Comprobante, { cascade: true })
+  @OneToOne(() => Comprobante, (comprobante) => comprobante.caja, {
+    cascade: true,
+  })
   @JoinColumn()
   comprobante?: Comprobante;
 

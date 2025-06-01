@@ -15,10 +15,10 @@ export class AlumnoComision {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Alumno, (alumno) => alumno.id)
+  @ManyToOne(() => Alumno, (alumno) => alumno.alumnoComisiones)
   alumno: Alumno;
 
-  @ManyToOne(() => Comision, (comision) => comision.id,{
+  @ManyToOne(() => Comision, (comision) => comision.alumnoComisiones,{
     onDelete:"CASCADE"
   })
   comision: Comision;
@@ -30,5 +30,5 @@ export class AlumnoComision {
   asistencias: Asistencia[];
   
   @OneToMany(() => Caja, (caja) => caja.alumnoComision)
-  pagos?: Caja[];
+  pagos: Caja[];
 }

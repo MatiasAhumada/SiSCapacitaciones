@@ -81,6 +81,7 @@ const DashAlumno = () => {
     if (isDesdeAdmin) {
       const alucom = async () => {
         await getAluCom(idAlu).then((data) => {
+          console.log(data)
           setDataAlumno(data.alumno);
           setDataComision(data.comision);
           setTableItems(data.pagos);
@@ -154,7 +155,7 @@ const DashAlumno = () => {
     setIsModalOpen(true);
     setInfoComprobante(item);
   };
-console.log(dataAlumno)
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {/* {!isSubRoute && ( */}

@@ -40,11 +40,13 @@ export class CajaService {
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
+
     if (tipo === TipoMovimiento.INGRESO) {
       const alumnoComision = await this.alumnoComisionRepository.findOne({
         where: { alumno: { id: alumnoComisionId } },
         relations: ['alumno'],
       });
+      console.log(alumnoComision);
       if (!alumnoComision) {
         throw new NotFoundException('Alumno no encontrado');
       }
@@ -94,7 +96,12 @@ export class CajaService {
       newCaja.alumnoComision = alumnoComision;
 
       await this.cajaRepository.save(newCaja);
-
+      const alumnoConPagosActualizados =
+        await this.alumnoComisionRepository.findOne({
+          where: { id: alumnoComision.id },
+          relations: ['pagos'],
+        });
+      console.log(alumnoConPagosActualizados);
       return newCaja;
     }
   }
@@ -270,21 +277,22 @@ export class CajaService {
     return this.subcategoriaRepository.save(subcategoria);
   }
   //CATEGORIA Y SUBCATEGORIA JUNTAS
-  async createCategoriaConSubcategorias(nombre: string, subcategorias: string[]) {
+  async createCategoriaConSubcategorias(
+    nombre: string,
+    subcategorias: string[],
+  ) {
     const categoria = this.categoriaRepository.create({ nombre });
     const savedCategoria = await this.categoriaRepository.save(categoria);
-  
+
     const subcategoriasEntities = subcategorias.map((nombre) =>
-      this.subcategoriaRepository.create({ nombre, categoria: savedCategoria })
+      this.subcategoriaRepository.create({ nombre, categoria: savedCategoria }),
     );
-  
+
     await this.subcategoriaRepository.save(subcategoriasEntities);
     return savedCategoria;
   }
   async obtenerCategoriasConSubcategorias() {
-    console.log(
-      "en devolucion de categorias"
-    )
+    console.log('en devolucion de categorias');
     return this.categoriaRepository.find({
       relations: ['subcategorias'],
       order: {
@@ -295,5 +303,4 @@ export class CajaService {
       },
     });
   }
-  
 }

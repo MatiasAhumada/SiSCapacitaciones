@@ -15,5 +15,6 @@ import { Subcategoria } from './entities/subcategoria.entity';
   imports:[TypeOrmModule.forFeature([Caja,Vendedor,Alumno,AlumnoComision,Comprobante,Categoria,Subcategoria])],
   controllers: [CajaController],
   providers: [CajaService],
+  exports:[CajaService]
 })
 export class CajaModule {}

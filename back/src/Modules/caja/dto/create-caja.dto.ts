@@ -14,7 +14,7 @@ import { CreateComprobanteDto } from '@modules/Modules/comprobante/dto/create-co
 
 export class CreateCajaDto {
   @IsEnum(TipoMovimiento)
-  tipo: TipoMovimiento;
+  tipo: TipoMovimiento= TipoMovimiento.INGRESO;
 
   @IsEnum(MetodoPago)
   metodoPago: MetodoPago;
@@ -45,6 +45,6 @@ export class CreateCajaDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(()=>Comprobante)
+  @Type(()=>CreateComprobanteDto)
   comprobante?: CreateComprobanteDto
 }

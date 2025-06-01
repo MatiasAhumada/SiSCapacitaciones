@@ -11,6 +11,8 @@ import { Alumno } from '../alumno/entities/alumno.entity';
 import { Comision } from '../comision/entities/comision.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { Comprobante } from '../comprobante/entities/comprobante.entity';
+import { Categoria } from './entities/categoria.entity';
+import { Subcategoria } from './entities/subcategoria.entity';
 @Injectable()
 export class CajaService {
   constructor(
@@ -22,6 +24,10 @@ export class CajaService {
     private comprobanteRepository: Repository<Comprobante>,
     @InjectRepository(AlumnoComision)
     private readonly alumnoComisionRepository: Repository<AlumnoComision>,
+    @InjectRepository(Categoria)
+    private readonly categoriaRepository: Repository<Categoria>,
+    @InjectRepository(Subcategoria)
+    private readonly subcategoriaRepository: Repository<Subcategoria>,
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
@@ -112,28 +118,6 @@ export class CajaService {
     });
   }
 
-  async findByVendedor(vendedorId: string) {
-    const movimientos = await this.cajaRepository.find({
-      where: { vendedor: { id: vendedorId } },
-      relations: ['alumnoComision.alumno'],
-      select: {
-        alumnoComision: {
-          id: true,
-
-          alumno: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-      order: { fecha: 'DESC' },
-    });
-    return movimientos.map((mov) => ({
-      ...mov,
-      fecha: format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm', { locale: es }),
-    }));
-  }
-
   async findOne(id: string) {
     return `This action returns a #${id} caja`;
   }
@@ -178,6 +162,28 @@ export class CajaService {
 
   async remove(id: string) {
     return this.cajaRepository.delete(id);
+  }
+
+  async findByVendedor(vendedorId: string) {
+    const movimientos = await this.cajaRepository.find({
+      where: { vendedor: { id: vendedorId } },
+      relations: ['alumnoComision.alumno'],
+      select: {
+        alumnoComision: {
+          id: true,
+
+          alumno: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      order: { fecha: 'DESC' },
+    });
+    return movimientos.map((mov) => ({
+      ...mov,
+      fecha: format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm', { locale: es }),
+    }));
   }
 
   async getMovimientosPorDia(fecha: string) {
@@ -226,6 +232,8 @@ export class CajaService {
       .reduce((sum, m) => sum + Number(m.monto), 0);
     return { ingresos, egresos, total: ingresos - egresos };
   }
+
+  //BUSCAR CAJAS POR ADMINS
   async findByTobias(): Promise<Caja[]> {
     return this.cajaRepository.find({
       where: { metodoPago: MetodoPago.DIGITAL_TOBIAS },
@@ -240,4 +248,52 @@ export class CajaService {
       order: { fecha: 'DESC' },
     });
   }
+  //CATEGORIAS SEPARADAS
+  async createCategoria(nombre: string): Promise<Categoria> {
+    const categoria = this.categoriaRepository.create({ nombre });
+    return this.categoriaRepository.save(categoria);
+  }
+
+  async createSubcategoria(
+    nombre: string,
+    categoriaId: string,
+  ): Promise<Subcategoria> {
+    const categoria = await this.categoriaRepository.findOneBy({
+      id: categoriaId,
+    });
+    if (!categoria) throw new Error('Categoría no encontrada');
+
+    const subcategoria = this.subcategoriaRepository.create({
+      nombre,
+      categoria,
+    });
+    return this.subcategoriaRepository.save(subcategoria);
+  }
+  //CATEGORIA Y SUBCATEGORIA JUNTAS
+  async createCategoriaConSubcategorias(nombre: string, subcategorias: string[]) {
+    const categoria = this.categoriaRepository.create({ nombre });
+    const savedCategoria = await this.categoriaRepository.save(categoria);
+  
+    const subcategoriasEntities = subcategorias.map((nombre) =>
+      this.subcategoriaRepository.create({ nombre, categoria: savedCategoria })
+    );
+  
+    await this.subcategoriaRepository.save(subcategoriasEntities);
+    return savedCategoria;
+  }
+  async obtenerCategoriasConSubcategorias() {
+    console.log(
+      "en devolucion de categorias"
+    )
+    return this.categoriaRepository.find({
+      relations: ['subcategorias'],
+      order: {
+        nombre: 'ASC',
+        subcategorias: {
+          nombre: 'ASC',
+        },
+      },
+    });
+  }
+  
 }

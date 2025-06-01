@@ -15,7 +15,7 @@ import { UpdateCajaDto } from './dto/update-caja.dto';
 @Controller('caja')
 export class CajaController {
   constructor(private readonly cajaService: CajaService) {}
-
+ 
   @Post()
   create(@Body() createCajaDto: CreateCajaDto) {
     return this.cajaService.create(createCajaDto);
@@ -25,25 +25,64 @@ export class CajaController {
   findAll() {
     return this.cajaService.findAll();
   }
-  @Get("digita-tobias")
-  findDigitalTobias(){
+  @Get('/digita-tobias')
+  findDigitalTobias() {
     return this.cajaService.findByTobias();
   }
-  @Get("digita-javier")
-  findDigitalJavier(){
+  @Get('/digita-javier')
+  findDigitalJavier() {
     return this.cajaService.findByJavier();
   }
 
   @Get('/resumen-total')
-   getResumenTotal() {
+  getResumenTotal() {
     return this.cajaService.getResumenTotal();
   }
 
   @Get('/vendedor/:id')
   findByVendedor(@Param('id') id: string) {
     return this.cajaService.findByVendedor(id);
+  } 
+
+  @Get('/movimientos/:fecha')
+  getMovimientosPorDia(@Param('fecha') fecha: string) {
+    return this.cajaService.getMovimientosPorDia(fecha);
   }
 
+  @Get('/con-subcategorias')
+  getCategoriasConSubcategorias() {
+    return this.cajaService.obtenerCategoriasConSubcategorias();
+  }
+
+  @Get('/resumen/:fecha')
+  getResumenPorDia(@Param('fecha') fecha: string) {
+    return this.cajaService.getResumenPorDia(fecha);
+  }
+
+  
+
+  @Post('/crear-categoria')
+  createCategoria(@Body('nombre') nombre: string) {
+    return this.cajaService.createCategoria(nombre);
+  }
+
+  @Post('/crear-subcategoria/:categoriaId')
+  createSubcategoria(
+    @Param('categoriaId') categoriaId: string,
+    @Body('nombre') nombre: string,
+  ) {
+    return this.cajaService.createSubcategoria(nombre, categoriaId);
+  }
+
+  @Post('/crear-con-subcategorias')
+  createCategoriaConSubcategorias(
+    @Body() body: { nombre: string; subcategorias: string[] },
+  ) {
+    return this.cajaService.createCategoriaConSubcategorias(
+      body.nombre,
+      body.subcategorias,
+    );
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cajaService.findOne(id);
@@ -58,16 +97,5 @@ export class CajaController {
   remove(@Param('id') id: string) {
     return this.cajaService.remove(id);
   }
-
-  @Get("/movimientos/:fecha")
-  getMovimientosPorDia(@Param('fecha') fecha: string) {
-    return this.cajaService.getMovimientosPorDia(fecha);
-  }
-
-  @Get('/resumen/:fecha')
-   getResumenPorDia(@Param('fecha') fecha: string) {
-    return this.cajaService.getResumenPorDia(fecha);
-  }
-
  
 }

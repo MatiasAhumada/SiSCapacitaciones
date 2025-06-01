@@ -4,9 +4,13 @@ import { Admins } from '../Modules/admin/entities/admin.entity';
 import { Sucursal } from '../Modules/sucursal/entities/sucursal.entity';
 import { SeederService } from './seeders.service';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
+import { Caja } from '@modules/Modules/caja/entities/caja.entity';
+import { CajaModule } from '@modules/Modules/caja/caja.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Admins, Sucursal,Curso])],
+  imports: [
+    TypeOrmModule.forFeature([Admins, Sucursal,Curso]),
+CajaModule],
   providers: [SeederService],
   exports: [SeederService],
 })

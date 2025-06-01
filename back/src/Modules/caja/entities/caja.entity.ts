@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Subcategoria } from './subcategoria.entity';
+import { Categoria } from './categoria.entity';
 export enum TipoMovimiento {
   INGRESO = 'Ingreso',
   EGRESO = 'Egreso',
@@ -74,7 +75,11 @@ export class Caja {
   @JoinColumn()
   profesor?: Profesor;
 
+  // @ManyToOne(() => Categoria, (cat) => cat.cajas, { nullable: true })
+  // @JoinColumn()
+  // categoria?: Categoria;
+
   @ManyToOne(() => Subcategoria, (sub) => sub.cajas, { nullable: true })
   @JoinColumn()
-  subcategoria: Subcategoria;
+  subcategoria?: Subcategoria;
 }

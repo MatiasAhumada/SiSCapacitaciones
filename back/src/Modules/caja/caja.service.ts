@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +18,8 @@ import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { Comprobante } from '../comprobante/entities/comprobante.entity';
 import { Categoria } from './entities/categoria.entity';
 import { Subcategoria } from './entities/subcategoria.entity';
+import { EgresoCajaDTO } from './dto/egreso-caja.dto';
+import { Profesor } from '../profesor/entities/profesor.entity';
 @Injectable()
 export class CajaService {
   constructor(
@@ -28,6 +35,8 @@ export class CajaService {
     private readonly categoriaRepository: Repository<Categoria>,
     @InjectRepository(Subcategoria)
     private readonly subcategoriaRepository: Repository<Subcategoria>,
+    @InjectRepository(Profesor)
+    private readonly profesorRepository: Repository<Profesor>,
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
@@ -96,12 +105,7 @@ export class CajaService {
       newCaja.alumnoComision = alumnoComision;
 
       await this.cajaRepository.save(newCaja);
-      const alumnoConPagosActualizados =
-        await this.alumnoComisionRepository.findOne({
-          where: { id: alumnoComision.id },
-          relations: ['pagos'],
-        });
-      console.log(alumnoConPagosActualizados);
+
       return newCaja;
     }
   }
@@ -302,5 +306,70 @@ export class CajaService {
         },
       },
     });
+  }
+
+  //PAGO A PROFESORES
+
+  async createEgresoProfesor(dto: EgresoCajaDTO) {
+    const profesor = await this.profesorRepository.findOne({
+      where: { id: dto.profesorId },
+    });
+    if (!profesor)
+      throw new HttpException('Profesor no encontrado', HttpStatus.NOT_FOUND);
+
+    const subcategoria = await this.subcategoriaRepository.findOne({
+      where: { id: dto.subcategoriaId },
+    });
+
+    if (!subcategoria)
+      throw new HttpException(
+        'Categoría no encontrada',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const caja = this.cajaRepository.create({
+      tipo: TipoMovimiento.EGRESO,
+      metodoPago: dto.metodoPago,
+      monto: dto.monto,
+      descripcion:
+        dto.descripcion ||
+        `Pago mensual al profesor ${profesor.name} ${profesor.apellido}`,
+      profesor,
+      subcategoria,
+      fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
+    });
+
+    return await this.cajaRepository.save(caja);
+  }
+
+  async createEgresoVendedor(dto: EgresoCajaDTO) {
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: dto.vendedorId },
+    });
+    if (!vendedor)
+      throw new HttpException('Vendedor no encontrado', HttpStatus.NOT_FOUND);
+
+    const subcategoria = await this.subcategoriaRepository.findOne({
+      where: { id: dto.subcategoriaId },
+    });
+
+    if (!subcategoria)
+      throw new HttpException(
+        'Categoría no encontrada',
+        HttpStatus.BAD_REQUEST,
+      );
+    const caja = this.cajaRepository.create({
+      tipo: TipoMovimiento.EGRESO,
+      metodoPago: dto.metodoPago,
+      monto: dto.monto,
+      descripcion:
+        dto.descripcion ||
+        `Pago de ${subcategoria.nombre} al vendedor ${vendedor.name}`,
+      vendedor,
+      subcategoria,
+      fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
+    });
+
+    return await this.cajaRepository.save(caja);
   }
 }

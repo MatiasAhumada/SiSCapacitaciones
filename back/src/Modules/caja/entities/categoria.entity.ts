@@ -1,8 +1,9 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Subcategoria } from "./subcategoria.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Subcategoria } from './subcategoria.entity';
+import { Caja } from './caja.entity';
 
 @Entity({
-    name:"categorias"
+  name: 'categorias',
 })
 export class Categoria {
   @PrimaryGeneratedColumn('uuid')
@@ -11,6 +12,9 @@ export class Categoria {
   @Column()
   nombre: string;
 
-  @OneToMany(() => Subcategoria, sub => sub.categoria)
+  // @OneToMany(() => Caja, (c) => c.categoria)
+  // cajas?: Caja[];
+
+  @OneToMany(() => Subcategoria, (sub) => sub.categoria)
   subcategorias: Subcategoria[];
 }

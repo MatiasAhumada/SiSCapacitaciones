@@ -363,28 +363,28 @@ export class SeederService implements OnModuleInit {
   }
   async categorias() {
     const data: Record<string, string[]> = {
-      'ALQUILER': [],
-      'SUELDOS': [],
-      'COMISIONES': [],
-      'PROFESORES': [],
+      'ALQUILER': ["ALQUILER"],
+      'SUELDOS': ["SUELDOS"],
+      'COMISIONES': ["COMISIONES"],
+      'PROFESORES': ["PROFESORES"],
       'SERVICIOS': [
         'electricidad', 'gas', 'agua', 'internet', 'celulares', 'sistemas',
         'plataformas_digitales', 'dispenser_agua', 'honorarios_abogados',
         'honorarios_contadores', 'capacitaciones_y_formaciones', 'cuotas_y_adhesiones',
       ],
       'MARKETING_Y_PUBLICIDAD': [
-        'honorarios_marketing', 'publicidad_digital', 'televisión', 'radio',
-        'diario', 'imprenta', 'cartelería', 'otros',
+        'honorarios_marketing', 'publicidad_digital', 'television', 'radio',
+        'diario', 'imprenta', 'carteleria',
       ],
       'IMPUESTOS': [
         'municipal', 'rentas', 'ingresos_brutos', 'afip_iva', 'afip_ganancias',
         'aportes_patronales', 'multas', 'otros',
       ],
       'REFACCIONES_Y_MANTENIMIENTOS': [
-        'Mano_de_obra', 'materiales', 'bienes_muebles',
+        'mano_de_obra', 'materiales', 'bienes_muebles',
       ],
       'INSUMOS': [
-        'limpieza_e_higiene', 'librería_y_oficina', 'almacén',
+        'limpieza_e_higiene', 'libreria_y_oficina', 'almacen',
       ],
       'CAPACITACIONES': [
         'insumos_y_materiales', 'herramientas_y_maquinarias',
@@ -392,7 +392,7 @@ export class SeederService implements OnModuleInit {
       'VIATICOS': [
         'pasaje/combustible', 'alojamiento', 'comida',
       ],
-      'GASTOS VARIOS': [],
+      'GASTOS_VARIOS': ["GASTOS_VARIOS"],
     };
 
     for (const [categoriaNombre, subcategorias] of Object.entries(data)) {

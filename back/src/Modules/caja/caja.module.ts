@@ -10,9 +10,10 @@ import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { Comprobante } from '../comprobante/entities/comprobante.entity';
 import { Categoria } from './entities/categoria.entity';
 import { Subcategoria } from './entities/subcategoria.entity';
+import { Profesor } from '../profesor/entities/profesor.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Caja,Vendedor,Alumno,AlumnoComision,Comprobante,Categoria,Subcategoria])],
+  imports:[TypeOrmModule.forFeature([Caja,Vendedor,Alumno,AlumnoComision,Comprobante,Categoria,Subcategoria,Profesor])],
   controllers: [CajaController],
   providers: [CajaService],
   exports:[CajaService]

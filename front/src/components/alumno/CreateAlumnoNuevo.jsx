@@ -34,42 +34,42 @@ const CreateAlumnoNuevo = () => {
     setFormAlu({ ...formAlu, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setPause(true);
     try {
-      postAlu(formAlu).then((data) => {
-        if (data) {
-          setPause(false);
-          setFormAlu((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
-          Swal.fire({
-            icon: "success",
-            title: "Alumno Cargado",
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => {
-            setFormAlu({
-              dni: "",
-              name: "",
-              fNac: "",
-              tel: "",
-              telex: "",
-              ocupation: "",
-              nationality: "",
-              address: "",
-              province: "",
-              locality: "",
-              email: "",
-              age: "",
-              gender: "",
-              sucursalId: "",
-            });
-          });
-        }
+      const data = await postAlu(formAlu);
+      //  .then((data) => { });
+      // if (data) {
+      setPause(false);
+      setFormAlu((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
+      Swal.fire({
+        icon: "success",
+        title: "Alumno Cargado",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        setFormAlu({
+          dni: "",
+          name: "",
+          fNac: "",
+          tel: "",
+          telex: "",
+          ocupation: "",
+          nationality: "",
+          address: "",
+          province: "",
+          locality: "",
+          email: "",
+          age: "",
+          gender: "",
+          sucursalId: "",
+        });
       });
+      // }
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Error al cargar alumno",
+        title: error?.response?.data?.message,
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {

@@ -42,7 +42,8 @@ export const postAlu = async (alumno) => {
     const response = await axios.post(`${URL}/alumno`, alumno);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
+    
   }
 };
 export const postAluSimple = async (alumno) => {

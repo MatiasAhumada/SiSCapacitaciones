@@ -349,6 +349,15 @@ export const getResumenTotal = async () => {
     console.log(error);
   }
 };
+export const getCategorias = async () => {
+  try {
+    const response = await axios.get(`${URL}/caja/con-subcategorias`);
+ 
+    return response.data;
+  } catch (error) {
+    throw error
+  }
+};
 
 //CERTIFICADOS
 

@@ -296,7 +296,6 @@ export class CajaService {
     return savedCategoria;
   }
   async obtenerCategoriasConSubcategorias() {
-    console.log('en devolucion de categorias');
     return this.categoriaRepository.find({
       relations: ['subcategorias'],
       order: {

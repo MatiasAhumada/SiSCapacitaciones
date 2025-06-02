@@ -50,7 +50,7 @@ export class CajaController {
     return this.cajaService.getMovimientosPorDia(fecha);
   }
 
-  @Get('/con-subcategorias')
+  @Get('con-subcategorias')
   getCategoriasConSubcategorias() {
     return this.cajaService.obtenerCategoriasConSubcategorias();
   }

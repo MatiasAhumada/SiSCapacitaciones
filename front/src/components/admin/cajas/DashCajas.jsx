@@ -35,6 +35,12 @@ const DashCajas = () => {
 
   const onFiltrar = async () => {
     await getMovimientosPorDia(fechaFiltro).then((data) => {
+     console.log(data.length==0)
+           if(data.length==0){
+      Swal.fire(
+        
+      )
+      }
       setTableItems(data);
     });
     await getResumenPorDia(fechaFiltro).then((data) => {
@@ -166,7 +172,7 @@ const DashCajas = () => {
       }
     });
   };
-  console.log(alu);
+  //console.log(alu);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>

@@ -42,28 +42,14 @@ const CajaEgreso = () => {
   const [categoriaSelec, setCategoriaSelec] = useState(null);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
-    fecha: "",
-    metodoPago: "",
-    tipo: "",
-    descripcion: "",
-    vendedorId: "",
-    alumnoComisionId: "",
-    monto: "",
-    cuota: "",
-    //vendTransId: "",
-    comprobante: {
-      apellidoNombre: "",
-      dni: "",
-      domicilioComercial: "",
-      iva: "",
-      numeroSucursal: "",
-      fecha: "",
-      formaPago: "",
-      observacion: "",
-      monto: "",
-      tipoComprobante: "",
-      numero: "",
-    },
+    fecha: "", 
+    tipo: "EGRESO", 
+    metodoPago: "", 
+    monto: 0,       
+    descripcion: "", 
+    vendedorId: "", 
+    profesorId: "", 
+    subcategoriaId: ""
   });
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -128,7 +114,7 @@ const CajaEgreso = () => {
     console.log(value);
   };
   const categoriaActual = categorias.find((cat) => cat.nombre === categoriaSelec);
-  console.log(categoriaActual);
+
   const handleSubmit = async (e) => {
     const { vendedorId, tipo, alumnoId, cuota, descripcion, monto, metodoPago } = e.target;
     const fechaISO = fecha.toISOString();

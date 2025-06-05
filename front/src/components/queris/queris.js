@@ -7,7 +7,7 @@ export const login = async ({ name, password }) => {
     const response = await axios.post(`${URL}/auth/login`, { name, password });
     return response.data;
   } catch (error) {
-    console.error(error);
+    throw error
   }
 };
 //ALUMNOS
@@ -17,7 +17,7 @@ export const getAluSucID = async (dni) => {
     const response = await axios.get(`${URL}/alumno/sucursal/${dni}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener alumno", error.response?.data);
+    throw error
   }
 };
 export const getAluID = async (dni) => {
@@ -25,7 +25,7 @@ export const getAluID = async (dni) => {
     const response = await axios.get(`${URL}/alumno/${dni}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener alumno", error.response?.data);
+    throw error
   }
 };
 export const getAlu = async (id) => {
@@ -33,7 +33,7 @@ export const getAlu = async (id) => {
     const response = await axios.get(`${URL}/alumno`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener alumno", error.response?.data);
+    throw error
   }
 };
 
@@ -60,7 +60,7 @@ export const deleteAlumnoId = async (id) => {
     const response = await axios.delete(`${URL}/alumno/${id}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 
@@ -70,7 +70,7 @@ export const getVendedores = async () => {
     const response = await axios.get(`${URL}/vendedor`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error;
   }
 };
 
@@ -79,7 +79,7 @@ export const getVendID = async (id) => {
     const response = await axios.get(`${URL}/vendedor/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const getVendSucID = async (id) => {
@@ -87,7 +87,7 @@ export const getVendSucID = async (id) => {
     const response = await axios.get(`${URL}/vendedor/sucursal/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const postVend = async (vendedor) => {
@@ -95,7 +95,7 @@ export const postVend = async (vendedor) => {
     const response = await axios.post(`${URL}/vendedor`, vendedor);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 
@@ -104,7 +104,7 @@ export const deleteVend = async (id) => {
     const response = await axios.delete(`${URL}/vendedor/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 
@@ -114,7 +114,7 @@ export const getSucursales = async () => {
     const response = await axios.get(`${URL}/suc`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener sucursal", error.response?.data);
+    throw error
   }
 };
 export const getSucursalId = async (id) => {
@@ -122,7 +122,7 @@ export const getSucursalId = async (id) => {
     const response = await axios.get(`${URL}/suc/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const postSucursal = async (datos) => {
@@ -130,7 +130,7 @@ export const postSucursal = async (datos) => {
     const response = await axios.post(`${URL}/suc`, datos);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 
@@ -141,7 +141,7 @@ export const getCursos = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const deleteCurso = async (id) => {
@@ -149,7 +149,7 @@ export const deleteCurso = async (id) => {
     const response = await axios.delete(`${URL}/curso/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const postCurso = async (curso) => {
@@ -157,7 +157,7 @@ export const postCurso = async (curso) => {
     const response = await axios.post(`${URL}/curso`, curso);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 
@@ -167,7 +167,7 @@ export const getComisiones = async () => {
     const response = await axios.get(`${URL}/comision`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error("Error al obtener vendedor", error.response?.data);
   }
 };
 export const getComisionId = async (id) => {
@@ -175,7 +175,7 @@ export const getComisionId = async (id) => {
     const response = await axios.get(`${URL}/comision/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const deleteComision = async (id) => {
@@ -183,7 +183,7 @@ export const deleteComision = async (id) => {
     const response = await axios.delete(`${URL}/comision/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const getComisionBySucursal = async (id) => {
@@ -191,7 +191,7 @@ export const getComisionBySucursal = async (id) => {
     const response = await axios.get(`${URL}/comision/suc/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const postComision = async (comision) => {
@@ -199,7 +199,7 @@ export const postComision = async (comision) => {
     const response = await axios.post(`${URL}/comision`, comision);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const putComision = async (id, comision) => {
@@ -207,7 +207,7 @@ export const putComision = async (id, comision) => {
     const response = await axios.put(`${URL}/comision/${id}`, comision);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 export const getAluCom = async (id) => {
@@ -215,7 +215,7 @@ export const getAluCom = async (id) => {
     const response = await axios.get(`${URL}/comision/aluCom/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 
@@ -225,7 +225,7 @@ export const editStateComision = async (change) => {
     const response = await axios.put(`${URL}/comision/estado`, change);
     return response.data;
   } catch (error) {
-    console.error("Error al cambiar estado", error);
+    throw error
   }
 };
 
@@ -235,7 +235,7 @@ export const postInscripcion = async (datos) => {
     const response = await axios.post(`${URL}/inscripcion`, datos);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener vendedor", error.response?.data);
+    throw error
   }
 };
 
@@ -246,7 +246,7 @@ export const getProfes = async () => {
     const response = await axios.get(`${URL}/profesor`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const getProfesId = async (id) => {
@@ -254,7 +254,7 @@ export const getProfesId = async (id) => {
     const response = await axios.get(`${URL}/profesor/${id}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const getProfesSucId = async (id) => {
@@ -262,7 +262,7 @@ export const getProfesSucId = async (id) => {
     const response = await axios.get(`${URL}/profesor/sucursal/${id}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const postProfes = async (profesor) => {
@@ -270,7 +270,7 @@ export const postProfes = async (profesor) => {
     const response = await axios.post(`${URL}/profesor`, profesor);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 
@@ -279,7 +279,7 @@ export const deleteProfesId = async (id) => {
     const response = await axios.delete(`${URL}/profesor/${id}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 
@@ -289,7 +289,7 @@ export const GetCajaByVendedor = async (id) => {
     const response = await axios.get(`${URL}/caja/vendedor/${id}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const deleteMovCaja = async (id) => {
@@ -297,7 +297,7 @@ export const deleteMovCaja = async (id) => {
     const response = await axios.delete(`${URL}/caja/${id}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const editMovCaja = async (id, mov) => {
@@ -305,7 +305,7 @@ export const editMovCaja = async (id, mov) => {
     const response = await axios.put(`${URL}/caja/${id}`, mov);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const postCaja = async (movimiento) => {
@@ -313,7 +313,7 @@ export const postCaja = async (movimiento) => {
     const response = await axios.post(`${URL}/caja`, movimiento);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const getCajas = async () => {
@@ -321,7 +321,7 @@ export const getCajas = async () => {
     const response = await axios.get(`${URL}/caja`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const getMovimientosPorDia = async (fecha) => {
@@ -329,7 +329,7 @@ export const getMovimientosPorDia = async (fecha) => {
     const response = await axios.get(`${URL}/caja/movimientos/${fecha}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const getResumenPorDia = async (fecha) => {
@@ -337,7 +337,7 @@ export const getResumenPorDia = async (fecha) => {
     const response = await axios.get(`${URL}/caja/resumen/${fecha}`);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const getResumenTotal = async () => {
@@ -346,7 +346,7 @@ export const getResumenTotal = async () => {
  
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 export const getCategorias = async () => {
@@ -366,6 +366,6 @@ export const postCert = async (cert) => {
     const response = await axios.post(`${URL}/certificado`, cert);
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };

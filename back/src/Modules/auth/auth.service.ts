@@ -12,7 +12,7 @@ import { Alumno } from '../alumno/entities/alumno.entity';
 import { JwtService } from '@nestjs/jwt';
 import { access } from 'fs';
 import { id } from 'date-fns/locale';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
@@ -28,7 +28,8 @@ export class AuthService {
   async validateUser(name: string, password: string) {
     const admin = await this.adminsRepository.findOne({ where: { name } });
     if (admin) {
-      if (password === admin.password) {
+      const isPasswordValid = await bcrypt.compare(password, admin.password);
+      if (isPasswordValid) {
         return { id: admin.id, isAdmin: true };
       } else {
         throw new BadRequestException('Contraseña incorrecta');
@@ -39,7 +40,8 @@ export class AuthService {
       where: { email: name },
     });
     if (vendedor) {
-      if (password === vendedor.password) {
+      const isPasswordValid = await bcrypt.compare(password, vendedor.password);
+      if (isPasswordValid) {
         return { id: vendedor.id, isAdmin: false };
       } else {
         throw new BadRequestException('Contraseña incorrecta');

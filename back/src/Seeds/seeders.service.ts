@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admins } from '../Modules/admin/entities/admin.entity';
@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
 import { Caja } from '@modules/Modules/caja/entities/caja.entity';
 import { CajaService } from '@modules/Modules/caja/caja.service';
+import { Vendedor } from '@modules/Modules/vendedor/entities/vendedor.entity';
 
 @Injectable()
 export class SeederService implements OnModuleInit {
@@ -17,12 +18,16 @@ export class SeederService implements OnModuleInit {
     private readonly sucursalRepository: Repository<Sucursal>,
     @InjectRepository(Curso)
     private readonly cursoRepository: Repository<Curso>,
+    @InjectRepository(Admins)
+    private readonly adminsRepository: Repository<Admins>,
+    @InjectRepository(Vendedor)
+    private readonly vendedorRepository: Repository<Vendedor>,
    
     private readonly cajaService: CajaService,
   ) {}
-
+  private readonly logger = new Logger(SeederService.name);
   async onModuleInit() {
-    await this.categorias();
+    await this.hashVendedores();
   }
 
   async seed() {
@@ -404,5 +409,37 @@ export class SeederService implements OnModuleInit {
 
     console.log('✅ Categorías y subcategorías creadas correctamente.');
   }
+  async hashAdmins() {
+    const admins = await this.adminsRepository.find();
 
+    for (const admin of admins) {
+      if (!admin.password.startsWith('$2a$') && !admin.password.startsWith('$2b$')) {
+        // No está hasheada, la actualizamos
+        const hashed = await bcrypt.hash(admin.password, 10);
+        admin.password = hashed;
+        await this.adminsRepository.save(admin);
+        this.logger.log(`Password admin ${admin.name} hasheada correctamente.`);
+      } else {
+        this.logger.log(`Password admin ${admin.name} ya estaba hasheada.`);
+      }
+    }
+
+    this.logger.log('Seeder finalizado.');
+  }
+  async hashVendedores() {
+    const vendedores = await this.vendedorRepository.find();
+
+    for (const vendedor of vendedores) {
+      if (!vendedor.password.startsWith('$2a$') && !vendedor.password.startsWith('$2b$')) {
+        const hashed = await bcrypt.hash(vendedor.password, 10);
+        vendedor.password = hashed;
+        await this.vendedorRepository.save(vendedor);
+        this.logger.log(`Password vendedor ${vendedor.email} hasheada correctamente.`);
+      } else {
+        this.logger.log(`Password vendedor ${vendedor.email} ya estaba hasheada.`);
+      }
+    }
+
+    this.logger.log('Seeder vendedores finalizado.');
+  }
 }

@@ -1,38 +1,14 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
-import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import {
-  getAlu,
-  getAluID,
-  getCategorias,
-  getCursos,
-  getProfes,
-  getVendedores,
-  getVendID,
-  postCaja,
-  postEgresoProfesor,
-  postProfes,
-} from "../queris/queris";
-import html2pdf from "html2pdf.js";
-import { useRef } from "react";
-import jsPDF from "jspdf";
-import { Modal } from "antd";
-import ReciboComprobante from "./Comprobante";
-import Opciones from "./Opciones";
+import { getCategorias, getProfes, getVendID, postEgresoProfesor } from "../queris/queris";
 const CajaEgreso = () => {
   const idVende = localStorage.getItem("token");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [profesores, setProfesores] = useState([]);
-  const [cuotaVieja, setCuotavieja] = useState(false);
-
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
-
   const [categorias, setCategorias] = useState([]);
-
   const [categoriaSelec, setCategoriaSelec] = useState(null);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
@@ -117,27 +93,26 @@ const CajaEgreso = () => {
       ...formData,
       fecha: fechaISO,
     };
-    console.log(nuevoFormData);
-    // await postEgresoProfesor(nuevoFormData)
-    //   .then(() => {
-    //     Swal.fire({
-    //       icon: "success",
-    //       title: "Egreso registrado correctamente",
-    //       text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
-    //     });
-    //     setPause(false);
-    //   })
-    //   .catch((error) => {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Error al registrar el egreso",
-    //       text: error.message || "Ocurrió un error al registrar el egreso.",
-    //     });
-    //     setPause(false);
-    //   });
+
+    await postEgresoProfesor(nuevoFormData)
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Egreso registrado correctamente",
+          text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
+        });
+        setPause(false);
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al registrar el egreso",
+          text: error.message || "Ocurrió un error al registrar el egreso.",
+        });
+        setPause(false);
+      });
   };
 
-  
   return (
     <>
       <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
@@ -155,25 +130,14 @@ const CajaEgreso = () => {
               Fecha
             </label>
             <div className="relative text-gray-400">
-              {!cuotaVieja ? (
-                <input
-                  type="text"
-                  name="fecha"
-                  id="fecha"
-                  disabled
-                  defaultValue={formatToDisplay(fecha)}
-                  className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-                />
-              ) : (
-                <input
-                  type="date"
-                  name="fecha"
-                  id="fecha"
-                  value={formData.fecha?.split("T")[0] || ""}
-                  onChange={handleChange}
-                  className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-                />
-              )}
+              <input
+                type="text"
+                name="fecha"
+                id="fecha"
+                disabled
+                defaultValue={formatToDisplay(fecha)}
+                className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+              />
             </div>
           </div>
           <div className="pb-2">

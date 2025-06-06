@@ -276,7 +276,7 @@ export const postProfes = async (profesor) => {
 
 export const deleteProfesId = async (id) => {
   try {
-    const response = await axios.delete(`${URL}/profesor/${id}`);
+    const response = await axios.delete(`${URL}/profesor/deleted/${id}`);
     return response.data;
   } catch (error) {
     throw error;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProfesorDto } from './dto/create-profesor.dto';
 import { UpdateProfesorDto } from './dto/update-profesor.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -40,7 +40,7 @@ export class ProfesorService {
       relations: ['comisiones'],
       select: ['id', 'name', 'apellido'],
     });
-  
+
     return profesores.map((prof) => ({
       id: prof.id,
       name: prof.name,
@@ -48,7 +48,7 @@ export class ProfesorService {
       cantidadComisiones: prof.comisiones.length,
     }));
   }
-  
+
   async findOne(id: string) {
     return this.profesorRepository.findOne({
       where: { id },
@@ -68,7 +68,15 @@ export class ProfesorService {
   }
 
   async update(id: string, updateProfesorDto: UpdateProfesorDto) {
-    return `This action updates a #${id} profesor`;
+    const profesor = await this.profesorRepository.findOne({ where: { id } });
+
+    if (!profesor) {
+      throw new NotFoundException(`Profesor con id ${id} no encontrado`);
+    }
+
+    Object.assign(profesor, updateProfesorDto);
+
+    return await this.profesorRepository.save(profesor);
   }
 
   async remove(id: string) {

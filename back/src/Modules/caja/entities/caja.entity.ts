@@ -75,10 +75,9 @@ export class Caja {
   @JoinColumn()
   profesor?: Profesor;
 
-  // @ManyToOne(() => Categoria, (cat) => cat.cajas, { nullable: true })
-  // @JoinColumn()
-  // categoria?: Categoria;
-
+  @ManyToOne(() => Vendedor, (v) => v.pagosRealizados, { nullable: true })
+  @JoinColumn()
+  vendedorPagos?: Vendedor;
   @ManyToOne(() => Subcategoria, (sub) => sub.cajas, { nullable: true })
   @JoinColumn()
   subcategoria?: Subcategoria;

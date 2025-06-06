@@ -372,7 +372,7 @@ export class CajaService {
       descripcion:
         dto.descripcion ||
         `Pago de ${subcategoria.nombre} al vendedor ${vendedor.name}`,
-      vendedor,
+      vendedorPagos: vendedor,
       subcategoria,
       fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
     });

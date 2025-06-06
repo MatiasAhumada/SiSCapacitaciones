@@ -358,6 +358,15 @@ export const getCategorias = async () => {
     throw error
   }
 };
+export const postEgresoProfesor = async (dataProfe) => {
+  try {
+    const response = await axios.post(`${URL}/caja/egreso/profesor`, dataProfe);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 //CERTIFICADOS
 

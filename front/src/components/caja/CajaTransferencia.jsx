@@ -1,74 +1,25 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
-import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import {
-  getAlu,
-  getAluID,
-  getCursos,
-  getVendedores,
-  getVendID,
-  postCaja,
-  postProfes,
-} from "../queris/queris";
-import html2pdf from "html2pdf.js";
-import { useRef } from "react";
-import jsPDF from "jspdf";
-import { Modal } from "antd";
-import ReciboComprobante from "./Comprobante";
-import Opciones from "./Opciones";
+import { getCategorias, getProfes, getVendID, postEgresoProfesor } from "../queris/queris";
 const CajaTransferencia = () => {
   const idVende = localStorage.getItem("token");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imprimir, setImprimir] = useState({
-    tipoComprobante: "Factura de venta",
-  });
-  const [infoComprobante, setInfoComprobante] = useState({
-    apellidoNombre: "",
-    dni: "",
-    domicilioComercial: "",
-    iva: "",
-    numeroSucursal: "",
-    fecha: "",
-    formaPago: "",
-    observacion: "",
-    monto: "",
-    tipoComprobante: "",
-    numero: "",
-  });
-  const [cambio, setCambio] = useState(false);
-  const [cuotaVieja, setCuotavieja] = useState(false);
-  const [generatePDF, setGeneratePDF] = useState(false);
-  const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
+  const [profesores, setProfesores] = useState([]);
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
-  const [vendedores, setVendores] = useState([]);
-  const [alu, setAlu] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaSelec, setCategoriaSelec] = useState(null);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
     fecha: "",
+    tipo: "EGRESO",
     metodoPago: "",
-    tipo: "",
+    monto: 0,
     descripcion: "",
     vendedorId: "",
-    alumnoComisionId: "",
-    monto: "",
-    cuota: "",
-    //vendTransId: "",
-    comprobante: {
-      apellidoNombre: "",
-      dni: "",
-      domicilioComercial: "",
-      iva: "",
-      numeroSucursal: "",
-      fecha: "",
-      formaPago: "",
-      observacion: "",
-      monto: "",
-      tipoComprobante: "",
-      numero: "",
-    },
+    profesorId: "",
+    subcategoriaId: "",
   });
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -90,24 +41,22 @@ const CajaTransferencia = () => {
         }));
       });
     };
-    const vendedores = async () => {
-      await getVendedores().then((data) => {
-        setVendores(data);
-      });
-    };
-    const alumnos = async () => {
-      await getAlu().then((data) => {
-        try {
-          setAlu(data);
-        } catch (error) {
-          console.log(error);
-        }
-      });
+
+    const categorias = async () => {
+      const data = await getCategorias();
+      try {
+        setCategorias(data);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar categorias",
+          text: error.message || "Ocurrió un error al cargar las categorias.",
+        });
+      }
     };
 
+    categorias();
     vendedor();
-    vendedores();
-    alumnos();
 
     const intervalId = setInterval(() => {
       setFecha(new Date());
@@ -120,99 +69,47 @@ const CajaTransferencia = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  const handleChangeCategoria = async (e) => {
+    const { name, value } = e.target;
+    setCategoriaSelec(value);
+    if (value === "PROFESORES") {
+      await getProfes().then((data) => {
+        setProfesores(data);
+      });
+    }
+  };
+  const handleChangeSubCat = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const categoriaActual = categorias.find((cat) => cat.nombre === categoriaSelec);
 
   const handleSubmit = async (e) => {
-    const {
-      vendedorId,
-      tipo,
-      alumnoId,
-      cuota,
-      descripcion,
-      monto,
-      metodoPago,
-    } = e.target;
     const fechaISO = fecha.toISOString();
     e.preventDefault();
     setPause(true);
-    //ARMO COMPROBANTE
-    const cargaComprobante = {
-      ...infoComprobante,
-      fecha: cuotaVieja ? formData.fecha : fechaISO,
-      formaPago: metodoPago.value,
-      observacion: descripcion.value,
-      monto: monto.value,
-      tipoComprobante: "Factura de venta",
-      numero: "-",
-      ...alumnoSeleccionado,
-    };
 
-    setInfoComprobante(cargaComprobante);
-    //ARMO EL FORM DATA
     const nuevoFormData = {
       ...formData,
-      fecha: cuotaVieja ? formData.fecha : fechaISO,
-      metodoPago: metodoPago.value,
-      descripcion: descripcion.value,
-      monto: monto.value,
-      tipo: tipo.value,
-      vendedorId: idVende,
-      comprobante: cargaComprobante,
+      fecha: fechaISO,
     };
 
-    await postCaja(nuevoFormData).then((data) => {
-      try {
+    await postEgresoProfesor(nuevoFormData)
+      .then(() => {
         Swal.fire({
-          title: "Movimiento Registrado",
           icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setImprimir(data.comprobante);
-          setPause(false);
-          setGeneratePDF(true);
+          title: "Egreso registrado correctamente",
+          text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
         });
-      } catch (error) {
-        console.log(error);
         setPause(false);
-      }
-    });
-  };
-
-  const handleOpen = () => {
-    setIsModalOpen(true);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-  const handleAlumnoClick = async (e) => {
-    e.preventDefault();
-    setPause(true);
-    await getAluID(alu)
-      .then((data) => {
-        if (data) {
-          setFormData((prev) => ({
-            ...prev,
-            alumnoComisionId: data.id,
-          }));
-          setAlumnoSeleccionado({
-            apellidoNombre: data.name,
-            dni: data.dni,
-            domicilioComercial: `${data.address}, ${data.locality}`,
-            iva: "-",
-            numeroSucursal: "000" + data.sucursal.numeroSucursal,
-          });
-          setPause(false);
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se encontró el alumno",
-          });
-          setPause(false);
-        }
       })
       .catch((error) => {
-        console.error("Error al obtener el alumno:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al registrar el egreso",
+          text: error.message || "Ocurrió un error al registrar el egreso.",
+        });
+        setPause(false);
       });
   };
 
@@ -224,7 +121,7 @@ const CajaTransferencia = () => {
             <img src={logo} alt="Logo" width="50" />
           </div>
 
-          <h2 className="my-auto principal">Transferencias</h2>
+          <h2 className="my-auto principal">Transferencia de cajas</h2>
         </div>
 
         <form className="flex flex-col" onSubmit={handleSubmit}>
@@ -233,32 +130,18 @@ const CajaTransferencia = () => {
               Fecha
             </label>
             <div className="relative text-gray-400">
-              {!cuotaVieja ? (
-                <input
-                  type="text"
-                  name="fecha"
-                  id="fecha"
-                  disabled
-                  defaultValue={formatToDisplay(fecha)}
-                  className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-                />
-              ) : (
-                <input
-                  type="date"
-                  name="fecha"
-                  id="fecha"
-                  value={formData.fecha?.split("T")[0] || ""}
-                  onChange={handleChange}
-                  className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-                />
-              )}
+              <input
+                type="text"
+                name="fecha"
+                id="fecha"
+                disabled
+                defaultValue={formatToDisplay(fecha)}
+                className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+              />
             </div>
           </div>
           <div className="pb-2">
-            <label
-              htmlFor="vendedor"
-              className="block mb-2 text-sm  principal text-[#111827]"
-            >
+            <label htmlFor="vendedor" className="block mb-2 text-sm  principal text-[#111827]">
               Vendedor
             </label>
             <div className="relative text-gray-400">
@@ -273,9 +156,7 @@ const CajaTransferencia = () => {
             </div>
           </div>
           <div className="pb-2">
-            <label className="block mb-2 text-sm principal">
-              Tipo de Movimiento
-            </label>
+            <label className="block mb-2 text-sm principal">Tipo de Movimiento</label>
             <input
               type="string"
               name="tipo"
@@ -287,9 +168,7 @@ const CajaTransferencia = () => {
           </div>
 
           <div className="pb-2">
-            <label className="block mb-2 text-sm principal">
-              Metodo de Pago
-            </label>
+            <label className="block mb-2 text-sm principal">Metodo de Pago</label>
             <select
               name="metodoPago"
               value={formData.metodoPago}
@@ -304,82 +183,60 @@ const CajaTransferencia = () => {
             </select>
           </div>
           <div className="pb-2">
-            <div className="pb-2">
-              <label
-                htmlFor="cuota"
-                className="block mb-2 text-sm  principal text-[#111827]"
-              >
-                Alumno
-              </label>
-
-              <div className="relative text-gray-400">
-                <input
-                  type="number"
-                  name="alumnoId"
-                  id="alumnoId"
-                  value={alu}
-                  onChange={(e) => setAlu(e.target.value)}
-                  className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400   p-3 pr-20"
-                  placeholder="ID del alumno"
-                />
-                <button
-                  type="button"
-                  onClick={handleAlumnoClick}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btnAz text-white text-sm px-4 py-1.5 rounded-md min-w-[100px] flex items-center justify-center"
-                >
-                  {pause ? (
-                    <svg
-                      fill="white"
-                      className="w-6 h-6 mx-auto"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                        <animateTransform
-                          attributeName="transform"
-                          type="rotate"
-                          dur="0.75s"
-                          values="0 12 12;360 12 12"
-                          repeatCount="indefinite"
-                        />
-                      </path>
-                    </svg>
-                  ) : (
-                    "Buscar"
-                  )}
-                </button>
-              </div>
-            </div>
-            {alumnoSeleccionado && (
-              <div className="text-sm text-gray-700 mb-2">
-                Alumno encontrado: {alumnoSeleccionado.apellidoNombre}
-              </div>
-            )}
-          </div>
-
-          <div className="pb-2">
-            <label
-              htmlFor="cuota"
-              className="block mb-2 text-sm  principal text-[#111827]"
+            <label className="block mb-2 text-sm principal">Categoria</label>
+            <select
+              name="categoria"
+              value={formData.categoria}
+              onChange={handleChangeCategoria}
+              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             >
-              N° Cuota
-            </label>
-            <div className="relative text-gray-400">
-              <input
-                type="number"
-                name="cuota"
-                id="cuota"
-                value={formData.cuota}
+              <option value="">Seleccione</option>
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.nombre}>
+                  {cat.nombre.replace(/_/g, " ").toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
+          {categoriaSelec && categoriaActual?.subcategorias.length > 0 && (
+            <div>
+              <label className="block mb-1">Subcategoría:</label>
+              <select
+                name="subcategoriaId"
+                value={formData.subcategoriaId}
+                onChange={handleChangeSubCat}
+                className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+              >
+                <option value="">Selecciona una subcategoría</option>
+                {categoriaActual.subcategorias.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.nombre.replace(/_/g, " ").toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {categoriaActual?.nombre === "PROFESORES" && (
+            <div>
+              <label className="block mb-1">Profesor</label>
+              <select
+                name="profesorId"
+                value={formData.profesorId}
                 onChange={handleChange}
                 className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              />
+              >
+                <option value="">Selecciona un profesor</option>
+                {profesores.map((pro) => (
+                  <option key={pro.id} value={pro.id}>
+                    {pro.name + " " + pro.apellido}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
+          )}
+
           <div className="pb-2">
-            <label
-              htmlFor="descripcion"
-              className="block mb-2 text-sm  principal text-[#111827]"
-            >
+            <label htmlFor="descripcion" className="block mb-2 text-sm  principal text-[#111827]">
               Descripcion
             </label>
             <div className="relative text-gray-400">
@@ -394,10 +251,7 @@ const CajaTransferencia = () => {
             </div>
           </div>
           <div className="pb-2">
-            <label
-              htmlFor="monto"
-              className="block mb-2 text-sm  principal text-[#111827]"
-            >
+            <label htmlFor="monto" className="block mb-2 text-sm  principal text-[#111827]">
               Monto
             </label>
             <div className="relative text-gray-400">
@@ -417,44 +271,16 @@ const CajaTransferencia = () => {
             className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
           >
             {pause ? (
-              <svg
-                fill="white"
-                className="w-6 h-6 mx-auto"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    dur="0.75s"
-                    values="0 12 12;360 12 12"
-                    repeatCount="indefinite"
-                  />
+                  <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
                 </path>
               </svg>
             ) : (
               "Registrar Movimiento"
             )}
           </button>
-          {generatePDF && (
-            <button
-              type="button"
-              onClick={handleOpen}
-              className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6 mt-2"
-            >
-              Generar PDF
-            </button>
-          )}
         </form>
-        <Modal
-          title="Comprobante"
-          open={isModalOpen}
-          onCancel={handleCancel}
-          footer={null}
-        >
-          <ReciboComprobante {...imprimir}></ReciboComprobante>
-        </Modal>
       </div>
     </>
   );

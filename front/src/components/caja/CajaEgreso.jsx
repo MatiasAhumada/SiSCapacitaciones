@@ -2,10 +2,11 @@ import React from "react";
 import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import Swal from "sweetalert2";
-import { getCategorias, getProfes, getVendID, postEgresoProfesor } from "../queris/queris";
+import { getCategorias, getProfes, getVendedores, getVendID, postEgresoProfesor, postEgresoVendedor } from "../queris/queris";
 const CajaEgreso = () => {
   const idVende = localStorage.getItem("token");
   const [profesores, setProfesores] = useState([]);
+  const [vendedores, setVendedores] = useState([]);
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
   const [categorias, setCategorias] = useState([]);
@@ -18,6 +19,7 @@ const CajaEgreso = () => {
     monto: 0,
     descripcion: "",
     vendedorId: "",
+    pagoVendedorId: "",
     profesorId: "",
     subcategoriaId: "",
   });
@@ -41,6 +43,19 @@ const CajaEgreso = () => {
         }));
       });
     };
+    const getVends = async () => {
+      await getVendedores()
+        .then((data) => {
+          setVendedores(data);
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error al cargar vendedores",
+            text: error.message || "Ocurrió un error al cargar los vendedores.",
+          });
+        });
+    };
 
     const categorias = async () => {
       const data = await getCategorias();
@@ -55,6 +70,7 @@ const CajaEgreso = () => {
       }
     };
 
+    getVends();
     categorias();
     vendedor();
 
@@ -93,24 +109,45 @@ const CajaEgreso = () => {
       ...formData,
       fecha: fechaISO,
     };
-
-    await postEgresoProfesor(nuevoFormData)
-      .then(() => {
-        Swal.fire({
-          icon: "success",
-          title: "Egreso registrado correctamente",
-          text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
+    console.log(nuevoFormData);
+    if (categoriaSelec === "PROFESORES") {
+      await postEgresoProfesor(nuevoFormData)
+        .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Egreso registrado correctamente",
+            text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
+          });
+          setPause(false);
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error al registrar el egreso",
+            text: error.message || "Ocurrió un error al registrar el egreso.",
+          });
+          setPause(false);
         });
-        setPause(false);
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Error al registrar el egreso",
-          text: error.message || "Ocurrió un error al registrar el egreso.",
+    }
+    if (categoriaSelec === "COMISIONES" || categoriaSelec === "SUELDOS") {
+      await postEgresoVendedor(nuevoFormData)
+        .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Egreso registrado correctamente",
+            text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
+          });
+          setPause(false);
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error al registrar el egreso",
+            text: error.message || "Ocurrió un error al registrar el egreso.",
+          });
+          setPause(false);
         });
-        setPause(false);
-      });
+    }
   };
 
   return (
@@ -216,7 +253,7 @@ const CajaEgreso = () => {
               </select>
             </div>
           )}
-          {categoriaActual?.nombre === "PROFESORES" && (
+          {categoriaSelec === "PROFESORES" && (
             <div>
               <label className="block mb-1">Profesor</label>
               <select
@@ -229,6 +266,24 @@ const CajaEgreso = () => {
                 {profesores.map((pro) => (
                   <option key={pro.id} value={pro.id}>
                     {pro.name + " " + pro.apellido}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {(categoriaSelec === "SUELDOS" || categoriaSelec === "COMISIONES") && (
+            <div>
+              <label className="block mb-1">Vendedor</label>
+              <select
+                name="pagoVendedorId"
+                value={formData.pagoVendedorId}
+                onChange={handleChange}
+                className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+              >
+                <option value="">Selecciona un vendedor</option>
+                {vendedores.map((vend) => (
+                  <option key={vend.id} value={vend.id}>
+                    {vend.name}
                   </option>
                 ))}
               </select>

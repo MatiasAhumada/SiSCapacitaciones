@@ -29,6 +29,10 @@ export class EgresoCajaDTO {
   @IsOptional()
   @IsUUID()
   vendedorId?: string;
+  
+  @IsOptional()
+  @IsUUID()
+  pagoVendedorId?: string;
 
   @IsOptional()
   @IsUUID()

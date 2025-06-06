@@ -351,7 +351,7 @@ export class CajaService {
 
   async createEgresoVendedor(dto: EgresoCajaDTO) {
     const vendedor = await this.vendedorRepository.findOne({
-      where: { id: dto.vendedorId },
+      where: { id: dto.pagoVendedorId },
     });
     if (!vendedor)
       throw new HttpException('Vendedor no encontrado', HttpStatus.NOT_FOUND);

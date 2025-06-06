@@ -35,28 +35,38 @@ export class Caja {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
 
-  @Column({ type: 'enum', enum: TipoMovimiento })
+  @Column({
+    type: 'enum',
+    enum: TipoMovimiento,
+    default: TipoMovimiento.INGRESO,
+  })
   tipo: TipoMovimiento;
 
-  @Column({ type: 'enum', enum: MetodoPago })
+  @Column({ type: 'enum', enum: MetodoPago, default: MetodoPago.EFECTIVO })
   metodoPago: MetodoPago;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    default: 0,
+  })
   monto: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, default: '-' })
   descripcion?: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fecha: Date;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'decimal', nullable: true, default: 0 })
   cuota?: number;
 
   @Column({ default: '0', nullable: true })
   descuento?: number;
 
-  @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja)
+  @ManyToOne(() => Vendedor, (vendedor) => vendedor.caja, { nullable: true })
   vendedor: Vendedor;
 
   @ManyToOne(() => AlumnoComision, (ac) => ac.pagos, {
@@ -67,6 +77,7 @@ export class Caja {
 
   @OneToOne(() => Comprobante, (comprobante) => comprobante.caja, {
     cascade: true,
+    nullable: true,
   })
   @JoinColumn()
   comprobante?: Comprobante;
@@ -78,6 +89,7 @@ export class Caja {
   @ManyToOne(() => Vendedor, (v) => v.pagosRealizados, { nullable: true })
   @JoinColumn()
   vendedorPagos?: Vendedor;
+  
   @ManyToOne(() => Subcategoria, (sub) => sub.cajas, { nullable: true })
   @JoinColumn()
   subcategoria?: Subcategoria;

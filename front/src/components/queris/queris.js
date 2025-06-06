@@ -374,6 +374,14 @@ export const postEgresoVendedor = async (dataVendedor) => {
     throw error;
   }
 };
+export const postEgresoSiemple = async (data) => {
+  try {
+    const response = await axios.post(`${URL}/caja/egreso`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 //CERTIFICADOS

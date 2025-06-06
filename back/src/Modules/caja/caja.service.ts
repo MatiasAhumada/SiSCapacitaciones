@@ -380,6 +380,13 @@ export class CajaService {
     return await this.cajaRepository.save(caja);
   }
   async createEgresoSimple(dto: EgresoCajaDTO) {
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: dto.vendedorId },
+    });
+    if (!vendedor) {
+      throw new HttpException('Vendedor no encontrado', HttpStatus.NOT_FOUND);
+    }
+
     const subcategoria = await this.subcategoriaRepository.findOne({
       where: { id: dto.subcategoriaId },
     });
@@ -395,6 +402,7 @@ export class CajaService {
       metodoPago: dto.metodoPago,
       monto: dto.monto,
       descripcion: dto.descripcion || `Egreso por ${subcategoria.nombre}`,
+      vendedor,
       subcategoria,
       fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
     });

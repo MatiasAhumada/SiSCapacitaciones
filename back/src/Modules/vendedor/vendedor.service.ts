@@ -48,12 +48,14 @@ export class VendedorService {
   async findAll() {
     return this.vendedorRepository.find();
   }
+
   async getVendedoresBySucursal(id: string) {
     return this.vendedorRepository.find({
       where: { sucursales: { id } },
       select: ['id', 'name', 'email', 'tel'],
     });
   }
+
   async findOne(id: string): Promise<VendedorResponseDto | undefined> {
     const vend = await this.vendedorRepository.findOne({
       where: { id },
@@ -107,4 +109,5 @@ export class VendedorService {
       throw new Error(`Vendedor con ID ${id} no encontrado`);
     }
   }
+  
 }

@@ -2,10 +2,10 @@ import React from "react";
 import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import Swal from "sweetalert2";
-import { getCategorias, getProfes, getVendID, postEgresoProfesor } from "../queris/queris";
+import { getCategorias, getProfes, getVendedores, getVendID, postEgresoProfesor } from "../queris/queris";
 const CajaTransferencia = () => {
   const idVende = localStorage.getItem("token");
-  const [profesores, setProfesores] = useState([]);
+  const [vendedores, setVendedores] = useState([]);
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
   const [categorias, setCategorias] = useState([]);
@@ -13,13 +13,11 @@ const CajaTransferencia = () => {
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
     fecha: "",
-    tipo: "EGRESO",
     metodoPago: "",
     monto: 0,
     descripcion: "",
-    vendedorId: "",
-    profesorId: "",
-    subcategoriaId: "",
+    vendedorOrigenId: "",
+    vendedorDestinoId: "",
   });
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -33,29 +31,37 @@ const CajaTransferencia = () => {
 
   useEffect(() => {
     const vendedor = async () => {
-      await getVendID(idVende).then((data) => {
-        setVend(data);
-        setFormData((prev) => ({
-          ...prev,
-          vendedorId: data.id,
-        }));
-      });
-    };
-
-    const categorias = async () => {
-      const data = await getCategorias();
-      try {
-        setCategorias(data);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Error al cargar categorias",
-          text: error.message || "Ocurrió un error al cargar las categorias.",
+      await getVendID(idVende)
+        .then((data) => {
+          setVend(data);
+          setFormData((prev) => ({
+            ...prev,
+            vendedorOrigenId: data.id,
+          }));
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error al cargar vendedor",
+            text: error.message || "Ocurrió un error al cargar el vendedor.",
+          });
         });
-      }
+    };
+    const vendedores = async () => {
+      await getVendedores()
+        .then((data) => {
+          setVendedores(data);
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error al cargar vendedores",
+            text: error.message || "Ocurrió un error al cargar los vendedores.",
+          });
+        });
     };
 
-    categorias();
+    vendedores();
     vendedor();
 
     const intervalId = setInterval(() => {
@@ -69,20 +75,6 @@ const CajaTransferencia = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const handleChangeCategoria = async (e) => {
-    const { name, value } = e.target;
-    setCategoriaSelec(value);
-    if (value === "PROFESORES") {
-      await getProfes().then((data) => {
-        setProfesores(data);
-      });
-    }
-  };
-  const handleChangeSubCat = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-  const categoriaActual = categorias.find((cat) => cat.nombre === categoriaSelec);
 
   const handleSubmit = async (e) => {
     const fechaISO = fecha.toISOString();
@@ -93,24 +85,26 @@ const CajaTransferencia = () => {
       ...formData,
       fecha: fechaISO,
     };
+    console.log(nuevoFormData);
+    setPause(false);
 
-    await postEgresoProfesor(nuevoFormData)
-      .then(() => {
-        Swal.fire({
-          icon: "success",
-          title: "Egreso registrado correctamente",
-          text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
-        });
-        setPause(false);
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Error al registrar el egreso",
-          text: error.message || "Ocurrió un error al registrar el egreso.",
-        });
-        setPause(false);
-      });
+    // await postEgresoProfesor(nuevoFormData)
+    //   .then(() => {
+    //     Swal.fire({
+    //       icon: "success",
+    //       title: "Egreso registrado correctamente",
+    //       text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
+    //     });
+    //     setPause(false);
+    //   })
+    //   .catch((error) => {
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Error al registrar el egreso",
+    //       text: error.message || "Ocurrió un error al registrar el egreso.",
+    //     });
+    //     setPause(false);
+    //   });
   };
 
   return (
@@ -142,29 +136,35 @@ const CajaTransferencia = () => {
           </div>
           <div className="pb-2">
             <label htmlFor="vendedor" className="block mb-2 text-sm  principal text-[#111827]">
-              Vendedor
+              Enviar desde:
             </label>
             <div className="relative text-gray-400">
               <input
                 type="string"
-                name="vendedorId"
-                id="vendedorId"
+                name="vendedorOrigenId"
+                id="vendedorOrigenId"
                 disabled
                 defaultValue={vend.name || ""}
                 className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               />
             </div>
           </div>
+
           <div className="pb-2">
-            <label className="block mb-2 text-sm principal">Tipo de Movimiento</label>
-            <input
-              type="string"
-              name="tipo"
-              id="tipo"
-              disabled
-              defaultValue={"Egreso"}
+            <label className="block mb-2 text-sm principal">Enviar hacia: </label>
+            <select
+              name="vendedorDestinoId"
+              value={formData.vendedorDestinoId}
+              onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-            />
+            >
+              <option value="">Seleccione</option>
+              {vendedores.map((ven) => (
+                <option key={ven.id} value={ven.id}>
+                  {ven.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="pb-2">
@@ -182,59 +182,6 @@ const CajaTransferencia = () => {
               <option value="Digital Javier">Digital Javier</option>
             </select>
           </div>
-          <div className="pb-2">
-            <label className="block mb-2 text-sm principal">Categoria</label>
-            <select
-              name="categoria"
-              value={formData.categoria}
-              onChange={handleChangeCategoria}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-            >
-              <option value="">Seleccione</option>
-              {categorias.map((cat) => (
-                <option key={cat.id} value={cat.nombre}>
-                  {cat.nombre.replace(/_/g, " ").toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </div>
-          {categoriaSelec && categoriaActual?.subcategorias.length > 0 && (
-            <div>
-              <label className="block mb-1">Subcategoría:</label>
-              <select
-                name="subcategoriaId"
-                value={formData.subcategoriaId}
-                onChange={handleChangeSubCat}
-                className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              >
-                <option value="">Selecciona una subcategoría</option>
-                {categoriaActual.subcategorias.map((sub) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.nombre.replace(/_/g, " ").toUpperCase()}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          {categoriaActual?.nombre === "PROFESORES" && (
-            <div>
-              <label className="block mb-1">Profesor</label>
-              <select
-                name="profesorId"
-                value={formData.profesorId}
-                onChange={handleChange}
-                className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              >
-                <option value="">Selecciona un profesor</option>
-                {profesores.map((pro) => (
-                  <option key={pro.id} value={pro.id}>
-                    {pro.name + " " + pro.apellido}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
           <div className="pb-2">
             <label htmlFor="descripcion" className="block mb-2 text-sm  principal text-[#111827]">
               Descripcion

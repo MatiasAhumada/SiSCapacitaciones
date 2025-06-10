@@ -382,6 +382,14 @@ export const postEgresoSiemple = async (data) => {
     throw error;
   }
 };
+export const postTransferencia = async (data) => {
+  try {
+    const response = await axios.post(`${URL}/caja/transferencia`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 //CERTIFICADOS

@@ -20,6 +20,7 @@ import { Categoria } from './entities/categoria.entity';
 import { Subcategoria } from './entities/subcategoria.entity';
 import { EgresoCajaDTO } from './dto/egreso-caja.dto';
 import { Profesor } from '../profesor/entities/profesor.entity';
+import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
 @Injectable()
 export class CajaService {
   constructor(
@@ -410,4 +411,52 @@ export class CajaService {
     return await this.cajaRepository.save(caja);
   }
   //transferencias
+  async transferirCaja(dto: CreateTransferenciaDto) {
+    const {
+      fecha,
+      metodoPago,
+      monto,
+      descripcion,
+      vendedorOrigenId,
+      vendedorDestinoId,
+    } = dto;
+
+    const vendedorOrigen = await this.vendedorRepository.findOneBy({
+      id: vendedorOrigenId,
+    });
+    if (!vendedorOrigen)
+      throw new NotFoundException('Vendedor origen no encontrado');
+
+    const vendedorDestino = await this.vendedorRepository.findOneBy({
+      id: vendedorDestinoId,
+    });
+    if (!vendedorDestino)
+      throw new NotFoundException('Vendedor destino no encontrado');
+
+    const egreso = this.cajaRepository.create({
+      tipo: TipoMovimiento.EGRESO,
+      metodoPago,
+      monto,
+      descripcion: descripcion || `Transferencia a ${vendedorDestino.name}`,
+      fecha: fecha ? new Date(fecha) : new Date(),
+      vendedor: vendedorOrigen,
+    });
+
+    const ingreso = this.cajaRepository.create({
+      tipo: TipoMovimiento.INGRESO,
+      metodoPago,
+      monto,
+      descripcion: descripcion || `Transferencia desde ${vendedorOrigen.name}`,
+      fecha: fecha ? new Date(fecha) : new Date(),
+      vendedor: vendedorDestino,
+    });
+
+    await this.cajaRepository.save([egreso, ingreso]);
+
+    return {
+      message: 'Transferencia realizada con éxito',
+      egreso,
+      ingreso,
+    };
+  }
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import logo from "../assets/simplificado_a_color.png";
 import Swal from "sweetalert2";
-import { getCategorias, getProfes, getVendedores, getVendID, postEgresoProfesor } from "../queris/queris";
+import { getCategorias, getProfes, getVendedores, getVendID, postEgresoProfesor, postTransferencia } from "../queris/queris";
 const CajaTransferencia = () => {
   const idVende = localStorage.getItem("token");
   const [vendedores, setVendedores] = useState([]);
@@ -88,23 +88,23 @@ const CajaTransferencia = () => {
     console.log(nuevoFormData);
     setPause(false);
 
-    // await postEgresoProfesor(nuevoFormData)
-    //   .then(() => {
-    //     Swal.fire({
-    //       icon: "success",
-    //       title: "Egreso registrado correctamente",
-    //       text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
-    //     });
-    //     setPause(false);
-    //   })
-    //   .catch((error) => {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Error al registrar el egreso",
-    //       text: error.message || "Ocurrió un error al registrar el egreso.",
-    //     });
-    //     setPause(false);
-    //   });
+    await postTransferencia(nuevoFormData)
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Transferencia realizada correctamente",
+          text: `Transferencia de ${nuevoFormData.monto} registrada exitosamente.`,
+        });
+        setPause(false);
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al registrar la transferencia",
+          text: error.message || "Ocurrió un error al registrar la transferencia.",
+        });
+        setPause(false);
+      });
   };
 
   return (

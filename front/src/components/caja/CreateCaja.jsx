@@ -34,7 +34,7 @@ const CreateCaja = () => {
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
-  const [vendedores, setVendores] = useState([]);
+  const [alumnoComisiones, setAlumnocomisiones] = useState([]);
   const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
@@ -61,6 +61,7 @@ const CreateCaja = () => {
       numero: "",
     },
   });
+
   const formatToDisplay = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -141,25 +142,25 @@ const CreateCaja = () => {
       vendedorId: idVende,
       comprobante: cargaComprobante,
     };
-// console.log(nuevoFormData)
-// console.log(alumnoSeleccionado)
-     await postCaja(nuevoFormData).then((data) => {
-       try {
-         Swal.fire({
-           title: "Movimiento Registrado",
-           icon: "success",
-           showConfirmButton: false,
-           timer: 1500,
-         }).then(() => {
-           setImprimir(data.comprobante);
-           setPause(false);
-           setGeneratePDF(true);
-         });
-       } catch (error) {
-         console.log(error);
-         setPause(false);
-       }
-     });
+    // console.log(nuevoFormData)
+    // console.log(alumnoSeleccionado)
+    await postCaja(nuevoFormData).then((data) => {
+      try {
+        Swal.fire({
+          title: "Movimiento Registrado",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          setImprimir(data.comprobante);
+          setPause(false);
+          setGeneratePDF(true);
+        });
+      } catch (error) {
+        console.log(error);
+        setPause(false);
+      }
+    });
   };
 
   const handleOpen = () => {
@@ -178,6 +179,7 @@ const CreateCaja = () => {
             ...prev,
             alumnoComisionId: data.id,
           }));
+          setAlumnocomisiones(data.alumnoComisiones);
           setAlumnoSeleccionado({
             apellidoNombre: data.name,
             dni: data.dni,
@@ -314,7 +316,27 @@ const CreateCaja = () => {
                   </button>
                 </div>
               </div>
-              {alumnoSeleccionado && <div className="text-sm text-gray-700 mb-2">Alumno encontrado: {alumnoSeleccionado.apellidoNombre}</div>}
+              {alumnoSeleccionado && (
+                <>
+                  <div className="text-sm text-gray-700 mb-2">Alumno encontrado: {alumnoSeleccionado.apellidoNombre}</div>
+                  <div className="pb-2">
+                    <label className="block mb-2 text-sm principal">Comisiones Del Alumno</label>
+                    <select
+                      name="alumnoComisionId"
+                      value={formData.alumnoComisionId}
+                      onChange={handleChange}
+                      className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+                    >
+                      <option value="">Seleccione Comision</option>
+                      {alumnoComisiones.map((alu) => (
+                        <option key={alu.id} value={alu.id}>
+                          {alu.comision?.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="pb-2">

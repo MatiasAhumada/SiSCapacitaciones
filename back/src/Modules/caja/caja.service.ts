@@ -53,7 +53,7 @@ export class CajaService {
 
     if (tipo === TipoMovimiento.INGRESO) {
       const alumnoComision = await this.alumnoComisionRepository.findOne({
-        where: { alumno: { id: alumnoComisionId } },
+        where: { id: alumnoComisionId },
         relations: ['alumno'],
       });
       console.log(alumnoComision);

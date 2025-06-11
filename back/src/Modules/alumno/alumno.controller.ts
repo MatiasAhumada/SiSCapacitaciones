@@ -32,24 +32,11 @@ export class AlumnoController {
   findAll() {
     return this.alumnoService.findAll();
   }
-  @Get("sucursal/:id")
+  @Get('sucursal/:id')
   getAlumnosBySucursal(@Param('id') sucursalId: string) {
     return this.alumnoService.getAlumnosBySucursal(sucursalId);
   }
-  
 
-  @Get(':dni')
-  findOne(@Param('dni') dni: string) {
-    return this.alumnoService.findOne(dni);
-  }
-
-  @Put(':id')
-  updateImgUrl(
-    @Param('id') id: string,
-    @Body() updateAlumnoDto: UpdateAlumnoDto,
-  ) {
-    return this.alumnoService.update(id, updateAlumnoDto);
-  }
   @Put('/img/:id')
   update(@Param('id') id: string, @Body() update: UpdateAlumnoDto) {
     return this.alumnoService.actualizarImgUrl(id, update);
@@ -63,6 +50,18 @@ export class AlumnoController {
   //   return this.alumnoService.cambiarEstado(id, estadoBooleano);
   // }
 
+  @Get(':dni')
+  findOne(@Param('dni') dni: string) {
+    return this.alumnoService.findOne(dni);
+  }
+
+  @Put(':id')
+  updateImgUrl(
+    @Param('id') id: string,
+    @Body() updateAlumnoDto: UpdateAlumnoDto,
+  ) {
+    return this.alumnoService.update(id, updateAlumnoDto);
+  }
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.alumnoService.remove(id);

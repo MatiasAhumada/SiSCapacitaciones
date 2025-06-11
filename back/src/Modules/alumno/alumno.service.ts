@@ -93,25 +93,25 @@ export class AlumnoService {
       },
     });
   }
-  
+
   async getAlumnosBySucursal(id: string) {
     const alumnos = await this.alumnoRepository.find({
       where: { sucursal: { id } },
       relations: ['alumnoComisiones', 'certificados'],
       select: ['id', 'name', 'dni', 'tel'],
     });
-  
-    return alumnos.map(alumno => ({
+
+    return alumnos.map((alumno) => ({
       id: alumno.id,
       name: alumno.name,
       dni: alumno.dni,
       tel: alumno.tel,
-      idAluCom:alumno.alumnoComisiones?.map(ac => ac.id) || [],
+      idAluCom: alumno.alumnoComisiones?.map((ac) => ac.id) || [],
       cantidadComisiones: alumno.alumnoComisiones?.length || 0,
       cantidadCertificados: alumno.certificados?.length || 0,
     }));
   }
-  
+
   async actualizarImgUrl(
     id: string,
     update: UpdateAlumnoDto,
@@ -134,7 +134,12 @@ export class AlumnoService {
   async findOne(dni: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
       where: { dni },
-      relations: ['sucursal', 'alumnoComisiones', 'alumnoComisiones.pagos'],
+      relations: [
+        'sucursal',
+        'alumnoComisiones',
+        'alumnoComisiones.pagos',
+        'alumnoComisiones.comision',
+      ],
       select: {
         sucursal: {
           id: true,
@@ -149,6 +154,9 @@ export class AlumnoService {
             fecha: true,
             cuota: true,
             metodoPago: true,
+          },
+          comision: {
+            name: true,
           },
         },
       },

@@ -179,14 +179,25 @@ export class CajaService {
   async findByVendedor(vendedorId: string) {
     const movimientos = await this.cajaRepository.find({
       where: { vendedor: { id: vendedorId } },
-      relations: ['alumnoComision.alumno'],
+      relations: [
+        'alumnoComision.alumno',
+        'subcategoria',
+        'subcategoria.categoria',
+      ],
       select: {
         alumnoComision: {
           id: true,
-
           alumno: {
             id: true,
             name: true,
+          },
+        },
+        subcategoria: {
+          id: true,
+          nombre: true,
+          categoria: {
+            id: true,
+            nombre: true,
           },
         },
       },

@@ -16,9 +16,11 @@ import { v4 as uuid } from 'uuid';
 import { Subcategoria } from './subcategoria.entity';
 import { Categoria } from './categoria.entity';
 export enum TipoMovimiento {
+  APERTURA = 'Apertura',
   INGRESO = 'Ingreso',
   EGRESO = 'Egreso',
   TRANSFERENCIA = 'Transferencia',
+  CIERRE = 'Cierre',
 }
 
 export enum MetodoPago {

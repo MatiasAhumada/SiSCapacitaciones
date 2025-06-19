@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -10,7 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Caja, MetodoPago, TipoMovimiento } from './entities/caja.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
-import { format } from 'date-fns';
+import { format, startOfDay, endOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Comision } from '../comision/entities/comision.entity';
@@ -469,5 +470,35 @@ export class CajaService {
       egreso,
       ingreso,
     };
+  }
+  //apertura de caja
+  async aperturaCaja(vendedorId: string): Promise<Caja> {
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: vendedorId },
+    });
+    if (!vendedor) {
+      throw new NotFoundException('Vendedor no encontrado');
+    }
+    const hoy = new Date();
+    const yaApertura = await this.cajaRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        tipo: TipoMovimiento.APERTURA,
+        fecha: Between(startOfDay(hoy), endOfDay(hoy)),
+      },
+    });
+    if (yaApertura) {
+      throw new BadRequestException('Ya se realizó una apertura de caja hoy.');
+    }
+    const apertura = this.cajaRepository.create({
+      fecha: hoy,
+      tipo: TipoMovimiento.APERTURA,
+      metodoPago: MetodoPago.EFECTIVO, 
+      descripcion: 'Apertura de caja',
+      monto: 0,
+      vendedor: vendedor,
+    });
+
+    return this.cajaRepository.save(apertura);
   }
 }

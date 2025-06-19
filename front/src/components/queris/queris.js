@@ -390,6 +390,14 @@ export const postTransferencia = async (data) => {
     throw error;
   }
 };
+export const aperturaCaja = async (idVend) => {
+  try {
+    const response = await axios.post(`${URL}/caja/apertura/${idVend}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 //CERTIFICADOS

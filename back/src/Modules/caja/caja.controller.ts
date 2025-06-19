@@ -60,8 +60,12 @@ export class CajaController {
   getResumenPorDia(@Param('fecha') fecha: string) {
     return this.cajaService.getResumenPorDia(fecha);
   }
-  
-  @Post("transferencia")
+  @Post('apertura/:vendedorId')
+  async aperturaCaja(@Param('vendedorId') vendedorId: string) {
+    return this.cajaService.aperturaCaja(vendedorId);
+  }
+
+  @Post('transferencia')
   createTransferencia(@Body() data: CreateTransferenciaDto) {
     return this.cajaService.transferirCaja(data);
   }

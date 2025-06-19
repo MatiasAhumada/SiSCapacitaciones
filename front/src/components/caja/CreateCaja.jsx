@@ -82,11 +82,11 @@ const CreateCaja = () => {
         }));
       });
     };
-    const vendedores = async () => {
-      await getVendedores().then((data) => {
-        setVendores(data);
-      });
-    };
+    // const vendedores = async () => {
+    //   await getVendedores().then((data) => {
+    //     setVendores(data);
+    //   });
+    // };
     const alumnos = async () => {
       await getAlu().then((data) => {
         try {
@@ -98,7 +98,7 @@ const CreateCaja = () => {
     };
 
     vendedor();
-    vendedores();
+    // vendedores();
     alumnos();
 
     const intervalId = setInterval(() => {

@@ -111,33 +111,6 @@ const DashCaja = () => {
               <p className="text-gray-600 mt-2">En esta tabla estarán los movimientos realizados.</p>
             </div>
             <AccionesDropdown idVend={idVend}></AccionesDropdown>
-            {/* <div className="mt-3 md:mt-0 ">
-              <button
-                onClick={() => navigate(`/${idVend}/cobrar`)}
-                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
-              >
-                Cobrar
-              </button>
-              <button
-                onClick={() => navigate(`/${idVend}/egreso`)}
-                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
-              >
-                Egreso
-              </button>
-              <button
-                onClick={() => navigate(`/${idVend}/transferencia`)}
-                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
-              >
-                Transferir
-              </button>
-              <button
-                disabled
-                onClick={() => navigate(`/${idVend}/cobrar`)}
-                className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
-              >
-                Cerrar caja
-              </button>
-            </div> */}
           </div>
 
           <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">

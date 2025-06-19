@@ -2,6 +2,7 @@ import React, { use, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { deleteMovCaja, editMovCaja, getAlu, GetCajaByVendedor, getVendedores, getVendID } from "../queris/queris";
 import Swal from "sweetalert2";
+import AccionesDropdown from "./AccionesDropdown";
 
 const DashCaja = () => {
   const idVend = localStorage.getItem("token");
@@ -109,7 +110,8 @@ const DashCaja = () => {
               <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
               <p className="text-gray-600 mt-2">En esta tabla estarán los movimientos realizados.</p>
             </div>
-            <div className="mt-3 md:mt-0 ">
+            <AccionesDropdown idVend={idVend}></AccionesDropdown>
+            {/* <div className="mt-3 md:mt-0 ">
               <button
                 onClick={() => navigate(`/${idVend}/cobrar`)}
                 className="inline-block px-3 py-2 me-2 mb-2 text-white principal btnAz md:text-sm"
@@ -135,7 +137,7 @@ const DashCaja = () => {
               >
                 Cerrar caja
               </button>
-            </div>
+            </div> */}
           </div>
 
           <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">

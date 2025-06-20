@@ -112,6 +112,7 @@ const DashCaja = () => {
       setPaused(false);
       return;
     }
+    console.log(filtros);
     const filtrado = tableItems.filter((item) => {
       return (
         (!filtros.alumno || item.alumnoComision?.alumno?.name?.toLowerCase().includes(filtros.alumno.toLowerCase())) &&
@@ -119,13 +120,13 @@ const DashCaja = () => {
         (!filtros.metodoPago || item.metodoPago.toLowerCase().includes(filtros.metodoPago.toLowerCase())) &&
         (!filtros.descripcion || item.descripcion?.toLowerCase().includes(filtros.descripcion.toLowerCase())) &&
         (!filtros.fecha || item.fecha.includes(filtros.fecha)) &&
-        (!filtros.categoria || item.subcategoria?.categoria?.nombre?.toLowerCase().includes(filtros.categoria.toLowerCase())) &&
-        (!filtros.subcategoria || item.subcategoria?.nombre?.toLowerCase().includes(filtros.subcategoria.toLowerCase()))
+        (!filtros.categoria || item.subcategoria?.categoria?.nombre?.toLowerCase() === filtros.categoria.toLowerCase()) &&
+        (!filtros.subcategoria || item.subcategoria?.nombre?.toLowerCase() === filtros.subcategoria.toLowerCase())
       );
     });
     setTableItems(filtrado);
   };
-  console.log(tableItems);
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (

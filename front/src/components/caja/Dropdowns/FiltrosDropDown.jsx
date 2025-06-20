@@ -13,6 +13,33 @@ const FiltrosDropDown = ({ onFiltrar }) => {
     categoria: "",
     subcategoria: "",
   });
+  const categorias = {
+    ALQUILER: ["ALQUILER"],
+    SUELDOS: ["SUELDOS"],
+    COMISIONES: ["COMISIONES"],
+    PROFESORES: ["PROFESORES"],
+    SERVICIOS: [
+      "electricidad",
+      "gas",
+      "agua",
+      "internet",
+      "celulares",
+      "sistemas",
+      "plataformas_digitales",
+      "dispenser_agua",
+      "honorarios_abogados",
+      "honorarios_contadores",
+      "capacitaciones_y_formaciones",
+      "cuotas_y_adhesiones",
+    ],
+    MARKETING_Y_PUBLICIDAD: ["honorarios_marketing", "publicidad_digital", "television", "radio", "diario", "imprenta", "carteleria"],
+    IMPUESTOS: ["municipal", "rentas", "ingresos_brutos", "afip_iva", "afip_ganancias", "aportes_patronales", "multas", "otros"],
+    REFACCIONES_Y_MANTENIMIENTOS: ["mano_de_obra", "materiales", "bienes_muebles"],
+    INSUMOS: ["limpieza_e_higiene", "libreria_y_oficina", "almacen"],
+    CAPACITACIONES: ["insumos_y_materiales", "herramientas_y_maquinarias"],
+    VIATICOS: ["pasaje/combustible", "alojamiento", "comida"],
+    GASTOS_VARIOS: ["GASTOS_VARIOS"],
+  };
 
   const handleChange = (e) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
@@ -88,7 +115,39 @@ const FiltrosDropDown = ({ onFiltrar }) => {
             className="w-full border rounded px-2 py-1"
             onChange={handleChange}
           />
-          <input
+          <select
+            name="categoria"
+            value={filtros.categoria}
+            onChange={(e) => {
+              const selectedCategoria = e.target.value;
+              setFiltros({
+                ...filtros,
+                categoria: selectedCategoria,
+                subcategoria: "", // reset subcategoria al cambiar categoria
+              });
+            }}
+            className="w-full border rounded px-2 py-1"
+          >
+            <option value="">Seleccionar categoría</option>
+            {Object.keys(categorias).map((cat) => (
+              <option key={cat} value={cat}>
+                {cat.replace(/_/g, " ")}
+              </option>
+            ))}
+          </select>
+
+          {filtros.categoria && (
+            <select name="subcategoria" value={filtros.subcategoria} onChange={handleChange} className="w-full border rounded px-2 py-1 mt-2">
+              <option value="">Seleccionar subcategoría</option>
+              {categorias[filtros.categoria].map((sub) => (
+                <option key={sub} value={sub}>
+                  {sub.replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {/* <input
             type="text"
             name="categoria"
             value={filtros.categoria}
@@ -103,7 +162,7 @@ const FiltrosDropDown = ({ onFiltrar }) => {
             placeholder="Subcategoría"
             className="w-full border rounded px-2 py-1"
             onChange={handleChange}
-          />
+          /> */}
 
           <button
             onClick={aplicarFiltro}

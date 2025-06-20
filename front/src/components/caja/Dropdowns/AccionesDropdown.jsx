@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { aperturaCaja } from "../queris/queris";
+import { aperturaCaja } from "../../queris/queris";
 import Swal from "sweetalert2";
 
 const AccionesDropdown = ({ idVend }) => {

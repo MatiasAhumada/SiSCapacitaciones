@@ -2,7 +2,8 @@ import React, { use, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { deleteMovCaja, editMovCaja, getAlu, GetCajaByVendedor, getVendedores, getVendID } from "../queris/queris";
 import Swal from "sweetalert2";
-import AccionesDropdown from "./AccionesDropdown";
+import AccionesDropdown from "./Dropdowns/AccionesDropdown";
+import FiltrosDropDown from "./Dropdowns/FiltrosDropDown";
 
 const DashCaja = () => {
   const idVend = localStorage.getItem("token");
@@ -20,6 +21,7 @@ const DashCaja = () => {
     alumnoComisionId: "",
     vendedorId: idVend,
   });
+  const [filtrados, setFiltrados] = useState(tableItems);
 
   const navigate = useNavigate();
   const isSubRoute = location.pathname.includes("crear");
@@ -100,6 +102,29 @@ const DashCaja = () => {
       }
     });
   };
+  const filtrar = async (filtros, setPaused) => {
+    const filtrosVacios = Object.values(filtros).every((v) => v.trim() === "");
+
+    if (filtrosVacios) {
+      setPaused(true);
+      const data = await GetCajaByVendedor(idVend); // ⏳ espera la respuesta
+      setTableItems(data); // ✅ actualiza tabla
+      setPaused(false);
+      return;
+    }
+    const filtrado = tableItems.filter((item) => {
+      return (
+        (!filtros.alumno || item.alumnoComision?.alumno?.name?.toLowerCase().includes(filtros.alumno.toLowerCase())) &&
+        (!filtros.tipo || item.tipo.toLowerCase().includes(filtros.tipo.toLowerCase())) &&
+        (!filtros.metodoPago || item.metodoPago.toLowerCase().includes(filtros.metodoPago.toLowerCase())) &&
+        (!filtros.descripcion || item.descripcion?.toLowerCase().includes(filtros.descripcion.toLowerCase())) &&
+        (!filtros.fecha || item.fecha.includes(filtros.fecha)) &&
+        (!filtros.categoria || item.subcategoria?.categoria?.nombre?.toLowerCase().includes(filtros.categoria.toLowerCase())) &&
+        (!filtros.subcategoria || item.subcategoria?.nombre?.toLowerCase().includes(filtros.subcategoria.toLowerCase()))
+      );
+    });
+    setTableItems(filtrado);
+  };
   console.log(tableItems);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -110,6 +135,7 @@ const DashCaja = () => {
               <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
               <p className="text-gray-600 mt-2">En esta tabla estarán los movimientos realizados.</p>
             </div>
+            <FiltrosDropDown onFiltrar={filtrar}></FiltrosDropDown>
             <AccionesDropdown idVend={idVend}></AccionesDropdown>
           </div>
 

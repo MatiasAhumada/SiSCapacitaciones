@@ -1,13 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { VendedorService } from './vendedor.service';
 import { CreateVendedorDto } from './dto/create-vendedor.dto';
 import { UpdateVendedorDto } from './dto/update-vendedor.dto';
 
 @Controller('vendedor')
 export class VendedorController {
-  constructor(
-    
-    private readonly vendedorService: VendedorService) {}
+  constructor(private readonly vendedorService: VendedorService) {}
 
   @Post()
   create(@Body() createVendedorDto: CreateVendedorDto) {
@@ -18,12 +24,11 @@ export class VendedorController {
   findAll() {
     return this.vendedorService.findAll();
   }
-  
-  @Get("sucursal/:id")
+
+  @Get('sucursal/:id')
   getVendedoresBySucursal(@Param('id') sucursalId: string) {
     return this.vendedorService.getVendedoresBySucursal(sucursalId);
-  }  
- 
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -31,7 +36,10 @@ export class VendedorController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVendedorDto: UpdateVendedorDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateVendedorDto: UpdateVendedorDto,
+  ) {
     return this.vendedorService.update(id, updateVendedorDto);
   }
 

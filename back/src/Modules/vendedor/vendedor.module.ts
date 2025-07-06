@@ -7,7 +7,7 @@ import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 
 @Module({
-imports:[TypeOrmModule.forFeature([Vendedor,Sucursal,Inscripcion])],
+  imports: [TypeOrmModule.forFeature([Vendedor, Sucursal, Inscripcion])],
   controllers: [VendedorController],
   providers: [VendedorService],
 })

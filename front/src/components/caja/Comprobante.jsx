@@ -60,7 +60,7 @@ const ReciboComprobante = ({
       ctx.fillText(numeroComprobante, 800, 183);
 
       ctx.font = "20px Arial";
-      ctx.fillText(formaPago, 250, 580);
+      ctx.fillText(formaPago, 235, 580);
 
       ctx.font = "20px Arial";
       ctx.fillText(observacion, 400, 580);

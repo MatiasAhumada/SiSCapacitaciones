@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { data, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { deleteComision, getAlu, getAluCom, getAluID, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
 import ReciboComprobante from "../../caja/Comprobante";
@@ -70,7 +70,6 @@ const DashAlumno = () => {
     if (isDesdeVendedor) {
       const alucom = async () => {
         await getAluCom(idAluCom).then((data) => {
-          console.log(data);
           setDataAlumno(data.alumno);
           setDataComision(data.comision);
           setTableItems(data.pagos);
@@ -81,7 +80,6 @@ const DashAlumno = () => {
     if (isDesdeAdmin) {
       const alucom = async () => {
         await getAluCom(idAlu).then((data) => {
-          console.log(data)
           setDataAlumno(data.alumno);
           setDataComision(data.comision);
           setTableItems(data.pagos);
@@ -153,12 +151,24 @@ const DashAlumno = () => {
   };
   const handlePrint = (item) => {
     setIsModalOpen(true);
-    setInfoComprobante(item);
+    const reciboProps = {
+      numero: item.cuota,
+      tipoComprobante: item.comprobante.tipoComprobante,
+      apellidoNombre: dataAlumno.name, // completar con el valor correspondiente si lo tenés
+      dni: dataAlumno.dni, // completar con el valor correspondiente si lo tenés
+      domicilioComercial: "-", // completar si es necesario
+      iva: "-", // completar si es necesario
+      fecha: new Date(item.fecha).toLocaleDateString("es-AR"), // formato legible
+      formaPago: item.metodoPago,
+      observacion: "-", // podés poner algo como `Pago de cuota ${data.cuota}` si querés
+      monto: item.monto,
+      numeroComprobante: item.comprobante.numeroComprobante,
+    };
+    console.log(reciboProps);
+    setInfoComprobante(reciboProps);
   };
-
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
-      {/* {!isSubRoute && ( */}
       <>
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
@@ -260,7 +270,7 @@ const DashAlumno = () => {
                     {/* BOTON IMPRIMIR  */}
                     <button
                       value={item.comprobante}
-                      onClick={() => handlePrint(item.comprobante)}
+                      onClick={() => handlePrint(item)}
                       className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (

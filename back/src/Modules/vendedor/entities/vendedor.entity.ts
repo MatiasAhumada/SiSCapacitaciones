@@ -1,3 +1,4 @@
+import { SesionCaja } from '@modules/Modules/caja/entities/sesion-caja.entity';
 import { Caja } from 'src/Modules/caja/entities/caja.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
@@ -39,4 +40,7 @@ export class Vendedor {
 
   @OneToMany(() => Caja, (caja) => caja.vendedor)
   caja: Caja[];
+  
+  @OneToMany(() => SesionCaja, (sesionCaja) => sesionCaja.vendedor)
+  sesionesCaja: SesionCaja[];
 }

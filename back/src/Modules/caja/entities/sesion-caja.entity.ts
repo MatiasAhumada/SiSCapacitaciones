@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Caja } from './caja.entity';
 import { v4 as uuid } from 'uuid';
+import { Vendedor } from '@modules/Modules/vendedor/entities/vendedor.entity';
 
 @Entity({
   name: 'sesiones_caja',
@@ -31,4 +32,8 @@ export class SesionCaja {
     cascade: true,
   })
   movimientos: Caja[];
+  
+  @ManyToOne(() => Vendedor, (vendedor) => vendedor.sesionesCaja, { nullable: true })
+  @JoinColumn({ name: 'vendedorId' })
+  vendedor: Vendedor;
 }

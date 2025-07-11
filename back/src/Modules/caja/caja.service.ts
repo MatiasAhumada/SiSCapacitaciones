@@ -490,6 +490,7 @@ export class CajaService {
     // Buscar sesión abierta sin cerrar en cualquier momento (fechaCierre = null)
     const sesionAbierta = await this.sesionRepository.findOne({
       where: {
+        vendedor: { id: vendedorId },
         fechaCierre: IsNull(),
       },
     });

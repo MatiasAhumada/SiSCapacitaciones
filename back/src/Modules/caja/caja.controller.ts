@@ -71,6 +71,14 @@ export class CajaController {
   async aperturaCaja(@Param('vendedorId') vendedorId: string) {
     return this.cajaService.aperturaCaja(vendedorId);
   }
+  @Get('/sesionesvendedor/:vendedorId')
+  findBySesionesVendedor(@Param('vendedorId') id: string) {
+    return this.cajaService.obtenerSesionesPorVendedor(id);
+  }
+  @Patch('cerrarSesion/:vendedorId')
+  async cerrarSesion(@Param('vendedorId') vendedorId: string) {
+    return this.cajaService.cerrarSesionCaja(vendedorId);
+  }
 
   @Post('transferencia')
   createTransferencia(@Body() data: CreateTransferenciaDto) {

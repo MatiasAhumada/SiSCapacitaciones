@@ -43,7 +43,6 @@ export class CajaService {
     private readonly profesorRepository: Repository<Profesor>,
     @InjectRepository(SesionCaja)
     private readonly sesionRepository: Repository<SesionCaja>,
-  
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
@@ -63,7 +62,9 @@ export class CajaService {
       },
     });
     if (!sesionCaja) {
-      throw new BadRequestException('No hay sesión de caja abierta para este vendedor');
+      throw new BadRequestException(
+        'No hay sesión de caja abierta para este vendedor',
+      );
     }
 
     if (tipo === TipoMovimiento.INGRESO) {
@@ -71,7 +72,7 @@ export class CajaService {
         where: { id: alumnoComisionId },
         relations: ['alumno'],
       });
-      
+
       if (!alumnoComision) {
         throw new NotFoundException('Alumno no encontrado');
       }
@@ -514,7 +515,7 @@ export class CajaService {
       montoApertura: 0,
       totalIngresos: 0,
       totalEgresos: 0,
-      vendedor
+      vendedor,
     });
     await this.sesionRepository.save(nuevaSesion);
 
@@ -531,10 +532,14 @@ export class CajaService {
     return this.cajaRepository.save(apertura);
   }
 
-  async cerrarSesionCaja(): Promise<SesionCaja> {
+  async cerrarSesionCaja(vendedorId: string): Promise<SesionCaja> {
+    if (!vendedorId) {
+      throw new BadRequestException('El id del vendedor es obligatorio');
+    }
     // Buscamos la sesión abierta (sin fechaCierre)
     const sesionAbierta = await this.sesionRepository.findOne({
       where: {
+        vendedor: { id: vendedorId },
         fechaCierre: IsNull(),
       },
       relations: ['movimientos'], // si necesitás cargar movimientos para actualizar totales
@@ -567,6 +572,20 @@ export class CajaService {
 
     return this.sesionRepository.save(sesionAbierta);
   }
+  async obtenerSesionesPorVendedor(vendedorId: string) {
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: vendedorId },
+    });
+    if (!vendedor) {
+      throw new NotFoundException('Vendedor no encontrado');
+    }
 
- 
+    const sesiones = await this.sesionRepository.find({
+      where: { vendedor: { id: vendedorId } },
+      relations: ['vendedor', 'movimientos'], // asumiendo que movimientos se llaman así
+      order: { fechaApertura: 'DESC' },
+    });
+
+    return sesiones;
+  }
 }

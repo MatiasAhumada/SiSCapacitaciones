@@ -56,13 +56,22 @@ export class CajaService {
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
+    const sesionCaja = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaCierre: IsNull(),
+      },
+    });
+    if (!sesionCaja) {
+      throw new BadRequestException('No hay sesión de caja abierta para este vendedor');
+    }
 
     if (tipo === TipoMovimiento.INGRESO) {
       const alumnoComision = await this.alumnoComisionRepository.findOne({
         where: { id: alumnoComisionId },
         relations: ['alumno'],
       });
-      console.log(alumnoComision);
+      
       if (!alumnoComision) {
         throw new NotFoundException('Alumno no encontrado');
       }
@@ -110,6 +119,7 @@ export class CajaService {
       newCaja.vendedor = vendedor;
       newCaja.comprobante = newComprobante;
       newCaja.alumnoComision = alumnoComision;
+      newCaja.sesionCaja = sesionCaja;
 
       await this.cajaRepository.save(newCaja);
 
@@ -487,7 +497,6 @@ export class CajaService {
 
     const hoy = new Date();
 
-    // Buscar sesión abierta sin cerrar en cualquier momento (fechaCierre = null)
     const sesionAbierta = await this.sesionRepository.findOne({
       where: {
         vendedor: { id: vendedorId },
@@ -505,10 +514,10 @@ export class CajaService {
       montoApertura: 0,
       totalIngresos: 0,
       totalEgresos: 0,
+      vendedor
     });
     await this.sesionRepository.save(nuevaSesion);
 
-    // Crear movimiento de apertura y asignar la sesión
     const apertura = this.cajaRepository.create({
       fecha: new Date(),
       tipo: TipoMovimiento.APERTURA,

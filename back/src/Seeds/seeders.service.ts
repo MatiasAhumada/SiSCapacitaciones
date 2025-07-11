@@ -27,8 +27,17 @@ export class SeederService implements OnModuleInit {
   ) {}
   private readonly logger = new Logger(SeederService.name);
   async onModuleInit() {
-    await this.hashVendedores();
+    await this.seed();
   }
+  // async crearSesionesCaja() {
+  //   this.logger.log('Iniciando creación de sesiones por día para movimientos de caja...');
+  //   try {
+  //     await this.cajaService.crearSesionesPorDia();
+  //     this.logger.log('Sesiones creadas correctamente.');
+  //   } catch (error) {
+  //     this.logger.error('Error creando sesiones por día:', error);
+  //   }
+  // }
 
   async seed() {
     console.log('Ejecutando seeder...');

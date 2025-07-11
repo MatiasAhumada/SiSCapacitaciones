@@ -11,11 +11,24 @@ import { Comprobante } from '../comprobante/entities/comprobante.entity';
 import { Categoria } from './entities/categoria.entity';
 import { Subcategoria } from './entities/subcategoria.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
+import { SesionCaja } from './entities/sesion-caja.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Caja,Vendedor,Alumno,AlumnoComision,Comprobante,Categoria,Subcategoria,Profesor])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Caja,
+      Vendedor,
+      Alumno,
+      AlumnoComision,
+      Comprobante,
+      Categoria,
+      Subcategoria,
+      Profesor,
+      SesionCaja,
+    ]),
+  ],
   controllers: [CajaController],
   providers: [CajaService],
-  exports:[CajaService]
+  exports: [CajaService],
 })
 export class CajaModule {}

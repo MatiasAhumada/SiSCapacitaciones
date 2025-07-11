@@ -9,7 +9,7 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Caja, MetodoPago, TipoMovimiento } from './entities/caja.entity';
-import { Between, Like, Repository } from 'typeorm';
+import { Between, DataSource, IsNull, Like, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format, startOfDay, endOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -22,6 +22,8 @@ import { Subcategoria } from './entities/subcategoria.entity';
 import { EgresoCajaDTO } from './dto/egreso-caja.dto';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
+import { SesionCaja } from './entities/sesion-caja.entity';
+import { groupBy } from 'lodash'; // o lo haces a mano
 @Injectable()
 export class CajaService {
   constructor(
@@ -39,6 +41,9 @@ export class CajaService {
     private readonly subcategoriaRepository: Repository<Subcategoria>,
     @InjectRepository(Profesor)
     private readonly profesorRepository: Repository<Profesor>,
+    @InjectRepository(SesionCaja)
+    private readonly sesionRepository: Repository<SesionCaja>,
+    private connection: DataSource,
   ) {}
 
   async create(createCajaDto: CreateCajaDto) {
@@ -479,26 +484,78 @@ export class CajaService {
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
+
     const hoy = new Date();
-    const yaApertura = await this.cajaRepository.findOne({
+
+    // Buscar sesión abierta sin cerrar en cualquier momento (fechaCierre = null)
+    const sesionAbierta = await this.sesionRepository.findOne({
       where: {
-        vendedor: { id: vendedorId },
-        tipo: TipoMovimiento.APERTURA,
-        fecha: Between(startOfDay(hoy), endOfDay(hoy)),
+        fechaCierre: IsNull(),
       },
     });
-    if (yaApertura) {
-      throw new BadRequestException('Ya se realizó una apertura de caja hoy.');
+
+    if (sesionAbierta) {
+      throw new BadRequestException(
+        'Ya hay una sesión de caja abierta sin cerrar.',
+      );
     }
+    const nuevaSesion = this.sesionRepository.create({
+      fechaApertura: hoy,
+      montoApertura: 0,
+      totalIngresos: 0,
+      totalEgresos: 0,
+    });
+    await this.sesionRepository.save(nuevaSesion);
+
+    // Crear movimiento de apertura y asignar la sesión
     const apertura = this.cajaRepository.create({
-      fecha: hoy,
+      fecha: new Date(),
       tipo: TipoMovimiento.APERTURA,
-      metodoPago: MetodoPago.EFECTIVO, 
+      metodoPago: MetodoPago.EFECTIVO,
       descripcion: 'Apertura de caja',
       monto: 0,
-      vendedor: vendedor,
+      vendedor,
+      sesionCaja: nuevaSesion,
     });
 
     return this.cajaRepository.save(apertura);
   }
+  async cerrarSesionCaja(): Promise<SesionCaja> {
+    // Buscamos la sesión abierta (sin fechaCierre)
+    const sesionAbierta = await this.sesionRepository.findOne({
+      where: {
+        fechaCierre: IsNull(),
+      },
+      relations: ['movimientos'], // si necesitás cargar movimientos para actualizar totales
+    });
+  
+    if (!sesionAbierta) {
+      throw new BadRequestException('No hay sesión abierta para cerrar.');
+    }
+  
+    // Opcional: validar que el vendedor tenga movimientos en esa sesión, si querés controlar por vendedor
+    // const movimientosVendedor = sesionAbierta.movimientos.filter(mov => mov.vendedor?.id === vendedorId);
+    // if (movimientosVendedor.length === 0) {
+    //   throw new BadRequestException('El vendedor no tiene movimientos en la sesión abierta.');
+    // }
+  
+    // Calcular totales (si no los estás actualizando en tiempo real)
+    const ingresos = sesionAbierta.movimientos
+      .filter(mov => mov.tipo === TipoMovimiento.INGRESO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+  
+    const egresos = sesionAbierta.movimientos
+      .filter(mov => mov.tipo === TipoMovimiento.EGRESO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+  
+    // Actualizar totales y fecha de cierre
+    sesionAbierta.totalIngresos = ingresos;
+    sesionAbierta.totalEgresos = egresos;
+    sesionAbierta.montoCierre = ingresos - egresos;
+    sesionAbierta.fechaCierre = new Date();
+  
+    return this.sesionRepository.save(sesionAbierta);
+  }
+  
+
 }

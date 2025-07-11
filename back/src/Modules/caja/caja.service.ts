@@ -9,7 +9,7 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Caja, MetodoPago, TipoMovimiento } from './entities/caja.entity';
-import { Between, DataSource, IsNull, Like, Repository } from 'typeorm';
+import { Between, DataSource, IsNull, Like, Not, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format, startOfDay, endOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -504,12 +504,30 @@ export class CajaService {
         fechaCierre: IsNull(),
       },
     });
+    
+    let montoApertura = 0;
+    const ultimaSesion = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaCierre: Not(IsNull()),
+      },
+      order: {
+        fechaCierre: 'DESC',
+      },
+    });
+    if (
+      ultimaSesion &&
+      ultimaSesion.totalIngresos > ultimaSesion.totalEgresos
+    ) {
+      montoApertura = ultimaSesion.totalIngresos - ultimaSesion.totalEgresos;
+    }
 
     if (sesionAbierta) {
       throw new BadRequestException(
         'Ya hay una sesión de caja abierta sin cerrar.',
       );
     }
+
     const nuevaSesion = this.sesionRepository.create({
       fechaApertura: hoy,
       montoApertura: 0,

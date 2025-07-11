@@ -67,7 +67,7 @@ export class CajaController {
   getResumenPorDia(@Param('fecha') fecha: string) {
     return this.cajaService.getResumenPorDia(fecha);
   }
-  @Post('apertura/:vendedorId')
+  @Post('/aperturaCaja/:vendedorId')
   async aperturaCaja(@Param('vendedorId') vendedorId: string) {
     return this.cajaService.aperturaCaja(vendedorId);
   }
@@ -75,7 +75,7 @@ export class CajaController {
   findBySesionesVendedor(@Param('vendedorId') id: string) {
     return this.cajaService.obtenerSesionesPorVendedor(id);
   }
-  @Patch('cerrarSesion/:vendedorId')
+  @Patch('cerrarCaja/:vendedorId')
   async cerrarSesion(@Param('vendedorId') vendedorId: string) {
     return this.cajaService.cerrarSesionCaja(vendedorId);
   }

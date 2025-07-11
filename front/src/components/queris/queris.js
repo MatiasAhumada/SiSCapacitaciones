@@ -392,7 +392,15 @@ export const postTransferencia = async (data) => {
 };
 export const aperturaCaja = async (idVend) => {
   try {
-    const response = await axios.post(`${URL}/caja/apertura/${idVend}`);
+    const response = await axios.post(`${URL}/caja/aperturaCaja/${idVend}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const cerrarCaja = async (idVend) => {
+  try {
+    const response = await axios.patch(`${URL}/caja/cerrarCaja/${idVend}`);
     return response.data;
   } catch (error) {
     throw error;

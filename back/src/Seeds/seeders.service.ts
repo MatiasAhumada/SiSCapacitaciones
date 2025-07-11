@@ -29,15 +29,15 @@ export class SeederService implements OnModuleInit {
   async onModuleInit() {
     await this.seed();
   }
-  // async crearSesionesCaja() {
-  //   this.logger.log('Iniciando creación de sesiones por día para movimientos de caja...');
-  //   try {
-  //     await this.cajaService.crearSesionesPorDia();
-  //     this.logger.log('Sesiones creadas correctamente.');
-  //   } catch (error) {
-  //     this.logger.error('Error creando sesiones por día:', error);
-  //   }
-  // }
+  //  async crearSesionesCaja() {
+  //    this.logger.log('Iniciando creación de sesiones por día para movimientos de caja...');
+  //    try {
+  //      await this.cajaService.crearSesionesPorDia();
+  //      this.logger.log('Sesiones creadas correctamente.');
+  //    } catch (error) {
+  //      this.logger.error('Error creando sesiones por día:', error);
+  //    }
+  //  }
 
   async seed() {
     console.log('Ejecutando seeder...');

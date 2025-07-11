@@ -13,7 +13,7 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { EgresoCajaDTO } from './dto/egreso-caja.dto';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
-
+import { format } from 'date-fns';
 @Controller('caja')
 export class CajaController {
   constructor(private readonly cajaService: CajaService) {}
@@ -27,6 +27,7 @@ export class CajaController {
   findAll() {
     return this.cajaService.findAll();
   }
+
   @Get('/digita-tobias')
   findDigitalTobias() {
     return this.cajaService.findByTobias();
@@ -44,6 +45,12 @@ export class CajaController {
   @Get('/vendedor/:id')
   findByVendedor(@Param('id') id: string) {
     return this.cajaService.findByVendedor(id);
+  }
+
+  @Get('movDiario')
+  async getMovimientosDiarios() {
+    const hoy = format(new Date(), 'yyyy-MM-dd');
+    return this.cajaService.getMovimientosPorDia(hoy);
   }
 
   @Get('/movimientos/:fecha')

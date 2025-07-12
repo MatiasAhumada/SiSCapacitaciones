@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { aperturaCaja, cerrarCaja } from "../../queris/queris";
-import Swal from "sweetalert2";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { aperturaCaja, cerrarCaja } from '../../queris/queris';
+import Swal from 'sweetalert2';
 
 const AccionesDropdown = ({ idVend }) => {
   const [open, setOpen] = useState(false);
@@ -10,39 +10,39 @@ const AccionesDropdown = ({ idVend }) => {
   const handleNavigate = async (ruta) => {
     setOpen(false);
     switch (ruta) {
-      case "apertura":
+      case 'apertura':
         await aperturaCaja(idVend)
           .then((res) => {
             console.log(res);
             Swal.fire({
-              icon: "success",
-              title: "Apertura de caja exitosa",
+              icon: 'success',
+              title: 'Apertura de caja exitosa',
               text: `Caja abierta por ${res.vendedor.name}`,
             });
           })
           .catch((err) => {
             Swal.fire({
-              icon: "error",
-              title: "Error al abrir la caja",
-              text: err.response?.data?.message || "Error desconocido",
+              icon: 'error',
+              title: 'Error al abrir la caja',
+              text: err.response?.data?.message || 'Error desconocido',
             });
           });
 
         break;
-      case "cierre":
+      case 'cierre':
         await cerrarCaja(idVend)
           .then((res) => {
             console.log(res);
             Swal.fire({
-              icon: "success",
-              title: "Cierre de caja exitosa",
+              icon: 'success',
+              title: 'Cierre de caja exitosa',
             });
           })
           .catch((err) => {
             Swal.fire({
-              icon: "error",
-              title: "Error al cerrar la caja",
-              text: err.response?.data?.message || "Error desconocido",
+              icon: 'error',
+              title: 'Error al cerrar la caja',
+              text: err.response?.data?.message || 'Error desconocido',
             });
           });
         break;
@@ -59,19 +59,34 @@ const AccionesDropdown = ({ idVend }) => {
 
       {open && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-          <button onClick={() => handleNavigate("apertura")} className="w-full text-left px-4 py-2 hover:bg-gray-100">
+          <button
+            onClick={() => handleNavigate('apertura')}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+          >
             Apertura Caja
           </button>
-          <button onClick={() => handleNavigate("cobrar")} className="w-full text-left px-4 py-2 hover:bg-gray-100">
+          <button
+            onClick={() => handleNavigate('cobrar')}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+          >
             Cobrar
           </button>
-          <button onClick={() => handleNavigate("egreso")} className="w-full text-left px-4 py-2 hover:bg-gray-100">
+          <button
+            onClick={() => handleNavigate('egreso')}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+          >
             Egreso
           </button>
-          <button onClick={() => handleNavigate("transferencia")} className="w-full text-left px-4 py-2 hover:bg-gray-100">
+          <button
+            onClick={() => handleNavigate('transferencia')}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+          >
             Transferir
           </button>
-          <button onClick={() => handleNavigate("cierre")} className="w-full text-left px-4 py-2 hover:bg-gray-100">
+          <button
+            onClick={() => handleNavigate('cierre')}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+          >
             Cerrar caja
           </button>
         </div>

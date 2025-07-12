@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { deleteAlumnoId, getAluSucID } from "../../queris/queris";
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { deleteAlumnoId, getAluSucID } from '../../queris/queris';
 
 const DashAlumnos = () => {
   const [tableItems, setTableItems] = useState([]);
@@ -14,14 +14,14 @@ const DashAlumnos = () => {
 
   const location = useLocation();
 
-  const isSubRoute = location.pathname.includes("crear");
+  const isSubRoute = location.pathname.includes('crear');
   const click = (item) => {
     console.log(item.idAluCom[0]);
     const idAlu = item.idAluCom[0];
     if (!idAlu) {
       Swal.fire({
-        title: "No hay comisiones asignadas",
-        icon: "error",
+        title: 'No hay comisiones asignadas',
+        icon: 'error',
         showConfirmButton: false,
         timer: 1500,
       });
@@ -39,8 +39,8 @@ const DashAlumnos = () => {
     await deleteAlumnoId(id).then(() => {
       try {
         Swal.fire({
-          title: "Alumno Eliminado",
-          icon: "success",
+          title: 'Alumno Eliminado',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -72,11 +72,18 @@ const DashAlumnos = () => {
         <>
           <div className="items-start justify-between md:flex">
             <div className="max-w-lg">
-              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Listado de alumnos.</h3>
-              <p className="text-gray-600 mt-2">En esta tabla estaran todos los alumnos de esta sucursal</p>
+              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+                Listado de alumnos.
+              </h3>
+              <p className="text-gray-600 mt-2">
+                En esta tabla estaran todos los alumnos de esta sucursal
+              </p>
             </div>
             <div className="mt-3 md:mt-0">
-              <button onClick={() => navigate(`/adm/${id}/alumnos/crear`)} className="inline-block px-4 py-2 text-white principal btnAz md:text-sm">
+              <button
+                onClick={() => navigate(`/adm/${id}/alumnos/crear`)}
+                className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
+              >
                 Nuevo Alumno
               </button>
             </div>
@@ -105,7 +112,12 @@ const DashAlumnos = () => {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       {/* BOTON VER MAS */}
-                      <button type="button" value={item.id} onClick={() => click(item)} className="px-4 py-2 ms-3 btnAz principal md:text-sm rounded">
+                      <button
+                        type="button"
+                        value={item.id}
+                        onClick={() => click(item)}
+                        className="px-4 py-2 ms-3 btnAz principal md:text-sm rounded"
+                      >
                         <i className="fa-solid fa-plus"></i>
                       </button>
 
@@ -116,7 +128,12 @@ const DashAlumnos = () => {
                         className=" px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (
-                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <svg
+                            fill="white"
+                            className="w-6 h-6 mx-auto"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
                             <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                               <animateTransform
                                 attributeName="transform"

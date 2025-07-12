@@ -1,5 +1,5 @@
-import React, { use, useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { Outlet, useParams } from 'react-router-dom';
 import {
   deleteMovCaja,
   editMovCaja,
@@ -9,37 +9,35 @@ import {
   getResumenPorDia,
   getResumenTotal,
   getVendedores,
-} from "../../queris/queris";
-import Swal from "sweetalert2";
+} from '../../queris/queris';
+import Swal from 'sweetalert2';
 
 const DashCajas = () => {
   const { id } = useParams();
-  const idVend = localStorage.getItem("token");
+  const idVend = localStorage.getItem('token');
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [editMode, setEditMode] = useState(null);
   const [alu, setAlu] = useState([]);
   const [vend, setVend] = useState([]);
   const [fecha, setFecha] = useState(new Date());
-  const [fechaFiltro, setFechaFiltro] = useState("");
+  const [fechaFiltro, setFechaFiltro] = useState('');
   const [datosFiltro, setDatosFiltro] = useState({});
   const [formEdit, setFormEdit] = useState({
     fecha: fecha,
-    tipo: "",
-    metodoPago: "",
-    monto: "",
-    descripcion: "",
-    alumnoComisionId: "",
+    tipo: '',
+    metodoPago: '',
+    monto: '',
+    descripcion: '',
+    alumnoComisionId: '',
     vendedorId: idVend,
   });
 
   const onFiltrar = async () => {
     await getMovimientosPorDia(fechaFiltro).then((data) => {
-     console.log(data.length==0)
-           if(data.length==0){
-      Swal.fire(
-        
-      )
+      console.log(data.length == 0);
+      if (data.length == 0) {
+        Swal.fire();
       }
       setTableItems(data);
     });
@@ -50,11 +48,11 @@ const DashCajas = () => {
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
@@ -99,8 +97,8 @@ const DashCajas = () => {
     await deleteMovCaja(e.target.value).then(() => {
       try {
         Swal.fire({
-          title: "Movimiento Eliminado",
-          icon: "success",
+          title: 'Movimiento Eliminado',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -159,13 +157,13 @@ const DashCajas = () => {
     await editMovCaja(item.id, formEdit).then((data) => {
       try {
         Swal.fire({
-          title: "Caja Editada",
-          icon: "success",
+          title: 'Caja Editada',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         });
       } catch (error) {
-        Swal.fire({ title: "Error al actualizar", icon: "error" });
+        Swal.fire({ title: 'Error al actualizar', icon: 'error' });
       } finally {
         setPause((prev) => ({ ...prev, [item.id]: false }));
         setEditMode(null);
@@ -178,11 +176,18 @@ const DashCajas = () => {
       <>
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
-            <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Historial de cajas</h3>
+            <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+              Historial de cajas
+            </h3>
             <p className="text-gray-600 mt-2">En esta tabla estaran los movimientos realizados.</p>
           </div>
           <div className="mt-3 md:mt-0 flex items-center gap-3">
-            <input type="date" value={fechaFiltro} onChange={(e) => setFechaFiltro(e.target.value)} className="p-2 border rounded" />
+            <input
+              type="date"
+              value={fechaFiltro}
+              onChange={(e) => setFechaFiltro(e.target.value)}
+              className="p-2 border rounded"
+            />
             <button onClick={onFiltrar} className="px-4 py-2 text-white principal btnAz md:text-sm">
               Filtrar
             </button>
@@ -223,7 +228,11 @@ const DashCajas = () => {
 
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <select name="vendedorId" value={formEdit.vendedorId} onChange={handleVendedorChange}>
+                      <select
+                        name="vendedorId"
+                        value={formEdit.vendedorId}
+                        onChange={handleVendedorChange}
+                      >
                         <option value="">Seleccione un vendedor</option>
                         {vend.map((vendedor) => (
                           <option key={vendedor.id} value={vendedor.id}>
@@ -232,12 +241,16 @@ const DashCajas = () => {
                         ))}
                       </select>
                     ) : (
-                      item.vendedor?.name || "-"
+                      item.vendedor?.name || '-'
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <select name="alumnoComisionId" value={formEdit.alumnoComisionId} onChange={handleAlumnoChange}>
+                      <select
+                        name="alumnoComisionId"
+                        value={formEdit.alumnoComisionId}
+                        onChange={handleAlumnoChange}
+                      >
                         <option value="">Seleccione un alumno</option>
                         {alu.map((alumno) => (
                           <option key={alumno.id} value={alumno.id}>
@@ -246,7 +259,7 @@ const DashCajas = () => {
                         ))}
                       </select>
                     ) : (
-                      item.alumnoComision?.alumno.name || "-"
+                      item.alumnoComision?.alumno.name || '-'
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -276,23 +289,43 @@ const DashCajas = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <input type="text" name="descripcion" value={formEdit.descripcion || ""} onChange={handleChange} className="text-center" />
+                      <input
+                        type="text"
+                        name="descripcion"
+                        value={formEdit.descripcion || ''}
+                        onChange={handleChange}
+                        className="text-center"
+                      />
                     ) : (
                       item.descripcion
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <input type="number" name="monto" value={formEdit.monto || ""} onChange={handleChange} className="text-center" />
+                      <input
+                        type="number"
+                        name="monto"
+                        value={formEdit.monto || ''}
+                        onChange={handleChange}
+                        className="text-center"
+                      />
                     ) : (
                       item.monto
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editMode === item.id ? (
-                      <button onClick={() => handleSave(item)} className="px-4 py-2 text-white me-2 bg-green-500 hover:bg-green-600 rounded">
+                      <button
+                        onClick={() => handleSave(item)}
+                        className="px-4 py-2 text-white me-2 bg-green-500 hover:bg-green-600 rounded"
+                      >
                         {pause[item.id] ? (
-                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <svg
+                            fill="white"
+                            className="w-6 h-6 mx-auto"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
                             <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                               <animateTransform
                                 attributeName="transform"
@@ -304,11 +337,15 @@ const DashCajas = () => {
                             </path>
                           </svg>
                         ) : (
-                          "Guardar"
+                          'Guardar'
                         )}
                       </button>
                     ) : (
-                      <button value={item.id} onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded me-2">
+                      <button
+                        value={item.id}
+                        onClick={() => handleEdit(item)}
+                        className="px-4 py-2 text-white btnAz rounded me-2"
+                      >
                         Editar
                       </button>
                     )}
@@ -318,7 +355,12 @@ const DashCajas = () => {
                       className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (
-                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="white"
+                          className="w-6 h-6 mx-auto"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"
@@ -330,7 +372,7 @@ const DashCajas = () => {
                           </path>
                         </svg>
                       ) : (
-                        "Eliminar"
+                        'Eliminar'
                       )}
                     </button>
                   </td>

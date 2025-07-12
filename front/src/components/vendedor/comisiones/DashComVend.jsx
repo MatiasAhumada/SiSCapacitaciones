@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { deleteComision, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import {
+  deleteComision,
+  getComisiones,
+  getCursos,
+  getProfes,
+  putComision,
+} from '../../queris/queris';
 
 const DashComVend = () => {
   const { id, idVend } = useParams();
@@ -11,17 +17,17 @@ const DashComVend = () => {
   const [pause, setPause] = useState({});
   const [editing, setEditing] = useState(null);
   const [editData, setEditData] = useState({
-    name: "",
-    day: "",
-    hour: { start: "", end: "" },
-    cursoId: "",
-    profesorId: "",
+    name: '',
+    day: '',
+    hour: { start: '', end: '' },
+    cursoId: '',
+    profesorId: '',
     sucursalId: id,
   });
   const [cursos, setCursos] = useState([]);
   const [profesores, setProfesores] = useState([]);
 
-  const isSubRoute = location.pathname.includes("crear");
+  const isSubRoute = location.pathname.includes('crear');
 
   const clickDelete = async (id) => {
     const comisionId = id;
@@ -30,8 +36,8 @@ const DashComVend = () => {
     await deleteComision(id).then(() => {
       try {
         Swal.fire({
-          title: "Comision Eliminada",
-          icon: "success",
+          title: 'Comision Eliminada',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -75,8 +81,8 @@ const DashComVend = () => {
       name: comision.name,
       day: comision.day,
       hour: comision.hour,
-      cursoId: comision.curso?.id || "",
-      profesorId: comision.profesor?.id || "",
+      cursoId: comision.curso?.id || '',
+      profesorId: comision.profesor?.id || '',
       sucursalId: comision.sucursal?.id || id,
     });
   };
@@ -97,7 +103,12 @@ const DashComVend = () => {
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     try {
       await putComision(comisionId, editData);
-      Swal.fire({ title: "Comisión actualizada", icon: "success", showConfirmButton: false, timer: 1500 });
+      Swal.fire({
+        title: 'Comisión actualizada',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
       setTableItems((prev) =>
         prev.map((item) =>
           item.id === comisionId
@@ -111,24 +122,24 @@ const DashComVend = () => {
         )
       );
     } catch (error) {
-      Swal.fire({ title: "Error al actualizar", icon: "error" });
+      Swal.fire({ title: 'Error al actualizar', icon: 'error' });
     } finally {
       setPause((prev) => ({ ...prev, [comisionId]: false }));
       setEditing(null);
     }
   };
   const dias = [
-    { value: "Lunes" },
-    { value: "Martes" },
-    { value: "Miercoles" },
-    { value: "Jueves" },
-    { value: "Viernes" },
-    { value: "Sabado" },
-    { value: "Domingo" },
+    { value: 'Lunes' },
+    { value: 'Martes' },
+    { value: 'Miercoles' },
+    { value: 'Jueves' },
+    { value: 'Viernes' },
+    { value: 'Sabado' },
+    { value: 'Domingo' },
   ];
   const horarios = Array.from({ length: (22 - 8) * 2 + 1 }, (_, i) => {
     const horas = Math.floor(8 + i / 2);
-    const minutos = i % 2 === 0 ? "00" : "30";
+    const minutos = i % 2 === 0 ? '00' : '30';
     return `${horas}:${minutos}`;
   });
   return (
@@ -137,8 +148,12 @@ const DashComVend = () => {
         <>
           <div className="items-start justify-between md:flex">
             <div className="max-w-lg">
-              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Listado de Comisiones</h3>
-              <p className="text-gray-600 mt-2">En esta tabla estaran las comisiones de esta sucursal</p>
+              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+                Listado de Comisiones
+              </h3>
+              <p className="text-gray-600 mt-2">
+                En esta tabla estaran las comisiones de esta sucursal
+              </p>
             </div>
             <div className="mt-3 md:mt-0">
               <button
@@ -167,7 +182,13 @@ const DashComVend = () => {
                   <tr key={item.id}>
                     <td className="px-6 py-4">
                       {editing === item.id ? (
-                        <input type="text" value={editData.name} name="name" onChange={handleChange} className="border rounded px-2" />
+                        <input
+                          type="text"
+                          value={editData.name}
+                          name="name"
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        />
                       ) : (
                         item.name
                       )}
@@ -175,23 +196,28 @@ const DashComVend = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                          item.day === "Lunes"
-                            ? "bg-blue-200 text-blue-800"
-                            : item.day === "Martes"
-                            ? "bg-yellow-200 text-yellow-800"
-                            : item.day === "Miercoles"
-                            ? "bg-red-200 text-red-800"
-                            : item.day === "Jueves"
-                            ? "bg-pink-200 text-pink-800"
-                            : item.day === "Viernes"
-                            ? "bg-purple-200 text-purple-800"
-                            : item.day === "Sabado"
-                            ? "bg-green-200 text-green-800"
-                            : "bg-gray-200 text-gray-800"
+                          item.day === 'Lunes'
+                            ? 'bg-blue-200 text-blue-800'
+                            : item.day === 'Martes'
+                              ? 'bg-yellow-200 text-yellow-800'
+                              : item.day === 'Miercoles'
+                                ? 'bg-red-200 text-red-800'
+                                : item.day === 'Jueves'
+                                  ? 'bg-pink-200 text-pink-800'
+                                  : item.day === 'Viernes'
+                                    ? 'bg-purple-200 text-purple-800'
+                                    : item.day === 'Sabado'
+                                      ? 'bg-green-200 text-green-800'
+                                      : 'bg-gray-200 text-gray-800'
                         }`}
                       >
                         {editing === item.id ? (
-                          <select name="day" value={editData?.day || ""} onChange={handleChange} className="border rounded px-2">
+                          <select
+                            name="day"
+                            value={editData?.day || ''}
+                            onChange={handleChange}
+                            className="border rounded px-2"
+                          >
                             <option value="">Seleccionar</option>
                             {dias.map((dia, idx) => (
                               <option key={idx} value={dia.value}>
@@ -207,7 +233,12 @@ const DashComVend = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editing === item.id ? (
                         <>
-                          <select name="start" value={editData.hour?.start || ""} onChange={handleChange} className="border rounded px-2">
+                          <select
+                            name="start"
+                            value={editData.hour?.start || ''}
+                            onChange={handleChange}
+                            className="border rounded px-2"
+                          >
                             <option value=""> Inicio</option>
                             {horarios.map((horario, index) => (
                               <option key={index} value={horario}>
@@ -216,7 +247,12 @@ const DashComVend = () => {
                             ))}
                           </select>
                           <span>-</span>
-                          <select name="end" value={editData.hour?.end || ""} onChange={handleChange} className="border rounded px-2">
+                          <select
+                            name="end"
+                            value={editData.hour?.end || ''}
+                            onChange={handleChange}
+                            className="border rounded px-2"
+                          >
                             <option value=""> Fin</option>
                             {horarios.map((horario, index) => (
                               <option key={index} value={horario}>
@@ -226,13 +262,17 @@ const DashComVend = () => {
                           </select>
                         </>
                       ) : (
-                        `${item?.hour?.start || "Hora no definida"} - ${item?.hour?.end || "Hora no definida"}`
+                        `${item?.hour?.start || 'Hora no definida'} - ${item?.hour?.end || 'Hora no definida'}`
                       )}
                     </td>
 
                     <td className="px-6 py-4">
                       {editing === item.id ? (
-                        <select name="profesorId" onChange={handleChange} className="border rounded px-2">
+                        <select
+                          name="profesorId"
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        >
                           {profesores.map((profesor) => (
                             <option key={profesor.id} value={profesor.id}>
                               {profesor.name} {profesor.apellido}
@@ -252,7 +292,12 @@ const DashComVend = () => {
                         className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (
-                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <svg
+                            fill="white"
+                            className="w-6 h-6 mx-auto"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
                             <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                               <animateTransform
                                 attributeName="transform"
@@ -271,9 +316,17 @@ const DashComVend = () => {
                       {editing === item.id ? (
                         // BOTON GUARDAR
 
-                        <button onClick={() => handleSave(item.id)} className="px-4 py-2 text-white bg-green-500 rounded ms-3">
+                        <button
+                          onClick={() => handleSave(item.id)}
+                          className="px-4 py-2 text-white bg-green-500 rounded ms-3"
+                        >
                           {pause[item.id] ? (
-                            <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg
+                              fill="white"
+                              className="w-6 h-6 mx-auto"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
                               <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                                 <animateTransform
                                   attributeName="transform"
@@ -290,9 +343,17 @@ const DashComVend = () => {
                         </button>
                       ) : (
                         // BOTON EDITAR
-                        <button onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded ms-3">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="px-4 py-2 text-white btnAz rounded ms-3"
+                        >
                           {pause[item.id] ? (
-                            <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg
+                              fill="white"
+                              className="w-6 h-6 mx-auto"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
                               <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                                 <animateTransform
                                   attributeName="transform"
@@ -315,7 +376,12 @@ const DashComVend = () => {
                         className=" px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                       >
                         {pause[item.id] ? (
-                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <svg
+                            fill="white"
+                            className="w-6 h-6 mx-auto"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
                             <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                               <animateTransform
                                 attributeName="transform"

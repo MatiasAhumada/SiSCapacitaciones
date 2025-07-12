@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { data, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { deleteComision, getAlu, getAluCom, getAluID, getComisiones, getCursos, getProfes, putComision } from "../../queris/queris";
-import ReciboComprobante from "../../caja/Comprobante";
-import { Modal } from "antd";
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import {
+  deleteComision,
+  getAluCom,
+  putComision,
+} from '../../queris/queris';
+import ReciboComprobante from '../../caja/Comprobante';
+import { Modal } from 'antd';
 
 const DashAlumno = () => {
   const { idAluCom, idAlu, idVend } = useParams();
@@ -16,30 +20,30 @@ const DashAlumno = () => {
   const [editing, setEditing] = useState(null);
   const [fecha, setFecha] = useState(new Date());
   const [editData, setEditData] = useState({
-    fecha: "",
-    metodoPago: "",
-    monto: "",
-    cuota: "",
-    alumnoId: "",
-    comisionId: "",
+    fecha: '',
+    metodoPago: '',
+    monto: '',
+    cuota: '',
+    alumnoId: '',
+    comisionId: '',
   });
   const [infoComprobante, setInfoComprobante] = useState({
-    apellidoNombre: "",
-    dni: "",
-    domicilioComercial: "",
-    iva: "",
-    fecha: "",
-    formaPago: "",
-    observacion: "",
-    monto: "",
-    comprobante: "",
-    numero: "",
-    numeroComprobante: "",
+    apellidoNombre: '',
+    dni: '',
+    domicilioComercial: '',
+    iva: '',
+    fecha: '',
+    formaPago: '',
+    observacion: '',
+    monto: '',
+    comprobante: '',
+    numero: '',
+    numeroComprobante: '',
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   //const isSubRoute = location.pathname.includes("crear");
   const isDesdeVendedor = location.pathname.includes(idVend);
-  const isDesdeAdmin = location.pathname.includes("adm");
+  const isDesdeAdmin = location.pathname.includes('adm');
 
   const clickDelete = async (id) => {
     const comisionId = id;
@@ -48,8 +52,8 @@ const DashAlumno = () => {
     await deleteComision(id).then(() => {
       try {
         Swal.fire({
-          title: "Comision Eliminada",
-          icon: "success",
+          title: 'Comision Eliminada',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -95,8 +99,8 @@ const DashAlumno = () => {
       name: comision.name,
       day: comision.day,
       hour: comision.hour,
-      cursoId: comision.curso?.id || "",
-      profesorId: comision.profesor?.id || "",
+      cursoId: comision.curso?.id || '',
+      profesorId: comision.profesor?.id || '',
       sucursalId: comision.sucursal?.id || id,
     });
   };
@@ -117,7 +121,12 @@ const DashAlumno = () => {
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     try {
       await putComision(comisionId, editData);
-      Swal.fire({ title: "Comisión actualizada", icon: "success", showConfirmButton: false, timer: 1500 });
+      Swal.fire({
+        title: 'Comisión actualizada',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
       setTableItems((prev) =>
         prev.map((item) =>
           item.id === comisionId
@@ -131,7 +140,7 @@ const DashAlumno = () => {
         )
       );
     } catch (error) {
-      Swal.fire({ title: "Error al actualizar", icon: "error" });
+      Swal.fire({ title: 'Error al actualizar', icon: 'error' });
     } finally {
       setPause((prev) => ({ ...prev, [comisionId]: false }));
       setEditing(null);
@@ -142,11 +151,11 @@ const DashAlumno = () => {
   };
   const formatToDisplay = (date) => {
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
   const handlePrint = (item) => {
@@ -156,11 +165,11 @@ const DashAlumno = () => {
       tipoComprobante: item.comprobante.tipoComprobante,
       apellidoNombre: dataAlumno.name, // completar con el valor correspondiente si lo tenés
       dni: dataAlumno.dni, // completar con el valor correspondiente si lo tenés
-      domicilioComercial: "-", // completar si es necesario
-      iva: "-", // completar si es necesario
-      fecha: new Date(item.fecha).toLocaleDateString("es-AR"), // formato legible
+      domicilioComercial: '-', // completar si es necesario
+      iva: '-', // completar si es necesario
+      fecha: new Date(item.fecha).toLocaleDateString('es-AR'), // formato legible
       formaPago: item.metodoPago,
-      observacion: "-", // podés poner algo como `Pago de cuota ${data.cuota}` si querés
+      observacion: '-', // podés poner algo como `Pago de cuota ${data.cuota}` si querés
       monto: item.monto,
       numeroComprobante: item.comprobante.numeroComprobante,
     };
@@ -172,13 +181,16 @@ const DashAlumno = () => {
       <>
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
-            <h1 className="text-gray-800 text-xl font-bold sm:text-2xl principal">{dataAlumno.name}</h1>
+            <h1 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+              {dataAlumno.name}
+            </h1>
             <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
               Tel: {dataAlumno.tel} / D.N.I: {dataAlumno.dni}
             </h2>
 
             <h3>
-              {dataComision.name}: {dataComision.day} {dataComision.hour?.start} - {dataComision.hour?.end}
+              {dataComision.name}: {dataComision.day} {dataComision.hour?.start} -{' '}
+              {dataComision.hour?.end}
             </h3>
           </div>
           <div className="mt-3 md:mt-0">
@@ -206,7 +218,13 @@ const DashAlumno = () => {
                 <tr key={item.id}>
                   <td className="px-6 py-4">
                     {editing === item.id ? (
-                      <input type="text" value={editData.name} name="name" onChange={handleChange} className="border rounded px-2" />
+                      <input
+                        type="text"
+                        value={editData.name}
+                        name="name"
+                        onChange={handleChange}
+                        className="border rounded px-2"
+                      />
                     ) : (
                       formatToDisplay(item.fecha)
                     )}
@@ -214,19 +232,24 @@ const DashAlumno = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                        item.metodoPago === "Efectivo"
-                          ? "bg-blue-200 text-blue-800"
-                          : item.metodoPago === "Debito"
-                          ? "bg-yellow-200 text-yellow-800"
-                          : item.metodoPago === "Transferencia"
-                          ? "bg-red-200 text-red-800"
-                          : item.metodoPago === "Credito"
-                          ? "bg-pink-200 text-pink-800"
-                          : "bg-gray-200 text-gray-800"
+                        item.metodoPago === 'Efectivo'
+                          ? 'bg-blue-200 text-blue-800'
+                          : item.metodoPago === 'Debito'
+                            ? 'bg-yellow-200 text-yellow-800'
+                            : item.metodoPago === 'Transferencia'
+                              ? 'bg-red-200 text-red-800'
+                              : item.metodoPago === 'Credito'
+                                ? 'bg-pink-200 text-pink-800'
+                                : 'bg-gray-200 text-gray-800'
                       }`}
                     >
                       {editing === item.id ? (
-                        <select name="day" value={editData?.day || ""} onChange={handleChange} className="border rounded px-2">
+                        <select
+                          name="day"
+                          value={editData?.day || ''}
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        >
                           <option value="">Seleccionar</option>
                           {dias.map((dia, idx) => (
                             <option key={idx} value={dia.value}>
@@ -242,7 +265,12 @@ const DashAlumno = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editing === item.id ? (
                       <>
-                        <select name="start" value={editData.hour?.start || ""} onChange={handleChange} className="border rounded px-2">
+                        <select
+                          name="start"
+                          value={editData.hour?.start || ''}
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        >
                           <option value=""> Inicio</option>
                           {horarios.map((horario, index) => (
                             <option key={index} value={horario}>
@@ -251,7 +279,12 @@ const DashAlumno = () => {
                           ))}
                         </select>
                         <span>-</span>
-                        <select name="end" value={editData.hour?.end || ""} onChange={handleChange} className="border rounded px-2">
+                        <select
+                          name="end"
+                          value={editData.hour?.end || ''}
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        >
                           <option value=""> Fin</option>
                           {horarios.map((horario, index) => (
                             <option key={index} value={horario}>
@@ -274,7 +307,12 @@ const DashAlumno = () => {
                       className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (
-                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="white"
+                          className="w-6 h-6 mx-auto"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"
@@ -293,9 +331,17 @@ const DashAlumno = () => {
                     {editing === item.id ? (
                       // BOTON GUARDAR
 
-                      <button onClick={() => handleSave(item.id)} className="px-4 py-2 text-white bg-green-500 rounded ms-3">
+                      <button
+                        onClick={() => handleSave(item.id)}
+                        className="px-4 py-2 text-white bg-green-500 rounded ms-3"
+                      >
                         {pause[item.id] ? (
-                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <svg
+                            fill="white"
+                            className="w-6 h-6 mx-auto"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
                             <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                               <animateTransform
                                 attributeName="transform"
@@ -312,9 +358,17 @@ const DashAlumno = () => {
                       </button>
                     ) : (
                       // BOTON EDITAR
-                      <button onClick={() => handleEdit(item)} className="px-4 py-2 text-white btnAz rounded ms-3">
+                      <button
+                        onClick={() => handleEdit(item)}
+                        className="px-4 py-2 text-white btnAz rounded ms-3"
+                      >
                         {pause[item.id] ? (
-                          <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <svg
+                            fill="white"
+                            className="w-6 h-6 mx-auto"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
                             <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                               <animateTransform
                                 attributeName="transform"
@@ -337,7 +391,12 @@ const DashAlumno = () => {
                       className=" px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                     >
                       {pause[item.id] ? (
-                        <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          fill="white"
+                          className="w-6 h-6 mx-auto"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
                             <animateTransform
                               attributeName="transform"

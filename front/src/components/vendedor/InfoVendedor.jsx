@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { deleteVend, getVendID } from "../queris/queris";
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { deleteVend, getVendID } from '../queris/queris';
 const InfoVendedor = () => {
   const location = useLocation();
   const { id } = location.state || {};
@@ -9,10 +9,10 @@ const InfoVendedor = () => {
   const [pause, setPause] = useState(false);
   const [tableItems, setTableItems] = useState([]);
   const [dataVend, setDataVend] = useState({
-    id: "",
-    name: "",
+    id: '',
+    name: '',
   });
-console.log(id)
+  console.log(id);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,8 +34,8 @@ console.log(id)
     await deleteVend(e.target.value).then((data) => {
       try {
         Swal.fire({
-          title: "Eliminado!",
-          icon: "success",
+          title: 'Eliminado!',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -44,8 +44,8 @@ console.log(id)
         });
       } catch (error) {
         Swal.fire({
-          title: "Error!",
-          icon: "error",
+          title: 'Error!',
+          icon: 'error',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -67,13 +67,24 @@ console.log(id)
             className="inline-block px-4 py-2 text-white bg-red-600 hover:bg-red-700 principal rounded md:text-sm"
           >
             {pause ? (
-              <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                fill="white"
+                className="w-6 h-6 mx-auto"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                  <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    dur="0.75s"
+                    values="0 12 12;360 12 12"
+                    repeatCount="indefinite"
+                  />
                 </path>
               </svg>
             ) : (
-              "Eliminar"
+              'Eliminar'
             )}
           </button>
         </div>

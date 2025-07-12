@@ -1,10 +1,17 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import logo from "../assets/simplificado_a_color.png";
-import Swal from "sweetalert2";
-import { getCategorias, getProfes, getVendedores, getVendID, postEgresoProfesor, postEgresoSiemple, postEgresoVendedor } from "../queris/queris";
+import { useEffect, useState } from 'react';
+import logo from '../assets/simplificado_a_color.png';
+import Swal from 'sweetalert2';
+import {
+  getCategorias,
+  getProfes,
+  getVendedores,
+  getVendID,
+  postEgresoProfesor,
+  postEgresoSiemple,
+  postEgresoVendedor,
+} from '../queris/queris';
 const CajaEgreso = () => {
-  const idVende = localStorage.getItem("token");
+  const idVende = localStorage.getItem('token');
   const [profesores, setProfesores] = useState([]);
   const [vendedores, setVendedores] = useState([]);
   const [pause, setPause] = useState(false);
@@ -13,23 +20,23 @@ const CajaEgreso = () => {
   const [categoriaSelec, setCategoriaSelec] = useState(null);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
-    fecha: "",
-    tipo: "EGRESO",
-    metodoPago: "",
+    fecha: '',
+    tipo: 'EGRESO',
+    metodoPago: '',
     monto: 0,
-    descripcion: "",
-    vendedorId: "",
-    pagoVendedorId: "",
-    profesorId: "",
-    subcategoriaId: "",
+    descripcion: '',
+    vendedorId: '',
+    pagoVendedorId: '',
+    profesorId: '',
+    subcategoriaId: '',
   });
   const formatToDisplay = (date) => {
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes} `;
   };
 
@@ -50,9 +57,9 @@ const CajaEgreso = () => {
         })
         .catch((error) => {
           Swal.fire({
-            icon: "error",
-            title: "Error al cargar vendedores",
-            text: error.message || "Ocurrió un error al cargar los vendedores.",
+            icon: 'error',
+            title: 'Error al cargar vendedores',
+            text: error.message || 'Ocurrió un error al cargar los vendedores.',
           });
         });
     };
@@ -63,9 +70,9 @@ const CajaEgreso = () => {
         setCategorias(data);
       } catch (error) {
         Swal.fire({
-          icon: "error",
-          title: "Error al cargar categorias",
-          text: error.message || "Ocurrió un error al cargar las categorias.",
+          icon: 'error',
+          title: 'Error al cargar categorias',
+          text: error.message || 'Ocurrió un error al cargar las categorias.',
         });
       }
     };
@@ -88,7 +95,7 @@ const CajaEgreso = () => {
   const handleChangeCategoria = async (e) => {
     const { name, value } = e.target;
     setCategoriaSelec(value);
-    if (value === "PROFESORES") {
+    if (value === 'PROFESORES') {
       await getProfes().then((data) => {
         setProfesores(data);
       });
@@ -110,40 +117,40 @@ const CajaEgreso = () => {
       fecha: fechaISO,
     };
     console.log(nuevoFormData);
-    if (categoriaSelec === "PROFESORES") {
+    if (categoriaSelec === 'PROFESORES') {
       await postEgresoProfesor(nuevoFormData)
         .then(() => {
           Swal.fire({
-            icon: "success",
-            title: "Egreso registrado correctamente",
+            icon: 'success',
+            title: 'Egreso registrado correctamente',
             text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
           });
           setPause(false);
         })
         .catch((error) => {
           Swal.fire({
-            icon: "error",
-            title: "Error al registrar el egreso",
-            text: error.message || "Ocurrió un error al registrar el egreso.",
+            icon: 'error',
+            title: 'Error al registrar el egreso',
+            text: error.message || 'Ocurrió un error al registrar el egreso.',
           });
           setPause(false);
         });
     }
-    if (categoriaSelec === "COMISIONES" || categoriaSelec === "SUELDOS") {
+    if (categoriaSelec === 'COMISIONES' || categoriaSelec === 'SUELDOS') {
       await postEgresoVendedor(nuevoFormData)
         .then(() => {
           Swal.fire({
-            icon: "success",
-            title: "Egreso registrado correctamente",
+            icon: 'success',
+            title: 'Egreso registrado correctamente',
             text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
           });
           setPause(false);
         })
         .catch((error) => {
           Swal.fire({
-            icon: "error",
-            title: "Error al registrar el egreso",
-            text: error.message || "Ocurrió un error al registrar el egreso.",
+            icon: 'error',
+            title: 'Error al registrar el egreso',
+            text: error.message || 'Ocurrió un error al registrar el egreso.',
           });
           setPause(false);
         });
@@ -151,17 +158,17 @@ const CajaEgreso = () => {
     await postEgresoSiemple(nuevoFormData)
       .then(() => {
         Swal.fire({
-          icon: "success",
-          title: "Egreso registrado correctamente",
+          icon: 'success',
+          title: 'Egreso registrado correctamente',
           text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
         });
         setPause(false);
       })
       .catch((error) => {
         Swal.fire({
-          icon: "error",
-          title: "Error al registrar el egreso",
-          text: error.message || "Ocurrió un error al registrar el egreso.",
+          icon: 'error',
+          title: 'Error al registrar el egreso',
+          text: error.message || 'Ocurrió un error al registrar el egreso.',
         });
         setPause(false);
       });
@@ -204,7 +211,7 @@ const CajaEgreso = () => {
                 name="vendedorId"
                 id="vendedorId"
                 disabled
-                defaultValue={vend.name || ""}
+                defaultValue={vend.name || ''}
                 className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               />
             </div>
@@ -216,7 +223,7 @@ const CajaEgreso = () => {
               name="tipo"
               id="tipo"
               disabled
-              defaultValue={"Egreso"}
+              defaultValue={'Egreso'}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             />
           </div>
@@ -247,7 +254,7 @@ const CajaEgreso = () => {
               <option value="">Seleccione</option>
               {categorias.map((cat) => (
                 <option key={cat.id} value={cat.nombre}>
-                  {cat.nombre.replace(/_/g, " ").toUpperCase()}
+                  {cat.nombre.replace(/_/g, ' ').toUpperCase()}
                 </option>
               ))}
             </select>
@@ -264,13 +271,13 @@ const CajaEgreso = () => {
                 <option value="">Selecciona una subcategoría</option>
                 {categoriaActual.subcategorias.map((sub) => (
                   <option key={sub.id} value={sub.id}>
-                    {sub.nombre.replace(/_/g, " ").toUpperCase()}
+                    {sub.nombre.replace(/_/g, ' ').toUpperCase()}
                   </option>
                 ))}
               </select>
             </div>
           )}
-          {categoriaSelec === "PROFESORES" && (
+          {categoriaSelec === 'PROFESORES' && (
             <div>
               <label className="block mb-1">Profesor</label>
               <select
@@ -282,13 +289,13 @@ const CajaEgreso = () => {
                 <option value="">Selecciona un profesor</option>
                 {profesores.map((pro) => (
                   <option key={pro.id} value={pro.id}>
-                    {pro.name + " " + pro.apellido}
+                    {pro.name + ' ' + pro.apellido}
                   </option>
                 ))}
               </select>
             </div>
           )}
-          {(categoriaSelec === "SUELDOS" || categoriaSelec === "COMISIONES") && (
+          {(categoriaSelec === 'SUELDOS' || categoriaSelec === 'COMISIONES') && (
             <div>
               <label className="block mb-1">Vendedor</label>
               <select
@@ -343,13 +350,24 @@ const CajaEgreso = () => {
             className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
           >
             {pause ? (
-              <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                fill="white"
+                className="w-6 h-6 mx-auto"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                  <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    dur="0.75s"
+                    values="0 12 12;360 12 12"
+                    repeatCount="indefinite"
+                  />
                 </path>
               </svg>
             ) : (
-              "Registrar Movimiento"
+              'Registrar Movimiento'
             )}
           </button>
         </form>

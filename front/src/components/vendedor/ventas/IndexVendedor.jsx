@@ -1,17 +1,28 @@
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import simplificado from "../../assets/simplificado_a_color.png";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import simplificado from '../../assets/simplificado_a_color.png';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 const IndexVendedor = () => {
   const { idVend } = useParams();
 
   const navigate = useNavigate();
-  const navigation = [{ name: "Inscribir" }, { name: "Caja" },  { name: "Cursos" }, { name: "Comisiones" }, { name: "Alu. Nuevo" }, { name: "Alu. Viejo" }];
+  const navigation = [
+    { name: 'Inscribir' },
+    { name: 'Caja' },
+    { name: 'Cursos' },
+    { name: 'Comisiones' },
+    { name: 'Alu. Nuevo' },
+    { name: 'Alu. Viejo' },
+  ];
   const handleClick = (e) => {
     e.preventDefault();
-    localStorage.removeItem("token");
-    navigate("/");
+    localStorage.removeItem('token');
+    navigate('/');
   };
   const clickBtn = (name) => {
     const formattedName = name.toLowerCase().replace(/\s+/g, '');
@@ -24,7 +35,12 @@ const IndexVendedor = () => {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <div className="shrink-0">
-                <img alt="Your Company" src={simplificado} className="size-8" onClick={() => navigate(`/${idVend}`)} />
+                <img
+                  alt="Your Company"
+                  src={simplificado}
+                  className="size-8"
+                  onClick={() => navigate(`/${idVend}`)}
+                />
               </div>
               <div className="hidden lg:block">
                 <div className="ml-10 flex items-baseline space-x-4">
@@ -70,7 +86,7 @@ const IndexVendedor = () => {
               <button
                 key={item.name}
                 onClick={() => clickBtn(item.name)}
-                aria-current={"page"}
+                aria-current={'page'}
                 className="btnAz rounded
                  px-3 py-2 mt-2 font-medium"
               >

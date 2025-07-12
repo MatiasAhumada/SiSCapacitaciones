@@ -1,56 +1,55 @@
-import { useEffect, useState } from "react";
-import logo from "../../../assets/simplificado_a_color.png";
-import { data, useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { getAlu, getAluID, getComisiones, getCursos, getVendedores, getVendID, postCaja, postInscripcion, postProfes } from "../../../queris/queris";
-import html2pdf from "html2pdf.js";
-import { useRef } from "react";
-import jsPDF from "jspdf";
-import { Modal } from "antd";
-import ReciboComprobante from "../../../caja/Comprobante";
+import { useEffect, useState } from 'react';
+import logo from '../../../assets/simplificado_a_color.png';
+import Swal from 'sweetalert2';
+import {
+  getAluID,
+  getComisiones,
+  getVendID,
+  postInscripcion,
+} from '../../../queris/queris';
 const Inscribir = () => {
-  const idVende = localStorage.getItem("token");
+  const idVende = localStorage.getItem('token');
   const [pause, setPause] = useState(false);
   const [fecha, setFecha] = useState(new Date());
   const [vend, setVend] = useState({});
   const [sucursal, setSucursal] = useState({});
-  const [alu, setAlu] = useState("");
+  const [alu, setAlu] = useState('');
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [comisiones, setComisiones] = useState([]);
   const [dataInscripcion, setDataInscipcion] = useState({
-    fechaRegistro: "",
+    fechaRegistro: '',
     vendedorId: idVende,
-    alumnoId: "",
-    comisionId: "",
-    sucursalId: "",
+    alumnoId: '',
+    comisionId: '',
+    sucursalId: '',
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [infoComprobante, setInfoComprobante] = useState({
-    apellidoNombre: "",
-    dni: "",
-    domicilioComercial: "",
-    iva: "",
-    numeroSucursal: "",
-    fecha: "",
-    formaPago: "",
-    observacion: "",
-    monto: "",
-    tipoComprobante: "",
-    numero: "",
+    apellidoNombre: '',
+    dni: '',
+    domicilioComercial: '',
+    iva: '',
+    numeroSucursal: '',
+    fecha: '',
+    formaPago: '',
+    observacion: '',
+    monto: '',
+    tipoComprobante: '',
+    numero: '',
   });
   const [generatePDF, setGeneratePDF] = useState(false);
   const [imprimir, setImprimir] = useState({
-    tipoComprobante: "Factura de venta",
+    tipoComprobante: 'Factura de venta',
   });
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes} `;
   };
 
@@ -107,15 +106,15 @@ const Inscribir = () => {
           setPause(false);
         } else {
           Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se encontró el alumno",
+            icon: 'error',
+            title: 'Error',
+            text: 'No se encontró el alumno',
           });
           setPause(false);
         }
       })
       .catch((error) => {
-        console.error("Error al obtener el alumno:", error);
+        console.error('Error al obtener el alumno:', error);
       });
   };
 
@@ -126,15 +125,15 @@ const Inscribir = () => {
     await postInscripcion(dataInscripcion).then((data) => {
       try {
         Swal.fire({
-          icon: "success",
-          title: "Inscripción exitosa",
-          text: "El alumno ha sido inscrito correctamente.",
+          icon: 'success',
+          title: 'Inscripción exitosa',
+          text: 'El alumno ha sido inscrito correctamente.',
         });
       } catch (error) {
         Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "No se pudo inscribir al alumno.",
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo inscribir al alumno.',
         });
         console.log(error);
       }
@@ -185,7 +184,7 @@ const Inscribir = () => {
               name="vendedorId"
               id="vendedorId"
               disabled
-              defaultValue={vend.name || ""}
+              defaultValue={vend.name || ''}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             />
           </div>
@@ -198,7 +197,7 @@ const Inscribir = () => {
               name="sucursalId"
               id="sucursalId"
               disabled
-              defaultValue={sucursal.name || ""}
+              defaultValue={sucursal.name || ''}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             />
           </div>
@@ -225,13 +224,24 @@ const Inscribir = () => {
               className="absolute right-2 top-1/2 transform -translate-y-1/2 btnAz text-white text-sm px-4 py-1.5 rounded-md min-w-[100px] flex items-center justify-center"
             >
               {pause ? (
-                <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  fill="white"
+                  className="w-6 h-6 mx-auto"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                    <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      dur="0.75s"
+                      values="0 12 12;360 12 12"
+                      repeatCount="indefinite"
+                    />
                   </path>
                 </svg>
               ) : (
-                "Buscar"
+                'Buscar'
               )}
             </button>
           </div>
@@ -268,13 +278,24 @@ const Inscribir = () => {
           className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
         >
           {pause ? (
-            <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              fill="white"
+              className="w-6 h-6 mx-auto"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  dur="0.75s"
+                  values="0 12 12;360 12 12"
+                  repeatCount="indefinite"
+                />
               </path>
             </svg>
           ) : (
-            "Inscribir Alumno"
+            'Inscribir Alumno'
           )}
         </button>
         {generatePDF && (

@@ -1,32 +1,33 @@
-import { useEffect, useState } from "react";
-import logo from "../assets/simplificado_a_color.png";
-import { useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { getAlu, getAluID, getCursos, getVendedores, getVendID, postCaja, postProfes } from "../queris/queris";
-import html2pdf from "html2pdf.js";
-import { useRef } from "react";
-import jsPDF from "jspdf";
-import { Modal } from "antd";
-import ReciboComprobante from "./Comprobante";
-import Opciones from "./Opciones";
+import { useEffect, useState } from 'react';
+import logo from '../assets/simplificado_a_color.png';
+import Swal from 'sweetalert2';
+import {
+  getAlu,
+  getAluID,
+  getVendID,
+  postCaja,
+} from '../queris/queris';
+import { Modal } from 'antd';
+import ReciboComprobante from './Comprobante';
+import Opciones from './Opciones';
 const CreateCaja = () => {
-  const idVende = localStorage.getItem("token");
+  const idVende = localStorage.getItem('token');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imprimir, setImprimir] = useState({
-    tipoComprobante: "Factura de venta",
+    tipoComprobante: 'Factura de venta',
   });
   const [infoComprobante, setInfoComprobante] = useState({
-    apellidoNombre: "",
-    dni: "",
-    domicilioComercial: "",
-    iva: "",
-    numeroSucursal: "",
-    fecha: "",
-    formaPago: "",
-    observacion: "",
-    monto: "",
-    tipoComprobante: "",
-    numero: "",
+    apellidoNombre: '',
+    dni: '',
+    domicilioComercial: '',
+    iva: '',
+    numeroSucursal: '',
+    fecha: '',
+    formaPago: '',
+    observacion: '',
+    monto: '',
+    tipoComprobante: '',
+    numero: '',
   });
   const [cambio, setCambio] = useState(false);
   const [cuotaVieja, setCuotavieja] = useState(false);
@@ -38,37 +39,37 @@ const CreateCaja = () => {
   const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
-    fecha: "",
-    metodoPago: "",
-    tipo: "",
-    descripcion: "",
-    vendedorId: "",
-    alumnoComisionId: "",
-    monto: "",
-    cuota: "",
+    fecha: '',
+    metodoPago: '',
+    tipo: '',
+    descripcion: '',
+    vendedorId: '',
+    alumnoComisionId: '',
+    monto: '',
+    cuota: '',
     //vendTransId: "",
     comprobante: {
-      apellidoNombre: "",
-      dni: "",
-      domicilioComercial: "",
-      iva: "",
-      numeroSucursal: "",
-      fecha: "",
-      formaPago: "",
-      observacion: "",
-      monto: "",
-      tipoComprobante: "",
-      numero: "",
+      apellidoNombre: '',
+      dni: '',
+      domicilioComercial: '',
+      iva: '',
+      numeroSucursal: '',
+      fecha: '',
+      formaPago: '',
+      observacion: '',
+      monto: '',
+      tipoComprobante: '',
+      numero: '',
     },
   });
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes} `;
   };
 
@@ -125,8 +126,8 @@ const CreateCaja = () => {
       formaPago: metodoPago.value,
       observacion: descripcion.value,
       monto: monto.value,
-      tipoComprobante: "Factura de venta",
-      numero: "-",
+      tipoComprobante: 'Factura de venta',
+      numero: '-',
       ...alumnoSeleccionado,
     };
 
@@ -147,8 +148,8 @@ const CreateCaja = () => {
     await postCaja(nuevoFormData).then((data) => {
       try {
         Swal.fire({
-          title: "Movimiento Registrado",
-          icon: "success",
+          title: 'Movimiento Registrado',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -184,21 +185,21 @@ const CreateCaja = () => {
             apellidoNombre: data.name,
             dni: data.dni,
             domicilioComercial: `${data.address}, ${data.locality}`,
-            iva: "-",
-            numeroSucursal: "000" + data.sucursal.numeroSucursal,
+            iva: '-',
+            numeroSucursal: '000' + data.sucursal.numeroSucursal,
           });
           setPause(false);
         } else {
           Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se encontró el alumno",
+            icon: 'error',
+            title: 'Error',
+            text: 'No se encontró el alumno',
           });
           setPause(false);
         }
       })
       .catch((error) => {
-        console.error("Error al obtener el alumno:", error);
+        console.error('Error al obtener el alumno:', error);
       });
   };
 
@@ -234,7 +235,7 @@ const CreateCaja = () => {
                     type="date"
                     name="fecha"
                     id="fecha"
-                    value={formData.fecha?.split("T")[0] || ""}
+                    value={formData.fecha?.split('T')[0] || ''}
                     onChange={handleChange}
                     className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
                   />
@@ -251,7 +252,7 @@ const CreateCaja = () => {
                   name="vendedorId"
                   id="vendedorId"
                   disabled
-                  defaultValue={vend.name || ""}
+                  defaultValue={vend.name || ''}
                   className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
                 />
               </div>
@@ -263,7 +264,7 @@ const CreateCaja = () => {
                 name="tipo"
                 id="tipo"
                 disabled
-                defaultValue={"Ingreso"}
+                defaultValue={'Ingreso'}
                 className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               />
             </div>
@@ -305,20 +306,33 @@ const CreateCaja = () => {
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 btnAz text-white text-sm px-4 py-1.5 rounded-md min-w-[100px] flex items-center justify-center"
                   >
                     {pause ? (
-                      <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg
+                        fill="white"
+                        className="w-6 h-6 mx-auto"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
                         <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                          <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                          <animateTransform
+                            attributeName="transform"
+                            type="rotate"
+                            dur="0.75s"
+                            values="0 12 12;360 12 12"
+                            repeatCount="indefinite"
+                          />
                         </path>
                       </svg>
                     ) : (
-                      "Buscar"
+                      'Buscar'
                     )}
                   </button>
                 </div>
               </div>
               {alumnoSeleccionado && (
                 <>
-                  <div className="text-sm text-gray-700 mb-2">Alumno encontrado: {alumnoSeleccionado.apellidoNombre}</div>
+                  <div className="text-sm text-gray-700 mb-2">
+                    Alumno encontrado: {alumnoSeleccionado.apellidoNombre}
+                  </div>
                   <div className="pb-2">
                     <label className="block mb-2 text-sm principal">Comisiones Del Alumno</label>
                     <select
@@ -390,13 +404,24 @@ const CreateCaja = () => {
               className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
             >
               {pause ? (
-                <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  fill="white"
+                  className="w-6 h-6 mx-auto"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                    <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      dur="0.75s"
+                      values="0 12 12;360 12 12"
+                      repeatCount="indefinite"
+                    />
                   </path>
                 </svg>
               ) : (
-                "Registrar Movimiento"
+                'Registrar Movimiento'
               )}
             </button>
             {generatePDF && (

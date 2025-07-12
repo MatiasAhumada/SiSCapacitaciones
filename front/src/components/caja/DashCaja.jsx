@@ -39,7 +39,8 @@ const DashCaja = () => {
   useEffect(() => {
     const peticion = async () => {
       await GetCajaByVendedor(idVend).then((data) => {
-        setTableItems(data);
+        console.log(data)
+        setTableItems(data.movimientos);
       });
     };
     const alumnos = async () => {
@@ -124,6 +125,7 @@ const DashCaja = () => {
         (!filtros.subcategoria || item.subcategoria?.nombre?.toLowerCase() === filtros.subcategoria.toLowerCase())
       );
     });
+ 
     setTableItems(filtrado);
   };
 

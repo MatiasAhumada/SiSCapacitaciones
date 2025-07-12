@@ -530,7 +530,7 @@ export class CajaService {
 
     const nuevaSesion = this.sesionRepository.create({
       fechaApertura: hoy,
-      montoApertura: 0,
+      montoApertura: montoApertura,
       totalIngresos: 0,
       totalEgresos: 0,
       vendedor,
@@ -542,7 +542,7 @@ export class CajaService {
       tipo: TipoMovimiento.APERTURA,
       metodoPago: MetodoPago.EFECTIVO,
       descripcion: 'Apertura de caja',
-      monto: 0,
+      monto: montoApertura,
       vendedor,
       sesionCaja: nuevaSesion,
     });
@@ -582,7 +582,7 @@ export class CajaService {
 
     // Calcular totales (si no los estás actualizando en tiempo real)
     const ingresos = sesionAbierta.movimientos
-      .filter((mov) => mov.tipo === TipoMovimiento.INGRESO)
+      .filter((mov) => mov.tipo === TipoMovimiento.INGRESO || mov.tipo === TipoMovimiento.APERTURA)
       .reduce((sum, mov) => sum + Number(mov.monto), 0);
 
     const egresos = sesionAbierta.movimientos

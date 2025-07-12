@@ -286,7 +286,7 @@ export const deleteProfesId = async (id) => {
 //CAJA
 export const GetCajaByVendedor = async (id) => {
   try {
-    const response = await axios.get(`${URL}/caja/vendedor/${id}`);
+    const response = await axios.get(`${URL}/caja/sesionDiariaVendedor/${id}`);
     return response.data;
   } catch (error) {
     throw error;

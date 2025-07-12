@@ -39,7 +39,7 @@ const DashCaja = () => {
   useEffect(() => {
     const peticion = async () => {
       await GetCajaByVendedor(idVend).then((data) => {
-        console.log(data)
+        console.log(data);
         setTableItems(data.movimientos);
       });
     };
@@ -125,7 +125,7 @@ const DashCaja = () => {
         (!filtros.subcategoria || item.subcategoria?.nombre?.toLowerCase() === filtros.subcategoria.toLowerCase())
       );
     });
- 
+
     setTableItems(filtrado);
   };
 
@@ -172,7 +172,7 @@ const DashCaja = () => {
                           className="text-center"
                         />
                       ) : (
-                        item.fecha
+                        <>{formatToDisplay(item.fecha)}</>
                       )}
                     </td>
 

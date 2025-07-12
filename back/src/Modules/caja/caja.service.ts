@@ -48,7 +48,7 @@ export class CajaService {
   async create(createCajaDto: CreateCajaDto) {
     const { comprobante, tipo, vendedorId, alumnoComisionId, ...restoCaja } =
       createCajaDto;
-    // console.log(createCajaDto)
+      
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
@@ -642,7 +642,7 @@ export class CajaService {
     const movimientos = await this.cajaRepository.find({
       where: {
         sesionCaja: { id: sesion.id },
-        fecha: Between(inicioDelDia, finDelDia),
+        //fecha: Between(inicioDelDia, finDelDia),
       },
       relations: ['alumnoComision.alumno'],
       select: {

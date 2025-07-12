@@ -504,7 +504,7 @@ export class CajaService {
         fechaCierre: IsNull(),
       },
     });
-    
+
     let montoApertura = 0;
     const ultimaSesion = await this.sesionRepository.findOne({
       where: {
@@ -554,6 +554,13 @@ export class CajaService {
     if (!vendedorId) {
       throw new BadRequestException('El id del vendedor es obligatorio');
     }
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: vendedorId },
+    });
+
+    if (!vendedor) {
+      throw new NotFoundException('Vendedor no encontrado');
+    }
     // Buscamos la sesión abierta (sin fechaCierre)
     const sesionAbierta = await this.sesionRepository.findOne({
       where: {
@@ -587,23 +594,78 @@ export class CajaService {
     sesionAbierta.totalEgresos = egresos;
     sesionAbierta.montoCierre = ingresos - egresos;
     sesionAbierta.fechaCierre = new Date();
+    await this.sesionRepository.save(sesionAbierta);
+    const cierre = this.cajaRepository.create({
+      fecha: new Date(),
+      tipo: TipoMovimiento.CIERRE,
+      metodoPago: MetodoPago.EFECTIVO,
+      descripcion: 'Cierre de caja',
+      monto: sesionAbierta.montoCierre,
+      vendedor,
+      sesionCaja: sesionAbierta,
+    });
 
-    return this.sesionRepository.save(sesionAbierta);
+    await this.cajaRepository.save(cierre);
+    return sesionAbierta;
   }
-  async obtenerSesionesPorVendedor(vendedorId: string) {
+  async obtenerSesionPorFecha(vendedorId: string) {
+    if (!vendedorId) {
+      throw new NotFoundException('ID Vendedor no enviado');
+    }
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
+
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
 
-    const sesiones = await this.sesionRepository.find({
-      where: { vendedor: { id: vendedorId } },
-      relations: ['vendedor', 'movimientos'], // asumiendo que movimientos se llaman así
+    const fecha = new Date();
+    const inicioDelDia = new Date(fecha.setHours(0, 0, 0, 0));
+    const finDelDia = new Date(fecha.setHours(23, 59, 59, 999));
+
+    const sesion = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaApertura: Between(inicioDelDia, finDelDia),
+      },
       order: { fechaApertura: 'DESC' },
+      // relations: ['vendedor'],
     });
 
-    return sesiones;
+    if (!sesion) {
+      throw new NotFoundException(
+        'No se encontró sesión para la fecha indicada.',
+      );
+    }
+
+    const movimientos = await this.cajaRepository.find({
+      where: {
+        sesionCaja: { id: sesion.id },
+        fecha: Between(inicioDelDia, finDelDia),
+      },
+      relations: ['alumnoComision.alumno'],
+      select: {
+        alumnoComision: {
+          id: true,
+          alumno: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      order: { fecha: 'ASC' },
+    });
+
+    if (!movimientos.length) {
+      throw new NotFoundException(
+        'No hay movimientos para la sesión en esa fecha.',
+      );
+    }
+
+    // Adjuntar los movimientos a la sesión
+    sesion['movimientos'] = movimientos;
+
+    return { ...sesion, movimientos };
   }
 }

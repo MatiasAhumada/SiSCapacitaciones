@@ -653,6 +653,7 @@ export class CajaService {
           alumno: {
             id: true,
             name: true,
+            dni:true
           },
         },
       },

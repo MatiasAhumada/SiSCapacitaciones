@@ -79,7 +79,7 @@ const FiltrosDropDown = ({ onFiltrar }) => {
             type="text"
             name="alumno"
             value={filtros.alumno}
-            placeholder="Alumno"
+            placeholder="DNI Alumno"
             className="w-full border rounded px-2 py-1"
             onChange={handleChange}
           />
@@ -87,7 +87,7 @@ const FiltrosDropDown = ({ onFiltrar }) => {
             type="text"
             name="tipo"
             value={filtros.tipo}
-            placeholder="Tipo"
+            placeholder="Tipo de Movimiento"
             className="w-full border rounded px-2 py-1"
             onChange={handleChange}
           />

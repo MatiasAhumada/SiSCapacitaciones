@@ -45,8 +45,7 @@ const DashProfe = () => {
 
   useEffect(() => {
     const peticion = async () => {
-      await getProfesSucId(id).then((data) => {   
-        console.log(data)
+      await getProfesSucId(id).then((data) => {         
         setTableItems(data);
       });
     };

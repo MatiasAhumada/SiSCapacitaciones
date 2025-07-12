@@ -6,15 +6,15 @@ import { CreateSucursalDto } from './dto/create-sucursal.dto';
 export class SucursalController {
   constructor(private readonly sucursalService: SucursalService) {}
 
+  @Get('/:id')
+  findOneSuc(@Param('id') id: string) {
+    return this.sucursalService.getByIdSucursal(id);
+  }
   @Get()
   findAllSuc() {
     return this.sucursalService.getSucursales();
   }
 
-  @Get(':id')
-  findOneSuc(@Param('id') id: string) {
-    return this.sucursalService.getByIdSucursal(id);
-  }
 
   @Post()
   createSuc(@Body() createSucursalDto: CreateSucursalDto) {

@@ -45,14 +45,15 @@ const CrearProfes = () => {
       }
     });
   };
+
   useEffect(() => {
+ 
     const profes = async () => {
       await getSucursalId(id).then((data) => {
-        console.log(data);
         setSuc(data.name);
       });
     };
-    profes;
+    profes();
   }, [id]);
 
   return (

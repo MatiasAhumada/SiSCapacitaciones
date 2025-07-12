@@ -39,7 +39,6 @@ const DashCaja = () => {
   useEffect(() => {
     const peticion = async () => {
       await GetCajaByVendedor(idVend).then((data) => {
-        console.log(data);
         setTableItems(data.movimientos);
       });
     };
@@ -105,22 +104,20 @@ const DashCaja = () => {
   };
   const filtrar = async (filtros, setPaused) => {
     const filtrosVacios = Object.values(filtros).every((v) => v.trim() === "");
-
     if (filtrosVacios) {
       setPaused(true);
       const data = await GetCajaByVendedor(idVend); // ⏳ espera la respuesta
-      setTableItems(data); // ✅ actualiza tabla
+      setTableItems(data.movimientos); // ✅ actualiza tabla
       setPaused(false);
       return;
     }
-    console.log(filtros);
     const filtrado = tableItems.filter((item) => {
       return (
-        (!filtros.alumno || item.alumnoComision?.alumno?.name?.toLowerCase().includes(filtros.alumno.toLowerCase())) &&
+        (!filtros.alumno || item.alumnoComision?.alumno?.dni?.toString().includes(filtros.alumno)) &&
         (!filtros.tipo || item.tipo.toLowerCase().includes(filtros.tipo.toLowerCase())) &&
         (!filtros.metodoPago || item.metodoPago.toLowerCase().includes(filtros.metodoPago.toLowerCase())) &&
         (!filtros.descripcion || item.descripcion?.toLowerCase().includes(filtros.descripcion.toLowerCase())) &&
-        (!filtros.fecha || item.fecha.includes(filtros.fecha)) &&
+        (!filtros.fecha || formatToDisplay(item.fecha).startsWith(filtros.fecha)) &&
         (!filtros.categoria || item.subcategoria?.categoria?.nombre?.toLowerCase() === filtros.categoria.toLowerCase()) &&
         (!filtros.subcategoria || item.subcategoria?.nombre?.toLowerCase() === filtros.subcategoria.toLowerCase())
       );

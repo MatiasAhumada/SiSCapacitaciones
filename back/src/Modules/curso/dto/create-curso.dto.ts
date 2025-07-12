@@ -1,18 +1,15 @@
-import { IsArray, IsNumber, IsString, IsUUID } from "class-validator";
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateCursoDto {
-    @IsString()
-    name: string;
-  
-    @IsNumber()
-    duration: number;
-  
-    @IsNumber()
-    price: number;
-  
-    @IsString()
-    area: string;
-  
-    
-  }
-  
+  @IsString()
+  name: string;
+
+  @IsNumber()
+  duration: number;
+
+  @IsNumber()
+  price: number;
+
+  @IsString()
+  area: string;
+}

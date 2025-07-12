@@ -1,11 +1,4 @@
 import { IsString, IsUUID, IsArray, IsNumber } from 'class-validator';
-import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
-import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
-import { Comision } from 'src/Modules/comision/entities/comision.entity';
-import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
-import { Admins } from 'src/Modules/admin/entities/admin.entity';
-import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
-import { Servicio } from 'src/Modules/servicio/entities/servicio.entity';
 
 export class CreateSucursalDto {
   @IsString()
@@ -21,11 +14,11 @@ export class CreateSucursalDto {
   provincia: string;
 
   @IsUUID()
-  adminId: string; 
+  adminId: string;
 
   @IsArray()
   @IsUUID('all', { each: true })
-  vendedores: string[]; 
+  vendedores: string[];
 
   @IsArray()
   @IsUUID('all', { each: true })

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { CertificadoService } from './certificado.service';
 import { CreateCertificadoDto } from './dto/create-certificado.dto';
 import { UpdateCertificadoDto } from './dto/update-certificado.dto';
@@ -23,7 +31,10 @@ export class CertificadoController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCertificadoDto: UpdateCertificadoDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCertificadoDto: UpdateCertificadoDto,
+  ) {
     return this.certificadoService.update(id, updateCertificadoDto);
   }
 

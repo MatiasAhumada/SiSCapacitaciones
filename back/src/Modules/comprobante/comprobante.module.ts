@@ -5,7 +5,7 @@ import { Comprobante } from './entities/comprobante.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Comprobante])],
+  imports: [TypeOrmModule.forFeature([Comprobante])],
   controllers: [ComprobanteController],
   providers: [ComprobanteService],
 })

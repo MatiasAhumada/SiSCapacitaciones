@@ -9,12 +9,10 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Caja, MetodoPago, TipoMovimiento } from './entities/caja.entity';
-import { Between, DataSource, IsNull, Like, Not, Repository } from 'typeorm';
+import { Between, IsNull, Like, Not, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
-import { format, startOfDay, endOfDay } from 'date-fns';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Alumno } from '../alumno/entities/alumno.entity';
-import { Comision } from '../comision/entities/comision.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { Comprobante } from '../comprobante/entities/comprobante.entity';
 import { Categoria } from './entities/categoria.entity';
@@ -48,7 +46,7 @@ export class CajaService {
   async create(createCajaDto: CreateCajaDto) {
     const { comprobante, tipo, vendedorId, alumnoComisionId, ...restoCaja } =
       createCajaDto;
-      
+
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
@@ -582,7 +580,11 @@ export class CajaService {
 
     // Calcular totales (si no los estás actualizando en tiempo real)
     const ingresos = sesionAbierta.movimientos
-      .filter((mov) => mov.tipo === TipoMovimiento.INGRESO || mov.tipo === TipoMovimiento.APERTURA)
+      .filter(
+        (mov) =>
+          mov.tipo === TipoMovimiento.INGRESO ||
+          mov.tipo === TipoMovimiento.APERTURA,
+      )
       .reduce((sum, mov) => sum + Number(mov.monto), 0);
 
     const egresos = sesionAbierta.movimientos

@@ -8,7 +8,7 @@ import { Caja } from '../caja/entities/caja.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Sucursal,Alumno,Caja,AlumnoComision])],
+  imports: [TypeOrmModule.forFeature([Sucursal, Alumno, Caja, AlumnoComision])],
 
   controllers: [AlumnoController],
   providers: [AlumnoService],

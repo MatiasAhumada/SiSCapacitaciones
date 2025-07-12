@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
-import { UpdateSucursalDto } from './dto/update-sucursal.dto';
 
 import { Repository } from 'typeorm';
 import { Sucursal } from './entities/sucursal.entity';
@@ -132,7 +131,6 @@ export class SucursalService {
   //   });
   // }
   async getByIdSucursal(id: string) {
-   
     const sucursal = await this.sucRepository.findOne({
       where: { id },
       select: {
@@ -140,10 +138,9 @@ export class SucursalService {
         name: true,
       },
     });
-  
+
     if (!sucursal) return null;
-  
- 
+
     const [
       alumnosCount,
       certificadosCount,
@@ -184,10 +181,10 @@ export class SucursalService {
         .leftJoin('v.sucursales', 's')
         .where('s.id = :id', { id })
         .getCount(),
-      
+
       //this.inscripcionRepository.count({ where: { sucursal: { id } } }),
     ]);
-  
+
     return {
       id: sucursal.id,
       name: sucursal.name,
@@ -202,7 +199,6 @@ export class SucursalService {
       //inscripciones: inscripcionesCount,
     };
   }
-  
 
   async createSuc(createSucursalDto: CreateSucursalDto) {
     const {

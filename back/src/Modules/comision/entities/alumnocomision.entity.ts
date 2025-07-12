@@ -18,17 +18,17 @@ export class AlumnoComision {
   @ManyToOne(() => Alumno, (alumno) => alumno.alumnoComisiones)
   alumno: Alumno;
 
-  @ManyToOne(() => Comision, (comision) => comision.alumnoComisiones,{
-    onDelete:"CASCADE"
+  @ManyToOne(() => Comision, (comision) => comision.alumnoComisiones, {
+    onDelete: 'CASCADE',
   })
   comision: Comision;
 
   @Column({ default: true })
   state: boolean;
-  
+
   @OneToMany(() => Asistencia, (asistencia) => asistencia.alumnoComision)
   asistencias: Asistencia[];
-  
+
   @OneToMany(() => Caja, (caja) => caja.alumnoComision)
   pagos: Caja[];
 }

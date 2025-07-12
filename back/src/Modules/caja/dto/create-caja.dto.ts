@@ -9,12 +9,11 @@ import {
 } from 'class-validator';
 import { MetodoPago, TipoMovimiento } from '../entities/caja.entity';
 import { Type } from 'class-transformer';
-import { Comprobante } from '@modules/Modules/comprobante/entities/comprobante.entity';
 import { CreateComprobanteDto } from '@modules/Modules/comprobante/dto/create-comprobante.dto';
 
 export class CreateCajaDto {
   @IsEnum(TipoMovimiento)
-  tipo: TipoMovimiento= TipoMovimiento.INGRESO;
+  tipo: TipoMovimiento = TipoMovimiento.INGRESO;
 
   @IsEnum(MetodoPago)
   metodoPago: MetodoPago;
@@ -27,7 +26,7 @@ export class CreateCajaDto {
   descripcion?: string;
 
   @IsDateString()
-  fecha: Date ;
+  fecha: Date;
 
   @IsUUID()
   vendedorId: string;
@@ -37,7 +36,7 @@ export class CreateCajaDto {
   alumnoComisionId: string;
 
   @IsString()
-  numeroSucursal:string
+  numeroSucursal: string;
 
   @IsOptional()
   @IsNumber()
@@ -45,6 +44,6 @@ export class CreateCajaDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(()=>CreateComprobanteDto)
-  comprobante?: CreateComprobanteDto
+  @Type(() => CreateComprobanteDto)
+  comprobante?: CreateComprobanteDto;
 }

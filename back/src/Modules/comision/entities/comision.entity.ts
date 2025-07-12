@@ -1,4 +1,3 @@
-import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Profesor } from 'src/Modules/profesor/entities/profesor.entity';
@@ -6,15 +5,12 @@ import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { AlumnoComision } from './alumnocomision.entity';
-import { Caja } from 'src/Modules/caja/entities/caja.entity';
 @Entity({
   name: 'comisiones',
 })
@@ -50,6 +46,4 @@ export class Comision {
 
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.comisiones)
   sucursal: Sucursal;
-
-  
 }

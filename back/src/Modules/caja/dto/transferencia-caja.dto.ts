@@ -1,4 +1,10 @@
-import { IsUUID, IsNumber, IsOptional, IsString, IsDateString } from 'class-validator';
+import {
+  IsUUID,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsDateString,
+} from 'class-validator';
 import { MetodoPago } from '../entities/caja.entity';
 
 export class CreateTransferenciaDto {

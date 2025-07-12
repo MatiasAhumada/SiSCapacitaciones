@@ -5,10 +5,8 @@ import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import {
   Column,
   Entity,
-  JoinTable,
   ManyToMany,
   OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -40,7 +38,7 @@ export class Vendedor {
 
   @OneToMany(() => Caja, (caja) => caja.vendedor)
   caja: Caja[];
-  
+
   @OneToMany(() => SesionCaja, (sesionCaja) => sesionCaja.vendedor)
   sesionesCaja: SesionCaja[];
 }

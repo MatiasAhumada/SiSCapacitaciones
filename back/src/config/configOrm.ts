@@ -50,7 +50,7 @@ const db_config = {
     Comprobante,
     Categoria,
     Subcategoria,
-    SesionCaja
+    SesionCaja,
   ],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],

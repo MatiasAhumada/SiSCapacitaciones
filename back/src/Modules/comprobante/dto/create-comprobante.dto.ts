@@ -28,7 +28,7 @@ export class CreateComprobanteDto {
 
   @IsString()
   numeroSucursal: string;
-  
+
   @IsString()
   observacion: string;
 

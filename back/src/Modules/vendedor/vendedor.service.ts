@@ -109,5 +109,4 @@ export class VendedorService {
       throw new Error(`Vendedor con ID ${id} no encontrado`);
     }
   }
-  
 }

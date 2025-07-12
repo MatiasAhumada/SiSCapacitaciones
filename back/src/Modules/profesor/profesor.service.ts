@@ -3,7 +3,7 @@ import { CreateProfesorDto } from './dto/create-profesor.dto';
 import { UpdateProfesorDto } from './dto/update-profesor.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profesor } from './entities/profesor.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 

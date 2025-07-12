@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,22 +27,21 @@ export class AdminService {
   }
 
   async updateAdmSv(id: string, updateAdminDto: UpdateAdminDto) {
-    const admin=await this.admRepository.findOneBy({id});
-    if(!admin){
+    const admin = await this.admRepository.findOneBy({ id });
+    if (!admin) {
       return null;
     }
-    Object.assign(admin,updateAdminDto);
+    Object.assign(admin, updateAdminDto);
     await this.admRepository.save(admin);
     return admin;
   }
 
   async removeAdmSv(id: string) {
-    const admin=await this.admRepository.findOneBy({id});
-    if(!admin){
+    const admin = await this.admRepository.findOneBy({ id });
+    if (!admin) {
       return null;
     }
     await this.admRepository.remove(admin);
     return admin;
   }
-  
 }

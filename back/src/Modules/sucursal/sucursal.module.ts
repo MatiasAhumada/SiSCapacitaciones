@@ -12,7 +12,18 @@ import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Sucursal,Admins,Servicio,Alumno,Profesor,Comision,Vendedor,Inscripcion])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Sucursal,
+      Admins,
+      Servicio,
+      Alumno,
+      Profesor,
+      Comision,
+      Vendedor,
+      Inscripcion,
+    ]),
+  ],
   controllers: [SucursalController],
   providers: [SucursalService],
 })

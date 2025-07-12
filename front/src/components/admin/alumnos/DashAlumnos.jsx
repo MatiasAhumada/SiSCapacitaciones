@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { deleteAlumnoId, getAluSucID } from '../../queris/queris';
+import FilterAlus from './DropDowns/FilterAlus';
 
 const DashAlumnos = () => {
   const [tableItems, setTableItems] = useState([]);
@@ -66,6 +67,31 @@ const DashAlumnos = () => {
     peticion();
   }, [id]);
 
+  const filtrarAlumnos = async (filtros, setPaused) => {
+    const hayFiltros = Object.values(filtros).some((v) => v !== '');
+    if (!hayFiltros) {
+      await getAluSucID(id).then((data) => {
+        setTableItems(data);
+      });
+      setPaused(false);
+      return;
+    }
+    const resultado = tableItems.filter((alumno) => {
+      return (
+        (!filtros.nombre || alumno.name.toLowerCase().includes(filtros.nombre.toLowerCase())) &&
+        (!filtros.dni || alumno.dni.includes(filtros.dni)) &&
+        (!filtros.tel || alumno.tel.includes(filtros.tel)) &&
+        (!filtros.cantidadComisiones ||
+          alumno.cantidadComisiones === parseInt(filtros.cantidadComisiones)) &&
+        (!filtros.cantidadCertificados ||
+          alumno.cantidadCertificados === parseInt(filtros.cantidadCertificados))
+      );
+    });
+
+    setTableItems(resultado);
+    setPaused(false);
+  };
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
@@ -79,10 +105,12 @@ const DashAlumnos = () => {
                 En esta tabla estaran todos los alumnos de esta sucursal
               </p>
             </div>
-            <div className="mt-3 md:mt-0">
+            <div className="mt-3 md:mt-0 flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 items-center">
+              <FilterAlus onFiltrar={filtrarAlumnos} />
+
               <button
                 onClick={() => navigate(`/adm/${id}/alumnos/crear`)}
-                className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
+                className="w-full md:w-auto px-4 py-2 text-white principal btnAz md:text-sm"
               >
                 Nuevo Alumno
               </button>

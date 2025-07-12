@@ -35,6 +35,18 @@ export class SesionCaja {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   totalEgresos: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  totalDigitalJavier: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  totalDigitalTobias: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  totalCredito: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  totalEfectivo: number;
+
   @OneToMany(() => Caja, (movimiento) => movimiento.sesionCaja, {
     cascade: true,
   })

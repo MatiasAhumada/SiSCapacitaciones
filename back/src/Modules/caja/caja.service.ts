@@ -495,15 +495,25 @@ export class CajaService {
     }
 
     const hoy = new Date();
-
+    // Validar que no haya una sesión abierta
     const sesionAbierta = await this.sesionRepository.findOne({
       where: {
         vendedor: { id: vendedorId },
         fechaCierre: IsNull(),
       },
     });
+    if (sesionAbierta) {
+      throw new BadRequestException(
+        'Ya hay una sesión de caja abierta sin cerrar.',
+      );
+    }
 
     let montoApertura = 0;
+    let totalDigitalJavier = 0;
+    let totalDigitalTobias = 0;
+    let totalCredito = 0;
+    let totalEfectivo = 0;
+    // Buscar última sesión cerrad
     const ultimaSesion = await this.sesionRepository.findOne({
       where: {
         vendedor: { id: vendedorId },
@@ -513,17 +523,14 @@ export class CajaService {
         fechaCierre: 'DESC',
       },
     });
-    if (
-      ultimaSesion &&
-      ultimaSesion.totalIngresos > ultimaSesion.totalEgresos
-    ) {
-      montoApertura = ultimaSesion.totalIngresos - ultimaSesion.totalEgresos;
-    }
-
-    if (sesionAbierta) {
-      throw new BadRequestException(
-        'Ya hay una sesión de caja abierta sin cerrar.',
-      );
+    if (ultimaSesion) {
+      if (ultimaSesion.totalIngresos > ultimaSesion.totalEgresos) {
+        montoApertura = ultimaSesion.totalIngresos - ultimaSesion.totalEgresos;
+      }
+      totalDigitalJavier = ultimaSesion.totalDigitalJavier || 0;
+      totalDigitalTobias = ultimaSesion.totalDigitalTobias || 0;
+      totalCredito = ultimaSesion.totalCredito || 0;
+      totalEfectivo = ultimaSesion.totalEfectivo || 0;
     }
 
     const nuevaSesion = this.sesionRepository.create({
@@ -531,6 +538,10 @@ export class CajaService {
       montoApertura: montoApertura,
       totalIngresos: 0,
       totalEgresos: 0,
+      totalDigitalJavier,
+      totalDigitalTobias,
+      totalCredito,
+      totalEfectivo,
       vendedor,
     });
     await this.sesionRepository.save(nuevaSesion);
@@ -591,11 +602,31 @@ export class CajaService {
       .filter((mov) => mov.tipo === TipoMovimiento.EGRESO)
       .reduce((sum, mov) => sum + Number(mov.monto), 0);
 
+    const totalDigitalJavier = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.DIGITAL_JAVIER)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const totalDigitalTobias = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.DIGITAL_TOBIAS)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const totalCredito = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.CREDITO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const totalEfectivo = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.EFECTIVO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
     // Actualizar totales y fecha de cierre
     sesionAbierta.totalIngresos = ingresos;
     sesionAbierta.totalEgresos = egresos;
     sesionAbierta.montoCierre = ingresos - egresos;
     sesionAbierta.fechaCierre = new Date();
+    sesionAbierta.totalDigitalJavier = totalDigitalJavier;
+    sesionAbierta.totalDigitalTobias = totalDigitalTobias;
+    sesionAbierta.totalCredito = totalCredito;
+    sesionAbierta.totalEfectivo = totalEfectivo;
     await this.sesionRepository.save(sesionAbierta);
     const cierre = this.cajaRepository.create({
       fecha: new Date(),
@@ -637,7 +668,7 @@ export class CajaService {
 
     if (!sesion) {
       throw new NotFoundException(
-        'No se encontró sesión para la fecha indicada.',
+        'No se encontró sesión para el dia de la fecha.',
       );
     }
 
@@ -653,7 +684,7 @@ export class CajaService {
           alumno: {
             id: true,
             name: true,
-            dni:true
+            dni: true,
           },
         },
       },

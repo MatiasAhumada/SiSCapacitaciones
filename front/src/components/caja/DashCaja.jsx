@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import {
-  editMovCaja,
-  getAlu,
-  GetCajaByVendedor,
-} from '../queris/queris';
+import { editMovCaja, getAlu, GetCajaByVendedor } from '../queris/queris';
 import Swal from 'sweetalert2';
 import AccionesDropdown from './Dropdowns/AccionesDropdown';
 import FiltrosDropDown from './Dropdowns/FiltrosDropDown';
+import CajaResumen from './Dropdowns/CajaResumen';
 
 const DashCaja = () => {
   const idVend = localStorage.getItem('token');
@@ -26,6 +23,7 @@ const DashCaja = () => {
     vendedorId: idVend,
   });
   const [filtrados, setFiltrados] = useState(tableItems);
+  const [sesionCaja, setSesionCaja] = useState(null);
 
   const navigate = useNavigate();
   const isSubRoute = location.pathname.includes('crear');
@@ -42,18 +40,32 @@ const DashCaja = () => {
 
   useEffect(() => {
     const peticion = async () => {
-      await GetCajaByVendedor(idVend).then((data) => {
+      try {
+        const data = await GetCajaByVendedor(idVend);
+        console.log(data);
+        setSesionCaja(data);
         setTableItems(data.movimientos);
-      });
+      } catch (error) {
+        const msg = error?.response?.data?.message;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: msg,
+        });
+      }
     };
     const alumnos = async () => {
-      await getAlu().then((data) => {
-        try {
-          setAlu(data);
-        } catch (error) {
-          console.log(error);
-        }
-      });
+      try {
+        const data = await getAlu();
+        setAlu(data);
+      } catch (error) {
+        const msg = error?.response?.data?.message || 'Error al obtener los alumnos.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: msg,
+        });
+      }
     };
     alumnos();
     peticion();
@@ -135,24 +147,22 @@ const DashCaja = () => {
 
     setTableItems(filtrado);
   };
-
+  console.log(sesionCaja);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+      <CajaResumen sesionCaja={sesionCaja}></CajaResumen>
       {!isSubRoute && (
         <>
-          <div className="items-start justify-between flex flex-col md:flex-row ">
-            <div className="max-w-lg">
-              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-                Historial de cajas
-              </h3>
-              <p className="text-gray-600 mt-2">
-                En esta tabla estarán los movimientos realizados.
-              </p>
+          <div className="items-start justify-between flex flex-col md:flex-row">
+            <div className="max-w-lg mt-5">
+              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">CAJA</h3>
             </div>
-            <FiltrosDropDown onFiltrar={filtrar}></FiltrosDropDown>
-            <AccionesDropdown idVend={idVend}></AccionesDropdown>
-          </div>
 
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-2 md:ml-auto mt-4 md:mt-0">
+              <FiltrosDropDown onFiltrar={filtrar} />
+              <AccionesDropdown idVend={idVend} />
+            </div>
+          </div>
           <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
             <table className="w-full table-auto text-sm  text-center">
               <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">

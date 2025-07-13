@@ -282,9 +282,9 @@ export const deleteProfesId = async (id) => {
 };
 
 //CAJA
-export const GetCajaByVendedor = async (id) => {
+export const GetCajaByVendedor = async (vendedorId) => {
   try {
-    const response = await axios.get(`${URL}/caja/sesionDiariaVendedor/${id}`);
+    const response = await axios.get(`${URL}/caja/sesionDiariaVendedor/${vendedorId}`);
     return response.data;
   } catch (error) {
     throw error;

@@ -49,9 +49,15 @@ export class Alumno {
   imgUrl?: string;
   @Column({ nullable: true, default: '0' })
   descuento?: number;
-  @OneToMany(() => AlumnoComision, (alumnoComision) => alumnoComision.alumno)
+  @OneToMany(() => AlumnoComision, (alumnoComision) => alumnoComision.alumno, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   alumnoComisiones?: AlumnoComision[];
-  @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno)
+  @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.alumno, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   inscripciones?: Inscripcion[];
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.alumnos)
   sucursal?: Sucursal;

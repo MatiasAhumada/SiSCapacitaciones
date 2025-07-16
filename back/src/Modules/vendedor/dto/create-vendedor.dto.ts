@@ -1,4 +1,11 @@
-import { IsBoolean, IsEmail, IsString, IsUUID, IsOptional, IsArray } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsString,
+  IsUUID,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 
 export class CreateVendedorDto {
   @IsString()
@@ -18,9 +25,9 @@ export class CreateVendedorDto {
 
   @IsOptional()
   @IsArray()
-  @IsUUID('all', { each: true })  // Valida que cada elemento sea un UUID
-  inscripciones: string[];  
+  @IsUUID('all', { each: true }) // Valida que cada elemento sea un UUID
+  inscripciones: string[];
 
-  @IsUUID()  
-  sucursal: string[];  
+  @IsUUID()
+  sucursal: string[];
 }

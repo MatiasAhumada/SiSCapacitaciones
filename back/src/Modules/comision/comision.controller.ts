@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
@@ -27,15 +26,14 @@ export class ComisionController {
   findAll() {
     return this.comisionService.findAll();
   }
-  @Get("/aluCom/:idAluCom")
+  @Get('/aluCom/:idAluCom')
   findAluCom(@Param('idAluCom') id: string) {
     return this.comisionService.findOneAluCom(id);
   }
-  @Get("sucursal/:id")
+  @Get('sucursal/:id')
   getComisionesBySucursal(@Param('id') sucursalId: string) {
     return this.comisionService.getComisionesBySucursal(sucursalId);
   }
-  
 
   @Get('/suc/:id')
   findOneBySucursal(@Param('id') id: string) {
@@ -47,7 +45,7 @@ export class ComisionController {
   }
   @Put('/estado')
   cambiarEstado(@Body() change: ChangeStateDto) {
-    console.log(change)
+    console.log(change);
     return this.comisionService.cambiarEstadoAlumnoComision(change);
   }
   @Put(':id')
@@ -67,6 +65,4 @@ export class ComisionController {
   registrarAsistencia(@Body() dto: CreateAsistenciaDto[]) {
     return this.comisionService.registrarAsistencia(dto);
   }
-
- 
 }

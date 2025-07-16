@@ -1,8 +1,7 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-const Opciones = ({ setCambio,setCuotavieja }) => {
-  const idVend = localStorage.getItem("token");
+const Opciones = ({ setCambio, setCuotavieja }) => {
+  const idVend = localStorage.getItem('token');
   const navigate = useNavigate();
   const handleClickNuevo = () => {
     setCambio(true);
@@ -16,12 +15,15 @@ const Opciones = ({ setCambio,setCuotavieja }) => {
             className="btnAz text-white py-2 px-4 rounded-xl transition"
             onClick={() => {
               setCambio(true);
-              setCuotavieja(true)
+              setCuotavieja(true);
             }}
           >
             Cuotas vieja
           </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-xl  transition" onClick={() => setCambio(true)}>
+          <button
+            className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-xl  transition"
+            onClick={() => setCambio(true)}
+          >
             Cuotas nueva
           </button>
         </div>

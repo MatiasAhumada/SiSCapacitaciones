@@ -3,15 +3,13 @@ import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Curso } from './entities/curso.entity';
-import { In, Repository } from 'typeorm';
-import { Profesor } from '../profesor/entities/profesor.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CursoService {
   constructor(
     @InjectRepository(Curso)
     private readonly cursoRepository: Repository<Curso>,
-
   ) {}
 
   async create(createCursoDto: CreateCursoDto): Promise<Curso> {

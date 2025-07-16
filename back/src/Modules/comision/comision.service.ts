@@ -11,7 +11,6 @@ import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Asistencia } from './entities/asistencia.entity';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
 import { ChangeStateDto } from './dto/changeState.dto';
-import { Tracing } from 'trace_events';
 
 @Injectable()
 export class ComisionService {

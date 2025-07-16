@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { getVendedores, getVendID, getVendSucID } from "../queris/queris";
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { getVendSucID } from '../queris/queris';
 
 const DashVendedor = () => {
   const navigate = useNavigate();
@@ -10,9 +10,9 @@ const DashVendedor = () => {
 
   const location = useLocation();
 
-  const isSubRoute = location.pathname.includes("crear") || location.pathname.includes("info");
+  const isSubRoute = location.pathname.includes('crear') || location.pathname.includes('info');
 
-  const click = (idVend) => {   
+  const click = (idVend) => {
     navigate(`/adm/${id}/vendedores/info`, {
       state: { id: idVend },
     });
@@ -32,8 +32,12 @@ const DashVendedor = () => {
         <>
           <div className="items-start justify-between md:flex">
             <div className="max-w-lg">
-              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">Equipo de vendedores</h3>
-              <p className="text-gray-600 mt-2">En esta tabla estaran todos los vendedores de esta sucursal</p>
+              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
+                Equipo de vendedores
+              </h3>
+              <p className="text-gray-600 mt-2">
+                En esta tabla estaran todos los vendedores de esta sucursal
+              </p>
             </div>
             <div className="mt-3 md:mt-0">
               <button
@@ -61,9 +65,15 @@ const DashVendedor = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.tel}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.inscripciones?.length || 0}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.inscripciones?.length || 0}
+                    </td>
                     <td className="text-right px-6 whitespace-nowrap">
-                      <button type="button" onClick={() => click(item.id)} className="py-2 px-3 btnAz principal rounded-lg">
+                      <button
+                        type="button"
+                        onClick={() => click(item.id)}
+                        className="py-2 px-3 btnAz principal rounded-lg"
+                      >
                         <i className="fa-solid fa-plus"></i>
                       </button>
                     </td>

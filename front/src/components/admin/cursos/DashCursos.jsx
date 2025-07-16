@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { deleteCurso, getCursos } from "../../queris/queris";
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { deleteCurso, getCursos } from '../../queris/queris';
 
 const DashCursos = () => {
   const [tableItems, setTableItems] = useState([]);
@@ -12,7 +12,7 @@ const DashCursos = () => {
 
   const location = useLocation();
 
-  const isSubRoute = location.pathname.includes("crear");
+  const isSubRoute = location.pathname.includes('crear');
 
   const clickDelete = async (e) => {
     e.preventDefault();
@@ -23,8 +23,8 @@ const DashCursos = () => {
     await deleteCurso(e.target.value).then(() => {
       try {
         Swal.fire({
-          title: "Curso Eliminado",
-          icon: "success",
+          title: 'Curso Eliminado',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -92,41 +92,37 @@ const DashCursos = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                          item.area === "Digital"
-                            ? "bg-blue-200 text-blue-800"
-                            : item.area === "Idiomas"
-                            ? "bg-yellow-200 text-yellow-800"
-                            : item.area === "Administrativa"
-                            ? "bg-red-200 text-red-800"
-                            : item.area === "Belleza"
-                            ? "bg-pink-200 text-pink-800"
-                            : item.area === "Técnica"
-                            ? "bg-purple-200 text-purple-800"
-                            : item.area === "Salud"
-                            ? "bg-green-200 text-green-800"
-                            : "bg-gray-200 text-gray-800"
+                          item.area === 'Digital'
+                            ? 'bg-blue-200 text-blue-800'
+                            : item.area === 'Idiomas'
+                              ? 'bg-yellow-200 text-yellow-800'
+                              : item.area === 'Administrativa'
+                                ? 'bg-red-200 text-red-800'
+                                : item.area === 'Belleza'
+                                  ? 'bg-pink-200 text-pink-800'
+                                  : item.area === 'Técnica'
+                                    ? 'bg-purple-200 text-purple-800'
+                                    : item.area === 'Salud'
+                                      ? 'bg-green-200 text-green-800'
+                                      : 'bg-gray-200 text-gray-800'
                         }`}
                       >
                         {item.area}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.duration}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.duration}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                          item.tipo === "Distancia"
-                            ? "bg-blue-200 text-blue-800"
-                            : "bg-green-200 text-green-800"
+                          item.tipo === 'Distancia'
+                            ? 'bg-blue-200 text-blue-800'
+                            : 'bg-green-200 text-green-800'
                         }`}
                       >
                         {item.tipo}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      ${item.price}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">${item.price}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         value={item.id}
@@ -151,7 +147,7 @@ const DashCursos = () => {
                             </path>
                           </svg>
                         ) : (
-                          "Eliminar"
+                          'Eliminar'
                         )}
                       </button>
                     </td>

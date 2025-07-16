@@ -1,12 +1,12 @@
 import { Caja } from '@modules/Modules/caja/entities/caja.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import { v4 as uuid } from 'uuid';
- export enum FormaPago {
-   EFECTIVO = 'Efectivo',
-   CREDITO = 'Credito',
-   DEBITO ='Digital Tobias' ,
-   TRANSFERENCIA = 'Digital Javier',
- }
+export enum FormaPago {
+  EFECTIVO = 'Efectivo',
+  CREDITO = 'Credito',
+  DEBITO = 'Digital Tobias',
+  TRANSFERENCIA = 'Digital Javier',
+}
 // export enum MetodoPago {
 //   EFECTIVO = 'Efectivo',
 //   CREDITO = 'Credito',

@@ -1,30 +1,34 @@
-import { Caja } from "@modules/Modules/caja/entities/caja.entity";
-import { Comision } from "src/Modules/comision/entities/comision.entity";
-import { Curso } from "src/Modules/curso/entities/curso.entity";
-import { Sucursal } from "src/Modules/sucursal/entities/sucursal.entity";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import {v4 as uuid} from "uuid"
-@Entity({ name: "profesores" })
-
+import { Caja } from '@modules/Modules/caja/entities/caja.entity';
+import { Comision } from 'src/Modules/comision/entities/comision.entity';
+import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { v4 as uuid } from 'uuid';
+@Entity({ name: 'profesores' })
 export class Profesor {
-    @PrimaryGeneratedColumn("uuid")
-    id: string=uuid();
+  @PrimaryGeneratedColumn('uuid')
+  id: string = uuid();
 
-    @Column()
-    name: string;
-    
-    @Column()
-    apellido: string;
-    
-    @Column()
-    tel:string
-   
-    @OneToMany(()=>Comision,comision=>comision.profesor)
-    comisiones:Comision[]
-    
-    @ManyToOne(()=>Sucursal,sucursal=>sucursal.profesores)
-    sucursal:Sucursal
+  @Column()
+  name: string;
 
-    @OneToMany(()=>Caja,(caja)=>caja.profesor)
-    pagos:Caja[]
+  @Column()
+  apellido: string;
+
+  @Column()
+  tel: string;
+
+  @OneToMany(() => Comision, (comision) => comision.profesor)
+  comisiones: Comision[];
+
+  @ManyToOne(() => Sucursal, (sucursal) => sucursal.profesores)
+  sucursal: Sucursal;
+
+  @OneToMany(() => Caja, (caja) => caja.profesor)
+  pagos: Caja[];
 }

@@ -6,7 +6,7 @@ import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Comision } from '../comision/entities/comision.entity';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Inscripcion } from './entities/inscripcion.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 

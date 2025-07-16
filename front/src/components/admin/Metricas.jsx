@@ -1,11 +1,10 @@
-import React from 'react';
 
 const Metricas = () => {
-    return (
-        <div>
-            <h2>metricas</h2>
-        </div>
-    );
+  return (
+    <div>
+      <h2>metricas</h2>
+    </div>
+  );
 };
 
 export default Metricas;

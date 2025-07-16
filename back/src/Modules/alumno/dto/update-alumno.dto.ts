@@ -3,6 +3,6 @@ import { CreateAlumnoDto } from './create-alumno.dto';
 import { IsString } from 'class-validator';
 
 export class UpdateAlumnoDto extends PartialType(CreateAlumnoDto) {
-    @IsString()
-    imgUrl: string;
+  @IsString()
+  imgUrl: string;
 }

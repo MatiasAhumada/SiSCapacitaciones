@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateProfesorDto {
   @IsString()
@@ -17,4 +17,3 @@ export class CreateProfesorDto {
   @IsNotEmpty()
   sucursalId: string;
 }
-

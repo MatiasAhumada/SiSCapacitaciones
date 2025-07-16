@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ComprobanteService } from './comprobante.service';
 import { CreateComprobanteDto } from './dto/create-comprobante.dto';
 import { UpdateComprobanteDto } from './dto/update-comprobante.dto';
@@ -23,7 +31,10 @@ export class ComprobanteController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateComprobanteDto: UpdateComprobanteDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateComprobanteDto: UpdateComprobanteDto,
+  ) {
     return this.comprobanteService.update(+id, updateComprobanteDto);
   }
 

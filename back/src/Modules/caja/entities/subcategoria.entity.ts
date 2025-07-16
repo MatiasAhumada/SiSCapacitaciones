@@ -22,7 +22,7 @@ export class Subcategoria {
   @ManyToOne(() => Categoria, (cat) => cat.subcategorias)
   @JoinColumn()
   categoria: Categoria;
-  
+
   @OneToMany(() => Caja, (caja) => caja.subcategoria)
   cajas: Caja[];
 }

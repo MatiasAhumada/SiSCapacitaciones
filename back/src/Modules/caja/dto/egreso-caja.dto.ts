@@ -1,11 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCajaDto } from './create-caja.dto';
 import {
   IsDateString,
   IsEnum,
   IsNumber,
   IsOptional,
-  IsString,
   IsUUID,
 } from 'class-validator';
 import { MetodoPago, TipoMovimiento } from '../entities/caja.entity';
@@ -29,7 +26,7 @@ export class EgresoCajaDTO {
   @IsOptional()
   @IsUUID()
   vendedorId?: string;
-  
+
   @IsOptional()
   @IsUUID()
   pagoVendedorId?: string;
@@ -38,7 +35,6 @@ export class EgresoCajaDTO {
   @IsUUID()
   profesorId?: string;
 
- 
   @IsUUID()
   subcategoriaId: string;
 }

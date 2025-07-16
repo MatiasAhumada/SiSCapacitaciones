@@ -13,7 +13,7 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { EgresoCajaDTO } from './dto/egreso-caja.dto';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
-
+import { format } from 'date-fns';
 @Controller('caja')
 export class CajaController {
   constructor(private readonly cajaService: CajaService) {}
@@ -27,6 +27,7 @@ export class CajaController {
   findAll() {
     return this.cajaService.findAll();
   }
+
   @Get('/digita-tobias')
   findDigitalTobias() {
     return this.cajaService.findByTobias();
@@ -46,6 +47,12 @@ export class CajaController {
     return this.cajaService.findByVendedor(id);
   }
 
+  @Get('movDiario')
+  async getMovimientosDiarios() {
+    const hoy = format(new Date(), 'yyyy-MM-dd');
+    return this.cajaService.getMovimientosPorDia(hoy);
+  }
+
   @Get('/movimientos/:fecha')
   getMovimientosPorDia(@Param('fecha') fecha: string) {
     return this.cajaService.getMovimientosPorDia(fecha);
@@ -60,9 +67,17 @@ export class CajaController {
   getResumenPorDia(@Param('fecha') fecha: string) {
     return this.cajaService.getResumenPorDia(fecha);
   }
-  @Post('apertura/:vendedorId')
+  @Post('/aperturaCaja/:vendedorId')
   async aperturaCaja(@Param('vendedorId') vendedorId: string) {
     return this.cajaService.aperturaCaja(vendedorId);
+  }
+  @Get('/sesionDiariaVendedor/:vendedorId')
+  findBySesionesVendedor(@Param('vendedorId') id: string) {
+    return this.cajaService.obtenerSesionPorFecha(id);
+  }
+  @Patch('cerrarCaja/:vendedorId')
+  async cerrarSesion(@Param('vendedorId') vendedorId: string) {
+    return this.cajaService.cerrarSesionCaja(vendedorId);
   }
 
   @Post('transferencia')

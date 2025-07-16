@@ -5,7 +5,6 @@ import { Admins } from '../Modules/admin/entities/admin.entity';
 import { Sucursal } from '../Modules/sucursal/entities/sucursal.entity';
 import * as bcrypt from 'bcrypt';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
-import { Caja } from '@modules/Modules/caja/entities/caja.entity';
 import { CajaService } from '@modules/Modules/caja/caja.service';
 import { Vendedor } from '@modules/Modules/vendedor/entities/vendedor.entity';
 
@@ -22,13 +21,22 @@ export class SeederService implements OnModuleInit {
     private readonly adminsRepository: Repository<Admins>,
     @InjectRepository(Vendedor)
     private readonly vendedorRepository: Repository<Vendedor>,
-   
+
     private readonly cajaService: CajaService,
   ) {}
   private readonly logger = new Logger(SeederService.name);
   async onModuleInit() {
-    await this.hashVendedores();
+    await this.seed();
   }
+  //  async crearSesionesCaja() {
+  //    this.logger.log('Iniciando creación de sesiones por día para movimientos de caja...');
+  //    try {
+  //      await this.cajaService.crearSesionesPorDia();
+  //      this.logger.log('Sesiones creadas correctamente.');
+  //    } catch (error) {
+  //      this.logger.error('Error creando sesiones por día:', error);
+  //    }
+  //  }
 
   async seed() {
     console.log('Ejecutando seeder...');
@@ -368,36 +376,52 @@ export class SeederService implements OnModuleInit {
   }
   async categorias() {
     const data: Record<string, string[]> = {
-      'ALQUILER': ["ALQUILER"],
-      'SUELDOS': ["SUELDOS"],
-      'COMISIONES': ["COMISIONES"],
-      'PROFESORES': ["PROFESORES"],
-      'SERVICIOS': [
-        'electricidad', 'gas', 'agua', 'internet', 'celulares', 'sistemas',
-        'plataformas_digitales', 'dispenser_agua', 'honorarios_abogados',
-        'honorarios_contadores', 'capacitaciones_y_formaciones', 'cuotas_y_adhesiones',
+      ALQUILER: ['ALQUILER'],
+      SUELDOS: ['SUELDOS'],
+      COMISIONES: ['COMISIONES'],
+      PROFESORES: ['PROFESORES'],
+      SERVICIOS: [
+        'electricidad',
+        'gas',
+        'agua',
+        'internet',
+        'celulares',
+        'sistemas',
+        'plataformas_digitales',
+        'dispenser_agua',
+        'honorarios_abogados',
+        'honorarios_contadores',
+        'capacitaciones_y_formaciones',
+        'cuotas_y_adhesiones',
       ],
-      'MARKETING_Y_PUBLICIDAD': [
-        'honorarios_marketing', 'publicidad_digital', 'television', 'radio',
-        'diario', 'imprenta', 'carteleria',
+      MARKETING_Y_PUBLICIDAD: [
+        'honorarios_marketing',
+        'publicidad_digital',
+        'television',
+        'radio',
+        'diario',
+        'imprenta',
+        'carteleria',
       ],
-      'IMPUESTOS': [
-        'municipal', 'rentas', 'ingresos_brutos', 'afip_iva', 'afip_ganancias',
-        'aportes_patronales', 'multas', 'otros',
+      IMPUESTOS: [
+        'municipal',
+        'rentas',
+        'ingresos_brutos',
+        'afip_iva',
+        'afip_ganancias',
+        'aportes_patronales',
+        'multas',
+        'otros',
       ],
-      'REFACCIONES_Y_MANTENIMIENTOS': [
-        'mano_de_obra', 'materiales', 'bienes_muebles',
+      REFACCIONES_Y_MANTENIMIENTOS: [
+        'mano_de_obra',
+        'materiales',
+        'bienes_muebles',
       ],
-      'INSUMOS': [
-        'limpieza_e_higiene', 'libreria_y_oficina', 'almacen',
-      ],
-      'CAPACITACIONES': [
-        'insumos_y_materiales', 'herramientas_y_maquinarias',
-      ],
-      'VIATICOS': [
-        'pasaje/combustible', 'alojamiento', 'comida',
-      ],
-      'GASTOS_VARIOS': ["GASTOS_VARIOS"],
+      INSUMOS: ['limpieza_e_higiene', 'libreria_y_oficina', 'almacen'],
+      CAPACITACIONES: ['insumos_y_materiales', 'herramientas_y_maquinarias'],
+      VIATICOS: ['pasaje/combustible', 'alojamiento', 'comida'],
+      GASTOS_VARIOS: ['GASTOS_VARIOS'],
     };
 
     for (const [categoriaNombre, subcategorias] of Object.entries(data)) {
@@ -413,7 +437,10 @@ export class SeederService implements OnModuleInit {
     const admins = await this.adminsRepository.find();
 
     for (const admin of admins) {
-      if (!admin.password.startsWith('$2a$') && !admin.password.startsWith('$2b$')) {
+      if (
+        !admin.password.startsWith('$2a$') &&
+        !admin.password.startsWith('$2b$')
+      ) {
         // No está hasheada, la actualizamos
         const hashed = await bcrypt.hash(admin.password, 10);
         admin.password = hashed;
@@ -430,13 +457,20 @@ export class SeederService implements OnModuleInit {
     const vendedores = await this.vendedorRepository.find();
 
     for (const vendedor of vendedores) {
-      if (!vendedor.password.startsWith('$2a$') && !vendedor.password.startsWith('$2b$')) {
+      if (
+        !vendedor.password.startsWith('$2a$') &&
+        !vendedor.password.startsWith('$2b$')
+      ) {
         const hashed = await bcrypt.hash(vendedor.password, 10);
         vendedor.password = hashed;
         await this.vendedorRepository.save(vendedor);
-        this.logger.log(`Password vendedor ${vendedor.email} hasheada correctamente.`);
+        this.logger.log(
+          `Password vendedor ${vendedor.email} hasheada correctamente.`,
+        );
       } else {
-        this.logger.log(`Password vendedor ${vendedor.email} ya estaba hasheada.`);
+        this.logger.log(
+          `Password vendedor ${vendedor.email} ya estaba hasheada.`,
+        );
       }
     }
 

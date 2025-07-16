@@ -1,31 +1,27 @@
-import React, { useState } from "react";
+import { useState } from 'react';
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-} from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import simplificado from "../assets/simplificado_a_color.png";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
-import { getSucursales } from "../queris/queris";
-import { useEffect } from "react";
+} from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import simplificado from '../assets/simplificado_a_color.png';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { getSucursales } from '../queris/queris';
+import { useEffect } from 'react';
 
 const DashAdmin = () => {
   const { id } = useParams();
   const [sucs, setSucs] = useState([]);
   const [sucursalActual, setSucursalActual] = useState(null);
   const navigation = [
-    { name: "Vendedores" },
-    { name: "Profesores" },
-    { name: "Alumnos" },
-    { name: "Cursos" },
-    { name: "Comisiones" },
-    { name: "Cajas" },
-    { name: "Certificados" },
+    { name: 'Vendedores' },
+    { name: 'Profesores' },
+    { name: 'Alumnos' },
+    { name: 'Cursos' },
+    { name: 'Comisiones' },
+    { name: 'Cajas' },
+    { name: 'Certificados' },
   ];
 
   const navigate = useNavigate();
@@ -35,7 +31,7 @@ const DashAdmin = () => {
   };
   const handleClick = (e) => {
     e.preventDefault();
-    navigate("/");
+    navigate('/');
   };
   useEffect(() => {
     const selectSuc = async () => {
@@ -51,9 +47,9 @@ const DashAdmin = () => {
 
   const handleChange = (e) => {
     const { value } = e.target;
-    const pathParts = location.pathname.split("/");
+    const pathParts = location.pathname.split('/');
     pathParts[2] = value;
-    const newPath = pathParts.join("/");
+    const newPath = pathParts.join('/');
     navigate(newPath);
   };
 
@@ -77,7 +73,7 @@ const DashAdmin = () => {
                   className="border p-1 rounded"
                 >
                   <option value={sucursalActual?.id}>
-                    {sucursalActual?.name || "Seleccionar sucursal"}
+                    {sucursalActual?.name || 'Seleccionar sucursal'}
                   </option>
                   {sucs
                     .filter((suc) => suc.id !== sucursalActual?.id)
@@ -119,14 +115,8 @@ const DashAdmin = () => {
             <div className="mr-2 flex lg:hidden rounded">
               {/* Boton para mobile */}
               <DisclosureButton className="group relative inline-flex items-center justify-center rounded p-2  btnAz ">
-                <Bars3Icon
-                  aria-hidden="true"
-                  className="block size-6 group-data-open:hidden"
-                />
-                <XMarkIcon
-                  aria-hidden="true"
-                  className="hidden size-6 group-data-open:block"
-                />
+                <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
+                <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
               </DisclosureButton>
             </div>
           </div>
@@ -138,7 +128,7 @@ const DashAdmin = () => {
               <button
                 key={item.name}
                 onClick={() => clickBtn(item.name)}
-                aria-current={"page"}
+                aria-current={'page'}
                 className="btnAz rounded
                  px-3 py-2 mt-2 font-medium"
               >

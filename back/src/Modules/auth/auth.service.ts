@@ -6,12 +6,10 @@ import {
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Admins } from '../admin/entities/admin.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { JwtService } from '@nestjs/jwt';
-import { access } from 'fs';
-import { id } from 'date-fns/locale';
 import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {

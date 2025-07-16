@@ -13,14 +13,16 @@ export class Inscripcion {
 
   @Column()
   fechaRegistro: Date;
-  
+
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.inscripciones)
   vendedor: Vendedor;
 
   @ManyToOne(() => Alumno, (alumno) => alumno.inscripciones)
   alumno: Alumno;
 
-  @ManyToOne(() => Comision, (comision) => comision.inscripciones,{onDelete:'CASCADE'})
+  @ManyToOne(() => Comision, (comision) => comision.inscripciones, {
+    onDelete: 'CASCADE',
+  })
   comision: Comision;
 
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.inscripciones)

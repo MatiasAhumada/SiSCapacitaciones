@@ -9,5 +9,5 @@ export class CreateAsistenciaDto {
 
   @IsOptional()
   @IsDateString()
-  fecha?: string; 
+  fecha?: string;
 }

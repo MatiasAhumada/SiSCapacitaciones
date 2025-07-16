@@ -15,7 +15,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeOrmConfig from '../config/configOrm';
 import { LoggerMiddleware } from 'src/Middleware/Peticiones.middleware';
 import { AuthModule } from './auth/auth.module';
-import { SeederModule } from 'src/Seeds/seeders.module';
 import { CajaModule } from './caja/caja.module';
 import { CertificadoModule } from './certificado/certificado.module';
 import { ComprobanteModule } from './comprobante/comprobante.module';

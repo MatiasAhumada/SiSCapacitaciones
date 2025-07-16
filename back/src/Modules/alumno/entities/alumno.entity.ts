@@ -1,16 +1,12 @@
-import { Caja } from 'src/Modules/caja/entities/caja.entity';
 import { Certificado } from 'src/Modules/certificado/entities/certificado.entity';
 import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
-import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import {
   Column,
   Entity,
-  ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';

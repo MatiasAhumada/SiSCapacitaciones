@@ -1,8 +1,6 @@
 import { Comprobante } from '@modules/Modules/comprobante/entities/comprobante.entity';
 import { Profesor } from '@modules/Modules/profesor/entities/profesor.entity';
-import { Alumno } from 'src/Modules/alumno/entities/alumno.entity';
 import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
-import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import {
   Column,
@@ -14,7 +12,8 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Subcategoria } from './subcategoria.entity';
-import { Categoria } from './categoria.entity';
+import { SesionCaja } from './sesion-caja.entity';
+
 export enum TipoMovimiento {
   APERTURA = 'Apertura',
   INGRESO = 'Ingreso',
@@ -91,8 +90,15 @@ export class Caja {
   @ManyToOne(() => Vendedor, (v) => v.pagosRealizados, { nullable: true })
   @JoinColumn()
   vendedorPagos?: Vendedor;
-  
+
   @ManyToOne(() => Subcategoria, (sub) => sub.cajas, { nullable: true })
   @JoinColumn()
   subcategoria?: Subcategoria;
+
+  @ManyToOne(() => SesionCaja, (sesion) => sesion.movimientos, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn()
+  sesionCaja?: SesionCaja;
 }

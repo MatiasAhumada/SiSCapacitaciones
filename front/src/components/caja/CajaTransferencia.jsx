@@ -1,10 +1,13 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import logo from "../assets/simplificado_a_color.png";
-import Swal from "sweetalert2";
-import { getCategorias, getProfes, getVendedores, getVendID, postEgresoProfesor, postTransferencia } from "../queris/queris";
+import { useEffect, useState } from 'react';
+import logo from '../assets/simplificado_a_color.png';
+import Swal from 'sweetalert2';
+import {
+  getVendedores,
+  getVendID,
+  postTransferencia,
+} from '../queris/queris';
 const CajaTransferencia = () => {
-  const idVende = localStorage.getItem("token");
+  const idVende = localStorage.getItem('token');
   const [vendedores, setVendedores] = useState([]);
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
@@ -12,20 +15,20 @@ const CajaTransferencia = () => {
   const [categoriaSelec, setCategoriaSelec] = useState(null);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
-    fecha: "",
-    metodoPago: "",
+    fecha: '',
+    metodoPago: '',
     monto: 0,
-    descripcion: "",
-    vendedorOrigenId: "",
-    vendedorDestinoId: "",
+    descripcion: '',
+    vendedorOrigenId: '',
+    vendedorDestinoId: '',
   });
   const formatToDisplay = (date) => {
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes} `;
   };
 
@@ -41,9 +44,9 @@ const CajaTransferencia = () => {
         })
         .catch((error) => {
           Swal.fire({
-            icon: "error",
-            title: "Error al cargar vendedor",
-            text: error.message || "Ocurrió un error al cargar el vendedor.",
+            icon: 'error',
+            title: 'Error al cargar vendedor',
+            text: error.message || 'Ocurrió un error al cargar el vendedor.',
           });
         });
     };
@@ -54,9 +57,9 @@ const CajaTransferencia = () => {
         })
         .catch((error) => {
           Swal.fire({
-            icon: "error",
-            title: "Error al cargar vendedores",
-            text: error.message || "Ocurrió un error al cargar los vendedores.",
+            icon: 'error',
+            title: 'Error al cargar vendedores',
+            text: error.message || 'Ocurrió un error al cargar los vendedores.',
           });
         });
     };
@@ -91,17 +94,17 @@ const CajaTransferencia = () => {
     await postTransferencia(nuevoFormData)
       .then(() => {
         Swal.fire({
-          icon: "success",
-          title: "Transferencia realizada correctamente",
+          icon: 'success',
+          title: 'Transferencia realizada correctamente',
           text: `Transferencia de ${nuevoFormData.monto} registrada exitosamente.`,
         });
         setPause(false);
       })
       .catch((error) => {
         Swal.fire({
-          icon: "error",
-          title: "Error al registrar la transferencia",
-          text: error.message || "Ocurrió un error al registrar la transferencia.",
+          icon: 'error',
+          title: 'Error al registrar la transferencia',
+          text: error.message || 'Ocurrió un error al registrar la transferencia.',
         });
         setPause(false);
       });
@@ -144,7 +147,7 @@ const CajaTransferencia = () => {
                 name="vendedorOrigenId"
                 id="vendedorOrigenId"
                 disabled
-                defaultValue={vend.name || ""}
+                defaultValue={vend.name || ''}
                 className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               />
             </div>
@@ -218,13 +221,24 @@ const CajaTransferencia = () => {
             className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
           >
             {pause ? (
-              <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                fill="white"
+                className="w-6 h-6 mx-auto"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                  <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    dur="0.75s"
+                    values="0 12 12;360 12 12"
+                    repeatCount="indefinite"
+                  />
                 </path>
               </svg>
             ) : (
-              "Registrar Movimiento"
+              'Registrar Movimiento'
             )}
           </button>
         </form>

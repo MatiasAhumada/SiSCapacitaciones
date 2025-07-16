@@ -17,7 +17,7 @@ import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
       Alumno,
       Comision,
       Sucursal,
-      AlumnoComision
+      AlumnoComision,
     ]),
   ],
   controllers: [InscripcionController],

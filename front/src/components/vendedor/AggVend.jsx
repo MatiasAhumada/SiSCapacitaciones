@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import logo from "../assets/simplificado_a_color.png";
-import { useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { getSucursalId, getVendID, postSucursal, postVend } from "../queris/queris";
+import { useEffect, useState } from 'react';
+import logo from '../assets/simplificado_a_color.png';
+import { useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { getSucursalId, postVend } from '../queris/queris';
 const AggVend = () => {
   const { id } = useParams();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    tel: "",
-    sucursal: "",
+    name: '',
+    email: '',
+    password: '',
+    tel: '',
+    sucursal: '',
     isAdmin: false,
   });
   const handleChange = (e) => {
@@ -31,8 +31,8 @@ const AggVend = () => {
       try {
         console.log(data);
         Swal.fire({
-          title: "Vendedor Registrado",
-          icon: "success",
+          title: 'Vendedor Registrado',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         });

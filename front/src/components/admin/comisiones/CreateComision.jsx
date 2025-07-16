@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import logo from "../../assets/simplificado_a_color.png";
-import { useNavigate, useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import { getAlu, getCursos, getProfes, postComision } from "../../queris/queris";
+import { useEffect, useState } from 'react';
+import logo from '../../assets/simplificado_a_color.png';
+import { useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { getCursos, getProfes, postComision } from '../../queris/queris';
 
 const CreateComision = () => {
-  const areas = ["Digital", "Idiomas", "Salud", "Administrativa", "Belleza", "Técnica"];
-  const tipos = ["Presencial", "Distancia"];
+  const areas = ['Digital', 'Idiomas', 'Salud', 'Administrativa', 'Belleza', 'Técnica'];
+  const tipos = ['Presencial', 'Distancia'];
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -14,14 +14,14 @@ const CreateComision = () => {
   const [profes, setProfes] = useState([]);
   const [cursos, setcursos] = useState([]);
   const [formData, setFormData] = useState({
-    name: "",
-    day: "",
+    name: '',
+    day: '',
     hour: {
-      start: "",
-      end: "",
+      start: '',
+      end: '',
     },
-    cursoId: "",
-    profesorId: "",
+    cursoId: '',
+    profesorId: '',
     sucursalId: id,
   });
 
@@ -45,8 +45,8 @@ const CreateComision = () => {
     await postComision(formData).then(() => {
       try {
         Swal.fire({
-          title: "Comision Creada",
-          icon: "success",
+          title: 'Comision Creada',
+          icon: 'success',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -73,17 +73,17 @@ const CreateComision = () => {
     curs();
   }, []);
   const dias = [
-    { value: "Lunes" },
-    { value: "Martes" },
-    { value: "Miercoles" },
-    { value: "Jueves" },
-    { value: "Viernes" },
-    { value: "Sabado" },
-    { value: "Domingo" },
+    { value: 'Lunes' },
+    { value: 'Martes' },
+    { value: 'Miercoles' },
+    { value: 'Jueves' },
+    { value: 'Viernes' },
+    { value: 'Sabado' },
+    { value: 'Domingo' },
   ];
   const horarios = Array.from({ length: (22 - 8) * 2 + 1 }, (_, i) => {
     const horas = Math.floor(8 + i / 2);
-    const minutos = i % 2 === 0 ? "00" : "30";
+    const minutos = i % 2 === 0 ? '00' : '30';
     return `${horas}:${minutos}`;
   });
   return (
@@ -120,7 +120,7 @@ const CreateComision = () => {
           <div className="relative text-gray-400">
             <select
               name="day"
-              value={formData.day || ""}
+              value={formData.day || ''}
               onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
             >
@@ -140,7 +140,7 @@ const CreateComision = () => {
           <div className="flex items-center w-full space-x-2">
             <select
               name="start"
-              value={formData.hour.start || ""}
+              value={formData.hour.start || ''}
               onChange={handleChange}
               className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
             >
@@ -154,7 +154,7 @@ const CreateComision = () => {
             <span className="font-bold text-lg">-</span>
             <select
               name="end"
-              value={formData.hour.end || ""}
+              value={formData.hour.end || ''}
               onChange={handleChange}
               className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
             >
@@ -210,13 +210,24 @@ const CreateComision = () => {
           className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
         >
           {pause ? (
-            <svg fill="white" className="w-6 h-6 mx-auto" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              fill="white"
+              className="w-6 h-6 mx-auto"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                <animateTransform
+                  attributeName="transform"
+                  type="rotate"
+                  dur="0.75s"
+                  values="0 12 12;360 12 12"
+                  repeatCount="indefinite"
+                />
               </path>
             </svg>
           ) : (
-            "Crear Comision"
+            'Crear Comision'
           )}
         </button>
       </form>

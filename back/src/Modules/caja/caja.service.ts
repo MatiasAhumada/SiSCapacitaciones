@@ -9,12 +9,10 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Caja, MetodoPago, TipoMovimiento } from './entities/caja.entity';
-import { Between, Like, Repository } from 'typeorm';
+import { Between, IsNull, Like, Not, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
-import { format, startOfDay, endOfDay } from 'date-fns';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Alumno } from '../alumno/entities/alumno.entity';
-import { Comision } from '../comision/entities/comision.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { Comprobante } from '../comprobante/entities/comprobante.entity';
 import { Categoria } from './entities/categoria.entity';
@@ -22,6 +20,14 @@ import { Subcategoria } from './entities/subcategoria.entity';
 import { EgresoCajaDTO } from './dto/egreso-caja.dto';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
+import { SesionCaja } from './entities/sesion-caja.entity';
+import dayjs = require('dayjs');
+import utc = require('dayjs/plugin/utc');
+import timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 @Injectable()
 export class CajaService {
   constructor(
@@ -39,17 +45,31 @@ export class CajaService {
     private readonly subcategoriaRepository: Repository<Subcategoria>,
     @InjectRepository(Profesor)
     private readonly profesorRepository: Repository<Profesor>,
+    @InjectRepository(SesionCaja)
+    private readonly sesionRepository: Repository<SesionCaja>,
   ) {}
-
+  get fechaLocal(): Date {
+    return dayjs().tz('America/Argentina/Buenos_Aires').toDate();
+  }
   async create(createCajaDto: CreateCajaDto) {
     const { comprobante, tipo, vendedorId, alumnoComisionId, ...restoCaja } =
       createCajaDto;
-    // console.log(createCajaDto)
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
+    }
+    const sesionCaja = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaCierre: IsNull(),
+      },
+    });
+    if (!sesionCaja) {
+      throw new BadRequestException(
+        'No hay sesión de caja abierta para este vendedor',
+      );
     }
 
     if (tipo === TipoMovimiento.INGRESO) {
@@ -57,7 +77,7 @@ export class CajaService {
         where: { id: alumnoComisionId },
         relations: ['alumno'],
       });
-      console.log(alumnoComision);
+
       if (!alumnoComision) {
         throw new NotFoundException('Alumno no encontrado');
       }
@@ -105,6 +125,7 @@ export class CajaService {
       newCaja.vendedor = vendedor;
       newCaja.comprobante = newComprobante;
       newCaja.alumnoComision = alumnoComision;
+      newCaja.sesionCaja = sesionCaja;
 
       await this.cajaRepository.save(newCaja);
 
@@ -409,6 +430,21 @@ export class CajaService {
         'Subcategoría no encontrada',
         HttpStatus.BAD_REQUEST,
       );
+    const sesionAbierta = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: dto.vendedorId },
+        fechaCierre: IsNull(), // la sesión no cerrada
+      },
+    });
+    if (!sesionAbierta) {
+      throw new HttpException(
+        'No hay sesión de caja abierta',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const fechaLocal = dto.fecha
+      ? dayjs(dto.fecha).tz('America/Argentina/Buenos_Aires').toDate()
+      : dayjs().tz('America/Argentina/Buenos_Aires').toDate();
 
     const caja = this.cajaRepository.create({
       tipo: TipoMovimiento.EGRESO,
@@ -417,7 +453,8 @@ export class CajaService {
       descripcion: dto.descripcion || `Egreso por ${subcategoria.nombre}`,
       vendedor,
       subcategoria,
-      fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
+      fecha: fechaLocal,
+      sesionCaja: sesionAbierta, // Asociamos la sesión abierta
     });
 
     return await this.cajaRepository.save(caja);
@@ -479,26 +516,274 @@ export class CajaService {
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
+
     const hoy = new Date();
-    const yaApertura = await this.cajaRepository.findOne({
+    hoy.setHours(hoy.getHours() - 3);
+    // Validar que no haya una sesión abierta
+    const sesionAbierta = await this.sesionRepository.findOne({
       where: {
         vendedor: { id: vendedorId },
-        tipo: TipoMovimiento.APERTURA,
-        fecha: Between(startOfDay(hoy), endOfDay(hoy)),
+        fechaCierre: IsNull(),
       },
     });
-    if (yaApertura) {
-      throw new BadRequestException('Ya se realizó una apertura de caja hoy.');
+    if (sesionAbierta) {
+      throw new BadRequestException(
+        'Ya hay una sesión de caja abierta sin cerrar.',
+      );
     }
+
+    let montoApertura = 0;
+    let totalDigitalJavier = 0;
+    let totalDigitalTobias = 0;
+    let totalCredito = 0;
+    let totalEfectivo = 0;
+    // Buscar última sesión cerrad
+    const ultimaSesion = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaCierre: Not(IsNull()),
+      },
+      order: {
+        fechaCierre: 'DESC',
+      },
+    });
+    if (ultimaSesion) {
+      if (ultimaSesion.totalIngresos > ultimaSesion.totalEgresos) {
+        montoApertura = ultimaSesion.totalIngresos - ultimaSesion.totalEgresos;
+      }
+      totalDigitalJavier = ultimaSesion.totalDigitalJavier || 0;
+      totalDigitalTobias = ultimaSesion.totalDigitalTobias || 0;
+      totalCredito = ultimaSesion.totalCredito || 0;
+      totalEfectivo = ultimaSesion.totalEfectivo || 0;
+    }
+
+    const nuevaSesion = this.sesionRepository.create({
+      fechaApertura: hoy,
+      montoApertura: montoApertura,
+      totalIngresos: 0,
+      totalEgresos: 0,
+      totalDigitalJavier,
+      totalDigitalTobias,
+      totalCredito,
+      totalEfectivo,
+      vendedor,
+    });
+    await this.sesionRepository.save(nuevaSesion);
+
     const apertura = this.cajaRepository.create({
-      fecha: hoy,
+      fecha: new Date(),
       tipo: TipoMovimiento.APERTURA,
-      metodoPago: MetodoPago.EFECTIVO, 
+      metodoPago: MetodoPago.EFECTIVO,
       descripcion: 'Apertura de caja',
-      monto: 0,
-      vendedor: vendedor,
+      monto: montoApertura,
+      vendedor,
+      sesionCaja: nuevaSesion,
     });
 
     return this.cajaRepository.save(apertura);
+  }
+
+  async cerrarSesionCaja(vendedorId: string): Promise<SesionCaja> {
+    if (!vendedorId) {
+      throw new BadRequestException('El id del vendedor es obligatorio');
+    }
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: vendedorId },
+    });
+
+    if (!vendedor) {
+      throw new NotFoundException('Vendedor no encontrado');
+    }
+    // Buscamos la sesión abierta (sin fechaCierre)
+    const sesionAbierta = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaCierre: IsNull(),
+      },
+      relations: ['movimientos'], // si necesitás cargar movimientos para actualizar totales
+    });
+
+    if (!sesionAbierta) {
+      throw new BadRequestException('No hay sesión abierta para cerrar.');
+    }
+
+    // Opcional: validar que el vendedor tenga movimientos en esa sesión, si querés controlar por vendedor
+    // const movimientosVendedor = sesionAbierta.movimientos.filter(mov => mov.vendedor?.id === vendedorId);
+    // if (movimientosVendedor.length === 0) {
+    //   throw new BadRequestException('El vendedor no tiene movimientos en la sesión abierta.');
+    // }
+
+    // Calcular totales (si no los estás actualizando en tiempo real)
+    const ingresos = sesionAbierta.movimientos
+      .filter(
+        (mov) =>
+          mov.tipo === TipoMovimiento.INGRESO ||
+          mov.tipo === TipoMovimiento.APERTURA,
+      )
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const egresos = sesionAbierta.movimientos
+      .filter((mov) => mov.tipo === TipoMovimiento.EGRESO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const totalDigitalJavier = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.DIGITAL_JAVIER)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const totalDigitalTobias = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.DIGITAL_TOBIAS)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const totalCredito = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.CREDITO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    const totalEfectivo = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.EFECTIVO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
+    // Actualizar totales y fecha de cierre
+    sesionAbierta.totalIngresos = ingresos;
+    sesionAbierta.totalEgresos = egresos;
+    sesionAbierta.montoCierre = ingresos - egresos;
+    sesionAbierta.fechaCierre = this.fechaLocal;
+    sesionAbierta.totalDigitalJavier = totalDigitalJavier;
+    sesionAbierta.totalDigitalTobias = totalDigitalTobias;
+    sesionAbierta.totalCredito = totalCredito;
+    sesionAbierta.totalEfectivo = totalEfectivo;
+    await this.sesionRepository.save(sesionAbierta);
+    const cierre = this.cajaRepository.create({
+      fecha: this.fechaLocal,
+      tipo: TipoMovimiento.CIERRE,
+      metodoPago: MetodoPago.EFECTIVO,
+      descripcion: 'Cierre de caja',
+      monto: sesionAbierta.montoCierre,
+      vendedor,
+      sesionCaja: sesionAbierta,
+    });
+
+    await this.cajaRepository.save(cierre);
+    return sesionAbierta;
+  }
+  async obtenerSesionPorFecha(vendedorId: string) {
+    if (!vendedorId) {
+      throw new NotFoundException('ID Vendedor no enviado');
+    }
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: vendedorId },
+    });
+
+    if (!vendedor) {
+      throw new NotFoundException('Vendedor no encontrado');
+    }
+
+    const fecha = new Date();
+    const inicioDelDia = new Date(fecha.setHours(0, 0, 0, 0));
+    const finDelDia = new Date(fecha.setHours(23, 59, 59, 999));
+
+    const sesion = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaApertura: Between(inicioDelDia, finDelDia),
+      },
+      order: { fechaApertura: 'DESC' },
+      // relations: ['vendedor'],
+    });
+
+    if (!sesion) {
+      throw new NotFoundException(
+        'No se encontró sesión para el dia de la fecha.',
+      );
+    }
+
+    const movimientos = await this.cajaRepository.find({
+      where: {
+        sesionCaja: { id: sesion.id },
+        //fecha: Between(inicioDelDia, finDelDia),
+      },
+      relations: ['alumnoComision.alumno'],
+      select: {
+        alumnoComision: {
+          id: true,
+          alumno: {
+            id: true,
+            name: true,
+            dni: true,
+          },
+        },
+      },
+      order: { fecha: 'ASC' },
+    });
+
+    if (!movimientos.length) {
+      throw new NotFoundException(
+        'No hay movimientos para la sesión en esa fecha.',
+      );
+    }
+
+    const totalEgresos = movimientos
+      .filter((m) => m.tipo === TipoMovimiento.EGRESO)
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+
+    const totalIngresos = movimientos
+      .filter(
+        (m) =>
+          m.tipo === TipoMovimiento.INGRESO ||
+          m.tipo === TipoMovimiento.APERTURA,
+      )
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+
+    const totalEfectivo = movimientos
+      .filter(
+        (m) =>
+          (m.tipo === TipoMovimiento.INGRESO ||
+            m.tipo === TipoMovimiento.APERTURA) &&
+          m.metodoPago === MetodoPago.EFECTIVO,
+      )
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+
+    const totalCredito = movimientos
+      .filter(
+        (m) =>
+          (m.tipo === TipoMovimiento.INGRESO ||
+            m.tipo === TipoMovimiento.APERTURA) &&
+          m.metodoPago === MetodoPago.CREDITO,
+      )
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+
+    const totalDigitalJavier = movimientos
+      .filter(
+        (m) =>
+          (m.tipo === TipoMovimiento.INGRESO ||
+            m.tipo === TipoMovimiento.APERTURA) &&
+          m.metodoPago === MetodoPago.DIGITAL_JAVIER,
+      )
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+
+    const totalDigitalTobias = movimientos
+      .filter(
+        (m) =>
+          (m.tipo === TipoMovimiento.INGRESO ||
+            m.tipo === TipoMovimiento.APERTURA) &&
+          m.metodoPago === MetodoPago.DIGITAL_TOBIAS,
+      )
+      .reduce((sum, m) => sum + Number(m.monto), 0);
+
+    const montoCierre = totalIngresos - totalEgresos;
+
+    // Adjuntar los movimientos a la sesión
+    //sesion['movimientos'] = movimientos;
+
+    return {
+      ...sesion,
+      movimientos,
+      totalIngresos,
+      totalEgresos,
+      montoCierre,
+      totalEfectivo,
+      totalCredito,
+      totalDigitalJavier,
+      totalDigitalTobias,
+    };
   }
 }

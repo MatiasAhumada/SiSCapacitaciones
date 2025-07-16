@@ -14,9 +14,10 @@ import { Caja } from 'src/Modules/caja/entities/caja.entity';
 import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.entity';
 import { Asistencia } from 'src/Modules/comision/entities/asistencia.entity';
 import { Certificado } from 'src/Modules/certificado/entities/certificado.entity';
-import { Comprobante } from '@modules/Modules/comprobante/entities/comprobante.entity';
-import { Categoria } from '@modules/Modules/caja/entities/categoria.entity';
-import { Subcategoria } from '@modules/Modules/caja/entities/subcategoria.entity';
+import { Comprobante } from 'src/Modules/comprobante/entities/comprobante.entity';
+import { Categoria } from 'src/Modules/caja/entities/categoria.entity';
+import { Subcategoria } from 'src/Modules/caja/entities/subcategoria.entity';
+import { SesionCaja } from 'src/Modules/caja/entities/sesion-caja.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -28,10 +29,29 @@ const db_config = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   autoLoadEntities: true,
-  synchronize: true ,
+  synchronize: false,
   dropSchema: false,
   logging: false,
-  entities: [Admins,Alumno,Caja,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor,Caja,AlumnoComision,Asistencia,Certificado,Comprobante,Categoria,Subcategoria],
+  entities: [
+    Admins,
+    Alumno,
+    Caja,
+    Comision,
+    Curso,
+    Inscripcion,
+    Profesor,
+    Servicio,
+    Sucursal,
+    Vendedor,
+    Caja,
+    AlumnoComision,
+    Asistencia,
+    Certificado,
+    Comprobante,
+    Categoria,
+    Subcategoria,
+    SesionCaja,
+  ],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
   migrations: ['dist/migrations/*.{js,ts}'],

@@ -97,7 +97,7 @@ export class Caja {
 
   @ManyToOne(() => SesionCaja, (sesion) => sesion.movimientos, {
     nullable: true,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
   @JoinColumn()
   sesionCaja?: SesionCaja;

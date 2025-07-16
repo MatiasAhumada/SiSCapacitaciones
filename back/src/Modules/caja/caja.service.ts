@@ -665,6 +665,7 @@ export class CajaService {
     await this.cajaRepository.save(cierre);
     return sesionAbierta;
   }
+
   async obtenerSesionPorFecha(vendedorId: string) {
     if (!vendedorId) {
       throw new NotFoundException('ID Vendedor no enviado');
@@ -672,118 +673,159 @@ export class CajaService {
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });
-
     if (!vendedor) {
       throw new NotFoundException('Vendedor no encontrado');
     }
 
     const fecha = new Date();
-    const inicioDelDia = new Date(fecha.setHours(0, 0, 0, 0));
-    const finDelDia = new Date(fecha.setHours(23, 59, 59, 999));
+    const inicioDelDia = new Date(fecha);
+    inicioDelDia.setHours(0, 0, 0, 0);
+    const finDelDia = new Date(fecha);
+    finDelDia.setHours(23, 59, 59, 999);
 
-    const sesion = await this.sesionRepository.findOne({
+
+    const sesiones = await this.sesionRepository.find({
       where: {
         vendedor: { id: vendedorId },
         fechaApertura: Between(inicioDelDia, finDelDia),
       },
-      order: { fechaApertura: 'DESC' },
-      // relations: ['vendedor'],
+      order: { fechaApertura: 'ASC' },
     });
 
-    if (!sesion) {
-      throw new NotFoundException(
-        'No se encontró sesión para el dia de la fecha.',
-      );
+    if (!sesiones.length) {
+      throw new NotFoundException('No se encontraron sesiones para el día.');
     }
 
-    const movimientos = await this.cajaRepository.find({
-      where: {
-        sesionCaja: { id: sesion.id },
-        //fecha: Between(inicioDelDia, finDelDia),
-      },
-      relations: ['alumnoComision.alumno'],
-      select: {
-        alumnoComision: {
-          id: true,
-          alumno: {
-            id: true,
-            name: true,
-            dni: true,
+
+    const sesionesConMovimientos = await Promise.all(
+      sesiones.map(async (sesion) => {
+        const movimientos = await this.cajaRepository.find({
+          where: { sesionCaja: { id: sesion.id } },
+          relations: ['alumnoComision.alumno'],
+          select: {
+            alumnoComision: {
+              id: true,
+              alumno: {
+                id: true,
+                name: true,
+                dni: true,
+              },
+            },
           },
-        },
-      },
-      order: { fecha: 'ASC' },
-    });
+          order: { fecha: 'ASC' },
+        });
 
-    if (!movimientos.length) {
-      throw new NotFoundException(
-        'No hay movimientos para la sesión en esa fecha.',
-      );
-    }
+        const totalEgresos = movimientos
+          .filter((m) => m.tipo === TipoMovimiento.EGRESO)
+          .reduce((sum, m) => sum + Number(m.monto), 0);
 
-    const totalEgresos = movimientos
-      .filter((m) => m.tipo === TipoMovimiento.EGRESO)
-      .reduce((sum, m) => sum + Number(m.monto), 0);
+        const totalApertura = movimientos
+          .filter((m) => m.tipo === TipoMovimiento.APERTURA)
+          .reduce((sum, m) => sum + Number(m.monto), 0);
 
-    const totalIngresos = movimientos
-      .filter(
-        (m) =>
-          m.tipo === TipoMovimiento.INGRESO ||
-          m.tipo === TipoMovimiento.APERTURA,
-      )
-      .reduce((sum, m) => sum + Number(m.monto), 0);
+        const totalIngresos = movimientos
+          .filter((m) => m.tipo === TipoMovimiento.INGRESO)
+          .reduce((sum, m) => sum + Number(m.monto), 0);
 
-    const totalEfectivo = movimientos
-      .filter(
-        (m) =>
-          (m.tipo === TipoMovimiento.INGRESO ||
-            m.tipo === TipoMovimiento.APERTURA) &&
-          m.metodoPago === MetodoPago.EFECTIVO,
-      )
-      .reduce((sum, m) => sum + Number(m.monto), 0);
+        const totalEfectivoApertura = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.APERTURA &&
+              m.metodoPago === MetodoPago.EFECTIVO,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
 
-    const totalCredito = movimientos
-      .filter(
-        (m) =>
-          (m.tipo === TipoMovimiento.INGRESO ||
-            m.tipo === TipoMovimiento.APERTURA) &&
-          m.metodoPago === MetodoPago.CREDITO,
-      )
-      .reduce((sum, m) => sum + Number(m.monto), 0);
+        const totalEfectivoIngresos = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.INGRESO &&
+              m.metodoPago === MetodoPago.EFECTIVO,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
 
-    const totalDigitalJavier = movimientos
-      .filter(
-        (m) =>
-          (m.tipo === TipoMovimiento.INGRESO ||
-            m.tipo === TipoMovimiento.APERTURA) &&
-          m.metodoPago === MetodoPago.DIGITAL_JAVIER,
-      )
-      .reduce((sum, m) => sum + Number(m.monto), 0);
+        const totalEfectivo = totalEfectivoApertura + totalEfectivoIngresos;
 
-    const totalDigitalTobias = movimientos
-      .filter(
-        (m) =>
-          (m.tipo === TipoMovimiento.INGRESO ||
-            m.tipo === TipoMovimiento.APERTURA) &&
-          m.metodoPago === MetodoPago.DIGITAL_TOBIAS,
-      )
-      .reduce((sum, m) => sum + Number(m.monto), 0);
+        const totalCreditoApertura = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.APERTURA &&
+              m.metodoPago === MetodoPago.CREDITO,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
 
-    const montoCierre = totalIngresos - totalEgresos;
+        const totalCreditoIngresos = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.INGRESO &&
+              m.metodoPago === MetodoPago.CREDITO,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
 
-    // Adjuntar los movimientos a la sesión
-    //sesion['movimientos'] = movimientos;
+        const totalCredito = totalCreditoApertura + totalCreditoIngresos;
 
-    return {
-      ...sesion,
-      movimientos,
-      totalIngresos,
-      totalEgresos,
-      montoCierre,
-      totalEfectivo,
-      totalCredito,
-      totalDigitalJavier,
-      totalDigitalTobias,
-    };
+        const totalDigitalJavierApertura = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.APERTURA &&
+              m.metodoPago === MetodoPago.DIGITAL_JAVIER,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
+
+        const totalDigitalJavierIngresos = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.INGRESO &&
+              m.metodoPago === MetodoPago.DIGITAL_JAVIER,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
+
+        const totalDigitalJavier =
+          totalDigitalJavierApertura + totalDigitalJavierIngresos;
+
+        const totalDigitalTobiasApertura = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.APERTURA &&
+              m.metodoPago === MetodoPago.DIGITAL_TOBIAS,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
+
+        const totalDigitalTobiasIngresos = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.INGRESO &&
+              m.metodoPago === MetodoPago.DIGITAL_TOBIAS,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
+
+        const totalDigitalTobias =
+          totalDigitalTobiasApertura + totalDigitalTobiasIngresos;
+
+        const montoCierre = totalApertura + totalIngresos - totalEgresos;
+
+        return {
+          ...sesion,
+          movimientos,
+          totalIngresos,
+          totalEgresos,
+          totalApertura,
+          montoCierre,
+          totalEfectivo,
+          totalCredito,
+          totalDigitalJavier,
+          totalDigitalTobias,
+          totalEfectivoApertura,
+          totalEfectivoIngresos,
+          totalCreditoApertura,
+          totalCreditoIngresos,
+          totalDigitalJavierApertura,
+          totalDigitalJavierIngresos,
+          totalDigitalTobiasApertura,
+          totalDigitalTobiasIngresos,
+        };
+      }),
+    );
+
+    return sesionesConMovimientos;
   }
 }

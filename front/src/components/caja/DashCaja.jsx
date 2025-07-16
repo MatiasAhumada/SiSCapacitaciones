@@ -42,9 +42,11 @@ const DashCaja = () => {
     const peticion = async () => {
       try {
         const data = await GetCajaByVendedor(idVend);
-        console.log(data);
-        setSesionCaja(data);
-        setTableItems(data.movimientos);
+        console.log(data)
+        const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
+        setSesionCaja(ultimaSesion);
+        const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
+        setTableItems(movimientosAplanados);
       } catch (error) {
         const msg = error?.response?.data?.message;
         Swal.fire({
@@ -147,7 +149,6 @@ const DashCaja = () => {
 
     setTableItems(filtrado);
   };
-  console.log(sesionCaja);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <CajaResumen sesionCaja={sesionCaja}></CajaResumen>

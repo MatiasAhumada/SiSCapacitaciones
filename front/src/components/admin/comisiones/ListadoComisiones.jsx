@@ -17,6 +17,8 @@ const ListadoComisiones = () => {
       alumnoComisionId: '',
     },
   ]);
+  const [todosLosAlumnos, setTodosLosAlumnos] = useState([]);
+  const [dniFiltro, setDniFiltro] = useState('');
 
   const { comId } = useParams();
   const navigate = useNavigate();
@@ -35,11 +37,11 @@ const ListadoComisiones = () => {
 
     navigate(redirectionPath);
   };
-  console.log(comisionDate);
   useEffect(() => {
     const alumnosCom = async () => {
       await getComisionId(comId).then((data) => {
         setAlumnosComision(data.alumnoComisiones);
+        setTodosLosAlumnos(data.alumnoComisiones);
         setComisionDate(data);
       });
     };
@@ -157,6 +159,19 @@ const ListadoComisiones = () => {
     if (day >= 16 && !pagosEsteMes) return 'bg-red-200';
     return '';
   };
+  // 🔹 CAMBIO: función para filtrar por DNI
+  const handleFiltrarDni = (e) => {
+    const value = e.target.value;
+    setDniFiltro(value);
+
+    if (!value.trim()) {
+      setAlumnosComision(todosLosAlumnos);
+      return;
+    }
+
+    const filtrados = todosLosAlumnos.filter((item) => item.alumno?.dni.includes(value));
+    setAlumnosComision(filtrados);
+  };
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -172,6 +187,15 @@ const ListadoComisiones = () => {
             <h5 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
               Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
             </h5>
+          </div>
+          <div className="mt-6 mb-2">
+            <input
+              type="text"
+              placeholder="Filtrar por DNI"
+              value={dniFiltro}
+              onChange={handleFiltrarDni}
+              className="px-4 py-2 border rounded w-full md:w-64"
+            />
           </div>
           <div className="mt-3 md:mt-0">
             <button

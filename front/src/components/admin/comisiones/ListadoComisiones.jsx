@@ -23,7 +23,6 @@ const ListadoComisiones = () => {
   const { comId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(id);
   const navegacion = (alumno) => {
     const currentPath = location.pathname;
     const isAdmin = currentPath.includes('adm');
@@ -83,7 +82,6 @@ const ListadoComisiones = () => {
 
     // Crear filas con datos de asistencia
     const rows = alumnosComision.map((item) => {
-      console.log(item);
       const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
       fechas.forEach((fecha) => {
         const asistencia = item.asistencias.find(

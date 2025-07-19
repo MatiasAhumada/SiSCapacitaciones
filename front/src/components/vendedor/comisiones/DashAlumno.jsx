@@ -169,11 +169,10 @@ const DashAlumno = () => {
       iva: '-', // completar si es necesario
       fecha: new Date(item.fecha).toLocaleDateString('es-AR'), // formato legible
       formaPago: item.metodoPago,
-      observacion: '-', // podés poner algo como `Pago de cuota ${data.cuota}` si querés
+      observacion: dataComision.name, // podés poner algo como `Pago de cuota ${data.cuota}` si querés
       monto: item.monto,
       numeroComprobante: item.comprobante.numeroComprobante,
     };
-    console.log(reciboProps);
     setInfoComprobante(reciboProps);
   };
   return (

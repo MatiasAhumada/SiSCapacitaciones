@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import {
-  deleteComision,
-  deleteMovCaja,
-  getAluCom,
-  putComision,
-} from '../../queris/queris';
+import { deleteComision, deleteMovCaja, getAluCom, putComision } from '../../queris/queris';
 import ReciboComprobante from '../../caja/Comprobante';
 import { Modal } from 'antd';
 
@@ -192,14 +187,6 @@ const DashAlumno = () => {
               {dataComision.name}: {dataComision.day} {dataComision.hour?.start} -{' '}
               {dataComision.hour?.end}
             </h3>
-          </div>
-          <div className="mt-3 md:mt-0">
-            <button
-              onClick={() => navigate(`/inicioVendedor/comisiones/crear`)}
-              className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
-            >
-              Nueva Comision
-            </button>
           </div>
         </div>
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">

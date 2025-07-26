@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AlumnoService } from './alumno.service';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
@@ -48,6 +49,11 @@ export class AlumnoController {
   //   const estadoBooleano = nuevoEstado === 'true';
   //   return this.alumnoService.cambiarEstado(id, estadoBooleano);
   // }
+  @Get('buscar')
+  async buscarPorDni(@Query('dni') dni: string) {
+    console.log(dni);
+    return this.alumnoService.findByDniBasic(dni);
+  }
 
   @Get(':dni')
   findOne(@Param('dni') dni: string) {

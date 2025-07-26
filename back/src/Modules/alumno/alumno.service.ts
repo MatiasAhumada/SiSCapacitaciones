@@ -163,6 +163,37 @@ export class AlumnoService {
     });
   }
 
+  async findByDniBasic(dni: string): Promise<Partial<Alumno> | null> {
+    if (!dni) {
+      throw new BadRequestException('Debe proporcionar un DNI');
+    }
+    const alumno = this.alumnoRepository.findOne({
+      where: { dni },
+      select: {
+        id: true,
+        dni: true,
+        name: true,
+        fNac: true,
+        tel: true,
+        telex: true,
+        ocupation: true,
+        nationality: true,
+        address: true,
+        province: true,
+        locality: true,
+        email: true,
+        age: true,
+        gender: true,
+        imgUrl: true,
+        descuento: true,
+      },
+    });
+    if (!alumno) {
+      throw new NotFoundException('Alumno no encontrado');
+    }
+    return alumno;
+  }
+
   async update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
     return `This action updates a #${id} alumno`;
   }

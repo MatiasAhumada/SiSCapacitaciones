@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { getSucursales, postAlu } from '../queris/queris';
+import { getAluByDNI, getSucursales, postAlu } from '../queris/queris';
 
 const CreateAlumnoNuevo = () => {
   const [pause, setPause] = useState(false);
@@ -87,10 +87,14 @@ const CreateAlumnoNuevo = () => {
       });
     }
   };
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log('DNI ingresado:', searchDni);
-    // Aquí podrías hacer una búsqueda por API, por ejemplo:
-    // fetch(`/api/pasajeros?dni=${dni}`).then(...)
+    const data = await getAluByDNI(searchDni);
+    try {
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

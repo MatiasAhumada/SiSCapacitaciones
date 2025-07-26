@@ -28,6 +28,15 @@ export const getAluID = async (dni) => {
     throw error;
   }
 };
+export const getAluByDNI = async (dni) => {
+  try {
+    const response = await axios.get(`${URL}/alumno/buscar?dni=${dni}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getAlu = async (id) => {
   try {
     const response = await axios.get(`${URL}/alumno`);

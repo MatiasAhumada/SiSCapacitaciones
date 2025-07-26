@@ -51,23 +51,22 @@ export class AlumnoController {
   // }
   @Get('buscar')
   async buscarPorDni(@Query('dni') dni: string) {
-    console.log(dni);
     return this.alumnoService.findByDniBasic(dni);
   }
 
-  @Get(':dni')
+  @Get('search/:dni')
   findOne(@Param('dni') dni: string) {
     return this.alumnoService.findOne(dni);
   }
 
-  @Put(':id')
+  @Put('edit/:id')
   updateImgUrl(
     @Param('id') id: string,
     @Body() updateAlumnoDto: UpdateAlumnoDto,
   ) {
     return this.alumnoService.update(id, updateAlumnoDto);
   }
-  @Delete(':id')
+  @Delete('remove/:id')
   remove(@Param('id') id: string) {
     return this.alumnoService.remove(id);
   }

@@ -131,6 +131,43 @@ export class AlumnoService {
 
     return await this.findOne(imgUpdt.id);
   }
+
+  async findByDniBasic(dni: string): Promise<Partial<Alumno> | null> {
+    if (!dni) {
+      throw new BadRequestException('Debe proporcionar un DNI');
+    }
+    const alumno = this.alumnoRepository.findOne({
+      where: { dni },
+      relations: ['sucursal'],
+      select: {
+        id: true,
+        dni: true,
+        name: true,
+        fNac: true,
+        tel: true,
+        telex: true,
+        ocupation: true,
+        nationality: true,
+        address: true,
+        province: true,
+        locality: true,
+        email: true,
+        age: true,
+        gender: true,
+        imgUrl: true,
+        descuento: true,
+        sucursal: {
+          id: true,
+          name: true,
+        },
+      },
+    });
+    if (!alumno) {
+      throw new NotFoundException('Alumno no encontrado');
+    }
+    return alumno;
+  }
+
   async findOne(dni: string): Promise<Alumno | null> {
     return this.alumnoRepository.findOne({
       where: { dni },
@@ -163,39 +200,33 @@ export class AlumnoService {
     });
   }
 
-  async findByDniBasic(dni: string): Promise<Partial<Alumno> | null> {
-    if (!dni) {
-      throw new BadRequestException('Debe proporcionar un DNI');
-    }
-    const alumno = this.alumnoRepository.findOne({
-      where: { dni },
-      select: {
-        id: true,
-        dni: true,
-        name: true,
-        fNac: true,
-        tel: true,
-        telex: true,
-        ocupation: true,
-        nationality: true,
-        address: true,
-        province: true,
-        locality: true,
-        email: true,
-        age: true,
-        gender: true,
-        imgUrl: true,
-        descuento: true,
-      },
+  async update(id: string, updateAlumnoDto: UpdateAlumnoDto): Promise<Alumno> {
+    const alumno = await this.alumnoRepository.findOne({
+      where: { id },
+      relations: ['sucursal'],
     });
-    if (!alumno) {
-      throw new NotFoundException('Alumno no encontrado');
-    }
-    return alumno;
-  }
 
-  async update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
-    return `This action updates a #${id} alumno`;
+    if (!alumno) {
+      throw new NotFoundException(`Alumno con ID ${id} no encontrado`);
+    }
+    
+    Object.assign(alumno, updateAlumnoDto);
+
+    if (updateAlumnoDto.sucursalId) {
+      const sucursal = await this.sucursalRepository.findOne({
+        where: { id: updateAlumnoDto.sucursalId },
+      });
+      if (!sucursal) {
+        throw new NotFoundException(
+          `Sucursal con ID ${updateAlumnoDto.sucursalId} no encontrada`,
+        );
+      }
+
+      alumno.sucursal = sucursal;
+    }
+
+    await this.alumnoRepository.save(alumno);
+    return alumno;
   }
 
   async remove(id: string) {

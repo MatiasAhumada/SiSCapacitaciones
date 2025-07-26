@@ -18,6 +18,7 @@ import { AuthModule } from './auth/auth.module';
 import { CajaModule } from './caja/caja.module';
 import { CertificadoModule } from './certificado/certificado.module';
 import { ComprobanteModule } from './comprobante/comprobante.module';
+import { SeederModule } from '@modules/Seeds/seeders.module';
 @Module({
   imports: [
     ConfigModule.forRoot({

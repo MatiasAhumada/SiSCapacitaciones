@@ -1,12 +1,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { Admins } from '../Modules/admin/entities/admin.entity';
 import { Sucursal } from '../Modules/sucursal/entities/sucursal.entity';
 import * as bcrypt from 'bcrypt';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
 import { CajaService } from '@modules/Modules/caja/caja.service';
 import { Vendedor } from '@modules/Modules/vendedor/entities/vendedor.entity';
+import { SesionCaja } from '@modules/Modules/caja/entities/sesion-caja.entity';
 
 @Injectable()
 export class SeederService implements OnModuleInit {
@@ -21,12 +22,14 @@ export class SeederService implements OnModuleInit {
     private readonly adminsRepository: Repository<Admins>,
     @InjectRepository(Vendedor)
     private readonly vendedorRepository: Repository<Vendedor>,
+    @InjectRepository(SesionCaja)
+    private readonly sesionRepository: Repository<SesionCaja>,
 
     private readonly cajaService: CajaService,
   ) {}
   private readonly logger = new Logger(SeederService.name);
   async onModuleInit() {
-    await this.seed();
+    await this.seedCajasEspeciales();
   }
   //  async crearSesionesCaja() {
   //    this.logger.log('Iniciando creación de sesiones por día para movimientos de caja...');
@@ -475,5 +478,55 @@ export class SeederService implements OnModuleInit {
     }
 
     this.logger.log('Seeder vendedores finalizado.');
+  }
+
+  async seedCajasEspeciales() {
+ 
+    const adminsInfo = [
+      {
+        id: '4ab59277-5a15-4841-acce-851b0f6dbe11', // Javier
+        nombre: 'Javier',
+      },
+      {
+        id: 'f709ac35-d270-4941-83de-d45031d6c33e', // Tobias
+        nombre: 'Tobias',
+      },
+    ];
+
+    for (const adminInfo of adminsInfo) {
+      const admin = await this.adminRepository.findOneBy({ id: adminInfo.id });
+
+      if (!admin) {
+        console.log(`❌ Admin ${adminInfo.nombre} no encontrado.`);
+        continue;
+      }
+
+      const sesionExistente = await this.sesionRepository.findOne({
+        where: {
+          admin: { id: admin.id },
+          fechaCierre: IsNull(),
+        },
+      });
+
+      if (sesionExistente) {
+        console.log(`ℹ️ Sesión ya abierta para ${adminInfo.nombre}.`);
+        continue;
+      }
+
+      const nuevaSesion = this.sesionRepository.create({
+        admin,
+        fechaApertura: new Date(),
+        montoApertura: 0,
+        totalDigitalJavier: 0,
+        totalDigitalTobias: 0,
+        totalEfectivo: 0,
+        totalCredito: 0,
+        totalEgresos: 0,
+        totalIngresos: 0,
+      });
+
+      await this.sesionRepository.save(nuevaSesion);
+      console.log(`✅ Sesión de caja creada para ${adminInfo.nombre}.`);
+    }
   }
 }

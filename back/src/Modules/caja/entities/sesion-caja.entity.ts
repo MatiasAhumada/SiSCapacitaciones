@@ -9,6 +9,7 @@ import {
 import { Caja } from './caja.entity';
 import { v4 as uuid } from 'uuid';
 import { Vendedor } from '@modules/Modules/vendedor/entities/vendedor.entity';
+import { Admins } from '@modules/Modules/admin/entities/admin.entity';
 
 @Entity({
   name: 'sesiones_caja',
@@ -57,4 +58,10 @@ export class SesionCaja {
   })
   @JoinColumn({ name: 'vendedorId' })
   vendedor: Vendedor;
+
+  @ManyToOne(() => Admins, (admin) => admin.sesionesCaja, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'adminId' })
+  admin: Admins;
 }

@@ -6,10 +6,11 @@ import { SeederService } from './seeders.service';
 import { Curso } from 'src/Modules/curso/entities/curso.entity';
 import { CajaModule } from '@modules/Modules/caja/caja.module';
 import { Vendedor } from '@modules/Modules/vendedor/entities/vendedor.entity';
+import { SesionCaja } from '@modules/Modules/caja/entities/sesion-caja.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Admins, Sucursal, Curso, Admins, Vendedor]),
+    TypeOrmModule.forFeature([Admins, Sucursal, Curso, Admins, Vendedor,SesionCaja]),
     CajaModule,
   ],
   providers: [SeederService],

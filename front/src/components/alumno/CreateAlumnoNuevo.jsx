@@ -36,9 +36,7 @@ const CreateAlumnoNuevo = () => {
   const ocupacion = [{ value: 'Estudiante' }, { value: 'Trabajador' }, { value: 'Retirado' }];
 
   useEffect(() => {
-    console.log('Cargando Sucursales...');
     getSucursales().then((data) => {
-      console.log('Sucursales cargadas:', data);
       setSucursales(data);
     });
   }, []);
@@ -88,10 +86,10 @@ const CreateAlumnoNuevo = () => {
     }
   };
   const handleSearch = async () => {
-    console.log('DNI ingresado:', searchDni);
     const data = await getAluByDNI(searchDni);
     try {
       console.log(data);
+      setFormAlu(data);
     } catch (error) {
       console.log(error);
     }

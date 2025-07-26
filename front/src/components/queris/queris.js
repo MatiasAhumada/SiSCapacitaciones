@@ -22,7 +22,7 @@ export const getAluSucID = async (dni) => {
 };
 export const getAluID = async (dni) => {
   try {
-    const response = await axios.get(`${URL}/alumno/${dni}`);
+    const response = await axios.get(`${URL}/alumno/search/${dni}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -65,7 +65,15 @@ export const postAluSimple = async (alumno) => {
 
 export const deleteAlumnoId = async (id) => {
   try {
-    const response = await axios.delete(`${URL}/alumno/${id}`);
+    const response = await axios.delete(`${URL}/alumno/remove/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const editAlumnoId = async (id,dataAlu) => {
+  try {
+    const response = await axios.put(`${URL}/alumno/edit/${id}`,dataAlu);
     return response.data;
   } catch (error) {
     throw error;

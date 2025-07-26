@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
   deleteComision,
+  deleteMovCaja,
   getAluCom,
   putComision,
 } from '../../queris/queris';
@@ -49,10 +50,10 @@ const DashAlumno = () => {
     const comisionId = id;
 
     setPause((prev) => ({ ...prev, [comisionId]: true }));
-    await deleteComision(id).then(() => {
+    await deleteMovCaja(id).then(() => {
       try {
         Swal.fire({
-          title: 'Comision Eliminada',
+          title: 'Pago Eliminado',
           icon: 'success',
           showConfirmButton: false,
           timer: 1500,

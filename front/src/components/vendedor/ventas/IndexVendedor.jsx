@@ -16,8 +16,7 @@ const IndexVendedor = () => {
     { name: 'Caja' },
     { name: 'Cursos' },
     { name: 'Comisiones' },
-    { name: 'Alu. Nuevo' },
-    { name: 'Alu. Viejo' },
+    { name: 'Alumnos' },
   ];
   const handleClick = (e) => {
     e.preventDefault();

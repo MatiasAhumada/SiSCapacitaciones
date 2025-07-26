@@ -42,7 +42,6 @@ const DashCaja = () => {
     const peticion = async () => {
       try {
         const data = await GetCajaByVendedor(idVend);
-        console.log(data)
         const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
         setSesionCaja(ultimaSesion);
         const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);

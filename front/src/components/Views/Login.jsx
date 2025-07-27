@@ -15,31 +15,28 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPause(true);
-    await login(formData).then((data) => {
-      if (data) {
-        localStorage.setItem('token', data.id);
-        Swal.fire({
-          icon: 'success',
-          title: 'Inicio de sesión exitoso',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause(false);
-          if (data.isAdmin) {
-            navigate('/inicio');
-          } else {
-            navigate(`/${data.id}`);
-          }
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Usuario o contraseña incorrectos',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => setPause(false));
-      }
-    });
+    try {
+      const data = await login(formData);
+      localStorage.setItem('token', data.id);
+      Swal.fire({
+        icon: 'success',
+        title: 'Inicio de sesión exitoso',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setPause(false);
+      // if(data.isAdmin){navigate('/inicio')}else{navigate(`/${data.id}`)}
+       data.isAdmin ? navigate('/inicio') : navigate(`/${data.id}`);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: error?.response?.data?.message || error?.message,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setPause(false);
+      return;
+    }
   };
 
   return (

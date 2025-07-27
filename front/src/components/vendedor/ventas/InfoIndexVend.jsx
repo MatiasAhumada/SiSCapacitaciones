@@ -6,29 +6,19 @@ import Swal from 'sweetalert2';
 const InfoIndexVend = () => {
   const [vendedor, setVendedor] = useState(null);
   const [totalCaja, setTotalCaja] = useState(0);
+  const id_vendedor = localStorage.getItem('token');
 
   useEffect(() => {
-    const id = localStorage.getItem('token');
-
     const vendedor = async () => {
-      await getVendID(id).then((data) => {
-        if (data) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Bienvenido!',
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => {
-            setVendedor(data);
-          });
-        }
-      });
-    };
-
-    const cajaVendedor = async () => {
       try {
-        const data = await GetCajaByVendedor(id_vendedor);
-        setTotalCaja(data[0].totalEfectivo);
+        const data = await getVendID(id_vendedor);
+        Swal.fire({
+          icon: 'success',
+          title: 'Bienvenido!',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setVendedor(data);
       } catch (error) {
         Swal.fire({
           icon: 'error',
@@ -40,21 +30,45 @@ const InfoIndexVend = () => {
       }
     };
 
-    cajaVendedor();
+    const cajaVendedor = async () => {
+      try {
+        const data = await GetCajaByVendedor(id_vendedor);
+        setTotalCaja(data.totalCajaEfectivo);
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ERROR!',
+          text: error?.response?.data?.message || error?.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+
+      // await GetCajaByVendedor(id_vendedor).then((data) => {
+      //   try {
+      //     const total = data.reduce((acc, item) => {
+      //       const monto = parseFloat(item.monto) || 0;
+      //       return item.tipo === 'transferencia' || item.tipo === 'egreso'
+      //         ? acc - monto
+      //         : acc + monto;
+      //     }, 0);
+
+      //     setTotalCaja(total);
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // });
+    };
     vendedor();
+    cajaVendedor();
   }, []);
+  console.log(vendedor);
   const stats = [
     { name: 'Inscripciones realizadas', value: vendedor?.inscripciones?.length || '0' },
     { name: 'Alumnos registrados', value: '300+' },
     { name: 'Total Caja Actual en efectivo', value: `$${totalCaja}` },
     { name: 'Paid time off', value: 'Unlimited' },
   ];
-
-  const navigate = useNavigate();
-
-  const click = (name) => {
-    navigate(`/inicioVendedor/${name.toLowerCase()}`);
-  };
 
   return (
     <div className="relative isolate overflow-hidden  py-24 sm:py-32">

@@ -24,6 +24,11 @@ export class AuthService {
   ) {}
 
   async validateUser(name: string, password: string) {
+    if (!name || !password) {
+      throw new BadRequestException(
+        'Nombre de usuario y contraseña son requeridos',
+      );
+    }
     const admin = await this.adminsRepository.findOne({ where: { name } });
     if (admin) {
       const isPasswordValid = await bcrypt.compare(password, admin.password);
@@ -56,8 +61,9 @@ export class AuthService {
         throw new BadRequestException('DNI incorrecto');
       }
     }
-    throw new NotFoundException('Usuario no encontrado');
+    throw new NotFoundException('Usuario o contraseña incorrectos');
   }
+
   async login(name: string, password: string) {
     const user = await this.validateUser(name, password);
     const payload = {

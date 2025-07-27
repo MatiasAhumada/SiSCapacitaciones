@@ -26,29 +26,27 @@ const InfoIndexVend = () => {
     };
 
     const cajaVendedor = async () => {
-      await GetCajaByVendedor(id).then((data) => {
-        try {
-          const total = data.reduce((acc, item) => {
-            const monto = parseFloat(item.monto) || 0;
-            return item.tipo === 'transferencia' || item.tipo === 'egreso'
-              ? acc - monto
-              : acc + monto;
-          }, 0);
-
-          setTotalCaja(total);
-        } catch (error) {
-          console.log(error);
-        }
-      });
+      try {
+        const data = await GetCajaByVendedor(id_vendedor);
+        setTotalCaja(data[0].totalEfectivo);
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ERROR!',
+          text: error?.response?.data?.message || error?.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
     };
-    vendedor();
-    cajaVendedor();
-  }, []);
 
+    cajaVendedor();
+    vendedor();
+  }, []);
   const stats = [
     { name: 'Inscripciones realizadas', value: vendedor?.inscripciones?.length || '0' },
     { name: 'Alumnos registrados', value: '300+' },
-    { name: 'Caja actual', value: `$${totalCaja}` },
+    { name: 'Total Caja Actual en efectivo', value: `$${totalCaja}` },
     { name: 'Paid time off', value: 'Unlimited' },
   ];
 

@@ -33,7 +33,7 @@ const InfoIndexVend = () => {
     const cajaVendedor = async () => {
       try {
         const data = await GetCajaByVendedor(id_vendedor);
-        setTotalCaja(data.totalCajaEfectivo);
+        setTotalCaja(data[0].totalEfectivo);
       } catch (error) {
         Swal.fire({
           icon: 'error',

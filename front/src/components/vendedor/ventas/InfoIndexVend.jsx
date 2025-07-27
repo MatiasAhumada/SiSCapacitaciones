@@ -43,26 +43,10 @@ const InfoIndexVend = () => {
           timer: 1500,
         });
       }
-
-      // await GetCajaByVendedor(id_vendedor).then((data) => {
-      //   try {
-      //     const total = data.reduce((acc, item) => {
-      //       const monto = parseFloat(item.monto) || 0;
-      //       return item.tipo === 'transferencia' || item.tipo === 'egreso'
-      //         ? acc - monto
-      //         : acc + monto;
-      //     }, 0);
-
-      //     setTotalCaja(total);
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
-      // });
     };
     vendedor();
     cajaVendedor();
   }, []);
-  console.log(vendedor);
   const stats = [
     { name: 'Inscripciones realizadas', value: vendedor?.inscripciones?.length || '0' },
     { name: 'Alumnos registrados', value: '300+' },

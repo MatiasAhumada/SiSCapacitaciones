@@ -26,6 +26,7 @@ const DashComVend = () => {
   });
   const [cursos, setCursos] = useState([]);
   const [profesores, setProfesores] = useState([]);
+  const [search, setSearch] = useState('');
 
   const isSubRoute = location.pathname.includes('crear');
 
@@ -53,6 +54,10 @@ const DashComVend = () => {
       }
     });
   };
+
+  const filteredItems = tableItems?.filter((item) =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   useEffect(() => {
     const sucursal = async () => {
@@ -146,16 +151,25 @@ const DashComVend = () => {
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       {!isSubRoute && (
         <>
-          <div className="items-start justify-between md:flex">
-            <div className="max-w-lg">
+          <div className="items-start justify-between md:flex md:flex-row flex-col gap-4">
+            <div className="max-w-lg order-1 md:order-none">
               <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
                 Listado de Comisiones
               </h3>
               <p className="text-gray-600 mt-2">
-                En esta tabla estaran las comisiones de esta sucursal
+                En esta tabla estarán las comisiones de esta sucursal
               </p>
             </div>
-            <div className="mt-3 md:mt-0">
+
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border rounded px-3 py-1 text-sm order-2 md:order-none md:mt-0 mt-2"
+            />
+
+            <div className="order-3 md:order-none">
               <button
                 onClick={() => navigate(`/${idVend}/comisiones/crear`)}
                 className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
@@ -178,7 +192,7 @@ const DashComVend = () => {
                 </tr>
               </thead>
               <tbody className="text-gray-600 divide-y">
-                {tableItems?.map((item) => (
+                {filteredItems?.map((item) => (
                   <tr key={item.id}>
                     <td className="px-6 py-4">
                       {editing === item.id ? (

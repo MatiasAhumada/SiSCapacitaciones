@@ -7,6 +7,7 @@ import { In, Repository } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { VendedorResponseDto } from './dto/response.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class VendedorService {
@@ -19,7 +20,8 @@ export class VendedorService {
     private readonly inscripcionRepository: Repository<Inscripcion>,
   ) {}
   async create(createVendedorDto: CreateVendedorDto) {
-    const { sucursal, inscripciones, ...vendedorData } = createVendedorDto;
+    const { sucursal, inscripciones, password, ...vendedorData } =
+      createVendedorDto;
 
     const sucursalesEntities = await this.sucursalRepository.findOne({
       where: { id: In(sucursal) },
@@ -36,8 +38,11 @@ export class VendedorService {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newVendedor = this.vendedorRepository.create({
       ...vendedorData,
+      password: hashedPassword,
       sucursales: [sucursalesEntities],
       inscripciones: inscripcionesEntities,
     });

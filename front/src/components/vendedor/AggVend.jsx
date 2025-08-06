@@ -3,8 +3,11 @@ import logo from '../assets/simplificado_a_color.png';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { getSucursalId, postVend } from '../queris/queris';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+
 const AggVend = () => {
   const { id } = useParams();
+  const [showPwd, setShowPwd] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -130,13 +133,13 @@ const AggVend = () => {
             />
           </div>
         </div>
-        <div className="pb-6">
+        <div className="pb-6 relative ">
           <label htmlFor="password" className="block mb-2 text-sm  text-[#111827] principal">
             Contraseña
           </label>
           <div className="relative text-gray-400">
             <input
-              type="password"
+              type={showPwd ? 'text' : 'password'}
               name="password"
               id="password"
               value={formData.password}
@@ -145,6 +148,19 @@ const AggVend = () => {
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               autoComplete="new-password"
             />
+            <button
+              type="button"
+              aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              onClick={() => setShowPwd((s) => !s)}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 "
+              tabIndex={0}
+            >
+              {showPwd ? (
+                <EyeSlashIcon className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <EyeIcon className="w-5 h-5" aria-hidden="true" />
+              )}
+            </button>
           </div>
         </div>
         <button

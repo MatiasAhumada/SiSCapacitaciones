@@ -3,8 +3,11 @@ import imagen from '../assets/simplificado_a_color.png';
 import { login } from '../queris/queris';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+
 const Login = () => {
   const [pause, setPause] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
   const [formData, setFormData] = useState({ name: '', password: '' });
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,7 +29,7 @@ const Login = () => {
       });
       setPause(false);
       // if(data.isAdmin){navigate('/inicio')}else{navigate(`/${data.id}`)}
-       data.isAdmin ? navigate('/inicio') : navigate(`/${data.id}`);
+      data.isAdmin ? navigate('/inicio') : navigate(`/${data.id}`);
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -65,18 +68,33 @@ const Login = () => {
             />
           </div>
 
-          <div className="mb-6">
+          <div className="mb-6 relative">
             <label htmlFor="password" className="block text-sm font-medium text-gray-600">
               Contraseña
             </label>
             <input
-              type="password"
+              type={showPwd ? 'text' : 'password'}
+              value={formData.password}
               id="password"
               name="password"
               className="w-full p-3 border border-gray-300 rounded-md mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ingresa tu contraseña"
               onChange={handleChange}
+              required
             />
+            <button
+              type="button"
+              aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              onClick={() => setShowPwd((s) => !s)}
+              className="mt-4 absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 "
+              tabIndex={0}
+            >
+              {showPwd ? (
+                <EyeSlashIcon className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <EyeIcon className="w-5 h-5" aria-hidden="true" />
+              )}
+            </button>
           </div>
 
           <button

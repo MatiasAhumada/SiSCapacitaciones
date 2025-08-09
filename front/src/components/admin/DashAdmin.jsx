@@ -5,7 +5,7 @@ import {
   DisclosurePanel,
 } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import simplificado from '../assets/simplificado_a_color.png';
+import simplificado from '../../assets/simplificado_a_color.png';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { getSucursales } from '../queris/queris';
 import { useEffect } from 'react';

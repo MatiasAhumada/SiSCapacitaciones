@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { jsPDF } from 'jspdf';
-import plantilla from '../assets/comprobanteSis.jpg';
+import plantilla from '../../assets/comprobanteSis.jpg';
 import { Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 const ReciboComprobante = ({

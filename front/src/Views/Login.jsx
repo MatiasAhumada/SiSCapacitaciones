@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import imagen from '../assets/simplificado_a_color.png';
-import { login } from '../queris/queris';
+import { login } from '../components/queris/queris';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  // const {login} =useAuth()
   const [pause, setPause] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
   const [formData, setFormData] = useState({ name: '', password: '' });
@@ -20,6 +22,8 @@ const Login = () => {
     setPause(true);
     try {
       const data = await login(formData);
+      console.log(data);
+      // login(data);
       localStorage.setItem('token', data.id);
       Swal.fire({
         icon: 'success',

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import logo from '../assets/simplificado_a_color.png';
+import logo from '../../assets/simplificado_a_color.png';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { getSucursalId, postProfes } from '../queris/queris';

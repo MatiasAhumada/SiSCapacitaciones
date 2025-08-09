@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import logo from '../assets/simplificado_a_color.png';
+import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
 import {
   getCategorias,

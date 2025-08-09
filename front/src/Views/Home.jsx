@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Row, Col, Card, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { getSucursales } from '../queris/queris';
+import { getSucursales } from '../components/queris/queris';
 
 const Home = () => {
   const navigate = useNavigate();

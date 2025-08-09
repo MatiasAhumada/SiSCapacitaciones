@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { getSucursales, postAlu } from '../../queris/queris';
+import { getSucursales } from '../../../helpers/Sucursales.service';
+import { postAlu } from '../../../helpers/Alumnos.service';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const CreateAlumno = () => {

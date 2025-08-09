@@ -29,13 +29,14 @@ import CreateAlumnoNuevo from './components/alumno/CreateAlumnoNuevo';
 import CreateAlumnoViejo from './components/alumno/CreateAlumnoViejo';
 import CajaEgreso from './components/caja/CajaEgreso';
 import CajaTransferencia from './components/caja/CajaTransferencia';
+import DashAdminLayout from './layouts/DashAdminLayout';
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login></Login>}></Route>
         <Route path="/inicio" element={<Home></Home>}></Route>
-        <Route path="/adm/:id" element={<DashAdmin></DashAdmin>}>
+        <Route path="/adm/:id" element={<DashAdminLayout/>}>
           <Route index element={<IndexAdm></IndexAdm>} />
           <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
           <Route path="egreso" element={<CajaEgreso></CajaEgreso>}></Route>

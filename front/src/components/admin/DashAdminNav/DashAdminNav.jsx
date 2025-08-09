@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-} from '@headlessui/react';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import simplificado from '../../../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSucursales } from '../../../helpers/Sucursales.service';
+import { useAuth } from '../../../context/AuthContext';
 
 const DashAdminNav = () => {
+  const { logout } = useAuth();
   const { id } = useParams();
   const [sucs, setSucs] = useState([]);
   const [sucursalActual, setSucursalActual] = useState(null);
@@ -30,10 +28,7 @@ const DashAdminNav = () => {
     navigate(`/adm/${id}/${name.toLowerCase()}`);
   };
 
-  const handleClickLogout = (e) => {
-    e.preventDefault();
-    navigate('/');
-  };
+
 
   useEffect(() => {
     const selectSuc = async () => {
@@ -103,7 +98,7 @@ const DashAdminNav = () => {
           {/* Botón Logout */}
           <div className="hidden lg:block">
             <button
-              onClick={handleClickLogout}
+              onClick={logout}
               className="text-gray-50 bg-red-600 hover:bg-red-700 rounded px-4 py-2 text-sm font-medium"
             >
               Cerrar Sesión
@@ -133,7 +128,7 @@ const DashAdminNav = () => {
             </button>
           ))}
           <button
-            onClick={handleClickLogout}
+            onClick={logout}
             className="text-gray-50 bg-red-600 hover:bg-red-700 rounded px-4 py-2 mt-4 text-sm font-medium"
           >
             Cerrar Sesión

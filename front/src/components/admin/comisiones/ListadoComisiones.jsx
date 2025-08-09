@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { editStateComision, getComisionId } from '../../../helpers/Comisiones.service';
+import { editStateComision, getComisionId } from '../../queris/queris';
 import { jsPDF } from 'jspdf';
 
 import autoTable from 'jspdf-autotable';

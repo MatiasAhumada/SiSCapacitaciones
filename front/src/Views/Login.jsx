@@ -5,10 +5,10 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
-import {Spinner} from '../components/Spinner/Spinner';
+import { Spinner } from '../components/Spinner/Spinner';
 
 const Login = () => {
-  // const {login} =useAuth()
+  const { login } = useAuth();
   const [pause, setPause] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
   const [formData, setFormData] = useState({ name: '', password: '' });
@@ -23,8 +23,8 @@ const Login = () => {
     setPause(true);
     try {
       const data = await AuthLogin(formData);
-      console.log(data.id);
-      // login(data);
+      console.log(data)
+      login(data);
       localStorage.setItem('token', data.id);
       Swal.fire({
         icon: 'success',
@@ -33,8 +33,12 @@ const Login = () => {
         timer: 1500,
       });
       setPause(false);
-      // if(data.isAdmin){navigate('/inicio')}else{navigate(`/${data.id}`)}
-      data.isAdmin ? navigate('/inicio') : navigate(`/${data.id}`);
+      if (data.isAdmin) {
+        navigate('/inicio');
+      } else {
+        navigate(`/${data.id}`);
+      }
+
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -106,7 +110,7 @@ const Login = () => {
             type="submit"
             className="w-full py-3 btnAz text-white font-semibold rounded  transition duration-200 "
           >
-            {pause ? <Spinner color='white' /> : 'Iniciar sesión'}
+            {pause ? <Spinner color="white" /> : 'Iniciar sesión'}
           </button>
         </form>
       </div>

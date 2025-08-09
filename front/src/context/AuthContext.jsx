@@ -1,10 +1,11 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-const STORAGE_KEY = "auth_user";
+const STORAGE_KEY = 'auth_user';
 
 const AuthContext = createContext({
   user: null,
   isAdmin: false,
+  role: null,
   login: async (userData) => {},
   logout: () => {},
 });
@@ -18,8 +19,9 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-
-  const isAdmin = user?.role === "admin";
+console.log('EN AUTHCONTEXT', user);
+  const isAdmin = !!user?.isAdmin;
+  const role = isAdmin ? 'admin' : 'vendedor';
 
   const login = (userData) => {
     setUser(userData);
@@ -29,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem(STORAGE_KEY);
-    window.location.href = "/login";
+    window.location.href = '/login';
   };
 
   useEffect(() => {
@@ -38,12 +40,12 @@ export const AuthProvider = ({ children }) => {
         setUser(e.newValue ? JSON.parse(e.newValue) : null);
       }
     };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  const value = useMemo(() => ({ user, isAdmin, login, logout }), [user, isAdmin]);
-  
+  const value = useMemo(() => ({ user, isAdmin, role, login, logout }), [user, isAdmin, role]);
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

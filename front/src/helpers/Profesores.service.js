@@ -1,4 +1,5 @@
 import { API_URL } from "../constants/ApiUrl";
+import axios from 'axios';
 
 export const getProfes = async () => {
     try {

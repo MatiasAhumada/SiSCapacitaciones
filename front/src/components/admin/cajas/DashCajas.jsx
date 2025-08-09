@@ -3,13 +3,13 @@ import { Outlet, useParams } from 'react-router-dom';
 import {
   deleteMovCaja,
   editMovCaja,
-  getAlu,
   getCajas,
   getMovimientosPorDia,
   getResumenPorDia,
   getResumenTotal,
-  getVendedores,
-} from '../../queris/queris';
+} from '../../../helpers/Cajas.service';
+import { getAlu } from '../../../helpers/Alumnos.service';
+import { getVendedores } from '../../../helpers/Vendedores.service';
 import Swal from 'sweetalert2';
 
 const DashCajas = () => {
@@ -35,7 +35,6 @@ const DashCajas = () => {
 
   const onFiltrar = async () => {
     await getMovimientosPorDia(fechaFiltro).then((data) => {
-      console.log(data.length == 0);
       if (data.length == 0) {
         Swal.fire();
       }
@@ -153,7 +152,6 @@ const DashCajas = () => {
 
   const handleSave = async (item) => {
     setPause((prev) => ({ ...prev, [item.id]: true }));
-    console.log(formEdit);
     await editMovCaja(item.id, formEdit).then((data) => {
       try {
         Swal.fire({
@@ -170,7 +168,6 @@ const DashCajas = () => {
       }
     });
   };
-  console.log(tableItems);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>

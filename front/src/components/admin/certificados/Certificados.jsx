@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import logo from '../../../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { getAlu, getCursos, postCert } from '../../queris/queris';
+import { getAlu } from '../../../helpers/Alumnos.service';
+import { getCursos } from '../../../helpers/Cursos.service';
+import { postCert } from '../../../helpers/Certificados.service';
 
 const Certificado = () => {
   const areas = ['Digital', 'Idiomas', 'Salud', 'Administrativa', 'Belleza', 'Técnica'];

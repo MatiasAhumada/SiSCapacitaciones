@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-console.log('EN AUTHCONTEXT', user);
   const isAdmin = !!user?.isAdmin;
   const role = isAdmin ? 'admin' : 'vendedor';
 

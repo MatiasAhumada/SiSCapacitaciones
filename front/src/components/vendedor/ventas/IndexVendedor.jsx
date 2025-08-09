@@ -1,13 +1,11 @@
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-} from '@headlessui/react';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import simplificado from '../../../assets/simplificado_a_color.png';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 
 const IndexVendedor = () => {
+  const { logout } = useAuth();
   const { idVend } = useParams();
 
   const navigate = useNavigate();
@@ -61,7 +59,7 @@ const IndexVendedor = () => {
               <div className="ml-4 flex items-center md:ml-6">
                 <button
                   type="submit"
-                  onClick={handleClick}
+                  onClick={logout}
                   className="text-gray-50 bg-red-600 hover:bg-red-700 
                           rounded px-4 py-2 me-2  text-sm font-medium"
                 >
@@ -94,7 +92,7 @@ const IndexVendedor = () => {
             ))}
             <button
               type="submit"
-              onClick={handleClick}
+              onClick={logout}
               className="text-gray-50 bg-red-600 hover:bg-red-700 
                           rounded px-4 py-2 mt-4  text-sm font-medium"
             >

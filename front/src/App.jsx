@@ -71,8 +71,7 @@ function App() {
               <Route path="cajas" element={<DashCajas></DashCajas>}></Route>
               <Route path="certificados" element={<Certificado></Certificado>}></Route>
             </Route>
-            <Route path="/:idVend" element={<IndexVendedor></IndexVendedor>}>
-              <Route index element={<InfoIndexVend></InfoIndexVend>}></Route>
+            <Route path=":idVend" element={<InfoIndexVend></InfoIndexVend>}>
               <Route path="alumno/:idAluCom" element={<DashAlumno></DashAlumno>}></Route>
               <Route path="inscribir" element={<Inscribir></Inscribir>}></Route>
 

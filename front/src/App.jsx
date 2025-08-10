@@ -5,7 +5,6 @@ import AggVend from './components/vendedor/AggVend';
 import DashVendedor from './components/vendedor/DashVendedor';
 import InfoVendedor from './components/vendedor/InfoVendedor';
 import InfoIndexVend from './components/vendedor/ventas/InfoIndexVend';
-import IndexVendedor from './components/vendedor/ventas/IndexVendedor';
 import Error404 from './Views/Error404';
 import Home from './Views/Home';
 import Login from './Views/Login';
@@ -25,20 +24,18 @@ import DashComVend from './components/vendedor/comisiones/DashComVend';
 import CreateComVend from './components/vendedor/comisiones/CreateComVend';
 import DashAlumno from './components/vendedor/comisiones/DashAlumno';
 import CreateAlumnoNuevo from './components/alumno/CreateAlumnoNuevo';
-import CreateAlumnoViejo from './components/alumno/CreateAlumnoViejo';
 import CajaEgreso from './components/caja/CajaEgreso';
 import CajaTransferencia from './components/caja/CajaTransferencia';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import RequireAuth from './context/RequireAuth';
-import DashAdminNav from './components/admin/DashAdminNav/DashAdminNav';
 import { AuthProvider } from './context/AuthContext';
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login></Login>}></Route>
-          <Route path="/inicio" element={<Home></Home>}></Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/inicio" element={<Home />} />
           <Route
             path="/"
             element={
@@ -47,49 +44,47 @@ function App() {
               </RequireAuth>
             }
           >
-            <Route path="adm/:id" element={<IndexAdm></IndexAdm>}>
-              <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
-              <Route path="egreso" element={<CajaEgreso></CajaEgreso>}></Route>
-              <Route path="vendedores" element={<DashVendedor></DashVendedor>}>
-                <Route path="crear" element={<AggVend></AggVend>}></Route>
-                <Route path="info" element={<InfoVendedor></InfoVendedor>}></Route>
+            <Route path="adm/:id">
+              <Route index element={<IndexAdm />} />
+              <Route path="cobrar" element={<CreateCaja />} />
+              <Route path="egreso" element={<CajaEgreso />} />
+              <Route path="vendedores" element={<DashVendedor />}>
+                <Route path="crear" element={<AggVend />} />
+                <Route path="info" element={<InfoVendedor />} />
               </Route>
-              <Route path="profesores" element={<DashProfe></DashProfe>}>
-                <Route path="crear" element={<CrearProfes></CrearProfes>}></Route>
+              <Route path="profesores" element={<DashProfe />}>
+                <Route path="crear" element={<CrearProfes />} />
               </Route>
-              <Route path="alumno/:idAlu" element={<DashAlumno></DashAlumno>}></Route>
-              <Route path="alumnos" element={<DashAlumnos></DashAlumnos>}>
-                <Route path="crear" element={<CreateAlumnoNuevo></CreateAlumnoNuevo>}></Route>
+              <Route path="alumno/:idAlu" element={<DashAlumno />} />
+              <Route path="alumnos" element={<DashAlumnos />}>
+                <Route path="crear" element={<CreateAlumnoNuevo />} />
               </Route>
-              <Route path="cursos" element={<DashCursos></DashCursos>}>
-                <Route path="crear" element={<CreateCurso></CreateCurso>}></Route>
+              <Route path="cursos" element={<DashCursos />}>
+                <Route path="crear" element={<CreateCurso />} />
               </Route>
-              <Route path="comisiones" element={<DashComisiones></DashComisiones>}>
-                <Route path="crear" element={<CreateComision></CreateComision>}></Route>
-                <Route path=":comId" element={<ListadoComisiones></ListadoComisiones>}></Route>
+              <Route path="comisiones" element={<DashComisiones />}>
+                <Route path="crear" element={<CreateComision />} />
+                <Route path=":comId" element={<ListadoComisiones />} />
               </Route>
-              <Route path="cajas" element={<DashCajas></DashCajas>}></Route>
-              <Route path="certificados" element={<Certificado></Certificado>}></Route>
+              <Route path="cajas" element={<DashCajas />} />
+              <Route path="certificados" element={<Certificado />} />
             </Route>
-            <Route path=":idVend" element={<InfoIndexVend></InfoIndexVend>}>
-              <Route path="alumno/:idAluCom" element={<DashAlumno></DashAlumno>}></Route>
-              <Route path="inscribir" element={<Inscribir></Inscribir>}></Route>
-
-              <Route path="caja" element={<DashCaja></DashCaja>}></Route>
-              <Route path="cobrar" element={<CreateCaja></CreateCaja>}></Route>
-              <Route path="egreso" element={<CajaEgreso></CajaEgreso>}></Route>
-              <Route path="transferencia" element={<CajaTransferencia></CajaTransferencia>}></Route>
-              <Route path="cursos" element={<DashCursos></DashCursos>}></Route>
-              <Route path="comisiones" element={<DashComVend></DashComVend>}>
-                <Route path="crear" element={<CreateComVend></CreateComVend>}></Route>
+            <Route path=":idVend">
+              <Route index element={<InfoIndexVend />} />
+              <Route path="alumno/:idAluCom" element={<DashAlumno />} />
+              <Route path="inscribir" element={<Inscribir />} />
+              <Route path="caja" element={<DashCaja />} />
+              <Route path="cobrar" element={<CreateCaja />} />
+              <Route path="egreso" element={<CajaEgreso />} />
+              <Route path="transferencia" element={<CajaTransferencia />} />
+              <Route path="cursos" element={<DashCursos />} />
+              <Route path="comisiones" element={<DashComVend />}>
+                <Route path="crear" element={<CreateComVend />} />
               </Route>
-              <Route
-                path="comisiones/:comId"
-                element={<ListadoComisiones></ListadoComisiones>}
-              ></Route>
-              <Route path="alumnos" element={<CreateAlumnoNuevo></CreateAlumnoNuevo>}></Route>
+              <Route path="comisiones/:comId" element={<ListadoComisiones />} />
+              <Route path="alumnos" element={<CreateAlumnoNuevo />} />
             </Route>
-            <Route path="/error" element={<Error404></Error404>}></Route>
+            <Route path="/error" element={<Error404 />} />
           </Route>
         </Routes>
       </BrowserRouter>

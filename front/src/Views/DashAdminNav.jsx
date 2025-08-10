@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import simplificado from '../../../assets/simplificado_a_color.png';
+import simplificado from '../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getSucursales } from '../../../helpers/Sucursales.service';
-import { useAuth } from '../../../context/AuthContext';
+import { getSucursales } from '../helpers/Sucursales.service';
+import { useAuth } from '../context/AuthContext';
 
 const DashAdminNav = () => {
   const { logout } = useAuth();
@@ -27,8 +27,6 @@ const DashAdminNav = () => {
   const clickBtn = (name) => {
     navigate(`/adm/${id}/${name.toLowerCase()}`);
   };
-
-
 
   useEffect(() => {
     const selectSuc = async () => {
@@ -53,7 +51,6 @@ const DashAdminNav = () => {
     <Disclosure as="nav" className="bg-blue-50 principal">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo y Sucursal */}
           <div className="flex items-center gap-2">
             <img
               alt="Your Company"
@@ -80,7 +77,6 @@ const DashAdminNav = () => {
             </select>
           </div>
 
-          {/* Menú escritorio */}
           <div className="hidden lg:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navigation.map((item) => (
@@ -95,7 +91,6 @@ const DashAdminNav = () => {
             </div>
           </div>
 
-          {/* Botón Logout */}
           <div className="hidden lg:block">
             <button
               onClick={logout}
@@ -105,7 +100,6 @@ const DashAdminNav = () => {
             </button>
           </div>
 
-          {/* Botón mobile */}
           <div className="mr-2 flex lg:hidden rounded">
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded p-2 btnAz">
               <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
@@ -115,7 +109,6 @@ const DashAdminNav = () => {
         </div>
       </div>
 
-      {/* Menú mobile */}
       <DisclosurePanel className="lg:hidden">
         <div className="flex flex-col items-center px-2 pt-2 pb-3">
           {navigation.map((item) => (

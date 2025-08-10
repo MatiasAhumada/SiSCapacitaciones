@@ -1,10 +1,10 @@
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import simplificado from '../../../assets/simplificado_a_color.png';
+import simplificado from '../assets/simplificado_a_color.png';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
-const IndexVendedor = () => {
+const DashVendedorNav = () => {
   const { logout } = useAuth();
   const { idVend } = useParams();
 
@@ -102,11 +102,9 @@ const IndexVendedor = () => {
         </DisclosurePanel>
       </Disclosure>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <Outlet />
-      </main>
+     
     </div>
   );
 };
 
-export default IndexVendedor;
+export default DashVendedorNav;

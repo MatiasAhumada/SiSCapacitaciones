@@ -23,7 +23,6 @@ const Login = () => {
     setPause(true);
     try {
       const data = await AuthLogin(formData);
-      console.log(data)
       login(data);
       localStorage.setItem('token', data.id);
       Swal.fire({

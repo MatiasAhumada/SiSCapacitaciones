@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import CardInfo from './CardInfo';
 import Metricas from './Metricas';
 import { useParams } from 'react-router-dom';
-import { getSucursalId } from '../queris/queris';
+import { getSucursalId } from '../../helpers/Sucursales.service';
 import { Spinner } from '../Spinner/Spinner';
 
 const IndexAdm = () => {

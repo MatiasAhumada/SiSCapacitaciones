@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { editStateComision, getComisionId } from '../../queris/queris';
+import { editStateComision, getComisionId } from '../../../helpers/Comisiones.service';
 import { jsPDF } from 'jspdf';
-
 import autoTable from 'jspdf-autotable';
 import { Spinner } from '../../Spinner/Spinner';
 

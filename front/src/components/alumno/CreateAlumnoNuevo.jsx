@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { editAlumnoId, getAluByDNI, getSucursales, postAlu } from '../queris/queris';
+import { editAlumnoId, getAluByDNI, getSucursales } from '../../helpers/Sucursales.service';
+import { postAlu } from '../../helpers/Alumnos.service'; 
 import { Spinner } from '../Spinner/Spinner';
 
 const CreateAlumnoNuevo = () => {

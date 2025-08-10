@@ -5,22 +5,13 @@ import simplificado from '../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSucursales } from '../helpers/Sucursales.service';
 import { useAuth } from '../context/AuthContext';
+import { navigationAdmin } from '../constants/navigations';
 
 const DashAdminNav = () => {
   const { logout } = useAuth();
   const { id } = useParams();
   const [sucs, setSucs] = useState([]);
   const [sucursalActual, setSucursalActual] = useState(null);
-
-  const navigation = [
-    { name: 'Vendedores' },
-    { name: 'Profesores' },
-    { name: 'Alumnos' },
-    { name: 'Cursos' },
-    { name: 'Comisiones' },
-    { name: 'Cajas' },
-    { name: 'Certificados' },
-  ];
 
   const navigate = useNavigate();
 
@@ -60,7 +51,7 @@ const DashAdminNav = () => {
             />
             <select
               name="sucId"
-              value={navigation.id}
+              value={navigationAdmin.id}
               onChange={handleChange}
               className="border p-1 rounded"
             >
@@ -79,7 +70,7 @@ const DashAdminNav = () => {
 
           <div className="hidden lg:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              {navigation.map((item) => (
+              {navigationAdmin.map((item) => (
                 <button
                   key={item.name}
                   onClick={() => clickBtn(item.name)}
@@ -111,7 +102,7 @@ const DashAdminNav = () => {
 
       <DisclosurePanel className="lg:hidden">
         <div className="flex flex-col items-center px-2 pt-2 pb-3">
-          {navigation.map((item) => (
+          {navigationAdmin.map((item) => (
             <button
               key={item.name}
               onClick={() => clickBtn(item.name)}

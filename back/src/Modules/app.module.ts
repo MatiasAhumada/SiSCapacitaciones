@@ -19,6 +19,7 @@ import { CajaModule } from './caja/caja.module';
 import { CertificadoModule } from './certificado/certificado.module';
 import { ComprobanteModule } from './comprobante/comprobante.module';
 import { SeederModule } from '@modules/Seeds/seeders.module';
+import { MetricsModule } from './metrics/metrics.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -46,6 +47,7 @@ import { SeederModule } from '@modules/Seeds/seeders.module';
     CajaModule,
     CertificadoModule,
     ComprobanteModule,
+    MetricsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

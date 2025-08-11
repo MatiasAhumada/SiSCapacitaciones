@@ -17,7 +17,8 @@ const IndexAdm = () => {
       setSede(data);
     });
   }, [id]);
-  console.log(sede);
+
+  
   return (
     <div>
       {pause ? (
@@ -26,7 +27,7 @@ const IndexAdm = () => {
         <h1 className="text-center text-2xl font-bold principal">Información de {sede.name}</h1>
       )}
       <CardInfo sede={sede}></CardInfo>
-      {/* <DashboardMetrics /> */}
+      <DashboardMetrics />
     </div>
   );
 };

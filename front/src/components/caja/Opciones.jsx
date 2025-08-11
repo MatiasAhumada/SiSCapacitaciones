@@ -1,11 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-
 const Opciones = ({ setCambio, setCuotavieja }) => {
-  const idVend = localStorage.getItem('token');
-  const navigate = useNavigate();
-  const handleClickNuevo = () => {
-    setCambio(true);
-  };
   return (
     <div className="max-w-md mx-auto mt-10">
       <div className="bg-white rounded-2xl shadow-md p-6 text-center">

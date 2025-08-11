@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { editMovCaja, getAlu, GetCajaByVendedor } from '../queris/queris';
+import { editMovCaja, GetCajaByVendedor } from '../../helpers/Cajas.service';
+import { getAlu } from '../../helpers/Alumnos.service';
 import Swal from 'sweetalert2';
 import AccionesDropdown from './Dropdowns/AccionesDropdown';
 import FiltrosDropDown from './Dropdowns/FiltrosDropDown';

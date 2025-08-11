@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { categorias } from '../../../constants/categoriasCajasEgreso';
 
 const FiltrosDropDown = ({ onFiltrar }) => {
   const [open, setOpen] = useState(false);
@@ -13,50 +14,6 @@ const FiltrosDropDown = ({ onFiltrar }) => {
     categoria: '',
     subcategoria: '',
   });
-  const categorias = {
-    ALQUILER: ['ALQUILER'],
-    SUELDOS: ['SUELDOS'],
-    COMISIONES: ['COMISIONES'],
-    PROFESORES: ['PROFESORES'],
-    SERVICIOS: [
-      'electricidad',
-      'gas',
-      'agua',
-      'internet',
-      'celulares',
-      'sistemas',
-      'plataformas_digitales',
-      'dispenser_agua',
-      'honorarios_abogados',
-      'honorarios_contadores',
-      'capacitaciones_y_formaciones',
-      'cuotas_y_adhesiones',
-    ],
-    MARKETING_Y_PUBLICIDAD: [
-      'honorarios_marketing',
-      'publicidad_digital',
-      'television',
-      'radio',
-      'diario',
-      'imprenta',
-      'carteleria',
-    ],
-    IMPUESTOS: [
-      'municipal',
-      'rentas',
-      'ingresos_brutos',
-      'afip_iva',
-      'afip_ganancias',
-      'aportes_patronales',
-      'multas',
-      'otros',
-    ],
-    REFACCIONES_Y_MANTENIMIENTOS: ['mano_de_obra', 'materiales', 'bienes_muebles'],
-    INSUMOS: ['limpieza_e_higiene', 'libreria_y_oficina', 'almacen'],
-    CAPACITACIONES: ['insumos_y_materiales', 'herramientas_y_maquinarias'],
-    VIATICOS: ['pasaje/combustible', 'alojamiento', 'comida'],
-    GASTOS_VARIOS: ['GASTOS_VARIOS'],
-  };
 
   const handleChange = (e) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value });

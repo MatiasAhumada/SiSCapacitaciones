@@ -202,7 +202,7 @@ const CreateCaja = () => {
         console.error('Error al obtener el alumno:', error);
       });
   };
-
+console.log(cambio)
   return (
     <>
       {cambio ? (

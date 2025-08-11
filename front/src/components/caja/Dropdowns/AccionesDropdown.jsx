@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { aperturaCaja, cerrarCaja } from '../../queris/queris';
+import { aperturaCaja, cerrarCaja } from '../../../helpers/Cajas.service';
 import Swal from 'sweetalert2';
 
 const AccionesDropdown = ({ idVend }) => {

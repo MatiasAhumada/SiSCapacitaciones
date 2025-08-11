@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import CardInfo from './CardInfo';
-import Metricas from './Metricas';
 import { useParams } from 'react-router-dom';
 import { getSucursalId } from '../../helpers/Sucursales.service';
 import { Spinner } from '../Spinner/Spinner';
+import DashboardMetrics from '../DashboardMetrics/DashboardMetrics';
 
 const IndexAdm = () => {
   const [sede, setSede] = useState({});
@@ -17,16 +17,16 @@ const IndexAdm = () => {
       setSede(data);
     });
   }, [id]);
-
+  console.log(sede);
   return (
     <div>
       {pause ? (
-        <Spinner color='black'/>
+        <Spinner color="black" />
       ) : (
         <h1 className="text-center text-2xl font-bold principal">Información de {sede.name}</h1>
       )}
       <CardInfo sede={sede}></CardInfo>
-      <Metricas sede={sede}></Metricas>
+      {/* <DashboardMetrics /> */}
     </div>
   );
 };

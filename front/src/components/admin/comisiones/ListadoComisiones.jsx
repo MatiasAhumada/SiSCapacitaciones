@@ -144,18 +144,26 @@ const ListadoComisiones = () => {
   const getRowBgColor = (alumno) => {
     const now = new Date();
     const day = now.getDate();
-    const month = now.getMonth();
-    const year = now.getFullYear();
+    const mesActual = now.getMonth();
+    const yearActual = now.getFullYear();
+    const mesAnterior = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+    const yearMesAnterior = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-    const pagosEsteMes = alumno.pagos.some((pago) => {
+    const pagoMesAnterior = alumno.pagos.some((pago) => {
       const fechaPago = new Date(pago.fecha);
-      return fechaPago.getMonth() === month && fechaPago.getFullYear() === year;
+      return fechaPago.getMonth() === mesAnterior && fechaPago.getFullYear() === yearMesAnterior;
     });
 
-    if (day <= 10 && pagosEsteMes) return 'bg-green-200';
-    if ((day >= 11 && day <= 15) || !pagosEsteMes) return 'bg-yellow-200';
-    if (day >= 16 || !pagosEsteMes) return 'bg-red-200';
-    return '';
+    const pagoMesActual = alumno.pagos.some((pago) => {
+      const fechaPago = new Date(pago.fecha);
+      return fechaPago.getMonth() === mesActual && fechaPago.getFullYear() === yearActual;
+    });
+
+    if (!pagoMesAnterior) return 'bg-red-200';
+    if (day <= 10) return 'bg-green-200';
+    if (day <= 15 && !pagoMesActual) return 'bg-yellow-200';
+    if (day > 15 && !pagoMesActual) return 'bg-red-200';
+    return 'bg-green-200';
   };
 
   const handleFiltrarDni = (e) => {

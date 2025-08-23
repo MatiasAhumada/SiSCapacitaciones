@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
-import {
-  getAlu,
-  getAluID,
-  getVendID,
-  postCaja,
-} from '../queris/queris';
+import { getAlu, getAluID, getVendID, postCaja } from '../queris/queris';
 import { Modal } from 'antd';
 import ReciboComprobante from './Comprobante';
 import Opciones from './Opciones';
@@ -119,7 +114,7 @@ const CreateCaja = () => {
     const fechaISO = fecha.toISOString();
     e.preventDefault();
     setPause(true);
-    //ARMO COMPROBANTE
+
     const cargaComprobante = {
       ...infoComprobante,
       fecha: cuotaVieja ? formData.fecha : fechaISO,
@@ -132,7 +127,7 @@ const CreateCaja = () => {
     };
 
     setInfoComprobante(cargaComprobante);
-    //ARMO EL FORM DATA
+
     const nuevoFormData = {
       ...formData,
       fecha: cuotaVieja ? formData.fecha : fechaISO,
@@ -143,8 +138,7 @@ const CreateCaja = () => {
       vendedorId: idVende,
       comprobante: cargaComprobante,
     };
-    // console.log(nuevoFormData)
-    // console.log(alumnoSeleccionado)
+
     await postCaja(nuevoFormData).then((data) => {
       try {
         Swal.fire({
@@ -153,7 +147,10 @@ const CreateCaja = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          setImprimir(data.comprobante);
+          setImprimir({
+            ...data.comprobante,
+            fecha: formatToDisplay(data.comprobante.fecha),
+          });
           setPause(false);
           setGeneratePDF(true);
         });
@@ -163,7 +160,6 @@ const CreateCaja = () => {
       }
     });
   };
-
   const handleOpen = () => {
     setIsModalOpen(true);
   };
@@ -202,7 +198,7 @@ const CreateCaja = () => {
         console.error('Error al obtener el alumno:', error);
       });
   };
-console.log(cambio)
+
   return (
     <>
       {cambio ? (

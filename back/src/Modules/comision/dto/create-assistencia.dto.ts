@@ -1,13 +1,20 @@
-import { IsUUID, IsBoolean, IsOptional, IsDateString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateAsistenciaDto {
-  @IsUUID()
-  alumnoComisionId: string;
+  @IsArray()
+  @IsString({ each: true })
+  alumnosComisionIds: string[];
 
-  @IsBoolean()
-  presente: boolean;
+  @IsString()
+  profesorId: string;
+
+  @IsString()
+  comisionId: string;
+
+  @IsEnum(['Presente', 'Ausente', 'Feriado'])
+  estadoProfesor: 'Presente' | 'Ausente' | 'Feriado';
 
   @IsOptional()
-  @IsDateString()
-  fecha?: string;
+  @IsString()
+  descripcion?: string;
 }

@@ -11,6 +11,7 @@ import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Asistencia } from './entities/asistencia.entity';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
 import { ChangeStateDto } from './dto/changeState.dto';
+import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
 
 @Injectable()
 export class ComisionService {
@@ -27,6 +28,8 @@ export class ComisionService {
     private readonly alumnoComisionRepository: Repository<AlumnoComision>,
     @InjectRepository(Asistencia)
     private readonly asistenciaRepository: Repository<Asistencia>,
+    @InjectRepository(AsistenciaProfesor)
+    private readonly asistenciaProfesorRepository: Repository<AsistenciaProfesor>,
   ) {}
   private cleanHour(hour: any): { start: string; end: string } {
     if (hour && hour.start && hour.end) {
@@ -275,34 +278,31 @@ export class ComisionService {
     return this.alumnoComisionRepository.save(alumnoComision);
   }
 
-  async registrarAsistencia(
-    dtoArray: CreateAsistenciaDto[],
-  ): Promise<Asistencia[]> {
-    const asistenciasAGuardar: Asistencia[] = [];
+  async registrarAsistencia(data: CreateAsistenciaDto) {
+    // Obtener todos los alumnos de la comisión
+    const todosAlumnos = await this.alumnoComisionRepository.find({
+      where: { comision: { id: data.comisionId } },
+    });
 
-    for (const dto of dtoArray) {
-      const { alumnoComisionId, presente, fecha } = dto;
+    // Registrar asistencias: presentes y ausentes
+    const asistencias = todosAlumnos.map((alumnoComision) =>
+      this.asistenciaRepository.create({
+        alumnoComision: { id: alumnoComision.id },
+        presente: data.alumnosComisionIds.includes(alumnoComision.id),
+      }),
+    );
+    await this.asistenciaRepository.save(asistencias);
 
-      const alumnoComision = await this.alumnoComisionRepository.findOne({
-        where: { id: alumnoComisionId },
-      });
+    // Registrar asistencia del profesor
+    const asistenciaProfesor = this.asistenciaProfesorRepository.create({
+      profesor: { id: data.profesorId },
+      comision: { id: data.comisionId },
+      estado: data.estadoProfesor,
+      descripcion: data.descripcion,
+    });
+    await this.asistenciaProfesorRepository.save(asistenciaProfesor);
 
-      if (!alumnoComision) {
-        throw new NotFoundException(
-          `Alumno con ID ${alumnoComisionId} no encontrado en la comisión`,
-        );
-      }
-
-      const asistencia = this.asistenciaRepository.create({
-        alumnoComision,
-        presente,
-        fecha: fecha,
-      });
-
-      asistenciasAGuardar.push(asistencia);
-    }
-
-    return await this.asistenciaRepository.save(asistenciasAGuardar);
+    return { message: 'Asistencias registradas correctamente' };
   }
 
   async obtenerAsistenciasPorComision(
@@ -311,6 +311,20 @@ export class ComisionService {
     return this.asistenciaRepository.find({
       where: { alumnoComision: { comision: { id: comisionId } } },
       relations: ['alumnoComision', 'alumnoComision.alumno'],
+      select:{
+        alumnoComision: {
+          id: true,
+          state: true,
+          alumno: {
+            id: true,
+            name: true,
+            dni: true,
+          },
+        },
+        presente: true,
+        fecha: true,
+      },
+      order: { fecha: 'DESC' },
     });
   }
 }

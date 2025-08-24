@@ -9,6 +9,7 @@ import { Profesor } from '../profesor/entities/profesor.entity';
 import { Asistencia } from './entities/asistencia.entity';
 import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Caja } from '../caja/entities/caja.entity';
+import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Caja } from '../caja/entities/caja.entity';
       AlumnoComision,
       Asistencia,
       Caja,
+      AsistenciaProfesor
     ]),
   ],
   controllers: [ComisionController],

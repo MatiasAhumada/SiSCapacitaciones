@@ -1,4 +1,5 @@
 import { Caja } from '@modules/Modules/caja/entities/caja.entity';
+import { AsistenciaProfesor } from '@modules/Modules/comision/entities/asistencia-profesor.entity';
 import { Comision } from 'src/Modules/comision/entities/comision.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import {
@@ -31,4 +32,7 @@ export class Profesor {
 
   @OneToMany(() => Caja, (caja) => caja.profesor)
   pagos: Caja[];
+
+  @OneToMany(() => AsistenciaProfesor, (asistencia) => asistencia.profesor)
+  asistencias: AsistenciaProfesor[];
 }

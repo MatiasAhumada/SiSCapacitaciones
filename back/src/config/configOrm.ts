@@ -18,6 +18,7 @@ import { Comprobante } from 'src/Modules/comprobante/entities/comprobante.entity
 import { Categoria } from 'src/Modules/caja/entities/categoria.entity';
 import { Subcategoria } from 'src/Modules/caja/entities/subcategoria.entity';
 import { SesionCaja } from 'src/Modules/caja/entities/sesion-caja.entity';
+import { AsistenciaProfesor } from '@modules/Modules/comision/entities/asistencia-profesor.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -51,6 +52,7 @@ const db_config = {
     Categoria,
     Subcategoria,
     SesionCaja,
+    AsistenciaProfesor
   ],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],

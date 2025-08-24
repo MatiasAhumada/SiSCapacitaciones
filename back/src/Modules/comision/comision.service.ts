@@ -132,53 +132,67 @@ export class ComisionService {
       select: ['id', 'name'],
     });
   }
-  async findOne(id: string) {
-    return this.comisionRepository.findOne({
+  async findOne(id: string, page = 1, limit = 10) {
+    // Traer datos generales de la comisión
+    const comision = await this.comisionRepository.findOne({
       where: { id },
-      relations: [
-        'sucursal',
-        'alumnoComisiones.alumno',
-        'alumnoComisiones.asistencias',
-        'alumnoComisiones.pagos',
-        'profesor',
-        'curso',
-      ],
+      relations: ['sucursal', 'profesor', 'curso'],
       select: {
-        sucursal: {
-          id: true,
-          name: true,
+        id: true,
+        name: true,
+        day: true,
+        hour: {
+          start: true,
+          end: true,
         },
-        alumnoComisiones: {
-          id: true,
-          state: true,
-          alumno: {
-            id: true,
-            dni: true,
-            name: true,
-            tel: true,
-          },
-          asistencias: {
-            id: true,
-            presente: true,
-            fecha: true,
-          },
-          pagos: {
-            id: true,
-            fecha: true,
-          },
-        },
+        sucursal: { id: true, name: true },
+        profesor: { id: true, name: true, apellido: true },
+        curso: { id: true, name: true },
+      },
+    });
 
-        profesor: {
+    if (!comision) {
+      throw new NotFoundException(`Comisión con id ${id} no encontrada`);
+    }
+
+    // Contar total de alumnos
+    const totalAlumnos = await this.alumnoComisionRepository.count({
+      where: { comision: { id } },
+    });
+
+    // Traer alumnos paginados con sus asistencias y pagos
+    const alumnosComision = await this.alumnoComisionRepository.find({
+      where: { comision: { id } },
+      relations: ['alumno', 'asistencias', 'pagos'],
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        state: true,
+        alumno: {
           id: true,
+          dni: true,
           name: true,
-          apellido: true,
+          tel: true,
         },
-        curso: {
+        asistencias: {
           id: true,
-          name: true,
+          presente: true,
+          fecha: true,
+        },
+        pagos: {
+          id: true,
+          fecha: true,
         },
       },
     });
+
+    return {
+      comision,
+      data: alumnosComision,
+      totalPages: Math.ceil(totalAlumnos / limit),
+      currentPage: page,
+    };
   }
 
   async update(id: string, updateComisionDto: UpdateComisionDto) {
@@ -311,7 +325,7 @@ export class ComisionService {
     return this.asistenciaRepository.find({
       where: { alumnoComision: { comision: { id: comisionId } } },
       relations: ['alumnoComision', 'alumnoComision.alumno'],
-      select:{
+      select: {
         alumnoComision: {
           id: true,
           state: true,

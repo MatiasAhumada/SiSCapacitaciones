@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ComisionService } from './comision.service';
 import { CreateComisionDto } from './dto/create-comision.dto';
@@ -52,8 +53,12 @@ export class ComisionController {
     return this.comisionService.findBySucursal(id);
   }
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.comisionService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.comisionService.findOne(id, Number(page), Number(limit));
   }
   @Put('/estado')
   cambiarEstado(@Body() change: ChangeStateDto) {

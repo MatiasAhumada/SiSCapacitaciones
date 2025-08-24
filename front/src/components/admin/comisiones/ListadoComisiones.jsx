@@ -4,30 +4,25 @@ import { editStateComision, getComisionId } from '../../../helpers/Comisiones.se
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Spinner } from '../../Spinner/Spinner';
+import Pagination from '../../Pagination/Pagination';
 
 const ListadoComisiones = () => {
-  const { id } = useParams();
+  const { id, comId } = useParams();
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
-  const [asistencias, setAsintencias] = useState([
-    {
-      fecha: '',
-      presente: false,
-      alumnoComisionId: '',
-    },
-  ]);
   const [todosLosAlumnos, setTodosLosAlumnos] = useState([]);
   const [dniFiltro, setDniFiltro] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const { comId } = useParams();
+  const itemsPerPage = 10; 
+
   const navigate = useNavigate();
   const location = useLocation();
   const navegacion = (alumno) => {
     const currentPath = location.pathname;
     const isAdmin = currentPath.includes('adm');
-    //console.log(isAdmin);isAdmin ? pathSegments[2] :
-
     const pathSegments = currentPath.split('/');
     const userId = pathSegments[1];
     const redirectionPath = isAdmin
@@ -36,16 +31,20 @@ const ListadoComisiones = () => {
 
     navigate(redirectionPath);
   };
+  const fetchAlumnos = async (page = 1) => {
+    try {
+      const data = await getComisionId(comId, page, itemsPerPage); // 👈 enviamos paginado al back
+      setAlumnosComision(data.data);
+      setComisionDate(data.comision || {});
+      setTotalPages(data.totalPages || 1);
+      setCurrentPage(data.currentPage || 1);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
-    const alumnosCom = async () => {
-      await getComisionId(comId).then((data) => {
-        setAlumnosComision(data.alumnoComisiones);
-        setTodosLosAlumnos(data.alumnoComisiones);
-        setComisionDate(data);
-      });
-    };
-    alumnosCom();
-  }, []);
+    fetchAlumnos(currentPage);
+  }, [currentPage,comId]);
 
   const allDates = Array.from(
     new Set(
@@ -99,19 +98,6 @@ const ListadoComisiones = () => {
     });
 
     doc.save(`Asistencia-${comisionDate.name}.pdf`);
-  };
-  const verMas = (e) => {
-    e.preventDefault();
-    const alumnoId = e.target.value;
-    setPause((prev) => ({ ...prev, [alumnoId]: true }));
-    const asistencia = alumnosComision.find((a) => a.id === alumnoId);
-    setAsintencias(asistencia.asistencias);
-    console.log(alumnosComision);
-    setPause((prev) => {
-      const newPause = { ...prev };
-      delete newPause[alumnoId];
-      return newPause;
-    });
   };
   const clickEdit = async (e, ID) => {
     e.preventDefault();
@@ -209,22 +195,22 @@ const ListadoComisiones = () => {
               className="px-4 py-2 border rounded w-full md:w-64"
             />
           </div>
-      <div className="mt-4 md:mt-0 flex justify-center">
-  <div className="flex flex-col md:flex-row gap-2 w-fit">
-    <button
-      onClick={generatePDF}
-      className="px-3 py-1 text-white principal rounded bg-red-500 hover:bg-red-600 text-sm"
-    >
-      PDF
-    </button>
-    <button
-      onClick={onAsist}
-      className="px-3 py-1 text-white principal rounded btnAz text-sm"
-    >
-      Asistencia
-    </button>
-  </div>
-</div>
+          <div className="mt-4 md:mt-0 flex justify-center">
+            <div className="flex flex-col md:flex-row gap-2 w-fit">
+              <button
+                onClick={generatePDF}
+                className="px-3 py-1 text-white principal rounded bg-red-500 hover:bg-red-600 text-sm"
+              >
+                PDF
+              </button>
+              <button
+                onClick={onAsist}
+                className="px-3 py-1 text-white principal rounded btnAz text-sm"
+              >
+                Asistencia
+              </button>
+            </div>
+          </div>
         </div>
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
           <table className="w-full table-auto text-sm  text-center">
@@ -295,6 +281,11 @@ const ListadoComisiones = () => {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </>
     </div>
   );

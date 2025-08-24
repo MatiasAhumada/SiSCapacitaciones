@@ -16,7 +16,7 @@ const ListadoComisiones = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const itemsPerPage = 10; 
+  const itemsPerPage = 10;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,6 +35,7 @@ const ListadoComisiones = () => {
     try {
       const data = await getComisionId(comId, page, itemsPerPage); // 👈 enviamos paginado al back
       setAlumnosComision(data.data);
+      setTodosLosAlumnos(data.data);
       setComisionDate(data.comision || {});
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
@@ -44,7 +45,7 @@ const ListadoComisiones = () => {
   };
   useEffect(() => {
     fetchAlumnos(currentPage);
-  }, [currentPage,comId]);
+  }, [currentPage, comId]);
 
   const allDates = Array.from(
     new Set(
@@ -158,11 +159,14 @@ const ListadoComisiones = () => {
 
     if (!value.trim()) {
       setAlumnosComision(todosLosAlumnos);
+      fetchAlumnos(1);
       return;
     }
 
     const filtrados = todosLosAlumnos.filter((item) => item.alumno?.dni.includes(value));
     setAlumnosComision(filtrados);
+    setTotalPages(1);
+    setCurrentPage(1);
   };
 
   const onAsist = (e) => {

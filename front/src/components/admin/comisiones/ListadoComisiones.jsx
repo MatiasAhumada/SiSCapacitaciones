@@ -179,6 +179,12 @@ const ListadoComisiones = () => {
     setAlumnosComision(filtrados);
   };
 
+  const onAsist = (e) => {
+    e.preventDefault();
+
+    console.log('botón click');
+  };
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -203,14 +209,22 @@ const ListadoComisiones = () => {
               className="px-4 py-2 border rounded w-full md:w-64"
             />
           </div>
-          <div className="mt-4 md:mt-0">
-            <button
-              onClick={generatePDF}
-              className="inline-block px-4 py-2 text-white principal rounded bg-red-500 hover:bg-red-600 md:text-sm"
-            >
-              PDF
-            </button>
-          </div>
+      <div className="mt-4 md:mt-0 flex justify-center">
+  <div className="flex flex-col md:flex-row gap-2 w-fit">
+    <button
+      onClick={generatePDF}
+      className="px-3 py-1 text-white principal rounded bg-red-500 hover:bg-red-600 text-sm"
+    >
+      PDF
+    </button>
+    <button
+      onClick={onAsist}
+      className="px-3 py-1 text-white principal rounded btnAz text-sm"
+    >
+      Asistencia
+    </button>
+  </div>
+</div>
         </div>
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
           <table className="w-full table-auto text-sm  text-center">

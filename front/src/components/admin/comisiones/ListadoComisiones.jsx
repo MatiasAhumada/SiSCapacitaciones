@@ -7,6 +7,7 @@ import { Spinner } from '../../Spinner/Spinner';
 
 const ListadoComisiones = () => {
   const { id } = useParams();
+   const [onAsistenciaClicked, setOnAsistenciaClicked] = useState(false);
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
@@ -97,7 +98,7 @@ const ListadoComisiones = () => {
       body: rows,
       startY: 42,
     });
-
+nst [onAsistencia, setOnAsistencia] = useState(false);
     doc.save(`Asistencia-${comisionDate.name}.pdf`);
   };
   const verMas = (e) => {
@@ -117,7 +118,12 @@ const ListadoComisiones = () => {
     e.preventDefault();
     const { name, value } = e.target;
     setPause((prev) => ({ ...prev, [ID]: true }));
-
+<button
+      onClick={onAsist}
+      className="px-3 py-1 text-white principal rounded btnAz text-sm"
+    >
+      Asistencia
+    </button>
     const nuevoEstado = name === 'activo' ? false : true;
     const change = {
       estado: nuevoEstado,
@@ -181,9 +187,10 @@ const ListadoComisiones = () => {
 
   const onAsist = (e) => {
     e.preventDefault();
-
+    setOnAsistenciaClicked(true);
     console.log('botón click');
   };
+   
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -217,12 +224,21 @@ const ListadoComisiones = () => {
     >
       PDF
     </button>
+    
+    { onAsistenciaClicked?
     <button
+      onClick={null}
+      className="min-w-[120px] px-3 py-1 text-white principal rounded bg-green-500 hover:bg-green-600 text-sm"
+    >
+      Guardar
+    </button>
+    : <button
       onClick={onAsist}
-      className="px-3 py-1 text-white principal rounded btnAz text-sm"
+      className="min-w-[120px] px-3 py-1 text-white principal rounded btnAz text-sm"
     >
       Asistencia
     </button>
+    }
   </div>
 </div>
         </div>

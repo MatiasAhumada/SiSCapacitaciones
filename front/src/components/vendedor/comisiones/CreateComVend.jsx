@@ -179,7 +179,7 @@ const CreateComVend = () => {
               ))}
             </select>
           </div>
-        </div>
+        </div>p
         <div className="pb-2">
           <label className="block mb-2 text-sm principal">Profesor</label>
           <select
@@ -198,7 +198,7 @@ const CreateComVend = () => {
             ))}
           </select>
         </div>
-
+p
         <div className="pb-2">
           <label className="block mb-2 text-sm principal">Curso</label>
           <select

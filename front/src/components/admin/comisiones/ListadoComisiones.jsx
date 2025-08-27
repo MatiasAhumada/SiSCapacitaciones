@@ -118,9 +118,6 @@ const ListadoComisiones = () => {
     e.preventDefault();
     const { name, value } = e.target;
     setPause((prev) => ({ ...prev, [ID]: true }));
-    <button onClick={onAsist} className="px-3 py-1 text-white principal rounded btnAz text-sm">
-      Asistencia
-    </button>;
     const nuevoEstado = name === 'activo' ? false : true;
     const change = {
       estado: nuevoEstado,

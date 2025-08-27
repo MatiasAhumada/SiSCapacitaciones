@@ -18,6 +18,9 @@ const ListadoComisiones = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const itemsPerPage = 10;
+  const [mostrarAsistencia, setMostrarAsistencia] = useState(false);
+  const [asistenciaProfesor, setAsistenciaProfesor] = useState('');
+  const [justificacion, setJustificacion] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -173,6 +176,7 @@ const ListadoComisiones = () => {
     e.preventDefault();
     setOnAsistenciaClicked(true);
     console.log('botón click');
+    setMostrarAsistencia((prev) => !prev);
   };
 
   return (
@@ -190,15 +194,48 @@ const ListadoComisiones = () => {
               Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
             </h5>
           </div>
-          <div className="mt-6 mb-2">
+          <div className="">
             <input
               type="text"
               placeholder="Filtrar por DNI"
               value={dniFiltro}
               onChange={handleFiltrarDni}
-              className="px-4 py-2 border rounded w-full md:w-64"
+              className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64"
             />
+
+            {mostrarAsistencia && (
+              <div className="mt-2 h-24 md:h-10 md:w-[536px] flex flex-col md:grid md:grid-cols-2 gap-2">
+                <select
+                  value={asistenciaProfesor}
+                  onChange={(e) => setAsistenciaProfesor(e.target.value)}
+                  className={`px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64 ${asistenciaProfesor === '' ? 'text-gray-500' : 'text-gray-900'}`}
+                >
+                  <option value="" className="text-gray-500">
+                    Asistencia profesor
+                  </option>
+                  <option value="Presente" className="text-gray-900">
+                    Presente
+                  </option>
+                  <option value="Ausente" className="text-gray-900">
+                    Ausente
+                  </option>
+                  <option value="Feriado" className="text-gray-900">
+                    Feriado
+                  </option>
+                </select>
+                {asistenciaProfesor === 'Ausente' && (
+                  <input
+                    type="text"
+                    placeholder="Descripción"
+                    value={justificacion}
+                    onChange={(e) => setJustificacion(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64"
+                  />
+                )}
+              </div>
+            )}
           </div>
+
           <div className="mt-4 md:mt-0 flex justify-center">
             <div className="flex flex-col md:flex-row gap-2 w-fit">
               <button

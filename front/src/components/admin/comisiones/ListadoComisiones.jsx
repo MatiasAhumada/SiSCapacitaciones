@@ -8,6 +8,7 @@ import Pagination from '../../Pagination/Pagination';
 
 const ListadoComisiones = () => {
   const { id, comId } = useParams();
+  const [onAsistenciaClicked, setOnAsistenciaClicked] = useState(false);
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
@@ -104,7 +105,6 @@ const ListadoComisiones = () => {
     e.preventDefault();
     const { name, value } = e.target;
     setPause((prev) => ({ ...prev, [ID]: true }));
-
     const nuevoEstado = name === 'activo' ? false : true;
     const change = {
       estado: nuevoEstado,
@@ -171,7 +171,7 @@ const ListadoComisiones = () => {
 
   const onAsist = (e) => {
     e.preventDefault();
-
+    setOnAsistenciaClicked(true);
     console.log('botón click');
   };
 
@@ -207,12 +207,22 @@ const ListadoComisiones = () => {
               >
                 PDF
               </button>
-              <button
-                onClick={onAsist}
-                className="px-3 py-1 text-white principal rounded btnAz text-sm"
-              >
-                Asistencia
-              </button>
+
+              {onAsistenciaClicked ? (
+                <button
+                  onClick={null}
+                  className="min-w-[120px] px-3 py-1 text-white principal rounded bg-green-500 hover:bg-green-600 text-sm"
+                >
+                  Guardar
+                </button>
+              ) : (
+                <button
+                  onClick={onAsist}
+                  className="min-w-[120px] px-3 py-1 text-white principal rounded btnAz text-sm"
+                >
+                  Asistencia
+                </button>
+              )}
             </div>
           </div>
         </div>

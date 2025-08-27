@@ -4,31 +4,26 @@ import { editStateComision, getComisionId } from '../../../helpers/Comisiones.se
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Spinner } from '../../Spinner/Spinner';
+import Pagination from '../../Pagination/Pagination';
 
 const ListadoComisiones = () => {
-  const { id } = useParams();
+  const { id, comId } = useParams();
   const [onAsistenciaClicked, setOnAsistenciaClicked] = useState(false);
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
-  const [asistencias, setAsintencias] = useState([
-    {
-      fecha: '',
-      presente: false,
-      alumnoComisionId: '',
-    },
-  ]);
   const [todosLosAlumnos, setTodosLosAlumnos] = useState([]);
   const [dniFiltro, setDniFiltro] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const { comId } = useParams();
+  const itemsPerPage = 10;
+
   const navigate = useNavigate();
   const location = useLocation();
   const navegacion = (alumno) => {
     const currentPath = location.pathname;
     const isAdmin = currentPath.includes('adm');
-    //console.log(isAdmin);isAdmin ? pathSegments[2] :
-
     const pathSegments = currentPath.split('/');
     const userId = pathSegments[1];
     const redirectionPath = isAdmin
@@ -37,16 +32,21 @@ const ListadoComisiones = () => {
 
     navigate(redirectionPath);
   };
+  const fetchAlumnos = async (page = 1) => {
+    try {
+      const data = await getComisionId(comId, page, itemsPerPage); // 👈 enviamos paginado al back
+      setAlumnosComision(data.data);
+      setTodosLosAlumnos(data.data);
+      setComisionDate(data.comision || {});
+      setTotalPages(data.totalPages || 1);
+      setCurrentPage(data.currentPage || 1);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
-    const alumnosCom = async () => {
-      await getComisionId(comId).then((data) => {
-        setAlumnosComision(data.alumnoComisiones);
-        setTodosLosAlumnos(data.alumnoComisiones);
-        setComisionDate(data);
-      });
-    };
-    alumnosCom();
-  }, []);
+    fetchAlumnos(currentPage);
+  }, [currentPage, comId]);
 
   const allDates = Array.from(
     new Set(
@@ -100,19 +100,6 @@ const ListadoComisiones = () => {
     });
 
     doc.save(`Asistencia-${comisionDate.name}.pdf`);
-  };
-  const verMas = (e) => {
-    e.preventDefault();
-    const alumnoId = e.target.value;
-    setPause((prev) => ({ ...prev, [alumnoId]: true }));
-    const asistencia = alumnosComision.find((a) => a.id === alumnoId);
-    setAsintencias(asistencia.asistencias);
-    console.log(alumnosComision);
-    setPause((prev) => {
-      const newPause = { ...prev };
-      delete newPause[alumnoId];
-      return newPause;
-    });
   };
   const clickEdit = async (e, ID) => {
     e.preventDefault();
@@ -172,11 +159,14 @@ const ListadoComisiones = () => {
 
     if (!value.trim()) {
       setAlumnosComision(todosLosAlumnos);
+      fetchAlumnos(1);
       return;
     }
 
     const filtrados = todosLosAlumnos.filter((item) => item.alumno?.dni.includes(value));
     setAlumnosComision(filtrados);
+    setTotalPages(1);
+    setCurrentPage(1);
   };
 
   const onAsist = (e) => {
@@ -305,6 +295,11 @@ const ListadoComisiones = () => {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </>
     </div>
   );

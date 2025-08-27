@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { AlumnoComision } from './alumnocomision.entity';
+import { AsistenciaProfesor } from './asistencia-profesor.entity';
 @Entity({
   name: 'comisiones',
 })
@@ -46,4 +47,7 @@ export class Comision {
 
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.comisiones)
   sucursal: Sucursal;
+
+  @OneToMany(() => AsistenciaProfesor, (asistencia) => asistencia.comision)
+  asistenciasProfesores: AsistenciaProfesor[];
 }

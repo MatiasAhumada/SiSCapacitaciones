@@ -6,12 +6,13 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ComisionService } from './comision.service';
 import { CreateComisionDto } from './dto/create-comision.dto';
+import { ChangeStateDto } from './dto/changeState.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
-import { ChangeStateDto } from './dto/changeState.dto';
 
 @Controller('comision')
 export class ComisionController {
@@ -20,6 +21,18 @@ export class ComisionController {
   @Post()
   create(@Body() createComisionDto: CreateComisionDto) {
     return this.comisionService.create(createComisionDto);
+  }
+
+  @Post('asistencia')
+  registrarAsistencia(
+    @Body()
+    data: CreateAsistenciaDto,
+  ) {
+    return this.comisionService.registrarAsistencia(data);
+  }
+  @Get('asistencia/:comisionId')
+  obtenerAsistenciasPorComision(@Param('comisionId') comisionId: string) {
+    return this.comisionService.obtenerAsistenciasPorComision(comisionId);
   }
 
   @Get()
@@ -40,8 +53,12 @@ export class ComisionController {
     return this.comisionService.findBySucursal(id);
   }
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.comisionService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.comisionService.findOne(id, Number(page), Number(limit));
   }
   @Put('/estado')
   cambiarEstado(@Body() change: ChangeStateDto) {
@@ -59,10 +76,5 @@ export class ComisionController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.comisionService.remove(id);
-  }
-
-  @Post('/asistencia')
-  registrarAsistencia(@Body() dto: CreateAsistenciaDto[]) {
-    return this.comisionService.registrarAsistencia(dto);
   }
 }

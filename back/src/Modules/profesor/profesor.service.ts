@@ -32,7 +32,9 @@ export class ProfesorService {
   }
 
   async findAll() {
-    return this.profesorRepository.find();
+    return this.profesorRepository.find({
+      relations:['asistencias'],
+    });
   }
   async getProfesoresBySucursal(id: string) {
     const profesores = await this.profesorRepository.find({

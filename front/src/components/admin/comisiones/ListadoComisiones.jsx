@@ -7,7 +7,7 @@ import { Spinner } from '../../Spinner/Spinner';
 
 const ListadoComisiones = () => {
   const { id } = useParams();
-   const [onAsistenciaClicked, setOnAsistenciaClicked] = useState(false);
+  const [onAsistenciaClicked, setOnAsistenciaClicked] = useState(false);
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
@@ -98,7 +98,7 @@ const ListadoComisiones = () => {
       body: rows,
       startY: 42,
     });
-nst [onAsistencia, setOnAsistencia] = useState(false);
+
     doc.save(`Asistencia-${comisionDate.name}.pdf`);
   };
   const verMas = (e) => {
@@ -118,12 +118,9 @@ nst [onAsistencia, setOnAsistencia] = useState(false);
     e.preventDefault();
     const { name, value } = e.target;
     setPause((prev) => ({ ...prev, [ID]: true }));
-<button
-      onClick={onAsist}
-      className="px-3 py-1 text-white principal rounded btnAz text-sm"
-    >
+    <button onClick={onAsist} className="px-3 py-1 text-white principal rounded btnAz text-sm">
       Asistencia
-    </button>
+    </button>;
     const nuevoEstado = name === 'activo' ? false : true;
     const change = {
       estado: nuevoEstado,
@@ -190,7 +187,6 @@ nst [onAsistencia, setOnAsistencia] = useState(false);
     setOnAsistenciaClicked(true);
     console.log('botón click');
   };
-   
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -216,31 +212,32 @@ nst [onAsistencia, setOnAsistencia] = useState(false);
               className="px-4 py-2 border rounded w-full md:w-64"
             />
           </div>
-      <div className="mt-4 md:mt-0 flex justify-center">
-  <div className="flex flex-col md:flex-row gap-2 w-fit">
-    <button
-      onClick={generatePDF}
-      className="px-3 py-1 text-white principal rounded bg-red-500 hover:bg-red-600 text-sm"
-    >
-      PDF
-    </button>
-    
-    { onAsistenciaClicked?
-    <button
-      onClick={null}
-      className="min-w-[120px] px-3 py-1 text-white principal rounded bg-green-500 hover:bg-green-600 text-sm"
-    >
-      Guardar
-    </button>
-    : <button
-      onClick={onAsist}
-      className="min-w-[120px] px-3 py-1 text-white principal rounded btnAz text-sm"
-    >
-      Asistencia
-    </button>
-    }
-  </div>
-</div>
+          <div className="mt-4 md:mt-0 flex justify-center">
+            <div className="flex flex-col md:flex-row gap-2 w-fit">
+              <button
+                onClick={generatePDF}
+                className="px-3 py-1 text-white principal rounded bg-red-500 hover:bg-red-600 text-sm"
+              >
+                PDF
+              </button>
+
+              {onAsistenciaClicked ? (
+                <button
+                  onClick={null}
+                  className="min-w-[120px] px-3 py-1 text-white principal rounded bg-green-500 hover:bg-green-600 text-sm"
+                >
+                  Guardar
+                </button>
+              ) : (
+                <button
+                  onClick={onAsist}
+                  className="min-w-[120px] px-3 py-1 text-white principal rounded btnAz text-sm"
+                >
+                  Asistencia
+                </button>
+              )}
+            </div>
+          </div>
         </div>
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
           <table className="w-full table-auto text-sm  text-center">

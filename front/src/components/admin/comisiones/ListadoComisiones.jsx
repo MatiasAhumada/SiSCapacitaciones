@@ -18,7 +18,6 @@ const ListadoComisiones = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const itemsPerPage = 10;
-  const [mostrarAsistencia, setMostrarAsistencia] = useState(false);
   const [asistenciaProfesor, setAsistenciaProfesor] = useState('');
   const [justificacion, setJustificacion] = useState('');
 
@@ -176,7 +175,6 @@ const ListadoComisiones = () => {
     e.preventDefault();
     setOnAsistenciaClicked(true);
     console.log('botón click');
-    setMostrarAsistencia((prev) => !prev);
   };
 
   return (
@@ -194,7 +192,7 @@ const ListadoComisiones = () => {
               Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
             </h5>
           </div>
-          <div className="">
+          <div>
             <input
               type="text"
               placeholder="Filtrar por DNI"
@@ -203,7 +201,7 @@ const ListadoComisiones = () => {
               className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64"
             />
 
-            {mostrarAsistencia && (
+            {onAsistenciaClicked && (
               <div className="mt-2 h-24 md:h-10 md:w-[536px] flex flex-col md:grid md:grid-cols-2 gap-2">
                 <select
                   value={asistenciaProfesor}

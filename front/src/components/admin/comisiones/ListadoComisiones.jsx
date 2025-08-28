@@ -176,6 +176,9 @@ const ListadoComisiones = () => {
     setOnAsistenciaClicked(true);
     console.log('botón click');
   };
+  const onGuardar = () => {
+    setOnAsistenciaClicked(false);
+  };
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -245,8 +248,9 @@ const ListadoComisiones = () => {
 
               {onAsistenciaClicked ? (
                 <button
-                  onClick={null}
-                  className="min-w-[120px] px-3 py-1 text-white principal rounded bg-green-500 hover:bg-green-600 text-sm"
+                  onClick={onGuardar}
+                  className="min-w-[120px] px-3 py-1 text-white principal rounded bg-green-500 hover:bg-green-600 text-sm
+                              opacity-100 animate-out fade-out duration-300"
                 >
                   Guardar
                 </button>
@@ -275,6 +279,15 @@ const ListadoComisiones = () => {
                     {date}
                   </th>
                 ))}
+                {onAsistenciaClicked ? (
+                  <th className="py-1">
+                    {' '}
+                    <input
+                      className="py-3 px-2  text-gray-600 rounded focus:outline-blue-600 focus ring-blue-400"
+                      type="date"
+                    />{' '}
+                  </th>
+                ) : null}
               </tr>
             </thead>
             <tbody className="text-gray-600 divide-y">
@@ -324,6 +337,15 @@ const ListadoComisiones = () => {
                         </td>
                       );
                     })}
+                    {onAsistenciaClicked ? (
+                      <th className="text-center py-2">
+                        <input
+                          className="w-6 h-6"
+                          style={{ accentColor: '#2563eb' }}
+                          type="checkbox"
+                        />
+                      </th>
+                    ) : null}
                   </tr>
                 );
               })}

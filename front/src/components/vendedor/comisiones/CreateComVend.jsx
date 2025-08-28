@@ -2,12 +2,7 @@ import { useEffect, useState } from 'react';
 import logo from '../../../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import {
-  getCursos,
-  getProfes,
-  getVendID,
-  postComision,
-} from '../../queris/queris';
+import { getCursos, getProfes, getVendID, postComision } from '../../queris/queris';
 
 const CreateComVend = () => {
   const areas = ['Digital', 'Idiomas', 'Salud', 'Administrativa', 'Belleza', 'Técnica'];
@@ -198,7 +193,6 @@ const CreateComVend = () => {
             ))}
           </select>
         </div>
-
         <div className="pb-2">
           <label className="block mb-2 text-sm principal">Curso</label>
           <select

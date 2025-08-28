@@ -132,7 +132,7 @@ export class ComisionService {
       select: ['id', 'name'],
     });
   }
-  async findOne(id: string, page = 1, limit = 10) {
+  async findOne(id: string, page = 1, limit = 10, dni?: string) {
     // Traer datos generales de la comisión
     const comision = await this.comisionRepository.findOne({
       where: { id },
@@ -153,6 +153,11 @@ export class ComisionService {
 
     if (!comision) {
       throw new NotFoundException(`Comisión con id ${id} no encontrada`);
+    }
+
+    const whereAlumno: any = { comision: { id } };
+    if (dni) {
+      whereAlumno.alumno = { dni };
     }
 
     // Contar total de alumnos

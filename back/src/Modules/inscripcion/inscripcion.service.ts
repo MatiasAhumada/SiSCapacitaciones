@@ -36,7 +36,6 @@ export class InscripcionService {
       fechaRegistro,
       state,
     } = createInscripcionDto;
-
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
     });

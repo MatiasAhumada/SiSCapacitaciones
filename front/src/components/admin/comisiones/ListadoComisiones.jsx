@@ -231,7 +231,7 @@ const ListadoComisiones = () => {
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
-        <div className="items-start justify-between md:flex">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-0">
           <div className="max-w-lg">
             <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
               {comisionDate.name}
@@ -243,7 +243,7 @@ const ListadoComisiones = () => {
               Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
             </h5>
           </div>
-          <div className="w-full flex flex-col md:flex-row md:items-start md:gap-6">
+          <div className="flex flex-col md:ml-auto md:flex-row md:items-start md:gap-6 w-full md:w-auto">
             {/* BLOQUE DE INPUTS (DNI + SELECT + DESCRIPCION) */}
             <div className="flex flex-col gap-2 w-full md:w-64">
               <input
@@ -299,7 +299,6 @@ const ListadoComisiones = () => {
               )}
             </div>
 
-            {/* BLOQUE DE BOTONES */}
             <div className="mt-1 md:mt-0 flex justify-center md:justify-start">
               <div className="flex flex-col md:flex-row gap-2 w-fit">
                 <button

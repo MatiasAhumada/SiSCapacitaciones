@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateAsistenciaDto {
   @IsArray()
@@ -10,6 +10,9 @@ export class CreateAsistenciaDto {
 
   @IsString()
   comisionId: string;
+
+  @IsDateString()
+  fecha: Date;
 
   @IsEnum(['Presente', 'Ausente', 'Feriado'])
   estadoProfesor: 'Presente' | 'Ausente' | 'Feriado';

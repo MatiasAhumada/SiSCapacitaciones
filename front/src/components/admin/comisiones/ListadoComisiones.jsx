@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { editStateComision, getComisionId } from '../../../helpers/Comisiones.service';
+import {
+  editStateComision,
+  getComisionId,
+  postAsistenciaComision,
+} from '../../../helpers/Comisiones.service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Spinner } from '../../Spinner/Spinner';
@@ -13,13 +17,12 @@ const ListadoComisiones = () => {
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
   const [asistencia, setAsistencia] = useState({
-    alumnosComisionIds: [{
-
-    }],
+    alumnosComisionIds: [],
     profesorId: '',
     comisionId: '',
     estadoProfesor: '',
     descripcion: '',
+    fecha: '',
   });
   const [todosLosAlumnos, setTodosLosAlumnos] = useState([]);
   const [dniFiltro, setDniFiltro] = useState('');
@@ -56,11 +59,17 @@ const ListadoComisiones = () => {
   useEffect(() => {
     fetchAlumnos(currentPage);
   }, [currentPage, comId]);
-
+  const formatFecha = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    const day = String(fecha.getDate()).padStart(2, '0');
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const year = fecha.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
   const allDates = Array.from(
     new Set(
       alumnosComision.flatMap((item) =>
-        item.asistencias.map((asistencia) => asistencia.fecha.split('T')[0])
+        item.asistencias.map((asistencia) => formatFecha(asistencia.fecha))
       )
     )
   ).sort();
@@ -184,13 +193,19 @@ const ListadoComisiones = () => {
       ...asistencia,
       profesorId: comisionDate.profesor?.id,
       comisionId: comisionDate.id,
-    })
+    });
     setOnAsistenciaClicked(true);
   };
-  const onGuardar = () => {
+  const onGuardar = async () => {
+    try {
+      const data = await postAsistenciaComision(asistencia);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
     setOnAsistenciaClicked(false);
   };
-
+  console.log(allDates);
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -219,7 +234,7 @@ const ListadoComisiones = () => {
               <div className="mt-2 h-24 md:h-10 md:w-[536px] flex flex-col md:grid md:grid-cols-2 gap-2">
                 <select
                   value={asistencia.estadoProfesor}
-                  onChange={(e) => setAsistencia({...asistencia, estadoProfesor: e.target.value})}
+                  onChange={(e) => setAsistencia({ ...asistencia, estadoProfesor: e.target.value })}
                   className={`px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64 ${asistencia.estadoProfesor === '' ? 'text-gray-500' : 'text-gray-900'}`}
                 >
                   <option value="" className="text-gray-500">
@@ -240,7 +255,7 @@ const ListadoComisiones = () => {
                     type="text"
                     placeholder="Descripción"
                     value={asistencia.descripcion}
-                    onChange={(e) => setAsistencia({...asistencia, descripcion: e.target.value})}
+                    onChange={(e) => setAsistencia({ ...asistencia, descripcion: e.target.value })}
                     className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64"
                   />
                 )}
@@ -292,11 +307,11 @@ const ListadoComisiones = () => {
                 ))}
                 {onAsistenciaClicked ? (
                   <th className="py-1">
-                    {' '}
                     <input
                       className="py-3 px-2  text-gray-600 rounded focus:outline-blue-600 focus ring-blue-400"
                       type="date"
-                    />{' '}
+                      onChange={(e) => setAsistencia({ ...asistencia, fecha: e.target.value })}
+                    />
                   </th>
                 ) : null}
               </tr>
@@ -327,7 +342,7 @@ const ListadoComisiones = () => {
                         onClick={(e) => clickEdit(e, item.id)}
                         className={`text-xs px-2 py-0.5 rounded text-white 
                         ${item.state ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}
-                        disabled={pause[item.id]} // evita doble click
+                        disabled={pause[item.id]}
                       >
                         {pause[item.id] ? (
                           <Spinner color="white" />
@@ -340,7 +355,7 @@ const ListadoComisiones = () => {
                     </td>
                     {allDates.map((date) => {
                       const asistencia = item.asistencias.find(
-                        (a) => a.fecha.split('T')[0] === date
+                        (a) => formatFecha(a.fecha) === date
                       );
                       return (
                         <td key={date} className="px-6 py-4">
@@ -353,6 +368,12 @@ const ListadoComisiones = () => {
                         <input
                           className="w-6 h-6"
                           style={{ accentColor: '#2563eb' }}
+                          onChange={() =>
+                            setAsistencia({
+                              ...asistencia,
+                              alumnosComisionIds: [...asistencia.alumnosComisionIds, item.id],
+                            })
+                          }
                           type="checkbox"
                         />
                       </th>

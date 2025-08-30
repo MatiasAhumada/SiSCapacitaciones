@@ -308,6 +308,7 @@ export class ComisionService {
       this.asistenciaRepository.create({
         alumnoComision: { id: alumnoComision.id },
         presente: data.alumnosComisionIds.includes(alumnoComision.id),
+        fecha:data.fecha,
       }),
     );
     await this.asistenciaRepository.save(asistencias);

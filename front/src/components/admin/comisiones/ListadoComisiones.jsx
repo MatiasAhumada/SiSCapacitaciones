@@ -8,7 +8,9 @@ import {
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Spinner } from '../../Spinner/Spinner';
+
 import Pagination from '../../Pagination/Pagination';
+import Swal from 'sweetalert2';
 
 const ListadoComisiones = () => {
   const { id, comId } = useParams();
@@ -199,13 +201,26 @@ const ListadoComisiones = () => {
   const onGuardar = async () => {
     try {
       const data = await postAsistenciaComision(asistencia);
-      console.log(data);
+      Swal.fire({
+        icon: 'success',
+        title: 'Asistencia guardada',
+        text: 'La asistencia se guardó correctamente',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al guardar la asistencia',
+        text: 'Hubo un error al guardar la asistencia',
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
     setOnAsistenciaClicked(false);
   };
-  console.log(allDates);
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>

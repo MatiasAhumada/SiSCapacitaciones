@@ -68,3 +68,12 @@ export const editStateComision = async (change) => {
     throw error;
   }
 };
+
+export const postAsistenciaComision = async (asistenciaComision) => {
+  try {
+    const response = await axios.post(`${API_URL}/comision/asistencia`, asistenciaComision);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -12,14 +12,21 @@ const ListadoComisiones = () => {
   const [alumnosComision, setAlumnosComision] = useState([]);
   const [comisionDate, setComisionDate] = useState([]);
   const [pause, setPause] = useState({});
+  const [asistencia, setAsistencia] = useState({
+    alumnosComisionIds: [{
+
+    }],
+    profesorId: '',
+    comisionId: '',
+    estadoProfesor: '',
+    descripcion: '',
+  });
   const [todosLosAlumnos, setTodosLosAlumnos] = useState([]);
   const [dniFiltro, setDniFiltro] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const itemsPerPage = 10;
-  const [asistenciaProfesor, setAsistenciaProfesor] = useState('');
-  const [justificacion, setJustificacion] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -173,8 +180,12 @@ const ListadoComisiones = () => {
 
   const onAsist = (e) => {
     e.preventDefault();
+    setAsistencia({
+      ...asistencia,
+      profesorId: comisionDate.profesor?.id,
+      comisionId: comisionDate.id,
+    })
     setOnAsistenciaClicked(true);
-    console.log('botón click');
   };
   const onGuardar = () => {
     setOnAsistenciaClicked(false);
@@ -207,9 +218,9 @@ const ListadoComisiones = () => {
             {onAsistenciaClicked && (
               <div className="mt-2 h-24 md:h-10 md:w-[536px] flex flex-col md:grid md:grid-cols-2 gap-2">
                 <select
-                  value={asistenciaProfesor}
-                  onChange={(e) => setAsistenciaProfesor(e.target.value)}
-                  className={`px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64 ${asistenciaProfesor === '' ? 'text-gray-500' : 'text-gray-900'}`}
+                  value={asistencia.estadoProfesor}
+                  onChange={(e) => setAsistencia({...asistencia, estadoProfesor: e.target.value})}
+                  className={`px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64 ${asistencia.estadoProfesor === '' ? 'text-gray-500' : 'text-gray-900'}`}
                 >
                   <option value="" className="text-gray-500">
                     Asistencia profesor
@@ -224,12 +235,12 @@ const ListadoComisiones = () => {
                     Feriado
                   </option>
                 </select>
-                {asistenciaProfesor === 'Ausente' && (
+                {asistencia.estadoProfesor === 'Ausente' && (
                   <input
                     type="text"
                     placeholder="Descripción"
-                    value={justificacion}
-                    onChange={(e) => setJustificacion(e.target.value)}
+                    value={asistencia.descripcion}
+                    onChange={(e) => setAsistencia({...asistencia, descripcion: e.target.value})}
                     className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-full md:w-64"
                   />
                 )}

@@ -133,9 +133,15 @@ export class CajaService {
     }
   }
 
-  async findAll() {
-    return this.cajaRepository.find({
+  async findAll(page = 1, limit = 10) {
+    const total = await this.cajaRepository.count();
+    const pagos = await this.cajaRepository.find({
       relations: ['vendedor', 'alumnoComision.alumno'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        fecha: 'DESC',
+      },
       select: {
         vendedor: {
           id: true,
@@ -150,6 +156,12 @@ export class CajaService {
         },
       },
     });
+
+    return {
+      data: pagos,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    };
   }
 
   async findOne(id: string) {
@@ -683,7 +695,6 @@ export class CajaService {
     const finDelDia = new Date(fecha);
     finDelDia.setHours(23, 59, 59, 999);
 
-
     const sesiones = await this.sesionRepository.find({
       where: {
         vendedor: { id: vendedorId },
@@ -695,7 +706,6 @@ export class CajaService {
     if (!sesiones.length) {
       throw new NotFoundException('No se encontraron sesiones para el día.');
     }
-
 
     const sesionesConMovimientos = await Promise.all(
       sesiones.map(async (sesion) => {

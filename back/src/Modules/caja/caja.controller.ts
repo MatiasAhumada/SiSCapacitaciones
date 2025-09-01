@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CajaService } from './caja.service';
 import { CreateCajaDto } from './dto/create-caja.dto';
@@ -24,8 +25,8 @@ export class CajaController {
   }
 
   @Get()
-  findAll() {
-    return this.cajaService.findAll();
+  findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.cajaService.findAll(Number(page), Number(limit));
   }
 
   @Get('/digita-tobias')

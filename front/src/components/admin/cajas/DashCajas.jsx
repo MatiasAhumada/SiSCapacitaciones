@@ -36,7 +36,12 @@ const DashCajas = () => {
   const onFiltrar = async () => {
     await getMovimientosPorDia(fechaFiltro).then((data) => {
       if (data.length == 0) {
-        Swal.fire();
+        Swal.fire({
+          title: 'No hay movimientos en esa fecha',
+          icon: 'warning',
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }
       setTableItems(data);
     });
@@ -73,7 +78,8 @@ const DashCajas = () => {
 
     const todasCajas = async () => {
       await getCajas().then((data) => {
-        setTableItems(data);
+        console.log(data)
+        setTableItems(data.data);
       });
     };
     const resumenCajasTotal = async () => {
@@ -168,6 +174,7 @@ const DashCajas = () => {
       }
     });
   };
+  console.log(tableItems)
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -284,7 +291,7 @@ const DashCajas = () => {
                       item.metodoPago
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4">
                     {editMode === item.id ? (
                       <input
                         type="text"
@@ -297,7 +304,7 @@ const DashCajas = () => {
                       item.descripcion
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 ">
                     {editMode === item.id ? (
                       <input
                         type="number"

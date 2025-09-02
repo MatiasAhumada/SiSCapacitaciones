@@ -216,11 +216,16 @@ export class CajaService {
       const [movimientos, total] = await this.cajaRepository.findAndCount({
         where: { vendedor: { id: vendedorId } },
         relations: [
+          'vendedor',
           'alumnoComision.alumno',
           'subcategoria',
           'subcategoria.categoria',
         ],
         select: {
+          vendedor: {
+            id: true,
+            name: true,
+          },
           alumnoComision: {
             id: true,
             alumno: {

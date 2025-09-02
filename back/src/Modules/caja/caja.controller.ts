@@ -44,8 +44,12 @@ export class CajaController {
   }
 
   @Get('/vendedor/:id')
-  findByVendedor(@Param('id') id: string) {
-    return this.cajaService.findByVendedor(id);
+  findByVendedor(
+    @Param('id') id: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.cajaService.findByVendedor(id, Number(page), Number(limit));
   }
 
   @Get('movDiario')

@@ -10,6 +10,7 @@ import {
 } from '../../../helpers/Cajas.service';
 import { getAlu } from '../../../helpers/Alumnos.service';
 import { getVendedores } from '../../../helpers/Vendedores.service';
+import Pagination from '../../Pagination/Pagination';
 import Swal from 'sweetalert2';
 
 const DashCajas = () => {
@@ -20,9 +21,15 @@ const DashCajas = () => {
   const [editMode, setEditMode] = useState(null);
   const [alu, setAlu] = useState([]);
   const [vend, setVend] = useState([]);
+  const [todosLosMovimientos, setTodosLosMovimientos] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [fechaFiltro, setFechaFiltro] = useState('');
+  const [vendedorFiltro, setVendedorFiltro] = useState('');
+  const [vendedorSeleccionado, setVendedorSeleccionado] = useState(null);
   const [datosFiltro, setDatosFiltro] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
   const [formEdit, setFormEdit] = useState({
     fecha: fecha,
     tipo: '',
@@ -76,10 +83,12 @@ const DashCajas = () => {
       });
     };
 
-    const todasCajas = async () => {
-      await getCajas().then((data) => {
-        console.log(data)
-        setTableItems(data.data);
+    const todasCajas = async (page = 1) => {
+      await getCajas(page, itemsPerPage).then((data) => {
+        setTableItems(data.data || data);
+        setTodosLosMovimientos(data.data || data);
+        setTotalPages(data.totalPages || 1);
+        setCurrentPage(data.currentPage || 1);
       });
     };
     const resumenCajasTotal = async () => {
@@ -88,10 +97,10 @@ const DashCajas = () => {
       });
     };
     resumenCajasTotal();
-    todasCajas();
+    todasCajas(currentPage);
     alumnos();
     peticion();
-  }, [id]);
+  }, [id, currentPage]);
 
   const clickDelete = async (e) => {
     e.preventDefault();
@@ -175,6 +184,26 @@ const DashCajas = () => {
     });
   };
   console.log(tableItems)
+
+  const handleFiltrarVendedor = (e) => {
+    const value = e.target.value;
+    setVendedorFiltro(value);
+
+    if (!value.trim()) {
+      setTableItems(todosLosMovimientos);
+      setVendedorSeleccionado(null);
+      return;
+    }
+
+    const vendedor = vend.find(v => v.id === value);
+    setVendedorSeleccionado(vendedor);
+    
+    const filtrados = todosLosMovimientos.filter((item) => item.vendedor?.id === value);
+    setTableItems(filtrados);
+    setTotalPages(1);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -185,18 +214,55 @@ const DashCajas = () => {
             </h3>
             <p className="text-gray-600 mt-2">En esta tabla estaran los movimientos realizados.</p>
           </div>
-          <div className="mt-3 md:mt-0 flex items-center gap-3">
-            <input
-              type="date"
-              value={fechaFiltro}
-              onChange={(e) => setFechaFiltro(e.target.value)}
-              className="p-2 border rounded"
-            />
-            <button onClick={onFiltrar} className="px-4 py-2 text-white principal btnAz md:text-sm">
-              Filtrar
-            </button>
+          <div className="mt-3 md:mt-0 flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <input
+                type="date"
+                value={fechaFiltro}
+                onChange={(e) => setFechaFiltro(e.target.value)}
+                className="p-2 border rounded"
+              />
+              <button onClick={onFiltrar} className="px-4 py-2 text-white principal btnAz md:text-sm">
+                Filtrar por Fecha
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <select
+                value={vendedorFiltro}
+                onChange={handleFiltrarVendedor}
+                className="p-2 border rounded w-48"
+              >
+                <option value="">Filtrar por vendedor</option>
+                {vend.map((vendedor) => (
+                  <option key={vendedor.id} value={vendedor.id}>
+                    {vendedor.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
+        
+        {vendedorSeleccionado && (
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-lg font-semibold text-blue-800 mb-2">Vendedor Seleccionado</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <span className="font-medium text-gray-700">Nombre:</span>
+                <span className="ml-2 text-gray-900">{vendedorSeleccionado.name}</span>
+              </div>
+              <div>
+                <span className="font-medium text-gray-700">Email:</span>
+                <span className="ml-2 text-gray-900">{vendedorSeleccionado.email || 'N/A'}</span>
+              </div>
+              <div>
+                <span className="font-medium text-gray-700">Teléfono:</span>
+                <span className="ml-2 text-gray-900">{vendedorSeleccionado.telefono || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
           <table className="w-full table-auto text-sm  text-center">
             <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
@@ -399,6 +465,11 @@ const DashCajas = () => {
         </div>
       </>
 
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
       <Outlet />
     </div>
   );

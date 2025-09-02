@@ -49,7 +49,7 @@ const ListadoComisiones = () => {
   };
   const fetchAlumnos = async (page = 1) => {
     try {
-      const data = await getComisionId(comId, page, itemsPerPage); // 👈 enviamos paginado al back
+      const data = await getComisionId(comId, page, itemsPerPage);
       setAlumnosComision(data.data);
       setTodosLosAlumnos(data.data);
       setComisionDate(data.comision || {});

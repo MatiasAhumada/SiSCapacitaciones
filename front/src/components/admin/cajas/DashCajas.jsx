@@ -5,6 +5,7 @@ import {
   editMovCaja,
   getCajas,
   getMovimientosPorDia,
+  GetMovsByVendedor,
   getResumenPorDia,
   getResumenTotal,
 } from '../../../helpers/Cajas.service';
@@ -179,30 +180,28 @@ const DashCajas = () => {
     setVendedorFiltro(value);
 
     if (!value.trim()) {
-      // Cuando se quita el filtro, recargar los datos con paginación
+      // Si no hay vendedor seleccionado -> resetear
       setVendedorSeleccionado(null);
       setCurrentPage(1);
-      await getCajas(1, itemsPerPage).then((data) => {
-        setTableItems(data.data || data);
-        setTodosLosMovimientos(data.data || data);
-        setTotalPages(data.totalPages || 1);
-        setCurrentPage(data.currentPage || 1);
-      });
+      await fetchCajas(1); // carga normal sin filtro
       return;
     }
 
+    // Guardamos el vendedor seleccionado
     const vendedor = vend.find((v) => v.id === value);
     setVendedorSeleccionado(vendedor);
 
-    const filtrados = todosLosMovimientos.filter((item) => item.vendedor?.id === value);
-    setTableItems(filtrados);
-    setTotalPages(1);
-    setCurrentPage(1);
+    // Pedimos la primera página de movimientos filtrados
+    const data = await GetMovsByVendedor(value, 1, itemsPerPage);
+    setTableItems(data.data || []);
+    setTotalPages(data.totalPages || 1);
+    setCurrentPage(data.currentPage || 1);
   };
 
   const fetchCajas = async (page) => {
     setLoading(true);
     await getCajas(page, itemsPerPage).then((data) => {
+      console.log(data)
       setTableItems(data.data || data);
       setTodosLosMovimientos(data.data || data);
       setTotalPages(data.totalPages || 1);

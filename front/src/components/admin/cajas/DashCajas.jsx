@@ -22,6 +22,7 @@ const DashCajas = () => {
   const [editMode, setEditMode] = useState(null);
   const [alu, setAlu] = useState([]);
   const [vend, setVend] = useState([]);
+  const [todosLosMovimientos, setTodosLosMovimientos] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [fechaFiltro, setFechaFiltro] = useState('');
   const [vendedorFiltro, setVendedorFiltro] = useState('');
@@ -276,6 +277,7 @@ const DashCajas = () => {
           </div>
         )}
 
+        
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
           <table
             key={`table-${currentPage}-${vendedorFiltro}`}
@@ -492,6 +494,7 @@ const DashCajas = () => {
           </table>
         </div>
       </>
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

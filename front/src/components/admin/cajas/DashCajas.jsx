@@ -215,6 +215,7 @@ const DashCajas = () => {
     setLoading(false);
   };
 
+
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -494,7 +495,6 @@ const DashCajas = () => {
           </table>
         </div>
       </>
-
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

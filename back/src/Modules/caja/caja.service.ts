@@ -210,7 +210,52 @@ export class CajaService {
     return this.cajaRepository.delete(id);
   }
 
-  async findByVendedor(vendedorId: string) {
+  async findByVendedor(vendedorId: string, page?: number, limit?: number) {
+    // Si vienen page y limit -> paginamos
+    if (page && limit) {
+      const [movimientos, total] = await this.cajaRepository.findAndCount({
+        where: { vendedor: { id: vendedorId } },
+        relations: [
+          'alumnoComision.alumno',
+          'subcategoria',
+          'subcategoria.categoria',
+        ],
+        select: {
+          alumnoComision: {
+            id: true,
+            alumno: {
+              id: true,
+              name: true,
+            },
+          },
+          subcategoria: {
+            id: true,
+            nombre: true,
+            categoria: {
+              id: true,
+              nombre: true,
+            },
+          },
+        },
+        order: { fecha: 'DESC' },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+
+      return {
+        data: movimientos.map((mov) => ({
+          ...mov,
+          fecha: format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm', {
+            locale: es,
+          }),
+        })),
+        total,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+      };
+    }
+
+    // Si NO vienen -> devolver todo sin paginación
     const movimientos = await this.cajaRepository.find({
       where: { vendedor: { id: vendedorId } },
       relations: [
@@ -237,6 +282,7 @@ export class CajaService {
       },
       order: { fecha: 'DESC' },
     });
+
     return movimientos.map((mov) => ({
       ...mov,
       fecha: format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm', { locale: es }),

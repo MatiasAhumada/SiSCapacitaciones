@@ -5,6 +5,7 @@ import { getAlu, getAluID, getVendID, postCaja } from '../queris/queris';
 import { Modal } from 'antd';
 import ReciboComprobante from './Comprobante';
 import Opciones from './Opciones';
+import { Spinner } from '../Spinner/Spinner';
 const CreateCaja = () => {
   const idVende = localStorage.getItem('token');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,37 +111,47 @@ const CreateCaja = () => {
   };
 
   const handleSubmit = async (e) => {
-    const { vendedorId, tipo, alumnoId, cuota, descripcion, monto, metodoPago } = e.target;
-    const fechaISO = fecha.toISOString();
     e.preventDefault();
     setPause(true);
 
-    const cargaComprobante = {
-      ...infoComprobante,
-      fecha: cuotaVieja ? formData.fecha : fechaISO,
-      formaPago: metodoPago.value,
-      observacion: descripcion.value,
-      monto: monto.value,
-      tipoComprobante: 'Factura de venta',
-      numero: '-',
-      ...alumnoSeleccionado,
-    };
+    try {
+      if (alumnoSeleccionado === null) throw new Error('Debe seleccionar un alumno válido');
+      if (alumnoComisiones.length === 0)
+        throw new Error('El alumno seleccionado no tiene comisiones asignadas');
+      if (formData.metodoPago === '') throw new Error('El metodo de pago es obligatorio');
+      if (formData.cuota === '') throw new Error('El numero de cuota es obligatorio');
+      if (formData.monto === '') throw new Error('El monto es obligatorio');
+      if (formData.monto <= 0) throw new Error('El monto debe ser mayor a cero');
 
-    setInfoComprobante(cargaComprobante);
+      const { vendedorId, tipo, alumnoId, cuota, descripcion, monto, metodoPago } = e.target;
 
-    const nuevoFormData = {
-      ...formData,
-      fecha: cuotaVieja ? formData.fecha : fechaISO,
-      metodoPago: metodoPago.value,
-      descripcion: descripcion.value,
-      monto: monto.value,
-      tipo: tipo.value,
-      vendedorId: idVende,
-      comprobante: cargaComprobante,
-    };
+      const fechaISO = fecha.toISOString();
 
-    await postCaja(nuevoFormData).then((data) => {
-      try {
+      const cargaComprobante = {
+        ...infoComprobante,
+        fecha: cuotaVieja ? formData.fecha : fechaISO,
+        formaPago: metodoPago.value,
+        observacion: descripcion.value,
+        monto: monto.value,
+        tipoComprobante: 'Factura de venta',
+        numero: '-',
+        ...alumnoSeleccionado,
+      };
+
+      setInfoComprobante(cargaComprobante);
+
+      const nuevoFormData = {
+        ...formData,
+        fecha: cuotaVieja ? formData.fecha : fechaISO,
+        metodoPago: metodoPago.value,
+        descripcion: descripcion.value,
+        monto: monto.value,
+        tipo: tipo.value,
+        vendedorId: idVende,
+        comprobante: cargaComprobante,
+      };
+
+      await postCaja(nuevoFormData).then((data) => {
         Swal.fire({
           title: 'Movimiento Registrado',
           icon: 'success',
@@ -151,15 +162,22 @@ const CreateCaja = () => {
             ...data.comprobante,
             fecha: formatToDisplay(data.comprobante.fecha),
           });
-          setPause(false);
+
           setGeneratePDF(true);
         });
-      } catch (error) {
-        console.log(error);
-        setPause(false);
-      }
-    });
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al registrar el movimiento',
+        text: error.message || 'Error inesperado,intente nuevamente',
+      });
+    } finally {
+      setPause(false);
+    }
   };
+
   const handleOpen = () => {
     setIsModalOpen(true);
   };
@@ -169,9 +187,9 @@ const CreateCaja = () => {
   const handleAlumnoClick = async (e) => {
     e.preventDefault();
     setPause(true);
-    await getAluID(alu)
-      .then((data) => {
-        if (data) {
+    try {
+      await getAluID(alu)
+        .then((data) => {
           setFormData((prev) => ({
             ...prev,
             alumnoComisionId: data.id,
@@ -184,19 +202,20 @@ const CreateCaja = () => {
             iva: '-',
             numeroSucursal: '000' + data.sucursal.numeroSucursal,
           });
-          setPause(false);
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se encontró el alumno',
-          });
-          setPause(false);
-        }
-      })
-      .catch((error) => {
-        console.error('Error al obtener el alumno:', error);
+        })
+        .catch((error) => {
+          throw error;
+        });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `No se encontró el alumno, verifique el ID ingresado.`,
       });
+    } finally {
+      setPause(false);
+    }
   };
 
   return (
@@ -301,26 +320,7 @@ const CreateCaja = () => {
                     onClick={handleAlumnoClick}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 btnAz text-white text-sm px-4 py-1.5 rounded-md min-w-[100px] flex items-center justify-center"
                   >
-                    {pause ? (
-                      <svg
-                        fill="white"
-                        className="w-6 h-6 mx-auto"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                          <animateTransform
-                            attributeName="transform"
-                            type="rotate"
-                            dur="0.75s"
-                            values="0 12 12;360 12 12"
-                            repeatCount="indefinite"
-                          />
-                        </path>
-                      </svg>
-                    ) : (
-                      'Buscar'
-                    )}
+                    {pause ? <Spinner color="white"></Spinner> : 'Buscar'}
                   </button>
                 </div>
               </div>
@@ -399,26 +399,7 @@ const CreateCaja = () => {
               type="submit"
               className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
             >
-              {pause ? (
-                <svg
-                  fill="white"
-                  className="w-6 h-6 mx-auto"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                    <animateTransform
-                      attributeName="transform"
-                      type="rotate"
-                      dur="0.75s"
-                      values="0 12 12;360 12 12"
-                      repeatCount="indefinite"
-                    />
-                  </path>
-                </svg>
-              ) : (
-                'Registrar Movimiento'
-              )}
+              {pause ? <Spinner color="white"></Spinner> : 'Registrar Movimiento'}
             </button>
             {generatePDF && (
               <button

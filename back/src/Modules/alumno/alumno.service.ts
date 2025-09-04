@@ -10,7 +10,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Alumno } from './entities/alumno.entity';
 import { Repository } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
+interface PaginationOptions {
+  page?: number;
+  limit?: number;
+}
 
+export interface PaginatedAlumnos {
+  data: any[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+}
 @Injectable()
 export class AlumnoService {
   constructor(
@@ -94,14 +104,26 @@ export class AlumnoService {
     });
   }
 
-  async getAlumnosBySucursal(id: string) {
+  async getAlumnosBySucursal(
+    id: string,
+    pagination?: PaginationOptions,
+  ): Promise<PaginatedAlumnos> {
+    const { page = 1, limit = 10 } = pagination || {};
+
+    // Contar total de alumnos
+    const totalItems = await this.alumnoRepository.count({
+      where: { sucursal: { id } },
+    });
+
     const alumnos = await this.alumnoRepository.find({
       where: { sucursal: { id } },
       relations: ['alumnoComisiones', 'certificados'],
       select: ['id', 'name', 'dni', 'tel'],
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
-    return alumnos.map((alumno) => ({
+    const data = alumnos.map((alumno) => ({
       id: alumno.id,
       name: alumno.name,
       dni: alumno.dni,
@@ -110,6 +132,13 @@ export class AlumnoService {
       cantidadComisiones: alumno.alumnoComisiones?.length || 0,
       cantidadCertificados: alumno.certificados?.length || 0,
     }));
+  
+    return {
+      data,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+    };
   }
 
   async actualizarImgUrl(
@@ -209,7 +238,7 @@ export class AlumnoService {
     if (!alumno) {
       throw new NotFoundException(`Alumno con ID ${id} no encontrado`);
     }
-    
+
     Object.assign(alumno, updateAlumnoDto);
 
     if (updateAlumnoDto.sucursalId) {

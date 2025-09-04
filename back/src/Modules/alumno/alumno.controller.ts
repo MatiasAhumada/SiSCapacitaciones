@@ -33,8 +33,15 @@ export class AlumnoController {
     return this.alumnoService.findAll();
   }
   @Get('sucursal/:id')
-  getAlumnosBySucursal(@Param('id') sucursalId: string) {
-    return this.alumnoService.getAlumnosBySucursal(sucursalId);
+  getAlumnosBySucursal(
+    @Param('id') sucursalId: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.alumnoService.getAlumnosBySucursal(sucursalId, {
+      page: Number(page),
+      limit: Number(limit),
+    });
   }
 
   @Put('/img/:id')

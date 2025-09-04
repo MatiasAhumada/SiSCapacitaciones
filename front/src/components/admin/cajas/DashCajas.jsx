@@ -4,6 +4,7 @@ import {
   deleteMovCaja,
   editMovCaja,
   getCajas,
+  GetMovsByVendedor,
   getMovimientosPorDia,
   GetMovsByVendedor,
   getResumenPorDia,
@@ -22,11 +23,11 @@ const DashCajas = () => {
   const [editMode, setEditMode] = useState(null);
   const [alu, setAlu] = useState([]);
   const [vend, setVend] = useState([]);
-  const [todosLosMovimientos, setTodosLosMovimientos] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [fechaFiltro, setFechaFiltro] = useState('');
   const [vendedorFiltro, setVendedorFiltro] = useState('');
   const [vendedorSeleccionado, setVendedorSeleccionado] = useState(null);
+  const [filtrandoPorVendedor, setFiltrandoPorVendedor] = useState(false);
   const [datosFiltro, setDatosFiltro] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -77,7 +78,6 @@ const DashCajas = () => {
       await getResumenTotal().then((data) => setDatosFiltro(data));
       await getCajas(1, itemsPerPage).then((data) => {
         setTableItems(data.data || data);
-        setTodosLosMovimientos(data.data || data);
         setTotalPages(data.totalPages || 1);
         setCurrentPage(data.currentPage || 1);
       });
@@ -86,8 +86,12 @@ const DashCajas = () => {
   }, [id]);
 
   useEffect(() => {
-    fetchCajas(currentPage);
-  }, [currentPage]);
+    if (filtrandoPorVendedor && vendedorFiltro) {
+      fetchMovimientosPorVendedor(vendedorFiltro, currentPage);
+    } else {
+      fetchCajas(currentPage);
+    }
+  }, [currentPage, filtrandoPorVendedor, vendedorFiltro]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -178,6 +182,7 @@ const DashCajas = () => {
   const handleFiltrarVendedor = async (e) => {
     const value = e.target.value;
     setVendedorFiltro(value);
+    setCurrentPage(1);
 
     if (!value.trim()) {
       // Si no hay vendedor seleccionado -> resetear
@@ -203,9 +208,7 @@ const DashCajas = () => {
     await getCajas(page, itemsPerPage).then((data) => {
       console.log(data)
       setTableItems(data.data || data);
-      setTodosLosMovimientos(data.data || data);
       setTotalPages(data.totalPages || 1);
-      setCurrentPage(data.currentPage || 1);
     });
     setLoading(false);
   };
@@ -254,20 +257,20 @@ const DashCajas = () => {
         </div>
 
         {vendedorSeleccionado && (
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-lg font-semibold text-blue-800 mb-2">Vendedor Seleccionado</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <span className="font-medium text-gray-700">Nombre:</span>
-                <span className="ml-2 text-gray-900">{vendedorSeleccionado.name}</span>
+          <div className="mt-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-base sm:text-lg font-semibold text-blue-800 mb-3">Vendedor Seleccionado</h4>
+            <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <span className="font-medium text-gray-700 text-sm sm:text-base">Nombre:</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-words">{vendedorSeleccionado.name}</span>
               </div>
-              <div>
-                <span className="font-medium text-gray-700">Email:</span>
-                <span className="ml-2 text-gray-900">{vendedorSeleccionado.email || 'N/A'}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <span className="font-medium text-gray-700 text-sm sm:text-base">Email:</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-all">{vendedorSeleccionado.email || 'N/A'}</span>
               </div>
-              <div>
-                <span className="font-medium text-gray-700">Teléfono:</span>
-                <span className="ml-2 text-gray-900">{vendedorSeleccionado.telefono || 'N/A'}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <span className="font-medium text-gray-700 text-sm sm:text-base">Teléfono:</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base">{vendedorSeleccionado.telefono || 'N/A'}</span>
               </div>
             </div>
           </div>

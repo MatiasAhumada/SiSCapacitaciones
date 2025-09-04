@@ -77,7 +77,18 @@ const DashAlumnos = () => {
       setCurrentPage(data.currentPage || 1);
       setTotalAlumnos(data.totalItems || 0);
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        title: 'Error al cargar los alumnos',
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          'Ha ocurrido un error inesperado, vuelva a intentarlo',
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+        customClass: {
+          confirmButton: 'btnAz principal',
+        },
+      });
     }
   };
 

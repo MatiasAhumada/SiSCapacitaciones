@@ -5,11 +5,20 @@ import { deleteAlumnoId } from '../../../helpers/Alumnos.service';
 import { getAluSucID } from '../../../helpers/Alumnos.service';
 import FilterAlus from './DropDowns/FilterAlus';
 import { Spinner } from '../../Spinner/Spinner';
+import Pagination from '../../Pagination/Pagination';
 
 const DashAlumnos = () => {
+  const initialItemPerPage = 10;
+
   const [tableItems, setTableItems] = useState([]);
 
   const [pause, setPause] = useState({});
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalAlumnos, setTotalAlumnos] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(initialItemPerPage);
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const navigate = useNavigate();
 
@@ -52,7 +61,7 @@ const DashAlumnos = () => {
             delete newPause[alumnoId];
             return newPause;
           });
-          setTableItems((prev) => prev.filter((item) => item.id !== alumnoId));
+          peticionAlumnos(currentPage);
         });
       } catch (error) {
         console.log(error);
@@ -60,24 +69,45 @@ const DashAlumnos = () => {
     });
   };
 
-  useEffect(() => {
-    const peticion = async () => {
-      await getAluSucID(id).then((data) => {
-        setTableItems(data);
+  const peticionAlumnos = async (page = 1, perPage = itemsPerPage) => {
+    try {
+      const data = await getAluSucID(id, page, perPage);
+      setTableItems(data.data);
+      setTotalPages(data.totalPages || 1);
+      setCurrentPage(data.currentPage || 1);
+      setTotalAlumnos(data.totalItems || 0);
+    } catch (error) {
+      Swal.fire({
+        title: 'Error al cargar los alumnos',
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          'Ha ocurrido un error inesperado, vuelva a intentarlo',
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+        customClass: {
+          confirmButton: 'btnAz principal',
+        },
       });
-    };
-    peticion();
-  }, [id]);
+    }
+  };
+
+  useEffect(() => {
+    peticionAlumnos(currentPage);
+  }, [currentPage, id]);
 
   const filtrarAlumnos = async (filtros, setPaused) => {
     const hayFiltros = Object.values(filtros).some((v) => v !== '');
     if (!hayFiltros) {
-      await getAluSucID(id).then((data) => {
-        setTableItems(data);
-      });
+      setItemsPerPage(initialItemPerPage);
+      setCurrentPage(1);
+      await peticionAlumnos(1, initialItemPerPage);
+      setIsFiltered(false);
       setPaused(false);
       return;
     }
+    setItemsPerPage(totalAlumnos);
+    await peticionAlumnos(currentPage);
     const resultado = tableItems.filter((alumno) => {
       return (
         (!filtros.nombre || alumno.name.toLowerCase().includes(filtros.nombre.toLowerCase())) &&
@@ -89,7 +119,7 @@ const DashAlumnos = () => {
           alumno.cantidadCertificados === parseInt(filtros.cantidadCertificados))
       );
     });
-
+    setIsFiltered(true);
     setTableItems(resultado);
     setPaused(false);
   };
@@ -169,6 +199,13 @@ const DashAlumnos = () => {
               </tbody>
             </table>
           </div>
+          {!isFiltered ? (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          ) : null}
         </>
       )}
       <Outlet />

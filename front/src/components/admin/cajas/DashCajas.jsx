@@ -4,7 +4,6 @@ import {
   deleteMovCaja,
   editMovCaja,
   getCajas,
-  GetMovsByVendedor,
   getMovimientosPorDia,
   getResumenPorDia,
   getResumenTotal,
@@ -22,12 +21,9 @@ const DashCajas = () => {
   const [editMode, setEditMode] = useState(null);
   const [alu, setAlu] = useState([]);
   const [vend, setVend] = useState([]);
-  const [todosLosMovimientos, setTodosLosMovimientos] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [fechaFiltro, setFechaFiltro] = useState('');
   const [vendedorFiltro, setVendedorFiltro] = useState('');
-  const [vendedorSeleccionado, setVendedorSeleccionado] = useState(null);
-  const [filtrandoPorVendedor, setFiltrandoPorVendedor] = useState(false);
   const [datosFiltro, setDatosFiltro] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -86,12 +82,8 @@ const DashCajas = () => {
   }, [id]);
 
   useEffect(() => {
-    if (filtrandoPorVendedor && vendedorFiltro) {
-      fetchMovimientosPorVendedor(vendedorFiltro, currentPage);
-    } else {
-      fetchCajas(currentPage);
-    }
-  }, [currentPage, filtrandoPorVendedor, vendedorFiltro]);
+    fetchCajas(currentPage, itemsPerPage, vendedorFiltro || null);
+  }, [currentPage, vendedorFiltro]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -179,36 +171,15 @@ const DashCajas = () => {
     });
   };
 
-  const handleFiltrarVendedor = async (e) => {
+  const handleFiltrarVendedor = (e) => {
     const value = e.target.value;
     setVendedorFiltro(value);
     setCurrentPage(1);
-
-    if (!value.trim()) {
-      setVendedorSeleccionado(null);
-      setFiltrandoPorVendedor(false);
-      fetchCajas(1);
-      return;
-    }
-
-    const vendedor = vend.find((v) => v.id === value);
-    setVendedorSeleccionado(vendedor);
-    setFiltrandoPorVendedor(true);
-    fetchMovimientosPorVendedor(value, 1);
   };
 
-  const fetchMovimientosPorVendedor = async (vendedorId, page) => {
+  const fetchCajas = async (page, limit = itemsPerPage, vendedorId = null) => {
     setLoading(true);
-    await GetMovsByVendedor(vendedorId, page, itemsPerPage).then((data) => {
-      setTableItems(data.data || data);
-      setTotalPages(data.totalPages || 1);
-    });
-    setLoading(false);
-  };
-
-  const fetchCajas = async (page) => {
-    setLoading(true);
-    await getCajas(page, itemsPerPage).then((data) => {
+    await getCajas(page, limit, vendedorId).then((data) => {
       setTableItems(data.data || data);
       setTotalPages(data.totalPages || 1);
     });
@@ -258,21 +229,21 @@ const DashCajas = () => {
           </div>
         </div>
 
-        {vendedorSeleccionado && (
+        {vendedorFiltro && tableItems.length > 0 && tableItems[0]?.vendedor && (
           <div className="mt-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h4 className="text-base sm:text-lg font-semibold text-blue-800 mb-3">Vendedor Seleccionado</h4>
             <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <span className="font-medium text-gray-700 text-sm sm:text-base">Nombre:</span>
-                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-words">{vendedorSeleccionado.name}</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-words">{tableItems[0].vendedor.name}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <span className="font-medium text-gray-700 text-sm sm:text-base">Email:</span>
-                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-all">{vendedorSeleccionado.email || 'N/A'}</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-all">{tableItems[0].vendedor.email || 'N/A'}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <span className="font-medium text-gray-700 text-sm sm:text-base">Teléfono:</span>
-                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base">{vendedorSeleccionado.telefono || 'N/A'}</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base">{tableItems[0].vendedor.telefono || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -498,7 +469,7 @@ const DashCajas = () => {
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
+        onPageChange={handlePageChange}
       />
       <Outlet />
     </div>

@@ -33,22 +33,13 @@ export const postCaja = async (movimiento) => {
     throw error;
   }
 };
-export const getCajas = async (page = 1, limit = 10) => {
+export const getCajas = async (page = 1, limit = 10, vendedorId = null) => {
   try {
-    const response = await axios.get(`${API_URL}/caja`, {
-      params: { page, limit },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const GetMovsByVendedor = async (vendedorId, page = 1, limit = 10) => {
-  try {
-    const response = await axios.get(`${API_URL}/caja/vendedor/${vendedorId}`, {
-      params: { page, limit },
-    });
+    const params = { page, limit };
+    if (vendedorId) {
+      params.vendedorId = vendedorId;
+    }
+    const response = await axios.get(`${API_URL}/caja`, { params });
     return response.data;
   } catch (error) {
     throw error;

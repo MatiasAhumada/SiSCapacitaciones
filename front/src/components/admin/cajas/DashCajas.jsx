@@ -4,7 +4,9 @@ import {
   deleteMovCaja,
   editMovCaja,
   getCajas,
+  GetMovsByVendedor,
   getMovimientosPorDia,
+  GetMovsByVendedor,
   getResumenPorDia,
   getResumenTotal,
 } from '../../../helpers/Cajas.service';

@@ -133,15 +133,26 @@ export class CajaService {
     }
   }
 
-  async findAll(page = 1, limit = 10) {
-    const total = await this.cajaRepository.count();
-    const pagos = await this.cajaRepository.find({
+  async findAll(
+    page = 1,
+    limit = 10,
+    vendedorId?: string,
+    order: 'ASC' | 'DESC' = 'DESC',
+  ) {
+    const where: any = {};
+    if (vendedorId) {
+      where.vendedor = { id: vendedorId };
+    }
+    const [data, total] = await this.cajaRepository.findAndCount({
       relations: ['vendedor', 'alumnoComision.alumno'],
-      skip: (page - 1) * limit,
-      take: limit,
-      order: {
-        fecha: 'DESC',
-      },
+      where,
+      ...(page && limit
+        ? {
+            skip: (page - 1) * limit,
+            take: limit,
+          }
+        : {}), // si no hay paginado, trae todo
+      order: { fecha: order },
       select: {
         vendedor: {
           id: true,
@@ -156,11 +167,10 @@ export class CajaService {
         },
       },
     });
-
     return {
-      data: pagos,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
+      data,
+      totalPages: limit ? Math.ceil(total / limit) : 1,
+      currentPage: page ?? 1,
     };
   }
 

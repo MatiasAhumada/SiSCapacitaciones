@@ -25,8 +25,18 @@ export class CajaController {
   }
 
   @Get()
-  findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
-    return this.cajaService.findAll(Number(page), Number(limit));
+  findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Query('vendedorId') vendedorId?: string,
+    @Query('order') order: 'ASC' | 'DESC' = 'DESC',
+  ) {
+    return this.cajaService.findAll(
+      Number(page),
+      Number(limit),
+      vendedorId,
+      order.toUpperCase() as 'ASC' | 'DESC',
+    );
   }
 
   @Get('/digita-tobias')

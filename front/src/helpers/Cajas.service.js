@@ -9,6 +9,16 @@ export const GetCajaByVendedor = async (vendedorId) => {
     throw error;
   }
 };
+export const GetMovsByVendedor = async (vendedorId, page, limit) => {
+  try {
+    const response = await axios.get(`${API_URL}/caja/vendedor/${vendedorId}`, {
+      params: { limit, page },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const deleteMovCaja = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/caja/${id}`);
@@ -33,9 +43,21 @@ export const postCaja = async (movimiento) => {
     throw error;
   }
 };
-export const getCajas = async () => {
+<<<<<<< HEAD
+export const getCajas = async (page = 1, limit = 10, vendedorId = null) => {
   try {
-    const response = await axios.get(`${API_URL}/caja`);
+    const params = { page, limit };
+    if (vendedorId) {
+      params.vendedorId = vendedorId;
+    }
+    const response = await axios.get(`${API_URL}/caja`, { params });
+=======
+export const getCajas = async (page, limit) => {
+  try {
+    const response = await axios.get(`${API_URL}/caja`, {
+      params: { page, limit },
+    });
+>>>>>>> 3ec3cf6e8f78a447d8f17edc70ba5cff84cf5c10
     return response.data;
   } catch (error) {
     throw error;

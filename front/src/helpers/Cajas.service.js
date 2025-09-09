@@ -43,7 +43,6 @@ export const postCaja = async (movimiento) => {
     throw error;
   }
 };
-<<<<<<< HEAD
 export const getCajas = async (page = 1, limit = 10, vendedorId = null) => {
   try {
     const params = { page, limit };
@@ -51,13 +50,6 @@ export const getCajas = async (page = 1, limit = 10, vendedorId = null) => {
       params.vendedorId = vendedorId;
     }
     const response = await axios.get(`${API_URL}/caja`, { params });
-=======
-export const getCajas = async (page, limit) => {
-  try {
-    const response = await axios.get(`${API_URL}/caja`, {
-      params: { page, limit },
-    });
->>>>>>> 3ec3cf6e8f78a447d8f17edc70ba5cff84cf5c10
     return response.data;
   } catch (error) {
     throw error;

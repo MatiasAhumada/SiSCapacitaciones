@@ -167,7 +167,7 @@ export class ComisionService {
 
     // Traer alumnos paginados con sus asistencias y pagos
     const alumnosComision = await this.alumnoComisionRepository.find({
-      where: { comision: { id } },
+      where: whereAlumno,
       relations: ['alumno', 'asistencias', 'pagos'],
       skip: (page - 1) * limit,
       take: limit,

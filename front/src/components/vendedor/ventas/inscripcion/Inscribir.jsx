@@ -94,7 +94,6 @@ const Inscribir = () => {
 
   const handleAlumnoClick = async (e) => {
     e.preventDefault();
-    console.log(dataInscripcion);
     setPause(true);
     await getAluID(alu)
       .then((data) => {
@@ -148,7 +147,6 @@ const Inscribir = () => {
         title: `Error ${error.response?.status || ''}`,
         text: errorMsg,
       });
-      console.log(error);
     } finally {
       setPause(false);
     }

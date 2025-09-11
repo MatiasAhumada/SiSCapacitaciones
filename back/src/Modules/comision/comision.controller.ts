@@ -57,9 +57,9 @@ export class ComisionController {
     @Param('id') id: string,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
-    @Query('dni') dni?: string
+    @Query('dni') dni?: string,
   ) {
-    return this.comisionService.findOne(id, Number(page), Number(limit));
+    return this.comisionService.findOne(id, Number(page), Number(limit), dni);
   }
   @Put('/estado')
   cambiarEstado(@Body() change: ChangeStateDto) {

@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import {
   getAluID,
   getComisiones,
+  getVendedores,
   getVendID,
   postInscripcion,
 } from '../../../queris/queris';
@@ -12,6 +13,7 @@ const Inscribir = () => {
   const [pause, setPause] = useState(false);
   const [fecha, setFecha] = useState(new Date());
   const [vend, setVend] = useState({});
+  const [vendedores, setVendedores] = useState([]);
   const [sucursal, setSucursal] = useState({});
   const [alu, setAlu] = useState('');
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
@@ -65,7 +67,13 @@ const Inscribir = () => {
         setComisiones(data);
       });
     };
+    const vendedores = async () => {
+      await getVendedores(idVende).then((data) => {
+        setVendedores(data);
+      });
+    };
 
+    vendedores();
     vendedor();
     comisiones();
 
@@ -83,11 +91,6 @@ const Inscribir = () => {
       [name]: value,
     }));
   };
-
-  // const handleAlumno = (e) => {
-  //   const { value } = e.target;
-  //   setAlu(value);
-  // };
 
   const handleAlumnoClick = async (e) => {
     e.preventDefault();
@@ -121,33 +124,35 @@ const Inscribir = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPause(true);
-    console.log(dataInscripcion);
-    await postInscripcion(dataInscripcion).then((data) => {
-      try {
-        Swal.fire({
-          icon: 'success',
-          title: 'Inscripción exitosa',
-          text: 'El alumno ha sido inscrito correctamente.',
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo inscribir al alumno.',
-        });
-        console.log(error);
+
+    try {
+      await postInscripcion(dataInscripcion);
+      Swal.fire({
+        icon: 'success',
+        title: 'Inscripción exitosa',
+        text: 'El alumno ha sido inscrito correctamente.',
+      });
+    } catch (error) {
+      let errorMsg = 'No se pudo inscribir al alumno.';
+
+      if (error.response?.data?.message) {
+        errorMsg = Array.isArray(error.response.data.message)
+          ? error.response.data.message.join(', ')
+          : error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
       }
-    });
-    setPause(false);
+
+      Swal.fire({
+        icon: 'error',
+        title: `Error ${error.response?.status || ''}`,
+        text: errorMsg,
+      });
+      console.log(error);
+    } finally {
+      setPause(false);
+    }
   };
-
-  //   const handleOpen = () => {
-  //     setIsModalOpen(true);
-  //   };
-  //   const handleCancel = () => {
-  //     setIsModalOpen(false);
-  //   };
-
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
       <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
@@ -179,14 +184,22 @@ const Inscribir = () => {
             Vendedor
           </label>
           <div className="relative text-gray-400">
-            <input
-              type="string"
+            <select
               name="vendedorId"
               id="vendedorId"
-              disabled
-              defaultValue={vend.name || ''}
+              value={dataInscripcion.vendedorId || ''}
+              onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-            />
+            >
+              <option value="" disabled>
+                Seleccione un vendedor
+              </option>
+              {vendedores.map((vendedor) => (
+                <option key={vendedor.id} value={vendedor.id}>
+                  {vendedor.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="pb-2">

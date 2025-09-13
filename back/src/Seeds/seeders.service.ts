@@ -481,7 +481,8 @@ export class SeederService implements OnModuleInit {
   }
 
   async seedCajasEspeciales() {
- 
+    this.logger.log('🚀 Iniciando creación de cajas perpetuas...');
+    
     const adminsInfo = [
       {
         id: '4ab59277-5a15-4841-acce-851b0f6dbe11', // Javier
@@ -497,7 +498,7 @@ export class SeederService implements OnModuleInit {
       const admin = await this.adminRepository.findOneBy({ id: adminInfo.id });
 
       if (!admin) {
-        console.log(`❌ Admin ${adminInfo.nombre} no encontrado.`);
+        this.logger.warn(`❌ Admin ${adminInfo.nombre} no encontrado.`);
         continue;
       }
 
@@ -509,7 +510,7 @@ export class SeederService implements OnModuleInit {
       });
 
       if (sesionExistente) {
-        console.log(`ℹ️ Sesión ya abierta para ${adminInfo.nombre}.`);
+        this.logger.log(`ℹ️ Sesión perpetua ya existe para ${adminInfo.nombre}.`);
         continue;
       }
 
@@ -526,7 +527,69 @@ export class SeederService implements OnModuleInit {
       });
 
       await this.sesionRepository.save(nuevaSesion);
-      console.log(`✅ Sesión de caja creada para ${adminInfo.nombre}.`);
+      this.logger.log(`✅ Caja perpetua creada para ${adminInfo.nombre}.`);
     }
+
+    // Migrar movimientos digitales existentes
+    await this.migrarMovimientosDigitales();
+  }
+
+  async migrarMovimientosDigitales() {
+    this.logger.log('🔄 Migrando movimientos digitales a cajas perpetuas...');
+    
+    const dataSource = this.sesionRepository.manager.connection;
+    
+    // Obtener sesiones perpetuas
+    const sesionJavier = await this.sesionRepository.findOne({
+      where: {
+        admin: { id: '4ab59277-5a15-4841-acce-851b0f6dbe11' },
+        fechaCierre: IsNull(),
+      },
+    });
+    
+    const sesionTobias = await this.sesionRepository.findOne({
+      where: {
+        admin: { id: 'f709ac35-d270-4941-83de-d45031d6c33e' },
+        fechaCierre: IsNull(),
+      },
+    });
+
+    if (!sesionJavier || !sesionTobias) {
+      this.logger.error('❌ No se encontraron las sesiones perpetuas.');
+      return;
+    }
+
+    // Migrar movimientos Digital Javier
+    const movimientosJavier = await dataSource.query(`
+      SELECT * FROM cajas 
+      WHERE "metodoPago" = 'Digital Javier' 
+      AND "sesionCajaId" IS NULL
+    `);
+
+    for (const mov of movimientosJavier) {
+      await dataSource.query(`
+        UPDATE cajas 
+        SET "sesionCajaId" = $1 
+        WHERE id = $2
+      `, [sesionJavier.id, mov.id]);
+    }
+
+    // Migrar movimientos Digital Tobias
+    const movimientosTobias = await dataSource.query(`
+      SELECT * FROM cajas 
+      WHERE "metodoPago" = 'Digital Tobias' 
+      AND "sesionCajaId" IS NULL
+    `);
+
+    for (const mov of movimientosTobias) {
+      await dataSource.query(`
+        UPDATE cajas 
+        SET "sesionCajaId" = $1 
+        WHERE id = $2
+      `, [sesionTobias.id, mov.id]);
+    }
+
+    this.logger.log(`✅ Migrados ${movimientosJavier.length} movimientos a caja Javier`);
+    this.logger.log(`✅ Migrados ${movimientosTobias.length} movimientos a caja Tobias`);
   }
 }

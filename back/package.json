@@ -24,7 +24,8 @@
     "migration:create": "npm run typeorm migration:create ",
     "migration:revert": "npm run typeorm -- -d ./src/config/configOrm.ts migration:revert ",
     "migration:show": "npm run typeorm -- -d ./src/config/configOrm.ts migration:show ",
-    "seed": "ts-node -r tsconfig-paths/register src/Seeds/seeders.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/Seeds/seeders.ts",
+    "seed:cajas-perpetuas": "ts-node -r tsconfig-paths/register src/Seeds/cajas-perpetuas.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

@@ -50,6 +50,16 @@ export class CajaController {
     return this.cajaService.findByJavier();
   }
 
+  @Get('/caja-perpetua-javier')
+  getCajaPerpetuaJavier() {
+    return this.cajaService.obtenerMovimientosCajaPerpetua('4ab59277-5a15-4841-acce-851b0f6dbe11');
+  }
+
+  @Get('/caja-perpetua-tobias')
+  getCajaPerpetuaTobias() {
+    return this.cajaService.obtenerMovimientosCajaPerpetua('f709ac35-d270-4941-83de-d45031d6c33e');
+  }
+
   @Get('/resumen-total')
   getResumenTotal() {
     return this.cajaService.getResumenTotal();
@@ -103,6 +113,25 @@ export class CajaController {
     res.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': `attachment; filename="caja-${new Date().toISOString().split('T')[0]}.xlsx"`,
+    });
+    
+    res.send(buffer);
+  }
+
+  @Get('/export-excel-perpetua/:adminId')
+  async exportarCajaPerpetuaExcel(
+    @Param('adminId') adminId: string,
+    @Res() res: Response,
+  ) {
+    const sesion = await this.cajaService.obtenerMovimientosCajaPerpetua(adminId);
+    const adminName = adminId === '4ab59277-5a15-4841-acce-851b0f6dbe11' ? 'Javier' : 'Tobias';
+    
+    // Usar el mismo método de Excel pero adaptado para caja perpetua
+    const buffer = await this.cajaService.generarExcelCajaPerpetua(adminId);
+    
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="caja-perpetua-${adminName}-${new Date().toISOString().split('T')[0]}.xlsx"`,
     });
     
     res.send(buffer);

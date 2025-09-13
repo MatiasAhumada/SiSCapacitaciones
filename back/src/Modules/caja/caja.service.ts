@@ -130,6 +130,11 @@ export class CajaService {
 
       await this.cajaRepository.save(newCaja);
 
+      // Si es pago digital, duplicar en caja perpetua correspondiente
+      if (restoCaja.metodoPago === MetodoPago.DIGITAL_JAVIER || restoCaja.metodoPago === MetodoPago.DIGITAL_TOBIAS) {
+        await this.duplicarEnCajaPerpetua(newCaja, restoCaja.metodoPago);
+      }
+
       return newCaja;
     }
   }
@@ -901,6 +906,53 @@ export class CajaService {
     return sesionesConMovimientos;
   }
 
+  private async duplicarEnCajaPerpetua(movimiento: Caja, metodoPago: MetodoPago) {
+    try {
+      const adminId = metodoPago === MetodoPago.DIGITAL_JAVIER 
+        ? '4ab59277-5a15-4841-acce-851b0f6dbe11' // Javier
+        : 'f709ac35-d270-4941-83de-d45031d6c33e'; // Tobias
+
+      const sesionPerpetua = await this.sesionRepository.findOne({
+        where: {
+          admin: { id: adminId },
+          fechaCierre: IsNull(),
+        },
+      });
+
+      if (!sesionPerpetua) {
+        console.warn(`No se encontró sesión perpetua para ${metodoPago}`);
+        return;
+      }
+
+      // Crear copia del movimiento para la caja perpetua
+      const movimientoCopia = this.cajaRepository.create({
+        tipo: movimiento.tipo,
+        metodoPago: movimiento.metodoPago,
+        monto: movimiento.monto,
+        descripcion: `${movimiento.descripcion} - Copia automática`,
+        fecha: movimiento.fecha,
+        cuota: movimiento.cuota,
+        alumnoComision: movimiento.alumnoComision,
+        sesionCaja: sesionPerpetua,
+        // No incluir vendedor para evitar duplicación en reportes del vendedor
+      });
+
+      await this.cajaRepository.save(movimientoCopia);
+      
+      // Actualizar totales de la sesión perpetua
+      if (metodoPago === MetodoPago.DIGITAL_JAVIER) {
+        sesionPerpetua.totalDigitalJavier += Number(movimiento.monto);
+      } else {
+        sesionPerpetua.totalDigitalTobias += Number(movimiento.monto);
+      }
+      sesionPerpetua.totalIngresos += Number(movimiento.monto);
+      
+      await this.sesionRepository.save(sesionPerpetua);
+    } catch (error) {
+      console.error('Error duplicando en caja perpetua:', error);
+    }
+  }
+
   async generarExcelCaja(vendedorId: string): Promise<Buffer> {
     const vendedor = await this.vendedorRepository.findOne({
       where: { id: vendedorId },
@@ -983,6 +1035,83 @@ export class CajaService {
         mov.monto,
         mov.subcategoria?.categoria?.nombre || '-',
         mov.subcategoria?.nombre || '-',
+      ]);
+    });
+
+    // Estilo para encabezados
+    const headerRow = worksheet.getRow(5);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' },
+    };
+
+    // Ajustar ancho de columnas
+    worksheet.columns.forEach((column) => {
+      column.width = 15;
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
+  // Método para obtener movimientos de caja perpetua
+  async obtenerMovimientosCajaPerpetua(adminId: string) {
+    const sesionPerpetua = await this.sesionRepository.findOne({
+      where: {
+        admin: { id: adminId },
+        fechaCierre: IsNull(),
+      },
+      relations: ['movimientos', 'movimientos.alumnoComision.alumno'],
+    });
+
+    if (!sesionPerpetua) {
+      throw new NotFoundException('Caja perpetua no encontrada');
+    }
+
+    return sesionPerpetua;
+  }
+
+  async generarExcelCajaPerpetua(adminId: string): Promise<Buffer> {
+    const sesion = await this.obtenerMovimientosCajaPerpetua(adminId);
+    const adminName = adminId === '4ab59277-5a15-4841-acce-851b0f6dbe11' ? 'Javier' : 'Tobias';
+    
+    if (!sesion.movimientos || sesion.movimientos.length === 0) {
+      throw new BadRequestException(
+        `No hay movimientos en la caja perpetua de ${adminName}.`,
+      );
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`Caja Perpetua ${adminName}`);
+
+    // Información del admin y fecha
+    worksheet.addRow([`REPORTE CAJA PERPETUA - ${adminName.toUpperCase()}`]);
+    worksheet.addRow(['Fecha de descarga:', format(new Date(), 'dd/MM/yyyy HH:mm')]);
+    worksheet.addRow(['Total movimientos:', sesion.movimientos.length]);
+    worksheet.addRow([]);
+
+    // Encabezados
+    const headers = [
+      'Fecha',
+      'Alumno',
+      'Tipo',
+      'Método de Pago',
+      'Descripción',
+      'Monto',
+    ];
+    worksheet.addRow(headers);
+
+    // Datos
+    sesion.movimientos.forEach((mov) => {
+      worksheet.addRow([
+        format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm'),
+        mov.alumnoComision?.alumno?.name || '-',
+        mov.tipo,
+        mov.metodoPago,
+        mov.descripcion || '-',
+        mov.monto,
       ]);
     });
 

@@ -21,6 +21,7 @@ import { EgresoCajaDTO } from './dto/egreso-caja.dto';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
 import { SesionCaja } from './entities/sesion-caja.entity';
+import * as ExcelJS from 'exceljs';
 import dayjs = require('dayjs');
 import utc = require('dayjs/plugin/utc');
 import timezone = require('dayjs/plugin/timezone');
@@ -898,5 +899,108 @@ export class CajaService {
     );
 
     return sesionesConMovimientos;
+  }
+
+  async generarExcelCaja(vendedorId: string): Promise<Buffer> {
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: vendedorId },
+    });
+    if (!vendedor) {
+      throw new NotFoundException('Vendedor no encontrado');
+    }
+
+    // Buscar sesiones del día (abiertas o cerradas)
+    const fecha = new Date();
+    const inicioDelDia = new Date(fecha);
+    inicioDelDia.setHours(0, 0, 0, 0);
+    const finDelDia = new Date(fecha);
+    finDelDia.setHours(23, 59, 59, 999);
+
+    const sesiones = await this.sesionRepository.find({
+      where: {
+        vendedor: { id: vendedorId },
+        fechaApertura: Between(inicioDelDia, finDelDia),
+      },
+      order: { fechaApertura: 'ASC' },
+    });
+
+    if (!sesiones || sesiones.length === 0) {
+      throw new NotFoundException(
+        'No se encontraron sesiones de caja para el día de hoy.',
+      );
+    }
+
+    // Obtener movimientos de todas las sesiones del día
+    const sesionesConMovimientos = await Promise.all(
+      sesiones.map(async (sesion) => {
+        const movimientos = await this.cajaRepository.find({
+          where: { sesionCaja: { id: sesion.id } },
+          relations: ['alumnoComision.alumno', 'subcategoria.categoria'],
+          order: { fecha: 'ASC' },
+        });
+        return { ...sesion, movimientos };
+      }),
+    );
+
+    const movimientos = sesionesConMovimientos.flatMap((sesion) => sesion.movimientos || []);
+
+    if (!movimientos || movimientos.length === 0) {
+      throw new BadRequestException(
+        'No hay movimientos en la caja para generar el reporte.',
+      );
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Movimientos de Caja');
+
+    // Información del vendedor y fecha
+    worksheet.addRow(['REPORTE DE CAJA']);
+    worksheet.addRow(['Vendedor:', vendedor.name]);
+    worksheet.addRow(['Fecha de descarga:', format(new Date(), 'dd/MM/yyyy HH:mm')]);
+    worksheet.addRow([]);
+
+    // Encabezados
+    const headers = [
+      'Fecha',
+      'Alumno',
+      'Tipo',
+      'Método de Pago',
+      'Descripción',
+      'Monto',
+      'Categoría',
+      'Subcategoría',
+    ];
+    worksheet.addRow(headers);
+
+    // Datos
+    movimientos.forEach((mov) => {
+      worksheet.addRow([
+        format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm'),
+        mov.alumnoComision?.alumno?.name || '-',
+        mov.tipo,
+        mov.metodoPago,
+        mov.descripcion || '-',
+        mov.monto,
+        mov.subcategoria?.categoria?.nombre || '-',
+        mov.subcategoria?.nombre || '-',
+      ]);
+    });
+
+    // Estilo para encabezados
+    const headerRow = worksheet.getRow(5);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' },
+    };
+
+    // Ajustar ancho de columnas
+    worksheet.columns.forEach((column) => {
+      column.width = 15;
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 }

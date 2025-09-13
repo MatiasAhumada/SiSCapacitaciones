@@ -137,3 +137,14 @@ export const cerrarCaja = async (idVend) => {
     throw error;
   }
 };
+
+export const descargarExcelCaja = async (vendedorId) => {
+  try {
+    const response = await axios.get(`${API_URL}/caja/export-excel/${vendedorId}`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

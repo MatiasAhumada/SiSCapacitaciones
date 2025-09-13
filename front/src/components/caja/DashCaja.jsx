@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { editMovCaja, GetCajaByVendedor } from '../../helpers/Cajas.service';
+import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../helpers/Cajas.service';
 import { getAlu } from '../../helpers/Alumnos.service';
 import Swal from 'sweetalert2';
 import AccionesDropdown from './Dropdowns/AccionesDropdown';
@@ -25,6 +25,7 @@ const DashCaja = () => {
   });
   const [filtrados, setFiltrados] = useState(tableItems);
   const [sesionCaja, setSesionCaja] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const navigate = useNavigate();
   const isSubRoute = location.pathname.includes('crear');
@@ -39,23 +40,24 @@ const DashCaja = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
+  const recargarDatos = async () => {
+    try {
+      const data = await GetCajaByVendedor(idVend);
+      const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
+      setSesionCaja(ultimaSesion);
+      const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
+      setTableItems(movimientosAplanados);
+    } catch (error) {
+      const msg = error?.response?.data?.message;
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: msg,
+      });
+    }
+  };
+
   useEffect(() => {
-    const peticion = async () => {
-      try {
-        const data = await GetCajaByVendedor(idVend);
-        const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
-        setSesionCaja(ultimaSesion);
-        const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
-        setTableItems(movimientosAplanados);
-      } catch (error) {
-        const msg = error?.response?.data?.message;
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: msg,
-        });
-      }
-    };
     const alumnos = async () => {
       try {
         const data = await getAlu();
@@ -70,8 +72,8 @@ const DashCaja = () => {
       }
     };
     alumnos();
-    peticion();
-  }, []);
+    recargarDatos();
+  }, [refreshKey]);
 
   const handleEdit = (mov) => {
     setEditMode(mov.id);
@@ -149,6 +151,49 @@ const DashCaja = () => {
 
     setTableItems(filtrado);
   };
+
+  const descargarExcel = async () => {
+    try {
+      const blob = await descargarExcelCaja(idVend);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `caja-${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Excel descargado',
+        text: 'El archivo se ha descargado correctamente',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      let errorMessage = 'No se pudo descargar el Excel';
+      
+      // Verificar si es un error de respuesta del servidor
+      if (error?.response?.status === 400 || error?.response?.status === 404) {
+        errorMessage = error.response.data?.message || errorMessage;
+      } else if (error?.response?.data) {
+        // Si hay datos en la respuesta pero es un blob de error
+        try {
+          const text = await error.response.data.text();
+          const errorData = JSON.parse(text);
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          errorMessage = error.response.data?.message || errorMessage;
+        }
+      }
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al generar Excel',
+        text: errorMessage,
+        confirmButtonText: 'Entendido',
+      });
+    }
+  };
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <CajaResumen sesionCaja={sesionCaja}></CajaResumen>
@@ -161,7 +206,7 @@ const DashCaja = () => {
 
             <div className="flex flex-col md:flex-row md:items-center md:space-x-2 md:ml-auto mt-4 md:mt-0">
               <FiltrosDropDown onFiltrar={filtrar} />
-              <AccionesDropdown idVend={idVend} />
+              <AccionesDropdown idVend={idVend} onCajaAction={() => setRefreshKey(prev => prev + 1)} onDescargarExcel={descargarExcel} />
             </div>
           </div>
           <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">

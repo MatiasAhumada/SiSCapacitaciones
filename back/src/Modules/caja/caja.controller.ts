@@ -8,7 +8,9 @@ import {
   Delete,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { CajaService } from './caja.service';
 import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
@@ -89,6 +91,21 @@ export class CajaController {
   @Get('/sesionDiariaVendedor/:vendedorId')
   findBySesionesVendedor(@Param('vendedorId') id: string) {
     return this.cajaService.obtenerSesionPorFecha(id);
+  }
+
+  @Get('/export-excel/:vendedorId')
+  async exportarCajaExcel(
+    @Param('vendedorId') vendedorId: string,
+    @Res() res: Response,
+  ) {
+    const buffer = await this.cajaService.generarExcelCaja(vendedorId);
+    
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="caja-${new Date().toISOString().split('T')[0]}.xlsx"`,
+    });
+    
+    res.send(buffer);
   }
   @Patch('cerrarCaja/:vendedorId')
   async cerrarSesion(@Param('vendedorId') vendedorId: string) {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { aperturaCaja, cerrarCaja } from '../../../helpers/Cajas.service';
 import Swal from 'sweetalert2';
 
-const AccionesDropdown = ({ idVend }) => {
+const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -19,6 +19,8 @@ const AccionesDropdown = ({ idVend }) => {
               title: 'Apertura de caja exitosa',
               text: `Caja abierta por ${res.vendedor.name}`,
             });
+            // Notificar al componente padre para recargar datos
+            if (onCajaAction) onCajaAction();
           })
           .catch((err) => {
             Swal.fire({
@@ -37,6 +39,8 @@ const AccionesDropdown = ({ idVend }) => {
               icon: 'success',
               title: 'Cierre de caja exitosa',
             });
+            // Notificar al componente padre para recargar datos
+            if (onCajaAction) onCajaAction();
           })
           .catch((err) => {
             Swal.fire({
@@ -45,6 +49,11 @@ const AccionesDropdown = ({ idVend }) => {
               text: err.response?.data?.message || 'Error desconocido',
             });
           });
+        break;
+      case 'excel':
+        if (onDescargarExcel) {
+          onDescargarExcel();
+        }
         break;
       default:
         navigate(`/${idVend}/${ruta}`);
@@ -82,6 +91,12 @@ const AccionesDropdown = ({ idVend }) => {
             className="w-full text-left px-4 py-2 hover:bg-gray-100"
           >
             Transferir
+          </button>
+          <button
+            onClick={() => handleNavigate('excel')}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+          >
+            📊 Descargar Excel
           </button>
           <button
             onClick={() => handleNavigate('cierre')}

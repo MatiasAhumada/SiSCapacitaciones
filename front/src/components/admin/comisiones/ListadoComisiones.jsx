@@ -390,10 +390,11 @@ const ListadoComisiones = () => {
                       </button>
                     </td>
                     {allDates.map((date) => {
-                      console.log(item.asistencias);
+                     
                       const asistencia = item.asistencias.find(
                         (a) => formatFecha(a.fecha) === date
                       );
+                      console.log(asistencia.presente);
                       return (
                         <td key={date} className="px-6 py-4">
                           {asistencia ? (asistencia.presente ? 'P' : 'A') : '-'}

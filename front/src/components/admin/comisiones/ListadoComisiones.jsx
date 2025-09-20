@@ -70,11 +70,6 @@ const ListadoComisiones = () => {
     return `${day}-${month}-${year}`;
   };
 
-  const normalizeDate = (fechaISO) => {
-    const fecha = new Date(fechaISO);
-    return fecha.toISOString().split('T')[0]; // "2025-08-30"
-  };
-
   const allDates = Array.from(
     new Set(
       alumnosComision.flatMap(
@@ -399,7 +394,7 @@ const ListadoComisiones = () => {
                       console.log('ASISTENCIAS', item.asistencias);
                       console.log('DATE', date);
                       const asistencia = item.asistencias.find(
-                        (a) => normalizeDate(a.fecha) === normalizeDate(date)
+                        (a) => formatFecha(a.fecha) === date
                       );
 
                       console.log('ASISTENCIA FORMATEADA', asistencia);

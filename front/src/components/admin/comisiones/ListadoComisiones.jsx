@@ -394,7 +394,7 @@ const ListadoComisiones = () => {
                       const asistencia = item.asistencias.find(
                         (a) => formatFecha(a.fecha) === date
                       );
-                      console.log(asistencia.presente);
+                      console.log(asistencia);
                       return (
                         <td key={date} className="px-6 py-4">
                           {asistencia ? (asistencia.presente ? 'P' : 'A') : '-'}

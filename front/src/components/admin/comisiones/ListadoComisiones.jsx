@@ -64,11 +64,17 @@ const ListadoComisiones = () => {
   }, [currentPage, comId, reload]);
   const formatFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
-    const day = String(fecha.getDate()).padStart(2, '0');
-    const month = String(fecha.getMonth() + 1).padStart(2, '0');
-    const year = fecha.getFullYear();
+    const day = String(fecha.getUTCDate()).padStart(2, '0');
+    const month = String(fecha.getUTCMonth() + 1).padStart(2, '0');
+    const year = fecha.getUTCFullYear();
     return `${day}-${month}-${year}`;
   };
+
+  const normalizeDate = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    return fecha.toISOString().split('T')[0]; // "2025-08-30"
+  };
+
   const allDates = Array.from(
     new Set(
       alumnosComision.flatMap(
@@ -390,14 +396,13 @@ const ListadoComisiones = () => {
                       </button>
                     </td>
                     {allDates.map((date) => {
-                     console.log("ASISTENCIAS",item.asistencias)
-                     console.log("DATE",date)
-                      const asistencia = item.asistencias.find((a)=>{
-                        const fechaAsistencia = formatFecha(a.fecha); // ej: "16/09/2025"
-                        const fechaBuscada = formatFecha(date);       // formateás también el "date"
-                        return fechaAsistencia === fechaBuscada;
-                      })
-                      console.log("ASISTENCIA FORMATEADA",asistencia);
+                      console.log('ASISTENCIAS', item.asistencias);
+                      console.log('DATE', date);
+                      const asistencia = item.asistencias.find(
+                        (a) => normalizeDate(a.fecha) === normalizeDate(date)
+                      );
+
+                      console.log('ASISTENCIA FORMATEADA', asistencia);
                       return (
                         <td key={date} className="px-6 py-4">
                           {asistencia ? (asistencia.presente ? 'P' : 'A') : '-'}

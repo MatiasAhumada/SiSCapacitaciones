@@ -390,11 +390,14 @@ const ListadoComisiones = () => {
                       </button>
                     </td>
                     {allDates.map((date) => {
-                     console.log(item.asistencias)
-                      const asistencia = item.asistencias.find(
-                        (a) => formatFecha(a.fecha) === date
-                      );
-                      console.log(asistencia);
+                     console.log("ASISTENCIAS",item.asistencias)
+                     console.log("DATE",date)
+                      const asistencia = item.asistencias.find((a)=>{
+                        const fechaAsistencia = formatFecha(a.fecha); // ej: "16/09/2025"
+                        const fechaBuscada = formatFecha(date);       // formateás también el "date"
+                        return fechaAsistencia === fechaBuscada;
+                      })
+                      console.log("ASISTENCIA FORMATEADA",asistencia);
                       return (
                         <td key={date} className="px-6 py-4">
                           {asistencia ? (asistencia.presente ? 'P' : 'A') : '-'}

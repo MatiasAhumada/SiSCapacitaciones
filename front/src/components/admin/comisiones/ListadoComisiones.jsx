@@ -396,7 +396,7 @@ const ListadoComisiones = () => {
                       );
                       return (
                         <td key={date} className="px-6 py-4">
-                          {asistencia ? (asistencia.presente ? '✔️' : '❌') : '-'}
+                          {asistencia ? (asistencia.presente ? 'P' : 'A') : '-'}
                         </td>
                       );
                     })}

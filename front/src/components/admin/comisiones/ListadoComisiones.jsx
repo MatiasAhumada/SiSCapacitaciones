@@ -400,7 +400,7 @@ const ListadoComisiones = () => {
                       console.log('ASISTENCIA FORMATEADA', asistencia);
                       return (
                         <td key={date} className="px-6 py-4">
-                          {asistencia ? (asistencia.presente ? 'P' : 'A') : '-'}
+                          {asistencia ? (asistencia.presente ? '✔️' : '❌') : '-'}
                         </td>
                       );
                     })}

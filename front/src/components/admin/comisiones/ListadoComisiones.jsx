@@ -390,6 +390,7 @@ const ListadoComisiones = () => {
                       </button>
                     </td>
                     {allDates.map((date) => {
+                      console.log(item.asistencias);
                       const asistencia = item.asistencias.find(
                         (a) => formatFecha(a.fecha) === date
                       );

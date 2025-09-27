@@ -27,6 +27,7 @@ import utc = require('dayjs/plugin/utc');
 import timezone = require('dayjs/plugin/timezone');
 import { formatNumber } from '@modules/common/utils/formatters.utils';
 import { formatPostgresDate } from '@modules/common/utils/date.utils';
+import { isNull } from 'lodash';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -767,22 +768,38 @@ export class CajaService {
       throw new NotFoundException('Vendedor no encontrado');
     }
 
-    const fecha = new Date();
-    const inicioDelDia = new Date(fecha);
-    inicioDelDia.setHours(0, 0, 0, 0);
-    const finDelDia = new Date(fecha);
-    finDelDia.setHours(23, 59, 59, 999);
-
-    const sesiones = await this.sesionRepository.find({
-      where: {
-        vendedor: { id: vendedorId },
-        fechaApertura: Between(inicioDelDia, finDelDia),
-      },
+    // 1. Buscar sesión abierta sin importar la fecha
+    const sesionAbierta = await this.sesionRepository.findOne({
+      where: { vendedor: { id: vendedorId }, fechaCierre: IsNull() },
       order: { fechaApertura: 'ASC' },
     });
 
-    if (!sesiones.length) {
-      throw new NotFoundException('No se encontraron sesiones para el día.');
+    let sesiones: SesionCaja[] = [];
+
+    if (sesionAbierta) {
+      // si hay una sesión abierta, usar esa
+      sesiones = [sesionAbierta];
+    } else {
+      // 2. Buscar sesiones del día (como ya tenías)
+      const fecha = new Date();
+      const inicioDelDia = new Date(fecha);
+      inicioDelDia.setHours(0, 0, 0, 0);
+      const finDelDia = new Date(fecha);
+      finDelDia.setHours(23, 59, 59, 999);
+
+      sesiones = await this.sesionRepository.find({
+        where: {
+          vendedor: { id: vendedorId },
+          fechaApertura: Between(inicioDelDia, finDelDia),
+        },
+        order: { fechaApertura: 'ASC' },
+      });
+
+      if (!sesiones.length) {
+        throw new NotFoundException(
+          'No se encontraron sesiones abiertas ni sesiones del día.',
+        );
+      }
     }
 
     const sesionesConMovimientos = await Promise.all(

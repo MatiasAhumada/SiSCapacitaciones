@@ -154,7 +154,7 @@ const DashCaja = () => {
 
   const descargarExcel = async () => {
     try {
-      const blob = await descargarExcelCaja(idVend);
+      const blob = await descargarExcelCaja(sesionCaja.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

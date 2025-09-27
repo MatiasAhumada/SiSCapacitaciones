@@ -5,12 +5,16 @@ import { useAuth } from '../../context/AuthContext';
 import { descargarExcelCaja, GetByVendedorMock } from '../../helpers/Cajas.service';
 import { Spinner } from '../Spinner/Spinner';
 import Swal from 'sweetalert2';
+import Pagination from '../Pagination/Pagination';
+
 const ListadoCajas = () => {
   // Estado para las cajas del vendedor actual
   const [sellerCajas, setSellerCajas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { user } = useAuth();
 
@@ -26,9 +30,10 @@ const ListadoCajas = () => {
       setLoading(true);
       setError(null);
       try {
-        const { data, currentPage, totalItems, totalPages } = await GetByVendedorMock(user.id);
+        const { data, totalItems, totalPages } = await GetByVendedorMock(user.id, currentPage, 10);
         console.log(data);
         setSellerCajas(data || []);
+        setTotalPages(totalPages);
       } catch (err) {
         console.error('Error al cargar las cajas:', err);
         setError('Error al cargar las cajas. Intenta de nuevo más tarde.');
@@ -38,7 +43,7 @@ const ListadoCajas = () => {
     };
 
     fetchCajas();
-  }, [user?.id]);
+  }, [user?.id, currentPage]);
 
   const handleDownload = async (id) => {
     setLoadingId(id);
@@ -89,8 +94,7 @@ const ListadoCajas = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4 font-sans">
-        <Spinner color={'white'} />
-        <p className="text-xl text-gray-700">Cargando cajas...</p>
+        <Spinner color={'black'} />
       </div>
     );
   }
@@ -102,7 +106,7 @@ const ListadoCajas = () => {
       </div>
     );
   }
-
+  console.log(sellerCajas[0]);
   return (
     <div className="font-sans antialiased">
       <div className="flex justify-center min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-sans">
@@ -112,154 +116,176 @@ const ListadoCajas = () => {
           </h2>
 
           {sellerCajas.length > 0 ? (
-            <div className="space-y-4">
-              {sellerCajas.map((caja) => (
-                <Disclosure
-                  as="div"
-                  key={caja.id}
-                  className="bg-white border border-gray-200 rounded-lg shadow-sm"
-                >
-                  {({ open }) => (
-                    <>
-                      <DisclosureButton className="flex w-full justify-between items-center p-4 text-left text-lg font-semibold text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-t-lg">
-                        <span>
-                          Fecha:{' '}
-                          <span className="font-mono text-gray-700 text-sm">
-                            {caja.fecha_apertura}
+            <>
+              <div className="space-y-4">
+                {sellerCajas.map((caja) => (
+                  <Disclosure
+                    as="div"
+                    key={caja.id}
+                    className="bg-white border border-gray-200 rounded-lg shadow-sm"
+                  >
+                    {({ open }) => (
+                      <>
+                        <DisclosureButton className="flex w-full justify-between items-center p-4 text-left text-lg font-semibold text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-t-lg">
+                          <span>
+                            Fecha:{' '}
+                            <span className="font-mono text-gray-700 text-sm">
+                              {caja.fecha_apertura}
+                            </span>
                           </span>
-                        </span>
-                        <span
-                          className={`px-3 py-1 text-xs font-bold rounded-full capitalize ${
-                            caja.fecha_cierre
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-green-100 text-green-800'
-                          }`}
-                        >
-                          {caja.fecha_cierre ? 'Cerrada' : 'Abierta'}
-                        </span>
-                        <button
-                          onClick={() => handleDownload(caja.id)}
-                          className="ml-3 p-2 rounded-full hover:bg-gray-200 transition"
-                        >
-                          {loadingId === caja.id ? (
-                            <Spinner className="w-5 h-5 text-green-600" />
+                          <span
+                            className={`px-3 py-1 text-xs font-bold rounded-full capitalize ${
+                              caja.fecha_cierre
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-green-100 text-green-800'
+                            }`}
+                          >
+                            {caja.fecha_cierre ? 'Cerrada' : 'Abierta'}
+                          </span>
+
+                          {open ? (
+                            <ChevronUpIcon className="w-6 h-6 text-gray-500 ml-2" />
                           ) : (
-                            <ArrowDownTrayIcon className="w-5 h-5 text-green-600" />
+                            <ChevronDownIcon className="w-6 h-6 text-gray-500 ml-2" />
                           )}
-                        </button>
-                        {open ? (
-                          <ChevronUpIcon className="w-6 h-6 text-gray-500 ml-2" />
-                        ) : (
-                          <ChevronDownIcon className="w-6 h-6 text-gray-500 ml-2" />
-                        )}
-                      </DisclosureButton>
-                      <DisclosurePanel className="px-4 pt-2 pb-4 text-sm text-gray-700 border-t border-gray-200">
-                        <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <p className="font-semibold text-gray-800 mb-2">Detalles Generales:</p>
-                            <ul className="list-disc list-inside ml-4 space-y-1">
-                              <li>
-                                ID de Caja:{' '}
-                                <span className="font-mono text-gray-600">
-                                  {caja.id.substring(0, 8)}...
-                                </span>
-                              </li>
-                              <li>Fecha Apertura: {caja.fecha_apertura}</li>
-                              <li>Fecha Cierre: {caja.fecha_cierre ? caja.fecha_cierre : 'N/A'}</li>
-                              <li>
-                                Usuario:{' '}
-                                {caja.admin
-                                  ? `${caja.admin.name} (${caja.admin.email || 'sin email'})`
-                                  : `${caja.vendedor?.name} (${caja.vendedor?.email || 'sin email'})`}
-                              </li>
-                            </ul>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-800 mb-2">
-                              Totales por Medio de Pago:
-                            </p>
-                            <ul className="list-disc list-inside ml-4 space-y-1">
-                              <li>
-                                Efectivo:{' '}
-                                <span className="font-bold text-green-700">
-                                  ${caja.total_efectivo}
-                                </span>
-                              </li>
-                              <li>
-                                Digital Javier:{' '}
-                                <span className="font-bold text-green-700">
-                                  ${caja.total_digital_javier}
-                                </span>
-                              </li>
-                              <li>
-                                Digital Tobias:{' '}
-                                <span className="font-bold text-green-700">
-                                  ${caja.total_digital_tobias}
-                                </span>
-                              </li>
-                              <li>
-                                Crédito:{' '}
-                                <span className="font-bold text-green-700">
-                                  ${caja.total_credito}
-                                </span>
-                              </li>
+                        </DisclosureButton>
+                        <DisclosurePanel className="px-4 pt-2 pb-4 text-sm text-gray-700 border-t border-gray-200">
+                          <div className="mb-4 grid grid-cols-1 lg:grid-cols-[1fr_1fr_auto] gap-4 items-start">
+                            {/* Columna de detalles */}
+                            <div>
+                              <p className="font-semibold text-gray-800 mb-2">
+                                Detalles Generales:
+                              </p>
+                              <ul className="list-disc list-inside ml-4 space-y-1">
+                                <li>
+                                  ID de Caja:{' '}
+                                  <span className="font-mono text-gray-600">
+                                    {caja.id.substring(0, 8)}...
+                                  </span>
+                                </li>
+                                <li>Fecha Apertura: {caja.fecha_apertura}</li>
+                                <li>
+                                  Fecha Cierre: {caja.fecha_cierre ? caja.fecha_cierre : 'N/A'}
+                                </li>
+                                <li>
+                                  Usuario:{' '}
+                                  {caja.admin
+                                    ? `${caja.admin.name} (${caja.admin.email || 'sin email'})`
+                                    : `${caja.vendedor?.name} (${caja.vendedor?.email || 'sin email'})`}
+                                </li>
+                              </ul>
+                            </div>
 
-                              <li className="font-bold mt-2">
-                                Total Ingresos:{' '}
-                                <span className="text-green-700">${caja.total_ingresos}</span>
-                              </li>
-                              <li className="font-bold mt-2">
-                                Total Egresos:{' '}
-                                <span className="text-red-700">${caja.total_egresos}</span>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
+                            {/* Columna de totales */}
+                            <div>
+                              <p className="font-semibold text-gray-800 mb-2">
+                                Totales por Medio de Pago:
+                              </p>
+                              <ul className="list-disc list-inside ml-4 space-y-1">
+                                <li>
+                                  Efectivo:{' '}
+                                  <span className="font-bold text-green-700">
+                                    ${caja.total_efectivo}
+                                  </span>
+                                </li>
+                                <li>
+                                  Digital Javier:{' '}
+                                  <span className="font-bold text-green-700">
+                                    ${caja.total_digital_javier}
+                                  </span>
+                                </li>
+                                <li>
+                                  Digital Tobias:{' '}
+                                  <span className="font-bold text-green-700">
+                                    ${caja.total_digital_tobias}
+                                  </span>
+                                </li>
+                                <li>
+                                  Crédito:{' '}
+                                  <span className="font-bold text-green-700">
+                                    ${caja.total_credito}
+                                  </span>
+                                </li>
 
-                        <h4 className="font-semibold text-gray-800 mb-2 mt-4">
-                          Movimientos de Caja:
-                        </h4>
-                        {caja.movimientos && caja.movimientos.length > 0 ? (
-                          <div className="space-y-2 max-h-48 overflow-y-auto p-2 border border-gray-100 rounded-md bg-white">
-                            {caja.movimientos.map((movimiento) => (
-                              <div
-                                key={movimiento.id}
-                                className={`flex justify-between items-center p-2 rounded-lg ${
-                                  movimiento.tipo === 'Ingreso' || movimiento.tipo === 'Apertura'
-                                    ? 'bg-emerald-50 text-emerald-800'
-                                    : 'bg-red-50 text-red-800'
-                                }`}
+                                <li className="font-bold mt-2">
+                                  Total Ingresos:{' '}
+                                  <span className="text-green-700">${caja.total_ingresos}</span>
+                                </li>
+                                <li className="font-bold mt-2">
+                                  Total Egresos:{' '}
+                                  <span className="text-red-700">${caja.total_egresos}</span>
+                                </li>
+                              </ul>
+                            </div>
+
+                            {/* Columna de acciones */}
+                            <div className="flex justify-center lg:justify-end items-center">
+                              <button
+                                onClick={() => handleDownload(caja.id)}
+                                className="p-2 rounded bg-green-100 hover:bg-green-200 text-green-700 transition"
                               >
-                                <div>
-                                  <p className="font-semibold capitalize">
-                                    {movimiento.tipo} - {movimiento.metodo_pago}
-                                  </p>
-                                  <p className="text-xs text-gray-600">{movimiento.fecha}</p>
-                                  <p className="text-xs text-gray-600">{movimiento.vendedor}</p>
-                                </div>
-                                <span
-                                  className={`font-bold text-lg ${
+                                {loadingId === caja.id ? (
+                                  <Spinner color={'black'} className="w-5 h-5 text-green-600" />
+                                ) : (
+                                  <ArrowDownTrayIcon className="w-5 h-5 text-green-600" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          <h4 className="font-semibold text-gray-800 mb-2 mt-4">
+                            Movimientos de Caja:
+                          </h4>
+                          {caja.movimientos && caja.movimientos.length > 0 ? (
+                            <div className="space-y-2 max-h-48 overflow-y-auto p-2 border border-gray-100 rounded-md bg-white">
+                              {caja.movimientos.map((movimiento) => (
+                                <div
+                                  key={movimiento.id}
+                                  className={`flex justify-between items-center p-2 rounded-lg ${
                                     movimiento.tipo === 'Ingreso' || movimiento.tipo === 'Apertura'
-                                      ? 'text-emerald-700'
-                                      : 'text-red-700'
+                                      ? 'bg-emerald-50 text-emerald-800'
+                                      : 'bg-red-50 text-red-800'
                                   }`}
                                 >
-                                  {movimiento.tipo === 'Egreso' ? '- ' : '+ '}${movimiento.monto}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-600">
-                            No hay movimientos registrados para esta caja.
-                          </p>
-                        )}
-                      </DisclosurePanel>
-                    </>
-                  )}
-                </Disclosure>
-              ))}
-            </div>
+                                  <div>
+                                    <p className="font-semibold capitalize">
+                                      {movimiento.tipo} - {movimiento.metodo_pago}
+                                    </p>
+                                    <p className="text-xs text-gray-600">{movimiento.fecha}</p>
+                                    <p className="text-xs text-gray-600">{movimiento.vendedor}</p>
+                                  </div>
+                                  <span
+                                    className={`font-bold text-lg ${
+                                      movimiento.tipo === 'Ingreso' ||
+                                      movimiento.tipo === 'Apertura'
+                                        ? 'text-emerald-700'
+                                        : 'text-red-700'
+                                    }`}
+                                  >
+                                    {movimiento.tipo === 'Egreso' ? '- ' : '+ '}${movimiento.monto}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-gray-600">
+                              No hay movimientos registrados para esta caja.
+                            </p>
+                          )}
+                        </DisclosurePanel>
+                      </>
+                    )}
+                  </Disclosure>
+                ))}
+              </div>
+              <div className="mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => setCurrentPage(page)}
+                />
+              </div>
+            </>
           ) : (
             <p className="text-center text-gray-600 text-lg">
               No tienes cajas asignadas o no hay cajas disponibles.

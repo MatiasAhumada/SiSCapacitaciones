@@ -41,14 +41,17 @@ export function formatDateToArgentina(
 
 export function formatPostgresDate(date: string | Date): string {
   if (!date) return '';
-  if (date instanceof Date) {
-    const yyyy = date.getUTCFullYear();
-    const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const dd = String(date.getUTCDate()).padStart(2, '0');
-    return `${dd}/${mm}/${yyyy}`;
-  }
-  const [year, month, day] = date.toString().split('-');
-  return `${day}/${month}/${year}`;
+
+  const d = date instanceof Date ? date : new Date(date);
+
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+
+  return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
 }
 
 export function normalizeDateArgentina(

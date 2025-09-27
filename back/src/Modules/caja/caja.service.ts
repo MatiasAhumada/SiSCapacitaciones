@@ -25,6 +25,8 @@ import * as ExcelJS from 'exceljs';
 import dayjs = require('dayjs');
 import utc = require('dayjs/plugin/utc');
 import timezone = require('dayjs/plugin/timezone');
+import { formatNumber } from '@modules/common/utils/formatters.utils';
+import { formatPostgresDate } from '@modules/common/utils/date.utils';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -131,7 +133,10 @@ export class CajaService {
       await this.cajaRepository.save(newCaja);
 
       // Si es pago digital, duplicar en caja perpetua correspondiente
-      if (restoCaja.metodoPago === MetodoPago.DIGITAL_JAVIER || restoCaja.metodoPago === MetodoPago.DIGITAL_TOBIAS) {
+      if (
+        restoCaja.metodoPago === MetodoPago.DIGITAL_JAVIER ||
+        restoCaja.metodoPago === MetodoPago.DIGITAL_TOBIAS
+      ) {
         await this.duplicarEnCajaPerpetua(newCaja, restoCaja.metodoPago);
       }
 
@@ -226,7 +231,15 @@ export class CajaService {
     return this.cajaRepository.delete(id);
   }
 
-  async findByVendedor(vendedorId: string, page?: number, limit?: number) {
+  async findByVendedor(
+    vendedorId: string,
+    page?: number,
+    limit?: number,
+    useCustom = false,
+  ) {
+    if (useCustom) {
+      return await this.getSesionesForUser(vendedorId, page, limit);
+    }
     // Si vienen page y limit -> paginamos
     if (page && limit) {
       const [movimientos, total] = await this.cajaRepository.findAndCount({
@@ -266,9 +279,7 @@ export class CajaService {
       return {
         data: movimientos.map((mov) => ({
           ...mov,
-          fecha: format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm', {
-            locale: es,
-          }),
+          fecha: formatPostgresDate(mov.fecha),
         })),
         total,
         totalPages: Math.ceil(total / limit),
@@ -906,11 +917,15 @@ export class CajaService {
     return sesionesConMovimientos;
   }
 
-  private async duplicarEnCajaPerpetua(movimiento: Caja, metodoPago: MetodoPago) {
+  private async duplicarEnCajaPerpetua(
+    movimiento: Caja,
+    metodoPago: MetodoPago,
+  ) {
     try {
-      const adminId = metodoPago === MetodoPago.DIGITAL_JAVIER 
-        ? '4ab59277-5a15-4841-acce-851b0f6dbe11' // Javier
-        : 'f709ac35-d270-4941-83de-d45031d6c33e'; // Tobias
+      const adminId =
+        metodoPago === MetodoPago.DIGITAL_JAVIER
+          ? '4ab59277-5a15-4841-acce-851b0f6dbe11' // Javier
+          : 'f709ac35-d270-4941-83de-d45031d6c33e'; // Tobias
 
       const sesionPerpetua = await this.sesionRepository.findOne({
         where: {
@@ -938,7 +953,7 @@ export class CajaService {
       });
 
       await this.cajaRepository.save(movimientoCopia);
-      
+
       // Actualizar totales de la sesión perpetua
       if (metodoPago === MetodoPago.DIGITAL_JAVIER) {
         sesionPerpetua.totalDigitalJavier += Number(movimiento.monto);
@@ -946,7 +961,7 @@ export class CajaService {
         sesionPerpetua.totalDigitalTobias += Number(movimiento.monto);
       }
       sesionPerpetua.totalIngresos += Number(movimiento.monto);
-      
+
       await this.sesionRepository.save(sesionPerpetua);
     } catch (error) {
       console.error('Error duplicando en caja perpetua:', error);
@@ -994,7 +1009,9 @@ export class CajaService {
       }),
     );
 
-    const movimientos = sesionesConMovimientos.flatMap((sesion) => sesion.movimientos || []);
+    const movimientos = sesionesConMovimientos.flatMap(
+      (sesion) => sesion.movimientos || [],
+    );
 
     if (!movimientos || movimientos.length === 0) {
       throw new BadRequestException(
@@ -1008,7 +1025,10 @@ export class CajaService {
     // Información del vendedor y fecha
     worksheet.addRow(['REPORTE DE CAJA']);
     worksheet.addRow(['Vendedor:', vendedor.name]);
-    worksheet.addRow(['Fecha de descarga:', format(new Date(), 'dd/MM/yyyy HH:mm')]);
+    worksheet.addRow([
+      'Fecha de descarga:',
+      format(new Date(), 'dd/MM/yyyy HH:mm'),
+    ]);
     worksheet.addRow([]);
 
     // Encabezados
@@ -1075,8 +1095,9 @@ export class CajaService {
 
   async generarExcelCajaPerpetua(adminId: string): Promise<Buffer> {
     const sesion = await this.obtenerMovimientosCajaPerpetua(adminId);
-    const adminName = adminId === '4ab59277-5a15-4841-acce-851b0f6dbe11' ? 'Javier' : 'Tobias';
-    
+    const adminName =
+      adminId === '4ab59277-5a15-4841-acce-851b0f6dbe11' ? 'Javier' : 'Tobias';
+
     if (!sesion.movimientos || sesion.movimientos.length === 0) {
       throw new BadRequestException(
         `No hay movimientos en la caja perpetua de ${adminName}.`,
@@ -1088,7 +1109,10 @@ export class CajaService {
 
     // Información del admin y fecha
     worksheet.addRow([`REPORTE CAJA PERPETUA - ${adminName.toUpperCase()}`]);
-    worksheet.addRow(['Fecha de descarga:', format(new Date(), 'dd/MM/yyyy HH:mm')]);
+    worksheet.addRow([
+      'Fecha de descarga:',
+      format(new Date(), 'dd/MM/yyyy HH:mm'),
+    ]);
     worksheet.addRow(['Total movimientos:', sesion.movimientos.length]);
     worksheet.addRow([]);
 
@@ -1131,5 +1155,49 @@ export class CajaService {
 
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
+  }
+
+  async getSesionesForUser(userId: string, page?: number, limit?: number) {
+    if (!page || !limit) return;
+
+    const [sesiones, total] = await this.sesionRepository.findAndCount({
+      where: [{ vendedor: { id: userId } }, { admin: { id: userId } }],
+      relations: ['vendedor', 'admin', 'movimientos'],
+      order: { fechaApertura: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const data = sesiones.map((sesion) => ({
+      id: sesion.id,
+      fecha_apertura: formatPostgresDate(sesion.fechaApertura),
+      fecha_cierre: formatPostgresDate(sesion.fechaCierre || ''),
+      monto_apertura: formatNumber(sesion.montoApertura),
+      monto_cierre: sesion.montoCierre
+        ? formatNumber(sesion.montoCierre)
+        : null,
+      total_ingresos: formatNumber(sesion.totalIngresos),
+      total_egresos: formatNumber(sesion.totalEgresos),
+      total_efectivo: formatNumber(sesion.totalEfectivo),
+      total_credito: formatNumber(sesion.totalCredito),
+      total_digital_javier: formatNumber(sesion.totalDigitalJavier),
+      total_digital_tobias: formatNumber(sesion.totalDigitalTobias),
+      vendedor: sesion.vendedor,
+      admin: sesion.admin,
+      movimientos: sesion.movimientos?.map((mov) => ({
+        id: mov.id,
+        tipo: mov.tipo,
+        metodo_pago: mov.metodoPago,
+        monto: formatNumber(mov.monto),
+        descripcion: mov.descripcion,
+        fecha: formatPostgresDate(mov.fecha),
+      })),
+    }));
+    return {
+      data,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    };
   }
 }

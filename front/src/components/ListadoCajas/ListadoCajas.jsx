@@ -278,13 +278,17 @@ const ListadoCajas = () => {
                   </Disclosure>
                 ))}
               </div>
-              <div className="mt-6">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={(page) => setCurrentPage(page)}
-                />
-              </div>
+              {sellerCajas > 1 ? (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => setCurrentPage(page)}
+                  />
+                </div>
+              ) : (
+                <></>
+              )}
             </>
           ) : (
             <p className="text-center text-gray-600 text-lg">

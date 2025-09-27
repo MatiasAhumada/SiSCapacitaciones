@@ -968,54 +968,24 @@ export class CajaService {
     }
   }
 
-  async generarExcelCaja(vendedorId: string): Promise<Buffer> {
-    const vendedor = await this.vendedorRepository.findOne({
-      where: { id: vendedorId },
+  async generarExcelCaja(sesionId: string): Promise<Buffer> {
+    const sesion = await this.sesionRepository.findOne({
+      where: { id: sesionId },
+      relations: ['vendedor'],
     });
-    if (!vendedor) {
-      throw new NotFoundException('Vendedor no encontrado');
+    if (!sesion) {
+      throw new NotFoundException('Caja no encontrada');
     }
 
-    // Buscar sesiones del día (abiertas o cerradas)
-    const fecha = new Date();
-    const inicioDelDia = new Date(fecha);
-    inicioDelDia.setHours(0, 0, 0, 0);
-    const finDelDia = new Date(fecha);
-    finDelDia.setHours(23, 59, 59, 999);
-
-    const sesiones = await this.sesionRepository.find({
-      where: {
-        vendedor: { id: vendedorId },
-        fechaApertura: Between(inicioDelDia, finDelDia),
-      },
-      order: { fechaApertura: 'ASC' },
+    const movimientos = await this.cajaRepository.find({
+      where: { sesionCaja: { id: sesionId } },
+      relations: ['alumnoComision.alumno', 'subcategoria.categoria'],
+      order: { fecha: 'ASC' },
     });
-
-    if (!sesiones || sesiones.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron sesiones de caja para el día de hoy.',
-      );
-    }
-
-    // Obtener movimientos de todas las sesiones del día
-    const sesionesConMovimientos = await Promise.all(
-      sesiones.map(async (sesion) => {
-        const movimientos = await this.cajaRepository.find({
-          where: { sesionCaja: { id: sesion.id } },
-          relations: ['alumnoComision.alumno', 'subcategoria.categoria'],
-          order: { fecha: 'ASC' },
-        });
-        return { ...sesion, movimientos };
-      }),
-    );
-
-    const movimientos = sesionesConMovimientos.flatMap(
-      (sesion) => sesion.movimientos || [],
-    );
 
     if (!movimientos || movimientos.length === 0) {
       throw new BadRequestException(
-        'No hay movimientos en la caja para generar el reporte.',
+        'No hay movimientos en esta sesión para generar el reporte.',
       );
     }
 
@@ -1024,11 +994,8 @@ export class CajaService {
 
     // Información del vendedor y fecha
     worksheet.addRow(['REPORTE DE CAJA']);
-    worksheet.addRow(['Vendedor:', vendedor.name]);
-    worksheet.addRow([
-      'Fecha de descarga:',
-      format(new Date(), 'dd/MM/yyyy HH:mm'),
-    ]);
+    worksheet.addRow(['Vendedor:', sesion.vendedor?.name || '-']);
+    worksheet.addRow(['Fecha de descarga:', formatPostgresDate(new Date())]);
     worksheet.addRow([]);
 
     // Encabezados
@@ -1047,7 +1014,7 @@ export class CajaService {
     // Datos
     movimientos.forEach((mov) => {
       worksheet.addRow([
-        format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm'),
+        formatPostgresDate(mov.fecha),
         mov.alumnoComision?.alumno?.name || '-',
         mov.tipo,
         mov.metodoPago,
@@ -1069,7 +1036,7 @@ export class CajaService {
 
     // Ajustar ancho de columnas
     worksheet.columns.forEach((column) => {
-      column.width = 15;
+      column.width = 30;
     });
 
     const buffer = await workbook.xlsx.writeBuffer();

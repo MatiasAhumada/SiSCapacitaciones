@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useAuth } from '../../context/AuthContext';
-import { descargarExcelCaja, GetByVendedorMock } from '../../helpers/Cajas.service';
+import {
+  descargarExcelAdmin,
+  descargarExcelCaja,
+  GetByVendedorMock,
+} from '../../helpers/Cajas.service';
 import { Spinner } from '../Spinner/Spinner';
 import Swal from 'sweetalert2';
 import Pagination from '../Pagination/Pagination';
@@ -48,7 +52,14 @@ const ListadoCajas = () => {
   const handleDownload = async (id) => {
     setLoadingId(id);
     try {
-      const blob = await descargarExcelCaja(id);
+      let blob;
+
+      if (user.isAdmin) {
+        blob = await descargarExcelAdmin(user.id);
+      } else {
+        blob = await descargarExcelCaja(id);
+      }
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

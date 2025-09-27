@@ -1067,7 +1067,16 @@ export class CajaService {
         admin: { id: adminId },
         fechaCierre: IsNull(),
       },
-      relations: ['movimientos', 'movimientos.alumnoComision.alumno'],
+      relations: [
+        'movimientos',
+        'movimientos.alumnoComision.alumno',
+        'movimientos.vendedor',
+      ],
+      select: {
+        vendedor: {
+          name: true,
+        },
+      },
     });
 
     if (!sesionPerpetua) {
@@ -1093,10 +1102,7 @@ export class CajaService {
 
     // Información del admin y fecha
     worksheet.addRow([`REPORTE CAJA PERPETUA - ${adminName.toUpperCase()}`]);
-    worksheet.addRow([
-      'Fecha de descarga:',
-      format(new Date(), 'dd/MM/yyyy HH:mm'),
-    ]);
+    worksheet.addRow(['Fecha de descarga:', formatPostgresDate(new Date())]);
     worksheet.addRow(['Total movimientos:', sesion.movimientos.length]);
     worksheet.addRow([]);
 
@@ -1108,18 +1114,20 @@ export class CajaService {
       'Método de Pago',
       'Descripción',
       'Monto',
+      'Vendedor',
     ];
     worksheet.addRow(headers);
 
     // Datos
     sesion.movimientos.forEach((mov) => {
       worksheet.addRow([
-        format(new Date(mov.fecha), 'dd/MM/yyyy HH:mm'),
+        formatPostgresDate(mov.fecha),
         mov.alumnoComision?.alumno?.name || '-',
         mov.tipo,
         mov.metodoPago,
         mov.descripcion || '-',
         mov.monto,
+        mov.vendedor?.name,
       ]);
     });
 
@@ -1134,7 +1142,7 @@ export class CajaService {
 
     // Ajustar ancho de columnas
     worksheet.columns.forEach((column) => {
-      column.width = 15;
+      column.width = 30;
     });
 
     const buffer = await workbook.xlsx.writeBuffer();

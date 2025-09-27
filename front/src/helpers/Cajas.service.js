@@ -158,3 +158,14 @@ export const descargarExcelCaja = async (vendedorId) => {
     throw error;
   }
 };
+
+export const descargarExcelAdmin = async (adminId) => {
+  try {
+    const response = await axios.get(`${API_URL}/caja/export-excel-perpetua/${adminId}`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

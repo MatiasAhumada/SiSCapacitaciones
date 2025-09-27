@@ -1191,11 +1191,14 @@ export class CajaService {
         monto: formatNumber(mov.monto),
         descripcion: mov.descripcion,
         fecha: formatPostgresDate(mov.fecha),
+        vendedor: mov.vendedor?.name || '',
+        alumno: mov.alumnoComision?.alumno?.name || '',
+        id_comprobante: mov.comprobante?.id,
       })),
     }));
     return {
       data,
-      total,
+      totalItems: total,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
     };

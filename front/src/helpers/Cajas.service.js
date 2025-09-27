@@ -19,6 +19,16 @@ export const GetMovsByVendedor = async (vendedorId, page, limit) => {
     throw error;
   }
 };
+export const GetByVendedorMock = async (vendedorId, page, limit) => {
+  try {
+    const response = await axios.get(`${API_URL}/caja/vendedor/${vendedorId}`, {
+      params: { limit, page },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const deleteMovCaja = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/caja/${id}`);

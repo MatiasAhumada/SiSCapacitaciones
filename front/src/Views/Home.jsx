@@ -1,56 +1,59 @@
 import { useEffect, useState } from 'react';
-import { Row, Col, Card, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { getSucursales } from '../components/queris/queris';
-import { Spinner } from '../components/Spinner/Spinner'
+import { Spinner } from '../components/Spinner/Spinner';
 
 const Home = () => {
   const navigate = useNavigate();
-  const [pause, setPause] = useState(false);
-  const handleClick = (id) => {
-    navigate(`/adm/${id}`);
-  };
+  const [loading, setLoading] = useState(false);
   const [sedes, setSedes] = useState([]);
+
   useEffect(() => {
-    setPause(true);
+    setLoading(true);
     getSucursales().then((data) => {
-      setPause(false);
       setSedes(data);
+      setLoading(false);
     });
   }, []);
 
+  const handleClick = (id) => {
+    navigate(`/adm/${id}`);
+  };
+
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: '100vh' }}
-    >
-      {pause ? (
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-6">
+      {loading ? (
         <Spinner />
       ) : (
-        <Row className="justify-content-center">
+        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3 ">
           {sedes.map((sede) => (
-            <Col key={sede.id} lg={4} sm={6} xs={12} className="d-flex justify-content-center">
-              <Card
-                style={{ width: '18rem', cursor: 'pointer' }}
-                className="m-3 text-center"
-                onClick={() => handleClick(sede.id)}
-              >
-                <Card.Body>
-                  <Card.Title className="mb-3">{sede.name}</Card.Title>
-                  <Card.Subtitle className="mb-3 text-muted">
-                    Profesores: {sede.profesores}
-                  </Card.Subtitle>
-                  <Card.Subtitle className="mb-3 text-muted">
-                    Vendedores: {sede.vendedores}
-                  </Card.Subtitle>
-                  <Card.Subtitle className="mb-3 text-muted">Alumnos: {sede.alumnos}</Card.Subtitle>
-                </Card.Body>
-              </Card>
-            </Col>
+            <div
+              key={sede.id}
+              onClick={() => handleClick(sede.id)}
+              className="cursor-pointer bg-white rounded-2xl shadow-lg p-6 flex flex-col justify-start border-l-4 border-blue-500
+                         hover:shadow-2xl hover:-translate-y-2 transform transition-all duration-300"
+            >
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{sede.name}</h2>
+
+              <div className="flex justify-between text-gray-700 mb-2">
+                <span className="font-semibold">Profesores:</span>
+                <span>{sede.profesores}</span>
+              </div>
+
+              <div className="flex justify-between text-gray-700 mb-2">
+                <span className="font-semibold">Vendedores:</span>
+                <span>{sede.vendedores}</span>
+              </div>
+
+              <div className="flex justify-between text-gray-700">
+                <span className="font-semibold">Alumnos:</span>
+                <span>{sede.alumnos}</span>
+              </div>
+            </div>
           ))}
-        </Row>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

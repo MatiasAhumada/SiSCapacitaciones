@@ -19,10 +19,10 @@ export const GetMovsByVendedor = async (vendedorId, page, limit) => {
     throw error;
   }
 };
-export const GetByVendedorMock = async (vendedorId, page, limit) => {
+export const GetByVendedorMock = async (vendedorId) => {
   try {
     const response = await axios.get(`${API_URL}/caja/vendedor/${vendedorId}`, {
-      params: { limit, page },
+      params: { limit: 10, page: 1, useCustom: true },
     });
     return response.data;
   } catch (error) {

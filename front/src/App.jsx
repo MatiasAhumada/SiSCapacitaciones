@@ -29,6 +29,7 @@ import CajaTransferencia from './components/caja/CajaTransferencia';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import RequireAuth from './context/RequireAuth';
 import { AuthProvider } from './context/AuthContext';
+import ListadoCajas from './components/ListadoCajas/ListadoCajas';
 function App() {
   return (
     <AuthProvider>
@@ -67,10 +68,12 @@ function App() {
                 <Route path=":comId" element={<ListadoComisiones />} />
               </Route>
               <Route path="cajas" element={<DashCajas />} />
+              <Route path="nuevo" element={<ListadoCajas />} />
               <Route path="certificados" element={<Certificado />} />
             </Route>
             <Route path=":idVend">
               <Route index element={<InfoIndexVend />} />
+              <Route path="nuevo" element={<ListadoCajas />} />
               <Route path="alumno/:idAluCom" element={<DashAlumno />} />
               <Route path="inscribir" element={<Inscribir />} />
               <Route path="caja" element={<DashCaja />} />

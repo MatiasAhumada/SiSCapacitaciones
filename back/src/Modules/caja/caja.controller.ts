@@ -100,6 +100,11 @@ export class CajaController {
     return this.cajaService.obtenerCategoriasConSubcategorias();
   }
 
+  @Get('totales-vendedores')
+  async getTotalesVendedores() {
+    return this.cajaService.getTotalesPorVendedor();
+  }
+  
   @Get('/resumen/:fecha')
   getResumenPorDia(@Param('fecha') fecha: string) {
     return this.cajaService.getResumenPorDia(fecha);

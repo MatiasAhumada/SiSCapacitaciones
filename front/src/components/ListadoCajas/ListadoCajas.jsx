@@ -117,7 +117,7 @@ const ListadoCajas = () => {
       </div>
     );
   }
-  console.log(sellerCajas[0]);
+  console.log(sellerCajas.length);
   return (
     <div className="font-sans antialiased">
       <div className="flex justify-center min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-sans">
@@ -289,7 +289,7 @@ const ListadoCajas = () => {
                   </Disclosure>
                 ))}
               </div>
-              {sellerCajas > 1 ? (
+              {sellerCajas.length > 1 && (
                 <div className="mt-6">
                   <Pagination
                     currentPage={currentPage}
@@ -297,8 +297,6 @@ const ListadoCajas = () => {
                     onPageChange={(page) => setCurrentPage(page)}
                   />
                 </div>
-              ) : (
-                <></>
               )}
             </>
           ) : (

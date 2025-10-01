@@ -149,7 +149,6 @@ const ListadoCajas = () => {
       </div>
     );
   }
-  console.log(sellerCajas.length);
   return (
     <div className="font-sans antialiased">
       <div className="flex justify-center min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-sans">

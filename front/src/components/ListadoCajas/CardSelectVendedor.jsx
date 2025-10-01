@@ -20,10 +20,8 @@ export const CardSelectVendedor = ({ vendedor, onSelect, isSelected }) => {
             <p className="font-semibold text-gray-800 mb-2">Totales por Medio de Pago:</p>
             <ul className="list-disc list-inside ml-4 space-y-1">
               <li>
-                Total Ingresos:{' '}
-                <span className="font-bold text-green-700">
-                  ${vendedor.totalIngreso.toFixed(2)}
-                </span>
+                Efectivo:{' '}
+                <span className="font-bold text-green-700">${vendedor.totalEfectivo}</span>
               </li>
               <li>
                 Digital Javier:{' '}
@@ -35,6 +33,12 @@ export const CardSelectVendedor = ({ vendedor, onSelect, isSelected }) => {
                 Digital Tobias:{' '}
                 <span className="font-bold text-green-700">
                   ${vendedor.totalDigitalTobias.toFixed(2)}
+                </span>
+              </li>
+              <li className="font-bold mt-2">
+                Total Ingresos:{' '}
+                <span className="font-bold text-green-700">
+                  ${vendedor.totalIngreso.toFixed(2)}
                 </span>
               </li>
               <li className="font-bold mt-2">

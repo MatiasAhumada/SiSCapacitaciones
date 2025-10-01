@@ -192,7 +192,6 @@ export class CajaService {
 
   async update(id: string, updateCajaDto: UpdateCajaDto) {
     const { alumnoComisionId, vendedorId, ...updateData } = updateCajaDto;
-    console.log('Fecha recibida:', updateCajaDto.fecha);
 
     const caja = await this.cajaRepository.findOne({
       where: { id },
@@ -548,7 +547,9 @@ export class CajaService {
       sesionCaja: sesionAbierta, // Asociamos la sesión abierta
     });
 
-    return await this.cajaRepository.save(caja);
+    const movimientoGuardado = await this.cajaRepository.save(caja);
+    await this.actualizarConMovimiento(sesionAbierta.id, movimientoGuardado);
+    return movimientoGuardado;
   }
   //transferencias
   async transferirCaja(dto: CreateTransferenciaDto) {
@@ -952,7 +953,6 @@ export class CajaService {
       });
 
       if (!sesionPerpetua) {
-        console.warn(`No se encontró sesión perpetua para ${metodoPago}`);
         return;
       }
 
@@ -1219,11 +1219,60 @@ export class CajaService {
     return Array.from(sesionesPorVendedor.values()).map((sesion) => ({
       id: sesion.vendedor.id,
       name: sesion.vendedor.name, // ajusta el campo real del nombre en tu entidad Vendedor
-      totalIngreso: Number(sesion.totalIngresos) || 0,
-      totalEgreso: Number(sesion.totalEgresos) || 0,
       totalEfectivo: Number(sesion.totalEfectivo) || 0,
       totalDigitalJavier: Number(sesion.totalDigitalJavier) || 0,
       totalDigitalTobias: Number(sesion.totalDigitalTobias) || 0,
+      totalIngreso: Number(sesion.totalIngresos) || 0,
+      totalEgreso: Number(sesion.totalEgresos) || 0,
     }));
+  }
+
+  async actualizarConMovimiento(
+    idSesion: string,
+    movimiento: Caja,
+  ): Promise<SesionCaja> {
+    const sesion = await this.sesionRepository.findOne({
+      where: { id: idSesion },
+    });
+
+    if (!sesion) {
+      throw new NotFoundException(`Sesión de caja ${idSesion} no encontrada`);
+    }
+
+    const monto = Number(movimiento.monto);
+
+    const esIngreso = movimiento.tipo === TipoMovimiento.INGRESO;
+
+    sesion.totalIngresos = Number(sesion.totalIngresos);
+    sesion.totalEgresos = Number(sesion.totalEgresos);
+    sesion.totalEfectivo = Number(sesion.totalEfectivo);
+    sesion.totalCredito = Number(sesion.totalCredito);
+    sesion.totalDigitalTobias = Number(sesion.totalDigitalTobias);
+    sesion.totalDigitalJavier = Number(sesion.totalDigitalJavier);
+
+    // Totales generales
+    if (esIngreso) {
+      sesion.totalIngresos += monto;
+    } else if (movimiento.tipo === TipoMovimiento.EGRESO) {
+      sesion.totalEgresos += monto;
+    }
+
+    // Totales por método de pago
+    switch (movimiento.metodoPago) {
+      case MetodoPago.EFECTIVO:
+        sesion.totalEfectivo += esIngreso ? monto : -monto;
+        break;
+      case MetodoPago.CREDITO:
+        sesion.totalCredito += esIngreso ? monto : -monto;
+        break;
+      case MetodoPago.DIGITAL_TOBIAS:
+        sesion.totalDigitalTobias += esIngreso ? monto : -monto;
+        break;
+      case MetodoPago.DIGITAL_JAVIER:
+        sesion.totalDigitalJavier += esIngreso ? monto : -monto;
+        break;
+    }
+
+    return this.sesionRepository.save(sesion);
   }
 }

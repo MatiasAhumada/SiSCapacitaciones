@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   editStateComision,
@@ -27,7 +27,6 @@ const ListadoComisiones = () => {
     descripcion: '',
     fecha: '',
   });
-  const [todosLosAlumnos, setTodosLosAlumnos] = useState([]);
   const [dniFiltro, setDniFiltro] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,11 +46,10 @@ const ListadoComisiones = () => {
 
     navigate(redirectionPath);
   };
-  const fetchAlumnos = async (page = 1) => {
+  const fetchAlumnos = async (page = 1, dni = '') => {
     try {
-      const data = await getComisionId(comId, page, itemsPerPage);
+      const data = await getComisionId(comId, page, itemsPerPage, dni);
       setAlumnosComision(data.data);
-      setTodosLosAlumnos(data.data);
       setComisionDate(data.comision || {});
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
@@ -59,8 +57,17 @@ const ListadoComisiones = () => {
       console.error(error);
     }
   };
+  // Debounce para búsqueda en tiempo real
   useEffect(() => {
-    fetchAlumnos(currentPage);
+    const timeoutId = setTimeout(() => {
+      fetchAlumnos(currentPage, dniFiltro);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [dniFiltro]);
+
+  useEffect(() => {
+    fetchAlumnos(currentPage, dniFiltro);
   }, [currentPage, comId, reload]);
   const formatFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
@@ -183,16 +190,6 @@ const ListadoComisiones = () => {
   const handleFiltrarDni = (e) => {
     const value = e.target.value;
     setDniFiltro(value);
-
-    if (!value.trim()) {
-      setAlumnosComision(todosLosAlumnos);
-      fetchAlumnos(1);
-      return;
-    }
-
-    const filtrados = todosLosAlumnos.filter((item) => item.alumno?.dni.includes(value));
-    setAlumnosComision(filtrados);
-    setTotalPages(1);
     setCurrentPage(1);
   };
 

@@ -9,10 +9,14 @@ export const getComisiones = async () => {
     throw error('Error al obtener vendedor', error.response?.data);
   }
 };
-export const getComisionId = async (id, page = 1, limit = 10) => {
+export const getComisionId = async (id, page = 1, limit = 10, dni = '') => {
   try {
+    const params = { page, limit };
+    if (dni) {
+      params.dni = dni;
+    }
     const response = await axios.get(`${API_URL}/comision/${id}`, {
-      params: { page, limit },
+      params,
     });
     return response.data;
   } catch (error) {

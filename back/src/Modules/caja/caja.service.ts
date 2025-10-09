@@ -156,7 +156,7 @@ export class CajaService {
       where.vendedor = { id: vendedorId };
     }
     const [data, total] = await this.cajaRepository.findAndCount({
-      relations: ['vendedor', 'alumnoComision.alumno'],
+      relations: ['vendedor', 'alumnoComision.alumno', 'alumnoComision.comision'],
       where,
       ...(page && limit
         ? {
@@ -173,6 +173,10 @@ export class CajaService {
         alumnoComision: {
           id: true,
           alumno: {
+            id: true,
+            name: true,
+          },
+          comision: {
             id: true,
             name: true,
           },

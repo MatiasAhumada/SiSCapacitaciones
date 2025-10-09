@@ -86,7 +86,7 @@ const ListadoCajas = () => {
     try {
       let blob;
 
-      if (user.isAdmin) {
+      if (user.id === id) {
         blob = await descargarExcelAdmin(user.id);
       } else {
         blob = await descargarExcelCaja(id);

@@ -1200,31 +1200,37 @@ export class CajaService {
     // Buscar sesiones abiertas por vendedor
     const sesionesAbiertas = await this.sesionRepository.find({
       where: { fechaCierre: IsNull() },
-      relations: ['vendedor'],
+      relations: ['vendedor', 'admin'],
       order: { fechaApertura: 'DESC' },
     });
 
     // Agrupar por vendedor y quedarnos con la última sesión
-    const sesionesPorVendedor = new Map<string, SesionCaja>();
+    const sesionesPorUsuario = new Map<string, SesionCaja>();
 
     for (const sesion of sesionesAbiertas) {
-      if (!sesion.vendedor) continue;
+      const usuarioId = sesion.vendedor?.id || sesion.admin?.id;
+      if (!usuarioId) continue;
 
-      if (!sesionesPorVendedor.has(sesion.vendedor.id)) {
-        sesionesPorVendedor.set(sesion.vendedor.id, sesion);
+      if (!sesionesPorUsuario.has(usuarioId)) {
+        sesionesPorUsuario.set(usuarioId, sesion);
       }
     }
 
     // Formatear resultado como mock
-    return Array.from(sesionesPorVendedor.values()).map((sesion) => ({
-      id: sesion.vendedor.id,
-      name: sesion.vendedor.name, // ajusta el campo real del nombre en tu entidad Vendedor
-      totalEfectivo: Number(sesion.totalEfectivo) || 0,
-      totalDigitalJavier: Number(sesion.totalDigitalJavier) || 0,
-      totalDigitalTobias: Number(sesion.totalDigitalTobias) || 0,
-      totalIngreso: Number(sesion.totalIngresos) || 0,
-      totalEgreso: Number(sesion.totalEgresos) || 0,
-    }));
+    return Array.from(sesionesPorUsuario.values()).map((sesion) => {
+      const isAdmin = !!sesion.admin;
+      const usuario = isAdmin ? sesion.admin : sesion.vendedor;
+      return {
+        id: usuario.id,
+        name: usuario.name,
+        tipo: isAdmin ? 'admin' : 'vendedor',
+        totalEfectivo: Number(sesion.totalEfectivo) || 0,
+        totalDigitalJavier: Number(sesion.totalDigitalJavier) || 0,
+        totalDigitalTobias: Number(sesion.totalDigitalTobias) || 0,
+        totalIngreso: Number(sesion.totalIngresos) || 0,
+        totalEgreso: Number(sesion.totalEgresos) || 0,
+      };
+    });
   }
 
   async actualizarConMovimiento(

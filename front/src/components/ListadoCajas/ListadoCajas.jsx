@@ -81,15 +81,15 @@ const ListadoCajas = () => {
     setCurrentPage(1); // Reiniciar a la primera página al seleccionar un vendedor
   };
 
-  const handleDownload = async (id) => {
-    setLoadingId(id);
+  const handleDownload = async (id_caja) => {
+    setLoadingId(id_caja);
     try {
       let blob;
 
-      if (user.id === id) {
-        blob = await descargarExcelAdmin(user.id);
+      if (isSelectedVendedor) {
+        blob = await descargarExcelCaja(id_caja);
       } else {
-        blob = await descargarExcelCaja(id);
+        blob = await descargarExcelAdmin(user.id);
       }
 
       const url = window.URL.createObjectURL(blob);
@@ -149,6 +149,7 @@ const ListadoCajas = () => {
       </div>
     );
   }
+
   return (
     <div className="font-sans antialiased">
       <div className="flex justify-center min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 font-sans">

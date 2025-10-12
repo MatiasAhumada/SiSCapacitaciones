@@ -51,6 +51,7 @@ const DashCaja = () => {
       setSesionCaja(ultimaSesion);
       const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
       setTableItems(movimientosAplanados);
+      console.log(movimientosAplanados);
     } catch (error) {
       const msg = error?.response?.data?.message;
       Swal.fire({
@@ -64,10 +65,7 @@ const DashCaja = () => {
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const [aluData, vendData] = await Promise.all([
-          getAlu(),
-          getVendedores()
-        ]);
+        const [aluData, vendData] = await Promise.all([getAlu(), getVendedores()]);
         setAlu(aluData);
         setVend(vendData);
       } catch (error) {
@@ -179,7 +177,7 @@ const DashCaja = () => {
       a.download = `caja-${new Date().toISOString().split('T')[0]}.xlsx`;
       a.click();
       window.URL.revokeObjectURL(url);
-      
+
       Swal.fire({
         icon: 'success',
         title: 'Excel descargado',
@@ -189,7 +187,7 @@ const DashCaja = () => {
       });
     } catch (error) {
       let errorMessage = 'No se pudo descargar el Excel';
-      
+
       // Verificar si es un error de respuesta del servidor
       if (error?.response?.status === 400 || error?.response?.status === 404) {
         errorMessage = error.response.data?.message || errorMessage;
@@ -203,7 +201,7 @@ const DashCaja = () => {
           errorMessage = error.response.data?.message || errorMessage;
         }
       }
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Error al generar Excel',
@@ -237,6 +235,7 @@ const DashCaja = () => {
                 <tr>
                   <th className="py-3 px-6">Fecha</th>
                   <th className="py-3 px-6">Alumno</th>
+                  <th className="py-3 px-6">Dni</th>
                   <th className="py-3 px-6">Tipo</th>
                   <th className="py-3 px-6">Metodo de Pago</th>
                   <th className="py-3 px-6">Descripcion</th>
@@ -252,6 +251,9 @@ const DashCaja = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{formatToDisplay(item.fecha)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.alumnoComision?.alumno.name || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.alumnoComision?.alumno.dni || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.tipo}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.metodoPago}</td>

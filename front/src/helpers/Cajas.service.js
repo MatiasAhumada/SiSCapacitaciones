@@ -19,10 +19,14 @@ export const GetMovsByVendedor = async (vendedorId, page, limit) => {
     throw error;
   }
 };
-export const GetByVendedorMock = async (vendedorId, currentPage = 1, limit = 10) => {
+export const GetByVendedorMock = async (vendedorId, currentPage = 1, limit = 10, filterDate = '') => {
   try {
+    const params = { limit, page: currentPage, useCustom: true };
+    if (filterDate) {
+      params.filterDate = filterDate;
+    }
     const response = await axios.get(`${API_URL}/caja/vendedor/${vendedorId}`, {
-      params: { limit, page: currentPage, useCustom: true },
+      params,
     });
     return response.data;
   } catch (error) {

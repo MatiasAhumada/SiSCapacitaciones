@@ -240,9 +240,10 @@ export class CajaService {
     page?: number,
     limit?: number,
     useCustom = false,
+    filterDate?: string,
   ) {
     if (useCustom) {
-      return await this.getSesionesForUser(vendedorId, page, limit);
+      return await this.getSesionesForUser(vendedorId, page, limit, filterDate);
     }
     // Si vienen page y limit -> paginamos
     if (page && limit) {
@@ -1153,11 +1154,22 @@ export class CajaService {
     return Buffer.from(buffer);
   }
 
-  async getSesionesForUser(userId: string, page?: number, limit?: number) {
+  async getSesionesForUser(userId: string, page?: number, limit?: number, filterDate?: string) {
     if (!page || !limit) return;
 
+    let whereCondition: any = [{ vendedor: { id: userId } }, { admin: { id: userId } }];
+    
+    if (filterDate) {
+      const startDate = new Date(`${filterDate}T00:00:00`);
+      const endDate = new Date(`${filterDate}T23:59:59.999`);
+      whereCondition = [
+        { vendedor: { id: userId }, fechaApertura: Between(startDate, endDate) },
+        { admin: { id: userId }, fechaApertura: Between(startDate, endDate) }
+      ];
+    }
+
     const [sesiones, total] = await this.sesionRepository.findAndCount({
-      where: [{ vendedor: { id: userId } }, { admin: { id: userId } }],
+      where: whereCondition,
       relations: ['vendedor', 'admin', 'movimientos'],
       order: { fechaApertura: 'DESC' },
       skip: (page - 1) * limit,

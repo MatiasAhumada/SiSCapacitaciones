@@ -84,7 +84,7 @@ const DashCajas = () => {
 
   useEffect(() => {
     fetchCajas(currentPage, itemsPerPage, vendedorFiltro || null);
-  }, [currentPage, vendedorFiltro]);
+  }, [currentPage, vendedorFiltro, fechaFiltro]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -187,7 +187,6 @@ const DashCajas = () => {
     setLoading(false);
   };
 
-
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
       <>
@@ -213,7 +212,7 @@ const DashCajas = () => {
                 Filtrar por Fecha
               </button>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex justify-items gap-3">
               <select
                 value={vendedorFiltro}
                 onChange={handleFiltrarVendedor}
@@ -226,31 +225,50 @@ const DashCajas = () => {
                   </option>
                 ))}
               </select>
+              {(vendedorFiltro || fechaFiltro) && (
+                <button
+                  onClick={() => {
+                    setVendedorFiltro('');
+                    setFechaFiltro('');
+                    setCurrentPage(1);
+                  }}
+                  className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                >
+                  Limpiar
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         {vendedorFiltro && tableItems.length > 0 && tableItems[0]?.vendedor && (
           <div className="mt-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-base sm:text-lg font-semibold text-blue-800 mb-3">Vendedor Seleccionado</h4>
+            <h4 className="text-base sm:text-lg font-semibold text-blue-800 mb-3">
+              Vendedor Seleccionado
+            </h4>
             <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <span className="font-medium text-gray-700 text-sm sm:text-base">Nombre:</span>
-                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-words">{tableItems[0].vendedor.name}</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-words">
+                  {tableItems[0].vendedor.name}
+                </span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <span className="font-medium text-gray-700 text-sm sm:text-base">Email:</span>
-                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-all">{tableItems[0].vendedor.email || 'N/A'}</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base break-all">
+                  {tableItems[0].vendedor.email || 'N/A'}
+                </span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <span className="font-medium text-gray-700 text-sm sm:text-base">Teléfono:</span>
-                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base">{tableItems[0].vendedor.telefono || 'N/A'}</span>
+                <span className="sm:ml-2 text-gray-900 text-sm sm:text-base">
+                  {tableItems[0].vendedor.telefono || 'N/A'}
+                </span>
               </div>
             </div>
           </div>
         )}
 
-        
         <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
           <table
             key={`table-${currentPage}-${vendedorFiltro}`}

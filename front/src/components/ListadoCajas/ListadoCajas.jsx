@@ -31,12 +31,18 @@ const ListadoCajas = () => {
   useEffect(() => {
     const fetchVendedores = async () => {
       if (isSelectedVendedor) return;
+      if (!user?.isAdmin && user?.id) {
+        setSelectedIdVendedor(user.id);
+        setIsSelectedVendedor(true);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError(null);
       try {
         const vendData = await getMockVendedores();
         setVend(vendData || []);
-        console.log(vendData);
+
       } catch (error) {
         console.error('Error al cargar los vendedores:', error);
         setError('Error al cargar los vendedores. Intenta de nuevo más tarde.');
@@ -61,7 +67,7 @@ const ListadoCajas = () => {
           currentPage,
           10
         );
-        console.log(data);
+
         setSellerCajas(data || []);
         setTotalPages(totalPages);
       } catch (err) {

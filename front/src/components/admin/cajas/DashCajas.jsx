@@ -283,13 +283,14 @@ const DashCajas = () => {
                 <th className="py-3 px-6">Metodo de Pago</th>
                 <th className="py-3 px-6">Descripcion</th>
                 <th className="py-3 px-6">Monto</th>
+                <th className="py-3 px-6">Comisión</th>
                 <th className="py-3 px-6"></th>
               </tr>
             </thead>
             <tbody className="text-gray-600 divide-y text-center">
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="py-8 text-center">
+                  <td colSpan="9" className="py-8 text-center">
                     Cargando...
                   </td>
                 </tr>
@@ -402,6 +403,9 @@ const DashCajas = () => {
                       ) : (
                         item.monto
                       )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {item.alumnoComision?.comision?.name || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (

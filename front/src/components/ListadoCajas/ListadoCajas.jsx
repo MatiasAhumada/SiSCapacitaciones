@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useAuth } from '../../context/AuthContext';
@@ -24,8 +24,19 @@ const ListadoCajas = () => {
   const [isSelectedVendedor, setIsSelectedVendedor] = useState(false);
   const [selectedIdVendedor, setSelectedIdVendedor] = useState('');
   const [vend, setVend] = useState([]);
+  const [filterDate, setFilterDate] = useState('');
+  const [debouncedFilterDate, setDebouncedFilterDate] = useState('');
 
   const { user } = useAuth();
+
+  // Debounce para el filtro de fecha
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFilterDate(filterDate);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [filterDate]);
 
   // Cargar datos de Cajas del usuario actual
   useEffect(() => {
@@ -65,7 +76,8 @@ const ListadoCajas = () => {
         const { data, totalItems, totalPages } = await GetByVendedorMock(
           selectedIdVendedor,
           currentPage,
-          10
+          10,
+          debouncedFilterDate
         );
 
         setSellerCajas(data || []);
@@ -79,7 +91,7 @@ const ListadoCajas = () => {
     };
     fetchVendedores();
     fetchCajas();
-  }, [selectedIdVendedor, currentPage, isSelectedVendedor]);
+  }, [selectedIdVendedor, currentPage, isSelectedVendedor, debouncedFilterDate]);
 
   const handleVendedorSelect = (vendedor) => {
     setSelectedIdVendedor(vendedor.id);
@@ -167,6 +179,19 @@ const ListadoCajas = () => {
                 ? sellerCajas[0].admin?.name || sellerCajas[0].vendedor?.name
                 : 'Vendedor'}
             </h2>
+
+            <div className="mb-6">
+              <label htmlFor="filterDate" className="block text-sm font-medium text-gray-700 mb-2">
+                Filtrar por fecha:
+              </label>
+              <input
+                type="date"
+                id="filterDate"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
 
             {sellerCajas.length > 0 ? (
               <>

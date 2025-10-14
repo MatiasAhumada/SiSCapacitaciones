@@ -3,7 +3,7 @@ import { CreateComisionDto } from './dto/create-comision.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comision } from './entities/comision.entity';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Curso } from '../curso/entities/curso.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
@@ -157,12 +157,12 @@ export class ComisionService {
 
     const whereAlumno: any = { comision: { id } };
     if (dni) {
-      whereAlumno.alumno = { dni };
+      whereAlumno.alumno = { dni: Like(`%${dni}%`) };
     }
 
-    // Contar total de alumnos
+    // Contar total de alumnos (aplicando el mismo filtro)
     const totalAlumnos = await this.alumnoComisionRepository.count({
-      where: { comision: { id } },
+      where: whereAlumno,
     });
 
     // Traer alumnos paginados con sus asistencias y pagos

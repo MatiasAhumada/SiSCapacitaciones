@@ -75,12 +75,14 @@ export class CajaController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('useCustom') useCustom?: boolean,
+    @Query('filterDate') filterDate?: string,
   ) {
     return this.cajaService.findByVendedor(
       id,
       Number(page),
       Number(limit),
       useCustom,
+      filterDate,
     );
   }
 

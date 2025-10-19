@@ -60,9 +60,9 @@ const CajaResumen = ({ sesionCaja }) => {
             </p>
           </div>
           <div className="bg-gray-50 border p-3 rounded text-center">
-            <p className="text-gray-500">Total Crédito</p>
+            <p className="text-gray-500">Total Ferro</p>
             <p className="font-bold text-blue-600">
-              ${Number(sesionCaja.totalCredito).toLocaleString()}
+              ${Number(sesionCaja.totalFerro).toLocaleString()}
             </p>
           </div>
         </div>

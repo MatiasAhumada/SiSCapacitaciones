@@ -53,7 +53,6 @@ const ListadoCajas = () => {
       try {
         const vendData = await getMockVendedores();
         setVend(vendData || []);
-
       } catch (error) {
         console.error('Error al cargar los vendedores:', error);
         setError('Error al cargar los vendedores. Intenta de nuevo más tarde.');
@@ -79,7 +78,6 @@ const ListadoCajas = () => {
           10,
           debouncedFilterDate
         );
-
         setSellerCajas(data || []);
         setTotalPages(totalPages);
       } catch (err) {
@@ -276,6 +274,12 @@ const ListadoCajas = () => {
                                     Digital Tobias:{' '}
                                     <span className="font-bold text-green-700">
                                       ${caja.total_digital_tobias}
+                                    </span>
+                                  </li>
+                                  <li>
+                                    Ferro:{' '}
+                                    <span className="font-bold text-green-700">
+                                      ${caja.total_ferro}
                                     </span>
                                   </li>
                                   <li>

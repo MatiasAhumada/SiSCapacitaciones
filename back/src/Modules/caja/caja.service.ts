@@ -931,22 +931,14 @@ export class CajaService {
         fecha: movimiento.fecha,
         cuota: movimiento.cuota,
         mesCuota: movimiento.mesCuota,
-        alumnoComision: movimiento.alumnoComision,
         sesionCaja: sesionPerpetua,
-        // No incluir vendedor para evitar duplicación en reportes del vendedor
+        // No incluir alumnoComision ni vendedor para evitar duplicación
       });
 
-      await this.cajaRepository.save(movimientoCopia);
+      const movimientoGuardado = await this.cajaRepository.save(movimientoCopia);
 
-      // Actualizar totales de la sesión perpetua
-      if (metodoPago === MetodoPago.DIGITAL_JAVIER) {
-        sesionPerpetua.totalDigitalJavier += Number(movimiento.monto);
-      } else {
-        sesionPerpetua.totalDigitalTobias += Number(movimiento.monto);
-      }
-      sesionPerpetua.totalIngresos += Number(movimiento.monto);
-
-      await this.sesionRepository.save(sesionPerpetua);
+      // Actualizar totales de la sesión perpetua usando el método estándar
+      await this.actualizarConMovimiento(sesionPerpetua.id, movimientoGuardado);
     } catch (error) {
       console.error('Error duplicando en caja perpetua:', error);
     }

@@ -222,14 +222,16 @@ const DashAlumno = () => {
                     <span
                       className={`px-3 py-1 text-sm font-semibold rounded-full ${
                         item.metodoPago === 'Efectivo'
-                          ? 'bg-blue-200 text-blue-800'
-                          : item.metodoPago === 'Debito'
-                            ? 'bg-yellow-200 text-yellow-800'
-                            : item.metodoPago === 'Transferencia'
-                              ? 'bg-red-200 text-red-800'
+                          ? 'bg-green-200 text-green-800'
+                          : item.metodoPago === 'Digital Tobias'
+                            ? 'bg-purple-200 text-purple-800'
+                            : item.metodoPago === 'Digital Javier'
+                              ? 'bg-orange-200 text-orange-800'
                               : item.metodoPago === 'Credito'
                                 ? 'bg-pink-200 text-pink-800'
-                                : 'bg-gray-200 text-gray-800'
+                                : item.metodoPago === 'Ferro'
+                                  ? 'bg-blue-200 text-blue-800'
+                                  : 'bg-gray-200 text-gray-800'
                       }`}
                     >
                       {editing === item.id ? (

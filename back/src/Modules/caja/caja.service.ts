@@ -931,9 +931,8 @@ export class CajaService {
         fecha: movimiento.fecha,
         cuota: movimiento.cuota,
         mesCuota: movimiento.mesCuota,
-        alumnoComision: movimiento.alumnoComision,
         sesionCaja: sesionPerpetua,
-        // No incluir vendedor para evitar duplicación en reportes del vendedor
+        // No incluir alumnoComision ni vendedor para evitar duplicación
       });
 
       const movimientoGuardado = await this.cajaRepository.save(movimientoCopia);

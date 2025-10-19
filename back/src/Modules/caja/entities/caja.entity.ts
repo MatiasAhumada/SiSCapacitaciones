@@ -58,12 +58,15 @@ export class Caja {
 
   @Column({ type: 'text', nullable: true, default: '-' })
   descripcion?: string;
-
+  
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fecha: Date;
-
+  
   @Column({ type: 'decimal', nullable: true, default: 0 })
   cuota?: number;
+  
+  @Column({ type: 'text', nullable: true, default: '-' })
+  mesCuota?: string;
 
   @Column({ default: '0', nullable: true })
   descuento?: number;

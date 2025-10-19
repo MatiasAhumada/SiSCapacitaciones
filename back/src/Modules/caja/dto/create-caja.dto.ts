@@ -25,6 +25,10 @@ export class CreateCajaDto {
   @IsOptional()
   descripcion?: string;
 
+  @IsString()
+  @IsOptional()
+  mesCuota?: string;
+
   @IsDateString()
   fecha: Date;
 

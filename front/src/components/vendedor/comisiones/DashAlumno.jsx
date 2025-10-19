@@ -197,6 +197,8 @@ const DashAlumno = () => {
                 <th className="py-3 px-6">Forma de pago</th>
                 <th className="py-3 px-6">Monto</th>
                 <th className="py-3 px-6">Cuota N°</th>
+                <th className="py-3 px-6">Cuota inicial</th>
+                <th className="py-3 px-6">Mes</th>
                 <th className="py-3 px-6"></th>
               </tr>
             </thead>
@@ -286,6 +288,14 @@ const DashAlumno = () => {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap">{item.cuota}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    {item.cuota == 1 ? (
+                      <span className="text-green-600 font-bold text-lg">✓</span>
+                    ) : (
+                      <span className="text-red-600 font-bold text-lg">✗</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.mesCuota || '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {/* BOTON IMPRIMIR  */}
                     <button

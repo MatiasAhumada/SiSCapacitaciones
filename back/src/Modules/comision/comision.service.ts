@@ -116,6 +116,7 @@ export class ComisionService {
           metodoPago: true,
           fecha: true,
           cuota: true,
+          mesCuota: true,
           comprobante: {
             numeroComprobante: true,
             tipoComprobante: true,
@@ -188,6 +189,10 @@ export class ComisionService {
         pagos: {
           id: true,
           fecha: true,
+          cuota: true,
+          mesCuota: true,
+          monto: true,
+          metodoPago: true,
         },
       },
     });

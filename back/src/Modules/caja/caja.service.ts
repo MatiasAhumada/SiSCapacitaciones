@@ -126,6 +126,7 @@ export class CajaService {
       newCaja.descripcion = restoCaja.descripcion;
       newCaja.fecha = restoCaja.fecha;
       newCaja.cuota = restoCaja.cuota;
+      newCaja.mesCuota = restoCaja.mesCuota;
       newCaja.vendedor = vendedor;
       newCaja.comprobante = newComprobante;
       newCaja.alumnoComision = alumnoComision;
@@ -159,7 +160,11 @@ export class CajaService {
       where.vendedor = { id: vendedorId };
     }
     const [data, total] = await this.cajaRepository.findAndCount({
-      relations: ['vendedor', 'alumnoComision.alumno', 'alumnoComision.comision'],
+      relations: [
+        'vendedor',
+        'alumnoComision.alumno',
+        'alumnoComision.comision',
+      ],
       where,
       ...(page && limit
         ? {
@@ -245,7 +250,7 @@ export class CajaService {
       where: { id },
       relations: ['sesionCaja'],
     });
-    
+
     if (!caja) {
       throw new NotFoundException(`Movimiento con ID ${id} no encontrado`);
     }
@@ -643,7 +648,7 @@ export class CajaService {
     const sesionOrigen = await this.sesionRepository.findOne({
       where: { vendedor: { id: vendedorOrigenId }, fechaCierre: IsNull() },
     });
-    
+
     const sesionDestino = await this.sesionRepository.findOne({
       where: { vendedor: { id: vendedorDestinoId }, fechaCierre: IsNull() },
     });
@@ -668,8 +673,11 @@ export class CajaService {
       sesionCaja: sesionDestino || undefined,
     });
 
-    const [egresoGuardado, ingresoGuardado] = await this.cajaRepository.save([egreso, ingreso]);
-    
+    const [egresoGuardado, ingresoGuardado] = await this.cajaRepository.save([
+      egreso,
+      ingreso,
+    ]);
+
     // Actualizar totales de ambas sesiones
     if (sesionOrigen) {
       await this.actualizarConMovimiento(sesionOrigen.id, egresoGuardado);
@@ -793,7 +801,10 @@ export class CajaService {
     // }
 
     // Los totales ya están actualizados automáticamente, solo calcular montoCierre
-    sesionAbierta.montoCierre = Number(sesionAbierta.totalIngresos) + Number(sesionAbierta.montoApertura) - Number(sesionAbierta.totalEgresos);
+    sesionAbierta.montoCierre =
+      Number(sesionAbierta.totalIngresos) +
+      Number(sesionAbierta.montoApertura) -
+      Number(sesionAbierta.totalEgresos);
     sesionAbierta.fechaCierre = this.fechaLocal;
     await this.sesionRepository.save(sesionAbierta);
     const cierre = this.cajaRepository.create({
@@ -874,7 +885,10 @@ export class CajaService {
         });
 
         // Usar totales ya calculados automáticamente
-        const montoCierre = Number(sesion.montoApertura) + Number(sesion.totalIngresos) - Number(sesion.totalEgresos);
+        const montoCierre =
+          Number(sesion.montoApertura) +
+          Number(sesion.totalIngresos) -
+          Number(sesion.totalEgresos);
 
         return {
           ...sesion,
@@ -916,6 +930,7 @@ export class CajaService {
         descripcion: `${movimiento.descripcion} - Copia automática`,
         fecha: movimiento.fecha,
         cuota: movimiento.cuota,
+        mesCuota: movimiento.mesCuota,
         alumnoComision: movimiento.alumnoComision,
         sesionCaja: sesionPerpetua,
         // No incluir vendedor para evitar duplicación en reportes del vendedor
@@ -975,6 +990,8 @@ export class CajaService {
       'Método de Pago',
       'Descripción',
       'Monto',
+      'Cuota',
+      'Mes Cuota',
       'Categoría',
       'Subcategoría',
     ];
@@ -989,6 +1006,8 @@ export class CajaService {
         mov.metodoPago,
         mov.descripcion || '-',
         mov.monto,
+        mov.cuota || '-',
+        mov.mesCuota || '-',
         mov.subcategoria?.categoria?.nombre || '-',
         mov.subcategoria?.nombre || '-',
       ]);
@@ -1066,6 +1085,8 @@ export class CajaService {
       'Método de Pago',
       'Descripción',
       'Monto',
+      'Cuota',
+      'Mes Cuota',
       'Vendedor',
     ];
     worksheet.addRow(headers);
@@ -1079,6 +1100,8 @@ export class CajaService {
         mov.metodoPago,
         mov.descripcion || '-',
         mov.monto,
+        mov.cuota || '-',
+        mov.mesCuota || '-',
         mov.vendedor?.name,
       ]);
     });
@@ -1101,17 +1124,28 @@ export class CajaService {
     return Buffer.from(buffer);
   }
 
-  async getSesionesForUser(userId: string, page?: number, limit?: number, filterDate?: string) {
+  async getSesionesForUser(
+    userId: string,
+    page?: number,
+    limit?: number,
+    filterDate?: string,
+  ) {
     if (!page || !limit) return;
 
-    let whereCondition: any = [{ vendedor: { id: userId } }, { admin: { id: userId } }];
-    
+    let whereCondition: any = [
+      { vendedor: { id: userId } },
+      { admin: { id: userId } },
+    ];
+
     if (filterDate) {
       const startDate = new Date(`${filterDate}T00:00:00`);
       const endDate = new Date(`${filterDate}T23:59:59.999`);
       whereCondition = [
-        { vendedor: { id: userId }, fechaApertura: Between(startDate, endDate) },
-        { admin: { id: userId }, fechaApertura: Between(startDate, endDate) }
+        {
+          vendedor: { id: userId },
+          fechaApertura: Between(startDate, endDate),
+        },
+        { admin: { id: userId }, fechaApertura: Between(startDate, endDate) },
       ];
     }
 
@@ -1147,6 +1181,8 @@ export class CajaService {
         monto: formatNumber(mov.monto),
         descripcion: mov.descripcion,
         fecha: formatPostgresDate(mov.fecha),
+        cuota: mov.cuota,
+        mes_cuota: mov.mesCuota,
         vendedor: mov.vendedor?.name || '',
         alumno: mov.alumnoComision?.alumno?.name || '',
         id_comprobante: mov.comprobante?.id,
@@ -1221,7 +1257,9 @@ export class CajaService {
     sesion.totalFerro = Number(sesion.totalFerro);
 
     const monto = Number(movimiento.monto);
-    const esIngreso = movimiento.tipo === TipoMovimiento.INGRESO || movimiento.tipo === TipoMovimiento.APERTURA;
+    const esIngreso =
+      movimiento.tipo === TipoMovimiento.INGRESO ||
+      movimiento.tipo === TipoMovimiento.APERTURA;
     const esEgreso = movimiento.tipo === TipoMovimiento.EGRESO;
     const esTransferencia = movimiento.tipo === TipoMovimiento.TRANSFERENCIA;
 
@@ -1234,7 +1272,7 @@ export class CajaService {
 
     // Actualizar totales por método de pago
     const multiplicador = esIngreso ? 1 : -1;
-    
+
     switch (movimiento.metodoPago) {
       case MetodoPago.EFECTIVO:
         sesion.totalEfectivo += monto * multiplicador;
@@ -1261,7 +1299,9 @@ export class CajaService {
       where: { id: sesionId },
     });
 
-    if (!sesion) return;
+    if (!sesion) {
+      throw new NotFoundException(`Sesión ${sesionId} no encontrada`);
+    }
 
     // Obtener todos los movimientos de la sesión
     const movimientos = await this.cajaRepository.find({
@@ -1280,7 +1320,9 @@ export class CajaService {
     // Recalcular desde cero
     for (const movimiento of movimientos) {
       const monto = Number(movimiento.monto);
-      const esIngreso = movimiento.tipo === TipoMovimiento.INGRESO || movimiento.tipo === TipoMovimiento.APERTURA;
+      const esIngreso =
+        movimiento.tipo === TipoMovimiento.INGRESO ||
+        movimiento.tipo === TipoMovimiento.APERTURA;
       const esEgreso = movimiento.tipo === TipoMovimiento.EGRESO;
       const esTransferencia = movimiento.tipo === TipoMovimiento.TRANSFERENCIA;
 
@@ -1293,7 +1335,7 @@ export class CajaService {
 
       // Actualizar totales por método de pago
       const multiplicador = esIngreso ? 1 : -1;
-      
+
       switch (movimiento.metodoPago) {
         case MetodoPago.EFECTIVO:
           sesion.totalEfectivo += monto * multiplicador;

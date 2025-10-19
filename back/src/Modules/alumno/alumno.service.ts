@@ -98,6 +98,7 @@ export class AlumnoService {
             id: true,
             fecha: true,
             cuota: true,
+            mesCuota: true,
           },
         },
       },
@@ -219,6 +220,7 @@ export class AlumnoService {
             id: true,
             fecha: true,
             cuota: true,
+            mesCuota: true,
             metodoPago: true,
           },
           comision: {

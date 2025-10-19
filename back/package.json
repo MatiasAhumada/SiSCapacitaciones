@@ -25,7 +25,8 @@
     "migration:revert": "npm run typeorm -- -d ./src/config/configOrm.ts migration:revert ",
     "migration:show": "npm run typeorm -- -d ./src/config/configOrm.ts migration:show ",
     "seed": "ts-node -r tsconfig-paths/register src/Seeds/seeders.ts",
-    "seed:recalcular-produccion": "ts-node -r tsconfig-paths/register src/Seeds/recalcular-totales-produccion.seed.ts"
+    "seed:recalcular-produccion": "ts-node -r tsconfig-paths/register src/Seeds/recalcular-produccion.seed.ts",
+    "seed:retiro-efectivo": "ts-node -r tsconfig-paths/register src/Seeds/retiro-efectivo.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

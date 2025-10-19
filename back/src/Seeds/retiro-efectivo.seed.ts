@@ -39,50 +39,47 @@ async function runRetiroEfectivo() {
     for (const vendedor of vendedores) {
       console.log(`📋 Procesando vendedor: ${vendedor.name}`);
 
-      // 4. Buscar la última sesión cerrada del vendedor
-      const ultimaSesionCerrada = await sesionRepository
+      // 4. Buscar todas las sesiones con efectivo > 0 (abiertas y cerradas)
+      const sesionesConEfectivo = await sesionRepository
         .createQueryBuilder('sesion')
         .where('sesion.vendedorId = :vendedorId', { vendedorId: vendedor.id })
-        .andWhere('sesion.fechaCierre IS NOT NULL')
-        .orderBy('sesion.fechaCierre', 'DESC')
-        .getOne();
+        .andWhere('sesion.totalEfectivo > 0')
+        .orderBy('sesion.fechaApertura', 'DESC')
+        .getMany();
 
-      if (!ultimaSesionCerrada) {
-        console.log(`   ⚠️  No se encontró sesión cerrada para ${vendedor.name}`);
+      if (!sesionesConEfectivo.length) {
+        console.log(`   ✅ ${vendedor.name} no tiene efectivo en ninguna sesión`);
         continue;
       }
 
-      const efectivoDisponible = Number(ultimaSesionCerrada.totalEfectivo);
+      for (const sesion of sesionesConEfectivo) {
+        const efectivoDisponible = Number(sesion.totalEfectivo);
+        const estado = sesion.fechaCierre ? 'cerrada' : 'abierta';
+        
+        console.log(`   💰 Sesión ${estado}: $${efectivoDisponible}`);
 
-      if (efectivoDisponible <= 0) {
-        console.log(`   ✅ ${vendedor.name} ya tiene efectivo en 0`);
-        continue;
+        // 5. Crear movimiento de retiro
+        const retiro = cajaRepository.create({
+          tipo: TipoMovimiento.EGRESO,
+          metodoPago: MetodoPago.EFECTIVO,
+          monto: efectivoDisponible,
+          descripcion: `Retiro total de efectivo - Seed automático (${estado})`,
+          vendedor: vendedor,
+          subcategoria: subcategoriaRetiro,
+          fecha: new Date(),
+          sesionCaja: sesion
+        });
+
+        await cajaRepository.save(retiro);
+
+        // 6. Actualizar totales de la sesión
+        sesion.totalEgresos = Number(sesion.totalEgresos) + efectivoDisponible;
+        sesion.totalEfectivo = 0;
+
+        await sesionRepository.save(sesion);
+
+        console.log(`   ✅ Retiro de $${efectivoDisponible} realizado en sesión ${estado}`);
       }
-
-      console.log(`   💰 Efectivo disponible: $${efectivoDisponible}`);
-
-      // 5. Crear movimiento de retiro
-      const retiro = cajaRepository.create({
-        tipo: TipoMovimiento.EGRESO,
-        metodoPago: MetodoPago.EFECTIVO,
-        monto: efectivoDisponible,
-        descripcion: 'Retiro total de efectivo - Seed automático',
-        vendedor: vendedor,
-        subcategoria: subcategoriaRetiro,
-        fecha: new Date(),
-        sesionCaja: ultimaSesionCerrada
-      });
-
-      await cajaRepository.save(retiro);
-
-      // 6. Actualizar totales de la sesión
-      ultimaSesionCerrada.totalEgresos = Number(ultimaSesionCerrada.totalEgresos) + efectivoDisponible;
-      ultimaSesionCerrada.totalIngresos = Number(ultimaSesionCerrada.totalIngresos) - efectivoDisponible;
-      ultimaSesionCerrada.totalEfectivo = 0;
-
-      await sesionRepository.save(ultimaSesionCerrada);
-
-      console.log(`   ✅ Retiro de $${efectivoDisponible} realizado para ${vendedor.name}`);
     }
 
     console.log('✅ Proceso de retiro completado exitosamente.');

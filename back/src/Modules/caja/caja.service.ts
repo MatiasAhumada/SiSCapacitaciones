@@ -681,6 +681,14 @@ export class CajaService {
       where: { vendedor: { id: vendedorDestinoId }, fechaCierre: IsNull() },
     });
 
+    if (!sesionOrigen) {
+      throw new BadRequestException('No hay sesión abierta para el vendedor origen');
+    }
+
+    if (!sesionDestino) {
+      throw new BadRequestException('No hay sesión abierta para el vendedor destino');
+    }
+
     const egreso = this.cajaRepository.create({
       tipo: TipoMovimiento.TRANSFERENCIA,
       metodoPago,
@@ -688,7 +696,7 @@ export class CajaService {
       descripcion: descripcion || `Transferencia a ${vendedorDestino.name}`,
       fecha: fecha ? new Date(fecha) : new Date(),
       vendedor: vendedorOrigen,
-      sesionCaja: sesionOrigen || undefined,
+      sesionCaja: sesionOrigen,
     });
 
     const ingreso = this.cajaRepository.create({
@@ -698,7 +706,7 @@ export class CajaService {
       descripcion: descripcion || `Transferencia desde ${vendedorOrigen.name}`,
       fecha: fecha ? new Date(fecha) : new Date(),
       vendedor: vendedorDestino,
-      sesionCaja: sesionDestino || undefined,
+      sesionCaja: sesionDestino,
     });
 
     const [egresoGuardado, ingresoGuardado] = await this.cajaRepository.save([
@@ -707,12 +715,8 @@ export class CajaService {
     ]);
 
     // Actualizar totales de ambas sesiones
-    if (sesionOrigen) {
-      await this.actualizarConMovimiento(sesionOrigen.id, egresoGuardado);
-    }
-    if (sesionDestino) {
-      await this.actualizarConMovimiento(sesionDestino.id, ingresoGuardado);
-    }
+    await this.actualizarConMovimiento(sesionOrigen.id, egresoGuardado);
+    await this.actualizarConMovimiento(sesionDestino.id, ingresoGuardado);
 
     return {
       message: 'Transferencia realizada con éxito',
@@ -745,11 +749,7 @@ export class CajaService {
     }
 
     let montoApertura = 0;
-    let totalDigitalJavier = 0;
-    let totalDigitalTobias = 0;
-    let totalCredito = 0;
-    let totalEfectivo = 0;
-    // Buscar última sesión cerrad
+    // Buscar última sesión cerrada
     const ultimaSesion = await this.sesionRepository.findOne({
       where: {
         vendedor: { id: vendedorId },
@@ -760,12 +760,8 @@ export class CajaService {
       },
     });
     if (ultimaSesion) {
-      // El arrastre debe ser el efectivo que quedó de la sesión anterior
+      // El arrastre debe ser solo el efectivo que quedó de la sesión anterior
       montoApertura = Number(ultimaSesion.totalEfectivo) || 0;
-      totalDigitalJavier = ultimaSesion.totalDigitalJavier || 0;
-      totalDigitalTobias = ultimaSesion.totalDigitalTobias || 0;
-      totalCredito = ultimaSesion.totalCredito || 0;
-      totalEfectivo = montoApertura; // El efectivo inicial es el arrastre
     }
 
     const nuevaSesion = this.sesionRepository.create({
@@ -773,11 +769,11 @@ export class CajaService {
       montoApertura: montoApertura,
       totalIngresos: 0,
       totalEgresos: 0,
-      totalDigitalJavier,
-      totalDigitalTobias,
-      totalCredito,
-      totalEfectivo,
-      totalFerro: ultimaSesion?.totalFerro || 0,
+      totalDigitalJavier: 0,
+      totalDigitalTobias: 0,
+      totalCredito: 0,
+      totalEfectivo: montoApertura, // El efectivo inicial es el arrastre
+      totalFerro: 0,
       vendedor,
     });
     await this.sesionRepository.save(nuevaSesion);
@@ -1287,7 +1283,6 @@ export class CajaService {
       sesion.totalIngresos += monto;
     } else if (esEgreso || esTransferencia) {
       sesion.totalEgresos += monto;
-      sesion.totalIngresos -= monto; // Restar del total de ingresos
     }
 
     // Actualizar totales por método de pago
@@ -1351,7 +1346,6 @@ export class CajaService {
         sesion.totalIngresos += monto;
       } else if (esEgreso || esTransferencia) {
         sesion.totalEgresos += monto;
-        sesion.totalIngresos -= monto; // Restar del total de ingresos
       }
 
       // Actualizar totales por método de pago

@@ -467,6 +467,21 @@ export class CajaService {
     });
   }
 
+  async inicializarCategoriaRetiro() {
+    const categoriaExistente = await this.categoriaRepository.findOne({
+      where: { nombre: 'RETIRO' },
+      relations: ['subcategorias'],
+    });
+
+    if (!categoriaExistente) {
+      const categoria = await this.createCategoria('RETIRO');
+      await this.createSubcategoria('Retiro', categoria.id);
+      return categoria;
+    }
+
+    return categoriaExistente;
+  }
+
   //PAGO A PROFESORES
 
   async createEgresoProfesor(dto: EgresoCajaDTO) {
@@ -583,6 +598,7 @@ export class CajaService {
 
     const subcategoria = await this.subcategoriaRepository.findOne({
       where: { id: dto.subcategoriaId },
+      relations: ['categoria'],
     });
 
     if (!subcategoria)
@@ -601,6 +617,17 @@ export class CajaService {
         'No hay sesión de caja abierta',
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    // Validar saldo suficiente para retiros en efectivo
+    if (subcategoria.categoria?.nombre?.toLowerCase() === 'retiro' && dto.metodoPago === MetodoPago.EFECTIVO) {
+      const saldoEfectivo = Number(sesionAbierta.totalEfectivo);
+      if (saldoEfectivo < dto.monto) {
+        throw new HttpException(
+          `Saldo insuficiente en efectivo. Disponible: $${saldoEfectivo}, Solicitado: $${dto.monto}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
     const fechaLocal = dto.fecha
       ? dayjs(dto.fecha).tz('America/Argentina/Buenos_Aires').toDate()
@@ -1260,6 +1287,7 @@ export class CajaService {
       sesion.totalIngresos += monto;
     } else if (esEgreso || esTransferencia) {
       sesion.totalEgresos += monto;
+      sesion.totalIngresos -= monto; // Restar del total de ingresos
     }
 
     // Actualizar totales por método de pago
@@ -1323,6 +1351,7 @@ export class CajaService {
         sesion.totalIngresos += monto;
       } else if (esEgreso || esTransferencia) {
         sesion.totalEgresos += monto;
+        sesion.totalIngresos -= monto; // Restar del total de ingresos
       }
 
       // Actualizar totales por método de pago

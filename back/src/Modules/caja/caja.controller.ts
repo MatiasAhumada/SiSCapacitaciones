@@ -202,6 +202,11 @@ export class CajaController {
       body.subcategorias,
     );
   }
+
+  @Post('/inicializar-retiro')
+  inicializarCategoriaRetiro() {
+    return this.cajaService.inicializarCategoriaRetiro();
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cajaService.findOne(id);

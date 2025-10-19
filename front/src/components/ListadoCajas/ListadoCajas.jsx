@@ -79,7 +79,6 @@ const ListadoCajas = () => {
           10,
           debouncedFilterDate
         );
-
         setSellerCajas(data || []);
         setTotalPages(totalPages);
       } catch (err) {

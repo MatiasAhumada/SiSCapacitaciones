@@ -25,7 +25,7 @@
     "migration:revert": "npm run typeorm -- -d ./src/config/configOrm.ts migration:revert ",
     "migration:show": "npm run typeorm -- -d ./src/config/configOrm.ts migration:show ",
     "seed": "ts-node -r tsconfig-paths/register src/Seeds/seeders.ts",
-    "seed:cajas-perpetuas": "ts-node -r tsconfig-paths/register src/Seeds/cajas-perpetuas.seed.ts"
+    "seed:recalcular-produccion": "ts-node -r tsconfig-paths/register src/Seeds/recalcular-totales-produccion.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

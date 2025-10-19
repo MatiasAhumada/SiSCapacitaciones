@@ -60,6 +60,7 @@ export class SeederService implements OnModuleInit {
         totalDigitalTobias: 0,
         totalEfectivo: 0,
         totalCredito: 0,
+        totalFerro: 0,
         totalEgresos: 0,
         totalIngresos: 0,
       });
@@ -103,6 +104,8 @@ export class SeederService implements OnModuleInit {
                            WHEN "metodoPago" = 'Digital Javier' AND tipo = 'Egreso' THEN -monto ELSE 0 END), 0) as ingresos_egresos_digital_javier,
           COALESCE(SUM(CASE WHEN "metodoPago" = 'Digital Tobias' AND tipo = 'Ingreso' THEN monto 
                            WHEN "metodoPago" = 'Digital Tobias' AND tipo = 'Egreso' THEN -monto ELSE 0 END), 0) as ingresos_egresos_digital_tobias,
+          COALESCE(SUM(CASE WHEN "metodoPago" = 'Ferro' AND tipo = 'Ingreso' THEN monto 
+                           WHEN "metodoPago" = 'Ferro' AND tipo = 'Egreso' THEN -monto ELSE 0 END), 0) as ingresos_egresos_ferro,
           COALESCE(SUM(CASE WHEN tipo = 'Apertura' THEN monto ELSE 0 END), 0) as monto_apertura
         FROM cajas 
         WHERE "sesionCajaId" = $1
@@ -115,6 +118,7 @@ export class SeederService implements OnModuleInit {
       const totalCredito = Number(totales.ingresos_egresos_credito);
       const totalDigitalJavier = Number(totales.ingresos_egresos_digital_javier);
       const totalDigitalTobias = Number(totales.ingresos_egresos_digital_tobias);
+      const totalFerro = Number(totales.ingresos_egresos_ferro);
 
       
       const usuario = sesion.vendedor?.name || sesion.admin?.name || 'Desconocido';
@@ -123,7 +127,7 @@ export class SeederService implements OnModuleInit {
       const montoCierre = Number(totales.monto_apertura) + Number(totales.total_ingresos) - Number(totales.total_egresos);
       
       this.logger.log(`🔧 Actualizando sesión ${sesion.id} - Usuario: ${usuario}`);
-      this.logger.log(`   Totales: I:${totales.total_ingresos} E:${totales.total_egresos} Ef:${totalEfectivo} Cr:${totalCredito} DJ:${totalDigitalJavier} DT:${totalDigitalTobias}`);
+      this.logger.log(`   Totales: I:${totales.total_ingresos} E:${totales.total_egresos} Ef:${totalEfectivo} Cr:${totalCredito} DJ:${totalDigitalJavier} DT:${totalDigitalTobias} F:${totalFerro}`);
       this.logger.log(`   Apertura: ${totales.monto_apertura} | Cierre: ${montoCierre}`);
 
       // Actualizar la sesión
@@ -137,11 +141,12 @@ export class SeederService implements OnModuleInit {
           "totalCredito" = $5,
           "totalDigitalJavier" = $6,
           "totalDigitalTobias" = $7,
+          "totalFerro" = $8,
           "montoCierre" = CASE 
-            WHEN "fechaCierre" IS NOT NULL THEN $8
+            WHEN "fechaCierre" IS NOT NULL THEN $9
             ELSE "montoCierre"
           END
-        WHERE id = $9
+        WHERE id = $10
       `, [
         totales.monto_apertura,
         totales.total_ingresos,
@@ -150,6 +155,7 @@ export class SeederService implements OnModuleInit {
         totalCredito,
         totalDigitalJavier,
         totalDigitalTobias,
+        totalFerro,
         montoCierre,
         sesion.id
       ]);

@@ -131,17 +131,20 @@ export class CajaService {
       newCaja.alumnoComision = alumnoComision;
       newCaja.sesionCaja = sesionCaja;
 
-      await this.cajaRepository.save(newCaja);
+      const cajaGuardada = await this.cajaRepository.save(newCaja);
+
+      // Actualizar totales de la sesión
+      await this.actualizarConMovimiento(sesionCaja.id, cajaGuardada);
 
       // Si es pago digital, duplicar en caja perpetua correspondiente
       if (
         restoCaja.metodoPago === MetodoPago.DIGITAL_JAVIER ||
         restoCaja.metodoPago === MetodoPago.DIGITAL_TOBIAS
       ) {
-        await this.duplicarEnCajaPerpetua(newCaja, restoCaja.metodoPago);
+        await this.duplicarEnCajaPerpetua(cajaGuardada, restoCaja.metodoPago);
       }
 
-      return newCaja;
+      return cajaGuardada;
     }
   }
 
@@ -579,13 +582,23 @@ export class CajaService {
     if (!vendedorDestino)
       throw new NotFoundException('Vendedor destino no encontrado');
 
+    // Buscar sesiones abiertas
+    const sesionOrigen = await this.sesionRepository.findOne({
+      where: { vendedor: { id: vendedorOrigenId }, fechaCierre: IsNull() },
+    });
+    
+    const sesionDestino = await this.sesionRepository.findOne({
+      where: { vendedor: { id: vendedorDestinoId }, fechaCierre: IsNull() },
+    });
+
     const egreso = this.cajaRepository.create({
-      tipo: TipoMovimiento.EGRESO,
+      tipo: TipoMovimiento.TRANSFERENCIA,
       metodoPago,
       monto,
       descripcion: descripcion || `Transferencia a ${vendedorDestino.name}`,
       fecha: fecha ? new Date(fecha) : new Date(),
       vendedor: vendedorOrigen,
+      sesionCaja: sesionOrigen || undefined,
     });
 
     const ingreso = this.cajaRepository.create({
@@ -595,14 +608,23 @@ export class CajaService {
       descripcion: descripcion || `Transferencia desde ${vendedorOrigen.name}`,
       fecha: fecha ? new Date(fecha) : new Date(),
       vendedor: vendedorDestino,
+      sesionCaja: sesionDestino || undefined,
     });
 
-    await this.cajaRepository.save([egreso, ingreso]);
+    const [egresoGuardado, ingresoGuardado] = await this.cajaRepository.save([egreso, ingreso]);
+    
+    // Actualizar totales de ambas sesiones
+    if (sesionOrigen) {
+      await this.actualizarConMovimiento(sesionOrigen.id, egresoGuardado);
+    }
+    if (sesionDestino) {
+      await this.actualizarConMovimiento(sesionDestino.id, ingresoGuardado);
+    }
 
     return {
       message: 'Transferencia realizada con éxito',
-      egreso,
-      ingreso,
+      egreso: egresoGuardado,
+      ingreso: ingresoGuardado,
     };
   }
   //apertura de caja
@@ -663,6 +685,7 @@ export class CajaService {
       totalDigitalTobias,
       totalCredito,
       totalEfectivo,
+      totalFerro: ultimaSesion?.totalFerro || 0,
       vendedor,
     });
     await this.sesionRepository.save(nuevaSesion);
@@ -739,6 +762,10 @@ export class CajaService {
       .filter((mov) => mov.metodoPago === MetodoPago.EFECTIVO)
       .reduce((sum, mov) => sum + Number(mov.monto), 0);
 
+    const totalFerro = sesionAbierta.movimientos
+      .filter((mov) => mov.metodoPago === MetodoPago.FERRO)
+      .reduce((sum, mov) => sum + Number(mov.monto), 0);
+
     // Actualizar totales y fecha de cierre
     sesionAbierta.totalIngresos = ingresos;
     sesionAbierta.totalEgresos = egresos;
@@ -748,6 +775,7 @@ export class CajaService {
     sesionAbierta.totalDigitalTobias = totalDigitalTobias;
     sesionAbierta.totalCredito = totalCredito;
     sesionAbierta.totalEfectivo = totalEfectivo;
+    sesionAbierta.totalFerro = totalFerro;
     await this.sesionRepository.save(sesionAbierta);
     const cierre = this.cajaRepository.create({
       fecha: this.fechaLocal,
@@ -912,6 +940,24 @@ export class CajaService {
         const totalDigitalTobias =
           totalDigitalTobiasApertura + totalDigitalTobiasIngresos;
 
+        const totalFerroApertura = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.APERTURA &&
+              m.metodoPago === MetodoPago.FERRO,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
+
+        const totalFerroIngresos = movimientos
+          .filter(
+            (m) =>
+              m.tipo === TipoMovimiento.INGRESO &&
+              m.metodoPago === MetodoPago.FERRO,
+          )
+          .reduce((sum, m) => sum + Number(m.monto), 0);
+
+        const totalFerro = totalFerroApertura + totalFerroIngresos;
+
         const montoCierre = totalApertura + totalIngresos - totalEgresos;
 
         return {
@@ -925,6 +971,7 @@ export class CajaService {
           totalCredito,
           totalDigitalJavier,
           totalDigitalTobias,
+          totalFerro,
           totalEfectivoApertura,
           totalEfectivoIngresos,
           totalCreditoApertura,
@@ -933,6 +980,8 @@ export class CajaService {
           totalDigitalJavierIngresos,
           totalDigitalTobiasApertura,
           totalDigitalTobiasIngresos,
+          totalFerroApertura,
+          totalFerroIngresos,
         };
       }),
     );
@@ -1249,7 +1298,7 @@ export class CajaService {
     });
   }
 
-  async actualizarConMovimiento(
+  private async actualizarConMovimiento(
     idSesion: string,
     movimiento: Caja,
   ): Promise<SesionCaja> {
@@ -1261,40 +1310,48 @@ export class CajaService {
       throw new NotFoundException(`Sesión de caja ${idSesion} no encontrada`);
     }
 
-    const monto = Number(movimiento.monto);
-
-    const esIngreso = movimiento.tipo === TipoMovimiento.INGRESO;
-
+    // Inicializar totales
     sesion.totalIngresos = Number(sesion.totalIngresos);
     sesion.totalEgresos = Number(sesion.totalEgresos);
     sesion.totalEfectivo = Number(sesion.totalEfectivo);
     sesion.totalCredito = Number(sesion.totalCredito);
-    sesion.totalDigitalTobias = Number(sesion.totalDigitalTobias);
     sesion.totalDigitalJavier = Number(sesion.totalDigitalJavier);
+    sesion.totalDigitalTobias = Number(sesion.totalDigitalTobias);
+    sesion.totalFerro = Number(sesion.totalFerro);
 
-    // Totales generales
+    const monto = Number(movimiento.monto);
+    const esIngreso = movimiento.tipo === TipoMovimiento.INGRESO || movimiento.tipo === TipoMovimiento.APERTURA;
+    const esEgreso = movimiento.tipo === TipoMovimiento.EGRESO;
+    const esTransferencia = movimiento.tipo === TipoMovimiento.TRANSFERENCIA;
+
+    // Actualizar totales generales
     if (esIngreso) {
       sesion.totalIngresos += monto;
-    } else if (movimiento.tipo === TipoMovimiento.EGRESO) {
+    } else if (esEgreso || esTransferencia) {
       sesion.totalEgresos += monto;
     }
 
-    // Totales por método de pago
+    // Actualizar totales por método de pago
+    const multiplicador = esIngreso ? 1 : -1;
+    
     switch (movimiento.metodoPago) {
       case MetodoPago.EFECTIVO:
-        sesion.totalEfectivo += esIngreso ? monto : -monto;
+        sesion.totalEfectivo += monto * multiplicador;
         break;
       case MetodoPago.CREDITO:
-        sesion.totalCredito += esIngreso ? monto : -monto;
-        break;
-      case MetodoPago.DIGITAL_TOBIAS:
-        sesion.totalDigitalTobias += esIngreso ? monto : -monto;
+        sesion.totalCredito += monto * multiplicador;
         break;
       case MetodoPago.DIGITAL_JAVIER:
-        sesion.totalDigitalJavier += esIngreso ? monto : -monto;
+        sesion.totalDigitalJavier += monto * multiplicador;
+        break;
+      case MetodoPago.DIGITAL_TOBIAS:
+        sesion.totalDigitalTobias += monto * multiplicador;
+        break;
+      case MetodoPago.FERRO:
+        sesion.totalFerro += monto * multiplicador;
         break;
     }
 
-    return this.sesionRepository.save(sesion);
+    return await this.sesionRepository.save(sesion);
   }
 }

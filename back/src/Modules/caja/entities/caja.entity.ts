@@ -27,6 +27,7 @@ export enum MetodoPago {
   CREDITO = 'Credito',
   DIGITAL_TOBIAS = 'Digital Tobias',
   DIGITAL_JAVIER = 'Digital Javier',
+  FERRO = 'Ferro',
 }
 
 @Entity({

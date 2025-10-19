@@ -137,10 +137,11 @@ export class CajaService {
       // Actualizar totales de la sesión
       await this.actualizarConMovimiento(sesionCaja.id, cajaGuardada);
 
-      // Si es pago digital, duplicar en caja perpetua correspondiente
+      // Si es pago digital o ferro, duplicar en caja perpetua correspondiente
       if (
         restoCaja.metodoPago === MetodoPago.DIGITAL_JAVIER ||
-        restoCaja.metodoPago === MetodoPago.DIGITAL_TOBIAS
+        restoCaja.metodoPago === MetodoPago.DIGITAL_TOBIAS ||
+        restoCaja.metodoPago === MetodoPago.FERRO
       ) {
         await this.duplicarEnCajaPerpetua(cajaGuardada, restoCaja.metodoPago);
       }
@@ -759,13 +760,12 @@ export class CajaService {
       },
     });
     if (ultimaSesion) {
-      if (ultimaSesion.totalIngresos > ultimaSesion.totalEgresos) {
-        montoApertura = ultimaSesion.totalIngresos - ultimaSesion.totalEgresos;
-      }
+      // El arrastre debe ser el efectivo que quedó de la sesión anterior
+      montoApertura = Number(ultimaSesion.totalEfectivo) || 0;
       totalDigitalJavier = ultimaSesion.totalDigitalJavier || 0;
       totalDigitalTobias = ultimaSesion.totalDigitalTobias || 0;
       totalCredito = ultimaSesion.totalCredito || 0;
-      totalEfectivo = ultimaSesion.totalEfectivo || 0;
+      totalEfectivo = montoApertura; // El efectivo inicial es el arrastre
     }
 
     const nuevaSesion = this.sesionRepository.create({
@@ -934,7 +934,7 @@ export class CajaService {
   ) {
     try {
       const adminId =
-        metodoPago === MetodoPago.DIGITAL_JAVIER
+        metodoPago === MetodoPago.DIGITAL_JAVIER || metodoPago === MetodoPago.FERRO
           ? '4ab59277-5a15-4841-acce-851b0f6dbe11' // Javier
           : 'f709ac35-d270-4941-83de-d45031d6c33e'; // Tobias
 

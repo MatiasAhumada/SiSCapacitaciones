@@ -6,6 +6,7 @@ export enum FormaPago {
   CREDITO = 'Credito',
   DEBITO = 'Digital Tobias',
   TRANSFERENCIA = 'Digital Javier',
+  FERRO = 'Ferro',
 }
 // export enum MetodoPago {
 //   EFECTIVO = 'Efectivo',

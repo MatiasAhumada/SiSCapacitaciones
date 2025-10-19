@@ -43,6 +43,7 @@ const CreateCaja = () => {
     alumnoComisionId: '',
     monto: '',
     cuota: '',
+    mesCuota: '',
     //vendTransId: "",
     comprobante: {
       apellidoNombre: '',
@@ -352,7 +353,7 @@ const CreateCaja = () => {
 
             <div className="pb-2">
               <label htmlFor="cuota" className="block mb-2 text-sm  principal text-[#111827]">
-                N° Cuota
+                N° de Cuota
               </label>
               <div className="relative text-gray-400">
                 <input
@@ -363,6 +364,35 @@ const CreateCaja = () => {
                   onChange={handleChange}
                   className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
                 />
+              </div>
+            </div>
+
+            <div className="pb-2">
+              <label htmlFor="mesCuota" className="block mb-2 text-sm  principal text-[#111827]">
+                Mes de Cuota
+              </label>
+              <div className="relative text-gray-400">
+                <select
+                  name="mesCuota"
+                  id="mesCuota"
+                  value={formData.mesCuota}
+                  onChange={handleChange}
+                  className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
+                >
+                  <option value="">Seleccione un mes</option>
+                  <option value="Enero">Enero</option>
+                  <option value="Febrero">Febrero</option>
+                  <option value="Marzo">Marzo</option>
+                  <option value="Abril">Abril</option>
+                  <option value="Mayo">Mayo</option>
+                  <option value="Junio">Junio</option>
+                  <option value="Julio">Julio</option>
+                  <option value="Agosto">Agosto</option>
+                  <option value="Septiembre">Septiembre</option>
+                  <option value="Octubre">Octubre</option>
+                  <option value="Noviembre">Noviembre</option>
+                  <option value="Diciembre">Diciembre</option>
+                </select>
               </div>
             </div>
             <div className="pb-2">

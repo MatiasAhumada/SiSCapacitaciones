@@ -778,19 +778,35 @@ export class CajaService {
     });
     await this.sesionRepository.save(nuevaSesion);
 
+    // Solo crear movimiento de apertura si hay monto > 0
+    if (montoApertura > 0) {
+      const apertura = this.cajaRepository.create({
+        fecha: new Date(),
+        tipo: TipoMovimiento.APERTURA,
+        metodoPago: MetodoPago.EFECTIVO,
+        descripcion: 'Apertura de caja',
+        monto: montoApertura,
+        vendedor,
+        sesionCaja: nuevaSesion,
+      });
+
+      const aperturaGuardada = await this.cajaRepository.save(apertura);
+      // NO llamar actualizarConMovimiento porque ya establecimos el totalEfectivo
+      return aperturaGuardada;
+    }
+
+    // Si no hay monto de apertura, crear movimiento simbólico
     const apertura = this.cajaRepository.create({
       fecha: new Date(),
       tipo: TipoMovimiento.APERTURA,
       metodoPago: MetodoPago.EFECTIVO,
       descripcion: 'Apertura de caja',
-      monto: montoApertura,
+      monto: 0,
       vendedor,
       sesionCaja: nuevaSesion,
     });
 
-    const aperturaGuardada = await this.cajaRepository.save(apertura);
-    await this.actualizarConMovimiento(nuevaSesion.id, aperturaGuardada);
-    return aperturaGuardada;
+    return await this.cajaRepository.save(apertura);
   }
 
   async cerrarSesionCaja(vendedorId: string): Promise<SesionCaja> {

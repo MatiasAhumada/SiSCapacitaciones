@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { deleteVend, getVendID } from '../queris/queris';
+import Button from '../common/Button';
 const InfoVendedor = () => {
   const location = useLocation();
   const { id } = location.state || {};
@@ -11,22 +12,36 @@ const InfoVendedor = () => {
   const [dataVend, setDataVend] = useState({
     id: '',
     name: '',
+    totalInscripciones: 0,
   });
+  const [fechaDesde, setFechaDesde] = useState('');
+  const [fechaHasta, setFechaHasta] = useState('');
   console.log(id);
   const navigate = useNavigate();
 
+  const cargarDatos = async (desde, hasta) => {
+    const data = await getVendID(id, desde, hasta);
+    setTableItems(data.inscripciones || []);
+    setDataVend({
+      id: data.id,
+      name: data.name,
+      totalInscripciones: data.totalInscripciones || 0,
+    });
+  };
+
   useEffect(() => {
-    const peticion = async () => {
-      await getVendID(id).then((data) => {
-        setTableItems(data.inscripciones);
-        setDataVend({
-          id: data.id,
-          name: data.name,
-        });
-      });
-    };
-    peticion();
+    cargarDatos();
   }, []);
+
+  const aplicarFiltro = () => {
+    cargarDatos(fechaDesde, fechaHasta);
+  };
+
+  const limpiarFiltro = () => {
+    setFechaDesde('');
+    setFechaHasta('');
+    cargarDatos();
+  };
 
   const handClick = async (e) => {
     e.preventDefault();
@@ -56,9 +71,12 @@ const InfoVendedor = () => {
   };
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
-      <div className="items-start justify-between md:flex mb-5">
+      <div className="items-center justify-between md:flex mb-5">
         <div className="max-w-lg">
           <h3 className="text-xl font-bold sm:text-2xl principal mt-4">{dataVend.name}</h3>
+        </div>
+        <div className="mt-4 md:mt-0"> 
+          <label className="text-sm font-medium text-gray-900 principal"> Total de inscripciones: {dataVend.totalInscripciones} </label>
         </div>
         <div className="mt-3 md:mt-0">
           <button
@@ -89,7 +107,41 @@ const InfoVendedor = () => {
           </button>
         </div>
       </div>
-      <h3 className="font-bold sm:text-2xl principal mt-4">Inscripciones Realizadas</h3>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <h3 className="font-bold sm:text-2xl principal mt-4">Inscripciones Realizadas</h3>
+        <div className="flex flex-col md:flex-row gap-2 mt-4 md:mt-0 md:items-end">
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-600 mb-1">Desde</label>
+            <input
+              type="date"
+              value={fechaDesde}
+              onChange={(e) => setFechaDesde(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-xl text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-600 mb-1">Hasta</label>
+            <input
+              type="date"
+              value={fechaHasta}
+              onChange={(e) => setFechaHasta(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-xl text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            />
+          </div>
+          <Button 
+            onClick={aplicarFiltro} 
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm"
+          >
+            Filtrar
+          </Button>
+          <Button 
+            onClick={limpiarFiltro} 
+            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm"
+          >
+            Limpiar
+          </Button>
+        </div>
+      </div>
       <div className="mt-3 shadow-sm border rounded-lg overflow-x-auto">
         <table className="w-full table-auto text-sm text-left">
           <thead className="bg-gray-50 text-gray-600 font-medium border-b principal text-center">

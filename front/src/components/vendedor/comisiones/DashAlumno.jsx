@@ -74,7 +74,6 @@ const DashAlumno = () => {
           setDataAlumno(data.alumno);
           setDataComision(data.comision);
           setTableItems(data.pagos);
-          console.log(data);
         });
       };
       alucom();

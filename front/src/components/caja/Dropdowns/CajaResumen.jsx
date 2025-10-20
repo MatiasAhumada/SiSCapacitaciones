@@ -33,7 +33,7 @@ const CajaResumen = ({ sesionCaja }) => {
         <div className="bg-white shadow-md border p-3 rounded text-center">
           <p className="text-gray-500">Total Caja</p>
           <p className="font-bold text-black">
-            ${Number(sesionCaja.montoCierre || 0).toLocaleString()}
+            ${Number(sesionCaja.totalIngresos - sesionCaja.totalEgresos || 0).toLocaleString()}
           </p>
         </div>
       </div>

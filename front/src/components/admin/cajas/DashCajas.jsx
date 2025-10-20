@@ -13,6 +13,7 @@ import { getAlu } from '../../../helpers/Alumnos.service';
 import { getVendedores } from '../../../helpers/Vendedores.service';
 import Pagination from '../../Pagination/Pagination';
 import Swal from 'sweetalert2';
+import { ModalEditar } from '../../caja/ModalEditar';
 
 const DashCajas = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const DashCajas = () => {
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [editMode, setEditMode] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [alu, setAlu] = useState([]);
   const [vend, setVend] = useState([]);
   const [fecha, setFecha] = useState(new Date());
@@ -85,7 +87,11 @@ const DashCajas = () => {
   useEffect(() => {
     fetchCajas(currentPage, itemsPerPage, vendedorFiltro || null);
   }, [currentPage, vendedorFiltro, fechaFiltro]);
-
+  // Evitar scroll cuando el modal está abierto
+  useEffect(() => {
+    if (isModalOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'unset';
+  }, [isModalOpen]);
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -96,39 +102,51 @@ const DashCajas = () => {
 
     setPause((prev) => ({ ...prev, [movId]: true }));
 
-    await deleteMovCaja(e.target.value).then(() => {
-      try {
-        Swal.fire({
-          title: 'Movimiento Eliminado',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause((prev) => {
-            const newPause = { ...prev };
-            delete newPause[movId];
-            return newPause;
-          });
+    try {
+      await deleteMovCaja(movId);
 
-          setTableItems((prev) => prev.filter((item) => item.id !== movId));
-        });
-      } catch (error) {
-        console.log(error);
+      Swal.fire({
+        title: 'Movimiento Eliminado',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      fetchCajas(currentPage, itemsPerPage, vendedorFiltro || null);
+
+      if (fechaFiltro) {
+        await getResumenPorDia(fechaFiltro).then((data) => setDatosFiltro(data));
+      } else {
+        await getResumenTotal().then((data) => setDatosFiltro(data));
       }
-    });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error al eliminar',
+        icon: 'error',
+        text: error?.response?.data?.message || 'Error desconocido',
+      });
+    } finally {
+      setPause((prev) => {
+        const newPause = { ...prev };
+        delete newPause[movId];
+        return newPause;
+      });
+    }
   };
 
   const handleEdit = (mov) => {
+    setIsModalOpen(true);
     setEditMode(mov.id);
     setFormEdit({
-      fecha: fecha,
+      fecha: mov.fecha,
       tipo: mov.tipo,
       metodoPago: mov.metodoPago,
       monto: mov.monto,
       descripcion: mov.descripcion,
-      alumnoComisionId: mov.alumnoComision.alumno.id,
+      alumnoComisionId: mov.alumnoComision?.alumno?.id || '',
       vendedorId: mov.vendedor.id,
     });
+    console.log(mov);
   };
 
   const handleChange = (e) => {
@@ -154,22 +172,29 @@ const DashCajas = () => {
   };
 
   const handleSave = async (item) => {
-    setPause((prev) => ({ ...prev, [item.id]: true }));
-    await editMovCaja(item.id, formEdit).then((data) => {
-      try {
-        Swal.fire({
-          title: 'Caja Editada',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      } catch (error) {
-        Swal.fire({ title: 'Error al actualizar', icon: 'error' });
-      } finally {
-        setPause((prev) => ({ ...prev, [item.id]: false }));
-        setEditMode(null);
+    if (!isModalOpen) return;
+    try {
+      await editMovCaja(editMode, formEdit);
+      Swal.fire({
+        title: 'Caja Editada',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setIsModalOpen(false);
+      fetchCajas(currentPage, itemsPerPage, vendedorFiltro || null);
+      //actualizar totales
+      if (fechaFiltro) {
+        await getResumenPorDia(fechaFiltro).then((data) => setDatosFiltro(data));
+      } else {
+        await getResumenTotal().then((data) => setDatosFiltro(data));
       }
-    });
+    } catch (error) {
+      Swal.fire({ title: 'Error al actualizar', icon: 'error' });
+      console.log(error);
+    } finally {
+      setEditMode(null);
+    }
   };
 
   const handleFiltrarVendedor = (e) => {
@@ -297,116 +322,17 @@ const DashCajas = () => {
               ) : (
                 tableItems.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {editMode === item.id ? (
-                        <input
-                          type="text"
-                          name="fecha"
-                          id="fecha"
-                          disabled
-                          defaultValue={formatToDisplay(fecha)}
-                          onChange={handleChange}
-                          className="text-center"
-                        />
-                      ) : (
-                        formatToDisplay(item.fecha)
-                      )}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{formatToDisplay(item.fecha)}</td>
 
+                    <td className="px-6 py-4 whitespace-nowrap">{item.vendedor?.name || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {editMode === item.id ? (
-                        <select
-                          name="vendedorId"
-                          value={formEdit.vendedorId}
-                          onChange={handleVendedorChange}
-                        >
-                          <option value="">Seleccione un vendedor</option>
-                          {vend.map((vendedor) => (
-                            <option key={vendedor.id} value={vendedor.id}>
-                              {vendedor.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        item.vendedor?.name || '-'
-                      )}
+                      {item.alumnoComision?.alumno.name || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {editMode === item.id ? (
-                        <select
-                          name="alumnoComisionId"
-                          value={formEdit.alumnoComisionId}
-                          onChange={handleAlumnoChange}
-                        >
-                          <option value="">Seleccione un alumno</option>
-                          {alu.map((alumno) => (
-                            <option key={alumno.id} value={alumno.id}>
-                              {alumno.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        item.alumnoComision?.alumno.name || '-'
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {editMode === item.id ? (
-                        <select name="tipo" value={formEdit.tipo} onChange={handleChange}>
-                          <option value="">Seleccione</option>
-                          <option value="Ingreso">Ingreso</option>
-                          <option value="Egreso">Egreso</option>
-                          <option value="Transferencia">Transferencia de caja</option>
-                        </select>
-                      ) : (
-                        item.tipo
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {editMode === item.id ? (
-                        <select
-                          name="metodoPago"
-                          value={formEdit.metodoPago}
-                          onChange={handleChange}
-                        >
-                          <option value="">Seleccione</option>
-                          <option value="Efectivo">Efectivo</option>
-                          <option value="Transferencia">Transferencia</option>
-                          <option value="Debito">Debito</option>
-                          <option value="Credito">Credito</option>
-                        </select>
-                      ) : (
-                        item.metodoPago
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editMode === item.id ? (
-                        <input
-                          type="text"
-                          name="descripcion"
-                          value={formEdit.descripcion || ''}
-                          onChange={handleChange}
-                          className="text-center"
-                        />
-                      ) : (
-                        item.descripcion
-                      )}
-                    </td>
-                    <td className="px-6 py-4 ">
-                      {editMode === item.id ? (
-                        <input
-                          type="number"
-                          name="monto"
-                          value={formEdit.monto || ''}
-                          onChange={handleChange}
-                          className="text-center"
-                        />
-                      ) : (
-                        item.monto
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {item.alumnoComision?.comision?.name || '-'}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.tipo}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.metodoPago}</td>
+                    <td className="px-6 py-4">{item.descripcion}</td>
+                    <td className="px-6 py-4 ">{item.monto}</td>
+                    <td className="px-6 py-4">{item.alumnoComision?.comision?.name || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editMode === item.id ? (
                         <button
@@ -487,6 +413,19 @@ const DashCajas = () => {
               </tr>
             </tbody>
           </table>
+          {isModalOpen && (
+            <ModalEditar
+              onClose={() => {
+                setIsModalOpen(false);
+                setEditMode(null);
+              }}
+              formData={formEdit}
+              onChange={handleChange}
+              onSave={handleSave}
+              alu={alu}
+              vend={vend}
+            />
+          )}
         </div>
       </>
       <Pagination

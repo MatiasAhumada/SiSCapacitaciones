@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { VendedorService } from './vendedor.service';
 import { CreateVendedorDto } from './dto/create-vendedor.dto';
@@ -31,8 +32,12 @@ export class VendedorController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vendedorService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query('fechaDesde') fechaDesde?: string,
+    @Query('fechaHasta') fechaHasta?: string,
+  ) {
+    return this.vendedorService.findOne(id, fechaDesde, fechaHasta);
   }
 
   @Patch(':id')

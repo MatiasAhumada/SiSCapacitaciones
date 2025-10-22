@@ -90,9 +90,12 @@ export const getVendedores = async () => {
   }
 };
 
-export const getVendID = async (id) => {
+export const getVendID = async (id, fechaDesde, fechaHasta) => {
   try {
-    const response = await axios.get(`${URL}/vendedor/${id}`);
+    const params = {};
+    if (fechaDesde) params.fechaDesde = fechaDesde;
+    if (fechaHasta) params.fechaHasta = fechaHasta;
+    const response = await axios.get(`${URL}/vendedor/${id}`, { params });
     return response.data;
   } catch (error) {
     throw error;

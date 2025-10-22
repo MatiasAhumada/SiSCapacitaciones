@@ -3,7 +3,7 @@ import { CreateVendedorDto } from './dto/create-vendedor.dto';
 import { UpdateVendedorDto } from './dto/update-vendedor.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendedor } from './entities/vendedor.entity';
-import { In, Repository } from 'typeorm';
+import { In, Repository, MoreThanOrEqual, LessThanOrEqual, Between } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { VendedorResponseDto } from './dto/response.dto';
@@ -61,7 +61,17 @@ export class VendedorService {
     });
   }
 
-  async findOne(id: string): Promise<VendedorResponseDto | undefined> {
+  async findOne(id: string, fechaDesde?: string, fechaHasta?: string): Promise<VendedorResponseDto | undefined> {
+    let inscripcionWhere = {};
+    
+    if (fechaDesde && fechaHasta) {
+      inscripcionWhere = { fechaRegistro: Between(new Date(fechaDesde), new Date(fechaHasta)) };
+    } else if (fechaDesde) {
+      inscripcionWhere = { fechaRegistro: MoreThanOrEqual(new Date(fechaDesde)) };
+    } else if (fechaHasta) {
+      inscripcionWhere = { fechaRegistro: LessThanOrEqual(new Date(fechaHasta)) };
+    }
+
     const vend = await this.vendedorRepository.findOne({
       where: { id },
       relations: [
@@ -72,14 +82,13 @@ export class VendedorService {
       select: {
         inscripciones: {
           id: true,
+          fechaRegistro: true,
           alumno: {
-            //id: true,
             name: true,
             dni: true,
             tel: true,
           },
           comision: {
-            //id: true,
             name: true,
             curso: {
               name: true,
@@ -95,12 +104,24 @@ export class VendedorService {
     if (!vend) {
       return undefined;
     }
+
+    let inscripcionesFiltradas = vend.inscripciones;
+    if (fechaDesde || fechaHasta) {
+      inscripcionesFiltradas = vend.inscripciones.filter(inscripcion => {
+        const fecha = new Date(inscripcion.fechaRegistro);
+        if (fechaDesde && fecha < new Date(fechaDesde)) return false;
+        if (fechaHasta && fecha > new Date(fechaHasta)) return false;
+        return true;
+      });
+    }
+
     return {
       id: vend.id,
       name: vend.name,
       isAdmin: vend.isAdmin,
-      inscripciones: vend.inscripciones,
+      inscripciones: inscripcionesFiltradas,
       sucursales: vend.sucursales,
+      totalInscripciones: inscripcionesFiltradas.length,
     };
   }
 

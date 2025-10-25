@@ -40,14 +40,14 @@ export class ProfesorService {
     const profesores = await this.profesorRepository.find({
       where: { sucursal: { id } },
       relations: ['comisiones'],
-      select: ['id', 'name', 'apellido'],
     });
 
     return profesores.map((prof) => ({
       id: prof.id,
       name: prof.name,
       apellido: prof.apellido,
-      cantidadComisiones: prof.comisiones.length,
+      cantidadComisiones: prof.comisiones?.length || 0,
+      comisiones: prof.comisiones || [],
     }));
   }
 

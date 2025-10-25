@@ -17,14 +17,23 @@ const InfoVendedor = () => {
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
 
+  const [loadingData, setLoadingData] = useState(false);
+
   const cargarDatos = async (desde, hasta) => {
-    const data = await getVendID(vendedorId, desde, hasta);
-    setTableItems(data.inscripciones || []);
-    setDataVend({
-      id: data.id,
-      name: data.name,
-      totalInscripciones: data.totalInscripciones || 0,
-    });
+    setLoadingData(true);
+    try {
+      const data = await getVendID(vendedorId, desde, hasta);
+      setTableItems(data.inscripciones || []);
+      setDataVend({
+        id: data.id,
+        name: data.name,
+        totalInscripciones: data.totalInscripciones || 0,
+      });
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+    } finally {
+      setLoadingData(false);
+    }
   };
 
   useEffect(() => {
@@ -45,28 +54,26 @@ const InfoVendedor = () => {
   const handClick = async (e) => {
     e.preventDefault();
     setPause(true);
-    await deleteVend(e.target.value).then((data) => {
-      try {
-        Swal.fire({
-          title: 'Eliminado!',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause(false);
-          navigate('/admin/vendedores');
-        });
-      } catch (error) {
-        Swal.fire({
-          title: 'Error!',
-          icon: 'error',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause(false);
-        });
-      }
-    });
+    try {
+      await deleteVend(e.target.value);
+      Swal.fire({
+        title: 'Eliminado!',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        navigate('/admin/vendedores');
+      });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } finally {
+      setPause(false);
+    }
   };
 
   return (
@@ -84,25 +91,17 @@ const InfoVendedor = () => {
           <button
             onClick={handClick}
             value={dataVend.id}
-            className="inline-block px-4 py-2 text-white bg-red-600 hover:bg-red-700 principal rounded md:text-sm"
+            disabled={pause}
+            className="inline-block px-4 py-2 text-white bg-red-600 hover:bg-red-700 principal rounded md:text-sm disabled:opacity-50"
           >
             {pause ? (
-              <svg
-                fill="white"
-                className="w-6 h-6 mx-auto"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    dur="0.75s"
-                    values="0 12 12;360 12 12"
-                    repeatCount="indefinite"
-                  />
-                </path>
-              </svg>
+              <div className="flex items-center">
+                <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Eliminando...
+              </div>
             ) : (
               'Eliminar'
             )}
@@ -132,13 +131,15 @@ const InfoVendedor = () => {
           </div>
           <Button
             onClick={aplicarFiltro}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm"
+            disabled={loadingData}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm disabled:opacity-50"
           >
-            Filtrar
+            {loadingData ? 'Filtrando...' : 'Filtrar'}
           </Button>
           <Button
             onClick={limpiarFiltro}
-            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm"
+            disabled={loadingData}
+            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm disabled:opacity-50"
           >
             Limpiar
           </Button>
@@ -156,15 +157,35 @@ const InfoVendedor = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 divide-y">
-            {tableItems.map((item, idx) => (
-              <tr key={idx} className="text-center">
-                <td className="px-6 py-4 whitespace-nowrap">{item.alumno.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.comision.curso.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.comision.name}</td>
+            {loadingData ? (
+              <tr>
+                <td colSpan="5" className="px-6 py-4 text-center">
+                  <div className="flex justify-center items-center">
+                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Cargando inscripciones...
+                  </div>
+                </td>
               </tr>
-            ))}
+            ) : tableItems.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                  No hay inscripciones para mostrar
+                </td>
+              </tr>
+            ) : (
+              tableItems.map((item, idx) => (
+                <tr key={idx} className="text-center">
+                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.comision.curso.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.comision.name}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

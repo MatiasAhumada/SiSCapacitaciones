@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useApp } from '../../context/AppContext';
 import { deleteProfesId, getProfesSucId } from '../../services/Profesores.service';
 import Swal from 'sweetalert2';
 
 const DashProfesor = () => {
   const { user } = useAuth();
+  const { getSucursalActiva } = useApp();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [expandedProfesor, setExpandedProfesor] = useState(null);
 
   const clickDelete = async (e) => {
     e.preventDefault();
@@ -16,44 +20,61 @@ const DashProfesor = () => {
 
     setPause((prev) => ({ ...prev, [profesorId]: true }));
 
-    await deleteProfesId(e.target.value).then(() => {
-      try {
-        Swal.fire({
-          title: 'Profesor Eliminado',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause((prev) => {
-            const newPause = { ...prev };
-            delete newPause[profesorId];
-            return newPause;
-          });
-          setTableItems((prev) => prev.filter((item) => item.id !== profesorId));
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    });
+    try {
+      await deleteProfesId(profesorId);
+      Swal.fire({
+        title: 'Profesor Eliminado',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setTableItems((prev) => prev.filter((item) => item.id !== profesorId));
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.response?.data?.message || error.message,
+        icon: 'error',
+      });
+    } finally {
+      setPause((prev) => {
+        const newPause = { ...prev };
+        delete newPause[profesorId];
+        return newPause;
+      });
+    }
+  };
+
+  const toggleComisiones = async (profesorId) => {
+    if (expandedProfesor === profesorId) {
+      setExpandedProfesor(null);
+    } else {
+      setExpandedProfesor(profesorId);
+    }
   };
 
   useEffect(() => {
-    if (!user?.sucursalId) return;
+    const sucursalId = getSucursalActiva()?.id;
+    if (!sucursalId) return;
     
     const peticion = async () => {
+      setLoading(true);
       try {
-        const data = await getProfesSucId(user.sucursalId);
-        setTableItems(data);
+        const data = await getProfesSucId(sucursalId);
+        setTableItems(data || []);
       } catch (error) {
+        console.error('Error al cargar profesores:', error);
+        setTableItems([]);
         Swal.fire({
           icon: 'error',
           title: 'Error al cargar profesores',
           text: error.response?.data?.message || error.message,
         });
+      } finally {
+        setLoading(false);
       }
     };
     peticion();
-  }, [user?.sucursalId]);
+  }, [getSucursalActiva()?.id]);
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -82,45 +103,82 @@ const DashProfesor = () => {
               <th className="py-3 px-6">Nombre</th>
               <th className="py-3 px-6">Apellido</th>
               <th className="py-3 px-6">Comisiones</th>
-              <th className="py-3 px-6"></th>
+              <th className="py-3 px-6 text-center">Acciones</th>
             </tr>
           </thead>
           <tbody className="text-gray-600 divide-y">
-            {tableItems.map((item) => (
-              <tr key={item.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.apellido}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.cantidadComisiones}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    value={item.id}
-                    onClick={clickDelete}
-                    className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
-                  >
-                    {pause[item.id] ? (
-                      <svg
-                        fill="white"
-                        className="w-6 h-6 mx-auto"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                          <animateTransform
-                            attributeName="transform"
-                            type="rotate"
-                            dur="0.75s"
-                            values="0 12 12;360 12 12"
-                            repeatCount="indefinite"
-                          />
-                        </path>
-                      </svg>
-                    ) : (
-                      'Eliminar'
-                    )}
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan="4" className="px-6 py-4 text-center">
+                  <div className="flex justify-center items-center">
+                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Cargando profesores...
+                  </div>
                 </td>
               </tr>
-            ))}
+            ) : tableItems.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                  No hay profesores registrados en esta sucursal
+                </td>
+              </tr>
+            ) : (
+              tableItems.map((item) => (
+                <>
+                  <tr key={item.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.apellido}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.cantidadComisiones}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() => toggleComisiones(item.id)}
+                          className="py-2 px-3 btnAz principal rounded-lg"
+                        >
+                          <i className="fa-solid fa-plus"></i>
+                        </button>
+                        <button
+                          value={item.id}
+                          onClick={clickDelete}
+                          disabled={pause[item.id]}
+                          className="py-2 px-3 text-white principal bg-red-500 hover:bg-red-600 rounded disabled:opacity-50"
+                        >
+                          {pause[item.id] ? (
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          ) : (
+                            <i className="fa-solid fa-trash"></i>
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedProfesor === item.id && (
+                    <tr>
+                      <td colSpan="4" className="px-6 py-4 bg-gray-50">
+                        <div className="text-sm">
+                          <h4 className="font-semibold mb-2">Comisiones actuales:</h4>
+                          {item.comisiones && item.comisiones.length > 0 ? (
+                            <ul className="list-disc list-inside">
+                              {item.comisiones.map((comision) => (
+                                <li key={comision.id}>{comision.name}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-gray-500">No tiene comisiones asignadas</p>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))
+            )}
           </tbody>
         </table>
       </div>

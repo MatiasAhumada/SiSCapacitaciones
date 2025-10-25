@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getSucursalId } from '../../services/Sucursales.service';
+import { useApp } from '../../context/AppContext';
 import { postProfes } from '../../services/Profesores.service';
 import Swal from 'sweetalert2';
 import logo from '../../assets/simplificado_a_color.png';
 
 const CreateProfesor = () => {
   const { user } = useAuth();
+  const { sucursales } = useApp();
   const navigate = useNavigate();
   const [pause, setPause] = useState(false);
-  const [suc, setSuc] = useState({});
   const [formData, setFormData] = useState({
     name: '',
     apellido: '',
-    dni: '',
-    sucursalId: user?.sucursalId,
+    tel: '',
+    sucursalId: '',
   });
 
   const handleChange = (e) => {
@@ -32,7 +32,7 @@ const CreateProfesor = () => {
     try {
       const updatedFormData = {
         ...formData,
-        sucursalId: user.sucursalId,
+        sucursalId: formData.sucursalId,
       };
 
       await postProfes(updatedFormData);
@@ -55,23 +55,7 @@ const CreateProfesor = () => {
     }
   };
 
-  useEffect(() => {
-    if (!user?.sucursalId) return;
-    
-    const cargarSucursal = async () => {
-      try {
-        const data = await getSucursalId(user.sucursalId);
-        setSuc(data.name);
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar sucursal',
-          text: error.response?.data?.message || error.message,
-        });
-      }
-    };
-    cargarSucursal();
-  }, [user?.sucursalId]);
+
 
   return (
     <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
@@ -118,15 +102,15 @@ const CreateProfesor = () => {
           </div>
         </div>
         <div className="pb-2">
-          <label htmlFor="dni" className="block mb-2 text-sm principal text-[#111827]">
-            DNI
+          <label htmlFor="tel" className="block mb-2 text-sm principal text-[#111827]">
+            Teléfono
           </label>
           <div className="relative text-gray-400">
             <input
-              type="number"
-              name="dni"
-              id="dni"
-              value={formData.dni}
+              type="text"
+              name="tel"
+              id="tel"
+              value={formData.tel}
               onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
               placeholder="3813528650"
@@ -139,39 +123,37 @@ const CreateProfesor = () => {
             Sucursal
           </label>
           <div className="relative text-gray-400">
-            <input
-              type="text"
-              name="sucursal"
-              id="sucursal"
-              disabled
-              value={suc}
+            <select
+              name="sucursalId"
+              id="sucursalId"
+              value={formData.sucursalId}
+              onChange={handleChange}
               className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              autoComplete="off"
-            />
+              required
+            >
+              <option value="">Seleccionar sucursal</option>
+              {sucursales.map((suc) => (
+                <option key={suc.id} value={suc.id}>
+                  {suc.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <button
           type="submit"
-          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
+          disabled={pause}
+          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6 disabled:opacity-50"
         >
           {pause ? (
-            <svg
-              fill="white"
-              className="w-6 h-6 mx-auto"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                <animateTransform
-                  attributeName="transform"
-                  type="rotate"
-                  dur="0.75s"
-                  values="0 12 12;360 12 12"
-                  repeatCount="indefinite"
-                />
-              </path>
-            </svg>
+            <div className="flex items-center justify-center">
+              <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Registrando...
+            </div>
           ) : (
             'Registrar Profesor'
           )}

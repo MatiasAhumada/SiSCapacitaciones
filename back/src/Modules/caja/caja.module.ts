@@ -11,6 +11,7 @@ import { Categoria } from './entities/categoria.entity';
 import { Subcategoria } from './entities/subcategoria.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { SesionCaja } from './entities/sesion-caja.entity';
+import { ComprobanteGeneratorService } from './comprobante-generator.service';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { SesionCaja } from './entities/sesion-caja.entity';
     ]),
   ],
   controllers: [CajaController],
-  providers: [CajaService],
+  providers: [CajaService, ComprobanteGeneratorService],
   exports: [CajaService],
 })
 export class CajaModule {}

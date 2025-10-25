@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useApp } from '../../context/AppContext';
 import Swal from 'sweetalert2';
 import { getCursos } from '../../services/Cursos.service';
+import Pagination from '../Pagination/Pagination';
 import { getProfes } from '../../services/Profesores.service';
 import {
   deleteComision,
@@ -12,6 +14,7 @@ import {
 
 const DashComisiones = () => {
   const { user } = useAuth();
+  const { getSucursalActiva } = useApp();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -26,6 +29,11 @@ const DashComisiones = () => {
   });
   const [cursos, setCursos] = useState([]);
   const [profesores, setProfesores] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchName, setSearchName] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const clickDelete = async (id) => {
     const comisionId = id;
@@ -52,29 +60,43 @@ const DashComisiones = () => {
     });
   };
 
-  useEffect(() => {
-    if (!user?.sucursalId) return;
+  const cargarComisiones = async (page = 1, name = '', day = '') => {
+    const sucursalId = getSucursalActiva()?.id;
+    if (!sucursalId) return;
     
+    setLoading(true);
+    try {
+      const data = await getComisionBySucursal(sucursalId, page, 10, name, day);
+      setTableItems(data.data || []);
+      setTotalPages(data.totalPages || 1);
+      setCurrentPage(data.currentPage || 1);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al cargar comisiones',
+        text: error.response?.data?.message || error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const [comisionesData, cursosData, profesoresData] = await Promise.all([
-          getComisionBySucursal(user.sucursalId),
+        const [cursosData, profesoresData] = await Promise.all([
           getCursos(),
           getProfes()
         ]);
-        setTableItems(comisionesData);
-        setCursos(cursosData);
+        setCursos(cursosData.data || cursosData);
         setProfesores(profesoresData);
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar datos',
-          text: error.response?.data?.message || error.message,
-        });
+        console.error('Error al cargar datos:', error);
       }
     };
     cargarDatos();
-  }, [user?.sucursalId]);
+    cargarComisiones(currentPage, searchName, selectedDay);
+  }, [currentPage, searchName, selectedDay, getSucursalActiva()?.id]);
 
   const handleEdit = (comision) => {
     setEditing(comision.id);
@@ -156,7 +178,34 @@ const DashComisiones = () => {
             En esta tabla estaran las comisiones de esta sucursal
           </p>
         </div>
-        <div className="mt-3 md:mt-0">
+        <div className="mt-3 md:mt-0 flex gap-4 items-center">
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={searchName}
+            onChange={(e) => {
+              setSearchName(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <select
+            value={selectedDay}
+            onChange={(e) => {
+              setSelectedDay(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          >
+            <option value="">Todos los días</option>
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miercoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sabado">Sábado</option>
+            <option value="Domingo">Domingo</option>
+          </select>
           <button
             onClick={() => navigate('/admin/comisiones/crear')}
             className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
@@ -179,7 +228,26 @@ const DashComisiones = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 divide-y">
-            {tableItems?.map((item) => (
+            {loading ? (
+              <tr>
+                <td colSpan="7" className="px-6 py-4 text-center">
+                  <div className="flex justify-center items-center">
+                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Cargando comisiones...
+                  </div>
+                </td>
+              </tr>
+            ) : tableItems.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+                  No hay comisiones disponibles
+                </td>
+              </tr>
+            ) : (
+              tableItems?.map((item) => (
               <tr key={item.id}>
                 <td className="px-6 py-4">
                   {editing === item.id ? (
@@ -331,14 +399,20 @@ const DashComisiones = () => {
                     onClick={() => clickDelete(item.id)}
                     className="px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                   >
-                    <i className="fa-solid fa-x"></i>
+                    <i className="fa-solid fa-trash"></i>
                   </button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
 };

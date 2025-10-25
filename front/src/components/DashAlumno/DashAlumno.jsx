@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAluID } from '../../services/Alumnos.service';
+import { getAluComID } from '../../services/Comisiones.service';
+import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import { Spinner } from '../Spinner/Spinner';
 import Swal from 'sweetalert2';
 
@@ -9,12 +10,41 @@ const DashAlumno = () => {
   const [alumno, setAlumno] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const handleEditPago = (pago) => {
+    console.log('Editar pago:', pago);
+    // TODO: Abrir modal de edición
+  };
+
+  const handlePrintPago = async (pago) => {
+    try {
+      await descargarComprobantePDF(pago.id);
+      Swal.fire({
+        icon: 'success',
+        title: 'Comprobante descargado',
+        text: 'El comprobante se ha descargado correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al descargar comprobante',
+        text: error.message,
+      });
+    }
+  };
+
+  const handleDeletePago = (pagoId) => {
+    console.log('Eliminar pago:', pagoId);
+    // TODO: Confirmar y eliminar pago
+  };
+
   useEffect(() => {
     const cargarAlumno = async () => {
       if (!alumnoId) return;
       
       try {
-        const data = await getAluID(alumnoId);
+        const data = await getAluComID(alumnoId);
         setAlumno(data);
       } catch (error) {
         Swal.fire({
@@ -65,15 +95,15 @@ const DashAlumno = () => {
           <div className="space-y-3">
             <div>
               <span className="font-medium text-gray-600">Nombre:</span>
-              <span className="ml-2">{alumno.name}</span>
+              <span className="ml-2">{alumno.alumno?.name}</span>
             </div>
             <div>
               <span className="font-medium text-gray-600">DNI:</span>
-              <span className="ml-2">{alumno.dni}</span>
+              <span className="ml-2">{alumno.alumno?.dni}</span>
             </div>
             <div>
               <span className="font-medium text-gray-600">Teléfono:</span>
-              <span className="ml-2">{alumno.tel}</span>
+              <span className="ml-2">{alumno.alumno?.tel}</span>
             </div>
             <div>
               <span className="font-medium text-gray-600">Email:</span>
@@ -94,64 +124,160 @@ const DashAlumno = () => {
           </div>
         </div>
 
-        {/* Comisiones */}
+        {/* Comisión */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h4 className="text-lg font-semibold mb-4 principal">Comisiones</h4>
-          {alumno.alumnoComisiones && alumno.alumnoComisiones.length > 0 ? (
-            <div className="space-y-3">
-              {alumno.alumnoComisiones.map((ac) => (
-                <div key={ac.id} className="p-3 bg-gray-50 rounded border">
-                  <div className="font-medium">{ac.comision?.name}</div>
-                  <div className="text-sm text-gray-600">
-                    Curso: {ac.comision?.curso?.name}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Horario: {ac.comision?.day} {ac.comision?.hour?.start}-{ac.comision?.hour?.end}
-                  </div>
-                  <div className="text-sm">
-                    Estado: 
-                    <span className={`ml-1 px-2 py-1 rounded text-xs ${
-                      ac.state ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {ac.state ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </div>
-                </div>
-              ))}
+          <h4 className="text-lg font-semibold mb-4 principal">Comisión</h4>
+          {alumno.comision ? (
+            <div className="p-3 bg-gray-50 rounded border">
+              <div className="font-medium">{alumno.comision.name}</div>
+              <div className="text-sm text-gray-600">
+                Día: {alumno.comision.day}
+              </div>
+              <div className="text-sm text-gray-600">
+                Horario: {alumno.comision.hour?.start}-{alumno.comision.hour?.end}
+              </div>
+              <div className="text-sm">
+                Estado: 
+                <span className={`ml-1 px-2 py-1 rounded text-xs ${
+                  alumno.state ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {alumno.state ? 'Activo' : 'Inactivo'}
+                </span>
+              </div>
             </div>
           ) : (
-            <p className="text-gray-600">No tiene comisiones asignadas</p>
+            <p className="text-gray-600">No tiene comisión asignada</p>
           )}
         </div>
       </div>
 
       {/* Pagos */}
       {alumno.pagos && alumno.pagos.length > 0 && (
-        <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-          <h4 className="text-lg font-semibold mb-4 principal">Historial de Pagos</h4>
-          <div className="overflow-x-auto">
+        <div className="mt-8">
+          <h4 className="text-xl font-bold mb-6 principal">Historial de Pagos</h4>
+          
+          {/* Vista Desktop */}
+          <div className="hidden md:block bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
             <table className="w-full table-auto text-sm">
               <thead className="bg-gray-50 text-gray-600 font-medium border-b">
                 <tr>
-                  <th className="py-3 px-6 text-left">Fecha</th>
-                  <th className="py-3 px-6 text-left">Monto</th>
-                  <th className="py-3 px-6 text-left">Método</th>
-                  <th className="py-3 px-6 text-left">Cuota</th>
+                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Fecha</th>
+                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Monto</th>
+                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Método</th>
+                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Cuota</th>
+                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Mes</th>
+                  <th className="py-4 px-6 text-center font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-600 divide-y">
-                {alumno.pagos.map((pago) => (
-                  <tr key={pago.id}>
-                    <td className="px-6 py-4">
-                      {new Date(pago.fecha).toLocaleDateString()}
+              <tbody className="divide-y divide-gray-200">
+                {alumno.pagos.map((pago, index) => (
+                  <tr key={pago.id} className={`hover:bg-gray-50 transition-colors ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                  }`}>
+                    <td className="px-6 py-4 text-gray-900">
+                      {new Date(pago.fecha).toLocaleDateString('es-ES')}
                     </td>
-                    <td className="px-6 py-4">${pago.monto}</td>
-                    <td className="px-6 py-4">{pago.metodoPago}</td>
-                    <td className="px-6 py-4">{pago.cuota}</td>
+                    <td className="px-6 py-4">
+                      <span className="font-semibold text-green-600">${pago.monto}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        pago.metodoPago === 'Efectivo' ? 'bg-green-100 text-green-800' :
+                        pago.metodoPago === 'Transferencia' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {pago.metodoPago}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-900">{pago.cuota}</td>
+                    <td className="px-6 py-4 text-gray-900">{pago.mesCuota}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          onClick={() => handleEditPago(pago)}
+                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                          title="Editar pago"
+                        >
+                          <i className="fa-solid fa-pen text-sm"></i>
+                        </button>
+                        <button
+                          onClick={() => handlePrintPago(pago)}
+                          className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
+                          title="Imprimir comprobante"
+                        >
+                          <i className="fa-solid fa-print text-sm"></i>
+                        </button>
+                        <button
+                          onClick={() => handleDeletePago(pago.id)}
+                          className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                          title="Eliminar pago"
+                        >
+                          <i className="fa-solid fa-trash text-sm"></i>
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
+          </div>
+
+          {/* Vista Mobile */}
+          <div className="md:hidden space-y-4">
+            {alumno.pagos.map((pago) => (
+              <div key={pago.id} className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <div className="font-semibold text-lg text-green-600">${pago.monto}</div>
+                    <div className="text-sm text-gray-600">
+                      {new Date(pago.fecha).toLocaleDateString('es-ES')}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditPago(pago)}
+                      className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+                    >
+                      <i className="fa-solid fa-pen text-sm"></i>
+                    </button>
+                    <button
+                      onClick={() => handlePrintPago(pago)}
+                      className="p-2 text-green-600 hover:bg-green-100 rounded-full"
+                    >
+                      <i className="fa-solid fa-print text-sm"></i>
+                    </button>
+                    <button
+                      onClick={() => handleDeletePago(pago.id)}
+                      className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+                    >
+                      <i className="fa-solid fa-trash text-sm"></i>
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-gray-600">Método:</span>
+                    <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                      pago.metodoPago === 'Efectivo' ? 'bg-green-100 text-green-800' :
+                      pago.metodoPago === 'Transferencia' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {pago.metodoPago}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Cuota:</span>
+                    <span className="ml-2 font-medium">{pago.cuota}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-gray-600">Mes:</span>
+                    <span className="ml-2 font-medium">{pago.mesCuota}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

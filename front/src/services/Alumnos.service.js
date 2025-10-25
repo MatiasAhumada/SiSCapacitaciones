@@ -1,10 +1,17 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const getAluSucID = async (id, page = 1, limit = 10) => {
+export const getAluSucID = async (id, page = 1, limit = 10, filtros = {}) => {
   try {
+    const params = { page, limit };
+    // Solo agregar filtros que tengan valor
+    Object.keys(filtros).forEach(key => {
+      if (filtros[key] && filtros[key] !== '') {
+        params[key] = filtros[key];
+      }
+    });
     const response = await axios.get(`${API_URL}/alumno/sucursal/${id}`, {
-      params: { page, limit },
+      params,
     });
     return response.data;
   } catch (error) {

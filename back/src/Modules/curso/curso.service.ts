@@ -18,9 +18,32 @@ export class CursoService {
     return this.cursoRepository.save(curso);
   }
 
-  async findAll() {
-    return this.cursoRepository.find();
+  async findAll(page = 1, limit = 10, area?: string) {
+    const whereConditions: any = {};
+    
+    if (area) {
+      whereConditions.area = area;
+    }
+
+    const totalItems = await this.cursoRepository.count({
+      where: whereConditions,
+    });
+
+    const cursos = await this.cursoRepository.find({
+      where: whereConditions,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: cursos,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+    };
   }
+
+
 
   async findOne(id: string) {
     return this.cursoRepository.findOne({

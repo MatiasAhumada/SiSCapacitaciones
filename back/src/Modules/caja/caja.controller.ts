@@ -221,4 +221,16 @@ export class CajaController {
   remove(@Param('id') id: string) {
     return this.cajaService.remove(id);
   }
+
+  @Get(':id/comprobante-pdf')
+  async generarComprobantePDF(@Param('id') id: string, @Res() res: Response) {
+    const buffer = await this.cajaService.generarComprobantePDF(id);
+    
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="comprobante-${id.substring(0, 8)}-${new Date().toISOString().split('T')[0]}.pdf"`,
+    });
+    
+    res.send(buffer);
+  }
 }

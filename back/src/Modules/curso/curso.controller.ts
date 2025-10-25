@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { CursoService } from './curso.service';
 import { CreateCursoDto } from './dto/create-curso.dto';
@@ -20,9 +21,15 @@ export class CursoController {
     return this.cursoService.create(createCursoDto);
   }
 
+
+
   @Get()
-  findAll() {
-    return this.cursoService.findAll();
+  findAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('area') area?: string,
+  ) {
+    return this.cursoService.findAll(Number(page), Number(limit), area);
   }
 
   @Get(':id')

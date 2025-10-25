@@ -37,11 +37,21 @@ export class AlumnoController {
     @Param('id') sucursalId: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
+    @Query('nombre') nombre?: string,
+    @Query('dni') dni?: string,
+    @Query('tel') tel?: string,
+    @Query('cantidadComisiones') cantidadComisiones?: string,
+    @Query('cantidadCertificados') cantidadCertificados?: string,
   ) {
-    return this.alumnoService.getAlumnosBySucursal(sucursalId, {
-      page: Number(page),
-      limit: Number(limit),
-    });
+    const filtros = { nombre, dni, tel, cantidadComisiones, cantidadCertificados };
+    return this.alumnoService.getAlumnosBySucursal(
+      sucursalId,
+      {
+        page: Number(page),
+        limit: Number(limit),
+      },
+      filtros,
+    );
   }
 
   @Put('/img/:id')

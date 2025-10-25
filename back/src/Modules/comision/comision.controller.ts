@@ -49,8 +49,14 @@ export class ComisionController {
   }
 
   @Get('/suc/:id')
-  findOneBySucursal(@Param('id') id: string) {
-    return this.comisionService.findBySucursal(id);
+  findOneBySucursal(
+    @Param('id') id: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('name') name?: string,
+    @Query('day') day?: string,
+  ) {
+    return this.comisionService.findBySucursal(id, Number(page), Number(limit), name, day);
   }
   @Get(':id')
   findOne(

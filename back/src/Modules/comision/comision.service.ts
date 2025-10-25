@@ -3,7 +3,7 @@ import { CreateComisionDto } from './dto/create-comision.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comision } from './entities/comision.entity';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, ILike } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Curso } from '../curso/entities/curso.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
@@ -267,10 +267,26 @@ export class ComisionService {
     }
   }
 
-  async findBySucursal(sucursalId: string): Promise<Comision[]> {
-    return await this.comisionRepository.find({
-      where: { sucursal: { id: sucursalId } },
+  async findBySucursal(sucursalId: string, page = 1, limit = 10, name?: string, day?: string) {
+    const whereConditions: any = { sucursal: { id: sucursalId } };
+    
+    if (name) {
+      whereConditions.name = ILike(`%${name}%`);
+    }
+    
+    if (day) {
+      whereConditions.day = day;
+    }
+
+    const totalItems = await this.comisionRepository.count({
+      where: whereConditions,
+    });
+
+    const comisiones = await this.comisionRepository.find({
+      where: whereConditions,
       relations: ['curso', 'profesor', 'alumnoComisiones', 'sucursal'],
+      skip: (page - 1) * limit,
+      take: limit,
       select: {
         curso: {
           id: true,
@@ -287,6 +303,13 @@ export class ComisionService {
         },
       },
     });
+
+    return {
+      data: comisiones,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+    };
   }
 
   async cambiarEstadoAlumnoComision(

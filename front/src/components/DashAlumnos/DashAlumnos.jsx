@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useApp } from '../../context/AppContext';
 import { deleteAlumnoId, getAluSucID } from '../../services/Alumnos.service';
 import FilterAlus from './FilterAlus';
 import { Spinner } from '../Spinner/Spinner';
@@ -9,6 +10,7 @@ import Swal from 'sweetalert2';
 
 const DashAlumnos = () => {
   const { user } = useAuth();
+  const { getSucursalActiva } = useApp();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -50,10 +52,11 @@ const DashAlumnos = () => {
     });
   };
 
-  const peticionAlumnos = async (page = 1, perPage = itemsPerPage) => {
-    if (!user?.sucursalId) return;
+  const peticionAlumnos = async (page = 1, perPage = itemsPerPage, filtros = {}) => {
+    const sucursalId = getSucursalActiva()?.id;
+    if (!sucursalId) return;
     try {
-      const data = await getAluSucID(user.sucursalId, page, perPage);
+      const data = await getAluSucID(sucursalId, page, perPage, filtros);
       setTableItems(data.data);
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
@@ -69,7 +72,7 @@ const DashAlumnos = () => {
 
   useEffect(() => {
     peticionAlumnos(currentPage);
-  }, [currentPage, user?.sucursalId]);
+  }, [currentPage, getSucursalActiva()?.id]);
 
   const filtrarAlumnos = async (filtros, setPaused) => {
     setPaused(true);
@@ -82,19 +85,9 @@ const DashAlumnos = () => {
         setIsFiltered(false);
         return;
       }
-      setItemsPerPage(totalAlumnos);
-      const data = await getAluSucID(user.sucursalId, 1, totalAlumnos);
-      const resultado = data.data.filter((alumno) => {
-        return (
-          (!filtros.nombre || alumno.name.toLowerCase().includes(filtros.nombre.toLowerCase())) &&
-          (!filtros.dni || alumno.dni.includes(filtros.dni)) &&
-          (!filtros.tel || alumno.tel.includes(filtros.tel)) &&
-          (!filtros.cantidadComisiones || alumno.cantidadComisiones === parseInt(filtros.cantidadComisiones)) &&
-          (!filtros.cantidadCertificados || alumno.cantidadCertificados === parseInt(filtros.cantidadCertificados))
-        );
-      });
+      setCurrentPage(1);
+      await peticionAlumnos(1, itemsPerPage, filtros);
       setIsFiltered(true);
-      setTableItems(resultado);
     } catch (error) {
       Swal.fire({
         icon: 'error',

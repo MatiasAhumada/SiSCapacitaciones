@@ -34,9 +34,25 @@ export const deleteComision = async (id) => {
   }
 };
 
-export const getComisionBySucursal = async (id) => {
+export const getAluComID = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/comision/suc/${id}`);
+    const response = await axios.get(`${API_URL}/comision/aluCom/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getComisionBySucursal = async (id, page = 1, limit = 10, name = '', day = '') => {
+  try {
+    const params = { page, limit };
+    if (name && name !== '') {
+      params.name = name;
+    }
+    if (day && day !== '') {
+      params.day = day;
+    }
+    const response = await axios.get(`${API_URL}/comision/suc/${id}`, { params });
     return response.data;
   } catch (error) {
     throw error;

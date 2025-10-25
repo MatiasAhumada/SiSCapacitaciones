@@ -8,7 +8,7 @@ import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Alumno } from './entities/alumno.entity';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 interface PaginationOptions {
   page?: number;
@@ -108,23 +108,37 @@ export class AlumnoService {
   async getAlumnosBySucursal(
     id: string,
     pagination?: PaginationOptions,
+    filtros?: any,
   ): Promise<PaginatedAlumnos> {
     const { page = 1, limit = 10 } = pagination || {};
+    
+    // Construir condiciones de filtro
+    const whereConditions: any = { sucursal: { id } };
+    
+    if (filtros?.nombre) {
+      whereConditions.name = Like(`%${filtros.nombre}%`);
+    }
+    if (filtros?.dni) {
+      whereConditions.dni = Like(`%${filtros.dni}%`);
+    }
+    if (filtros?.tel) {
+      whereConditions.tel = Like(`%${filtros.tel}%`);
+    }
 
-    // Contar total de alumnos
+    // Contar total de alumnos con filtros
     const totalItems = await this.alumnoRepository.count({
-      where: { sucursal: { id } },
+      where: whereConditions,
     });
 
     const alumnos = await this.alumnoRepository.find({
-      where: { sucursal: { id } },
+      where: whereConditions,
       relations: ['alumnoComisiones', 'certificados'],
       select: ['id', 'name', 'dni', 'tel'],
       skip: (page - 1) * limit,
       take: limit,
     });
 
-    const data = alumnos.map((alumno) => ({
+    let data = alumnos.map((alumno) => ({
       id: alumno.id,
       name: alumno.name,
       dni: alumno.dni,
@@ -133,11 +147,22 @@ export class AlumnoService {
       cantidadComisiones: alumno.alumnoComisiones?.length || 0,
       cantidadCertificados: alumno.certificados?.length || 0,
     }));
+    
+    // Filtrar por cantidad de comisiones y certificados si se especifica
+    if (filtros?.cantidadComisiones) {
+      data = data.filter(alumno => alumno.cantidadComisiones === parseInt(filtros.cantidadComisiones));
+    }
+    if (filtros?.cantidadCertificados) {
+      data = data.filter(alumno => alumno.cantidadCertificados === parseInt(filtros.cantidadCertificados));
+    }
+
+    // Si hay filtros aplicados, usar el total filtrado, sino el total original
+    const finalTotalItems = (filtros?.cantidadComisiones || filtros?.cantidadCertificados) ? data.length : totalItems;
   
     return {
       data,
-      totalItems,
-      totalPages: Math.ceil(totalItems / limit),
+      totalItems: finalTotalItems,
+      totalPages: Math.ceil(finalTotalItems / limit),
       currentPage: page,
     };
   }

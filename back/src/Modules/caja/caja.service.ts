@@ -28,6 +28,7 @@ import timezone = require('dayjs/plugin/timezone');
 import { formatNumber } from '@modules/common/utils/formatters.utils';
 import { formatPostgresDate } from '@modules/common/utils/date.utils';
 import { isNull } from 'lodash';
+import { ComprobanteGeneratorService } from './comprobante-generator.service';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -51,6 +52,7 @@ export class CajaService {
     private readonly profesorRepository: Repository<Profesor>,
     @InjectRepository(SesionCaja)
     private readonly sesionRepository: Repository<SesionCaja>,
+    private readonly comprobanteGeneratorService: ComprobanteGeneratorService,
   ) {}
   get fechaLocal(): Date {
     return dayjs().tz('America/Argentina/Buenos_Aires').toDate();
@@ -1266,6 +1268,23 @@ export class CajaService {
     });
   }
 
+  async generarComprobantePDF(movimientoId: string): Promise<Buffer> {
+    const movimiento = await this.cajaRepository.findOne({
+      where: { id: movimientoId },
+      relations: ['comprobante', 'alumnoComision.alumno'],
+    });
+
+    if (!movimiento) {
+      throw new NotFoundException('Movimiento no encontrado');
+    }
+
+    if (!movimiento.comprobante) {
+      throw new NotFoundException('El movimiento no tiene comprobante asociado');
+    }
+
+    return this.comprobanteGeneratorService.generarComprobantePDF(movimiento);
+  }
+
   private async actualizarConMovimiento(
     idSesion: string,
     movimiento: Caja,
@@ -1287,38 +1306,35 @@ export class CajaService {
     sesion.totalDigitalTobias = Number(sesion.totalDigitalTobias);
     sesion.totalFerro = Number(sesion.totalFerro);
 
-    const monto = Number(movimiento.monto);
-    const esIngreso =
-      movimiento.tipo === TipoMovimiento.INGRESO ||
-      movimiento.tipo === TipoMovimiento.APERTURA;
-    const esEgreso = movimiento.tipo === TipoMovimiento.EGRESO;
-    const esTransferencia = movimiento.tipo === TipoMovimiento.TRANSFERENCIA;
+    const montoMovimiento = Number(movimiento.monto);
 
-    // Actualizar totales generales
-    if (esIngreso) {
-      sesion.totalIngresos += monto;
-    } else if (esEgreso || esTransferencia) {
-      sesion.totalEgresos += monto;
+    // Actualizar totales según el tipo de movimiento
+    if (movimiento.tipo === TipoMovimiento.INGRESO) {
+      sesion.totalIngresos += montoMovimiento;
+    } else if (movimiento.tipo === TipoMovimiento.EGRESO || movimiento.tipo === TipoMovimiento.TRANSFERENCIA) {
+      sesion.totalEgresos += montoMovimiento;
     }
 
     // Actualizar totales por método de pago
-    const multiplicador = esIngreso ? 1 : -1;
-
     switch (movimiento.metodoPago) {
       case MetodoPago.EFECTIVO:
-        sesion.totalEfectivo += monto * multiplicador;
+        if (movimiento.tipo === TipoMovimiento.INGRESO) {
+          sesion.totalEfectivo += montoMovimiento;
+        } else if (movimiento.tipo === TipoMovimiento.EGRESO || movimiento.tipo === TipoMovimiento.TRANSFERENCIA) {
+          sesion.totalEfectivo -= montoMovimiento;
+        }
         break;
       case MetodoPago.CREDITO:
-        sesion.totalCredito += monto * multiplicador;
+        sesion.totalCredito += (movimiento.tipo === TipoMovimiento.INGRESO ? montoMovimiento : -montoMovimiento);
         break;
       case MetodoPago.DIGITAL_JAVIER:
-        sesion.totalDigitalJavier += monto * multiplicador;
+        sesion.totalDigitalJavier += (movimiento.tipo === TipoMovimiento.INGRESO ? montoMovimiento : -montoMovimiento);
         break;
       case MetodoPago.DIGITAL_TOBIAS:
-        sesion.totalDigitalTobias += monto * multiplicador;
+        sesion.totalDigitalTobias += (movimiento.tipo === TipoMovimiento.INGRESO ? montoMovimiento : -montoMovimiento);
         break;
       case MetodoPago.FERRO:
-        sesion.totalFerro += monto * multiplicador;
+        sesion.totalFerro += (movimiento.tipo === TipoMovimiento.INGRESO ? montoMovimiento : -montoMovimiento);
         break;
     }
 
@@ -1330,11 +1346,8 @@ export class CajaService {
       where: { id: sesionId },
     });
 
-    if (!sesion) {
-      throw new NotFoundException(`Sesión ${sesionId} no encontrada`);
-    }
+    if (!sesion) return;
 
-    // Obtener todos los movimientos de la sesión
     const movimientos = await this.cajaRepository.find({
       where: { sesionCaja: { id: sesionId } },
     });
@@ -1342,46 +1355,43 @@ export class CajaService {
     // Resetear totales
     sesion.totalIngresos = 0;
     sesion.totalEgresos = 0;
-    sesion.totalEfectivo = 0;
+    sesion.totalEfectivo = Number(sesion.montoApertura);
     sesion.totalCredito = 0;
     sesion.totalDigitalJavier = 0;
     sesion.totalDigitalTobias = 0;
     sesion.totalFerro = 0;
 
-    // Recalcular desde cero
-    for (const movimiento of movimientos) {
-      const monto = Number(movimiento.monto);
-      const esIngreso =
-        movimiento.tipo === TipoMovimiento.INGRESO ||
-        movimiento.tipo === TipoMovimiento.APERTURA;
-      const esEgreso = movimiento.tipo === TipoMovimiento.EGRESO;
-      const esTransferencia = movimiento.tipo === TipoMovimiento.TRANSFERENCIA;
-
-      // Actualizar totales generales
-      if (esIngreso) {
+    // Recalcular con todos los movimientos
+    for (const mov of movimientos) {
+      if (mov.tipo === TipoMovimiento.APERTURA || mov.tipo === TipoMovimiento.CIERRE) continue;
+      
+      const monto = Number(mov.monto);
+      
+      if (mov.tipo === TipoMovimiento.INGRESO) {
         sesion.totalIngresos += monto;
-      } else if (esEgreso || esTransferencia) {
+      } else if (mov.tipo === TipoMovimiento.EGRESO || mov.tipo === TipoMovimiento.TRANSFERENCIA) {
         sesion.totalEgresos += monto;
       }
 
-      // Actualizar totales por método de pago
-      const multiplicador = esIngreso ? 1 : -1;
-
-      switch (movimiento.metodoPago) {
+      switch (mov.metodoPago) {
         case MetodoPago.EFECTIVO:
-          sesion.totalEfectivo += monto * multiplicador;
+          if (mov.tipo === TipoMovimiento.INGRESO) {
+            sesion.totalEfectivo += monto;
+          } else if (mov.tipo === TipoMovimiento.EGRESO || mov.tipo === TipoMovimiento.TRANSFERENCIA) {
+            sesion.totalEfectivo -= monto;
+          }
           break;
         case MetodoPago.CREDITO:
-          sesion.totalCredito += monto * multiplicador;
+          sesion.totalCredito += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
           break;
         case MetodoPago.DIGITAL_JAVIER:
-          sesion.totalDigitalJavier += monto * multiplicador;
+          sesion.totalDigitalJavier += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
           break;
         case MetodoPago.DIGITAL_TOBIAS:
-          sesion.totalDigitalTobias += monto * multiplicador;
+          sesion.totalDigitalTobias += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
           break;
         case MetodoPago.FERRO:
-          sesion.totalFerro += monto * multiplicador;
+          sesion.totalFerro += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
           break;
       }
     }

@@ -8,15 +8,24 @@ import { useAuth } from '../context/AuthContext';
 import { navigationAdmin } from '../constants/navigations';
 
 const DashAdminNav = () => {
-  const { logout } = useAuth();
-  const { id } = useParams();
+  const { logout, user } = useAuth();
   const [sucs, setSucs] = useState([]);
   const [sucursalActual, setSucursalActual] = useState(null);
 
   const navigate = useNavigate();
 
   const clickBtn = (name) => {
-    navigate(`/adm/${id}/${name.toLowerCase()}`);
+    const routeMap = {
+      'vendedores': '/admin/vendedores',
+      'profesores': '/admin/profesores',
+      'alumnos': '/admin/alumnos',
+      'cursos': '/admin/cursos',
+      'comisiones': '/admin/comisiones',
+      'cajas': '/admin/cajas',
+      'nuevo': '/admin/listado-cajas',
+      'certificados': '/admin/certificados'
+    };
+    navigate(routeMap[name.toLowerCase()] || `/admin/${name.toLowerCase()}`);
   };
 
   useEffect(() => {
@@ -24,18 +33,17 @@ const DashAdminNav = () => {
       const data = await getSucursales();
       const nombresYIds = data.map(({ id, name }) => ({ id, name }));
       setSucs(nombresYIds);
-      const encontrada = nombresYIds.find((suc) => suc.id === id);
+      const encontrada = nombresYIds.find((suc) => suc.id === user?.sucursalId);
       setSucursalActual(encontrada || null);
     };
-    selectSuc();
-  }, [id]);
+    if (user?.sucursalId) {
+      selectSuc();
+    }
+  }, [user?.sucursalId]);
 
   const handleChange = (e) => {
-    const { value } = e.target;
-    const pathParts = location.pathname.split('/');
-    pathParts[2] = value;
-    const newPath = pathParts.join('/');
-    navigate(newPath);
+    // Funcionalidad de cambio de sucursal se manejará a través del contexto
+    console.log('Cambio de sucursal:', e.target.value);
   };
 
   return (
@@ -47,7 +55,7 @@ const DashAdminNav = () => {
               alt="Your Company"
               src={simplificado}
               className="size-8 cursor-pointer"
-              onClick={() => navigate(`/adm/${id}`)}
+              onClick={() => navigate('/admin')}
             />
             <select
               name="sucId"

@@ -33,9 +33,9 @@ const Login = () => {
       });
       setPause(false);
       if (data.isAdmin) {
-        navigate('/inicio');
+        navigate('/admin');
       } else {
-        navigate(`/${data.id}`);
+        navigate('/vendedor');
       }
 
     } catch (error) {

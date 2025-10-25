@@ -1,35 +1,37 @@
-import IndexAdm from './components/admin/IndexAdm';
-import CrearProfes from './components/profesor/CrearProfes';
-import DashProfe from './components/profesor/DashProfe';
-import AggVend from './components/vendedor/AggVend';
-import DashVendedor from './components/vendedor/DashVendedor';
-import InfoVendedor from './components/vendedor/InfoVendedor';
-import InfoIndexVend from './components/vendedor/ventas/InfoIndexVend';
-import Error404 from './Views/Error404';
-import Home from './Views/Home';
-import Login from './Views/Login';
 import { Route, BrowserRouter, Routes } from 'react-router-dom';
-import Inscribir from './components/vendedor/ventas/inscripcion/Inscribir';
-import DashAlumnos from './components/admin/alumnos/DashAlumnos';
-import DashCursos from './components/admin/cursos/DashCursos';
-import CreateCurso from './components/admin/cursos/CreateCurso';
-import DashComisiones from './components/admin/comisiones/DashComisiones';
-import CreateComision from './components/admin/comisiones/CreateComision';
-import DashCaja from './components/caja/DashCaja';
-import CreateCaja from './components/caja/CreateCaja';
-import Certificado from './components/admin/certificados/Certificados';
-import DashCajas from './components/admin/cajas/DashCajas';
-import ListadoComisiones from './components/admin/comisiones/ListadoComisiones';
-import DashComVend from './components/vendedor/comisiones/DashComVend';
-import CreateComVend from './components/vendedor/comisiones/CreateComVend';
-import DashAlumno from './components/vendedor/comisiones/DashAlumno';
-import CreateAlumnoNuevo from './components/alumno/CreateAlumnoNuevo';
-import CajaEgreso from './components/caja/CajaEgreso';
-import CajaTransferencia from './components/caja/CajaTransferencia';
-import ProtectedLayout from './layouts/ProtectedLayout';
-import RequireAuth from './context/RequireAuth';
 import { AuthProvider } from './context/AuthContext';
+import RequireAuth from './context/RequireAuth';
+import ProtectedLayout from './layouts/ProtectedLayout';
+
+// Views
+import Login from './Views/Login';
+import Home from './Views/Home';
+import Error404 from './Views/Error404';
+
+// Components
+import IndexAdm from './components/IndexAdm/IndexAdm';
+import DashVendedor from './components/DashVendedor/DashVendedor';
+import CreateVendedor from './components/CreateVendedor/CreateVendedor';
+import InfoVendedor from './components/InfoVendedor/InfoVendedor';
+import DashProfesor from './components/DashProfesor/DashProfesor';
+import CreateProfesor from './components/CreateProfesor/CreateProfesor';
+import DashAlumnos from './components/DashAlumnos/DashAlumnos';
+import CreateAlumno from './components/CreateAlumno/CreateAlumno';
+import DashCursos from './components/DashCursos/DashCursos';
+import CreateCurso from './components/CreateCurso/CreateCurso';
+import DashComisiones from './components/DashComisiones/DashComisiones';
+import CreateComision from './components/CreateComision/CreateComision';
+import ListadoComisiones from './components/ListadoComisiones/ListadoComisiones';
+import DashCaja from './components/caja/DashCaja';
+import CreateCaja from './components/CreateCaja/CreateCaja';
+import CajaEgreso from './components/CajaEgreso/CajaEgreso';
+import CajaTransferencia from './components/CajaTransferencia/CajaTransferencia';
+import DashCajas from './components/DashCajas/DashCajas';
 import ListadoCajas from './components/ListadoCajas/ListadoCajas';
+import Certificados from './components/Certificados/Certificados';
+import Inscribir from './components/Inscribir/Inscribir';
+import InfoIndexVend from './components/InfoIndexVend/InfoIndexVend';
+import DashAlumno from './components/DashAlumno/DashAlumno';
 function App() {
   return (
     <AuthProvider>
@@ -37,58 +39,44 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/inicio" element={<Home />} />
-          <Route
-            path="/"
-            element={
-              <RequireAuth>
-                <ProtectedLayout />
-              </RequireAuth>
-            }
-          >
-            <Route path="adm/:id">
-              <Route index element={<IndexAdm />} />
-              <Route path="cobrar" element={<CreateCaja />} />
-              <Route path="egreso" element={<CajaEgreso />} />
-              <Route path="vendedores" element={<DashVendedor />}>
-                <Route path="crear" element={<AggVend />} />
-                <Route path="info" element={<InfoVendedor />} />
-              </Route>
-              <Route path="profesores" element={<DashProfe />}>
-                <Route path="crear" element={<CrearProfes />} />
-              </Route>
-              <Route path="alumno/:idAlu" element={<DashAlumno />} />
-              <Route path="alumnos" element={<DashAlumnos />}>
-                <Route path="crear" element={<CreateAlumnoNuevo />} />
-              </Route>
-              <Route path="cursos" element={<DashCursos />}>
-                <Route path="crear" element={<CreateCurso />} />
-              </Route>
-              <Route path="comisiones" element={<DashComisiones />}>
-                <Route path="crear" element={<CreateComision />} />
-                <Route path=":comId" element={<ListadoComisiones />} />
-              </Route>
-              <Route path="cajas" element={<DashCajas />} />
-              <Route path="nuevo" element={<ListadoCajas />} />
-              <Route path="certificados" element={<Certificado />} />
-            </Route>
-            <Route path=":idVend">
-              <Route index element={<InfoIndexVend />} />
-              <Route path="nuevo" element={<ListadoCajas />} />
-              <Route path="alumno/:idAluCom" element={<DashAlumno />} />
-              <Route path="inscribir" element={<Inscribir />} />
-              <Route path="caja" element={<DashCaja />} />
-              <Route path="cobrar" element={<CreateCaja />} />
-              <Route path="egreso" element={<CajaEgreso />} />
-              <Route path="transferencia" element={<CajaTransferencia />} />
-              <Route path="cursos" element={<DashCursos />} />
-              <Route path="comisiones" element={<DashComVend />}>
-                <Route path="crear" element={<CreateComVend />} />
-              </Route>
-              <Route path="comisiones/:comId" element={<ListadoComisiones />} />
-              <Route path="alumnos" element={<CreateAlumnoNuevo />} />
-            </Route>
-            <Route path="/error" element={<Error404 />} />
-          </Route>
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<RequireAuth><ProtectedLayout><IndexAdm /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/vendedores" element={<RequireAuth><ProtectedLayout><DashVendedor /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/vendedores/crear" element={<RequireAuth><ProtectedLayout><CreateVendedor /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/vendedores/info/:vendedorId" element={<RequireAuth><ProtectedLayout><InfoVendedor /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/profesores" element={<RequireAuth><ProtectedLayout><DashProfesor /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/profesores/crear" element={<RequireAuth><ProtectedLayout><CreateProfesor /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/alumnos" element={<RequireAuth><ProtectedLayout><DashAlumnos /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/alumnos/crear" element={<RequireAuth><ProtectedLayout><CreateAlumno /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/alumno/:alumnoId" element={<RequireAuth><ProtectedLayout><DashAlumno /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/cursos" element={<RequireAuth><ProtectedLayout><DashCursos /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/cursos/crear" element={<RequireAuth><ProtectedLayout><CreateCurso /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/comisiones" element={<RequireAuth><ProtectedLayout><DashComisiones /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/comisiones/crear" element={<RequireAuth><ProtectedLayout><CreateComision /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/comisiones/:comisionId" element={<RequireAuth><ProtectedLayout><ListadoComisiones /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/cajas" element={<RequireAuth><ProtectedLayout><DashCajas /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/cobrar" element={<RequireAuth><ProtectedLayout><CreateCaja /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/egreso" element={<RequireAuth><ProtectedLayout><CajaEgreso /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/certificados" element={<RequireAuth><ProtectedLayout><Certificados /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/listado-cajas" element={<RequireAuth><ProtectedLayout><ListadoCajas /></ProtectedLayout></RequireAuth>} />
+          
+          {/* Vendedor Routes */}
+          <Route path="/vendedor" element={<RequireAuth><ProtectedLayout><InfoIndexVend /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/inscribir" element={<RequireAuth><ProtectedLayout><Inscribir /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/caja" element={<RequireAuth><ProtectedLayout><DashCaja /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/cobrar" element={<RequireAuth><ProtectedLayout><CreateCaja /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/egreso" element={<RequireAuth><ProtectedLayout><CajaEgreso /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/transferencia" element={<RequireAuth><ProtectedLayout><CajaTransferencia /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/cursos" element={<RequireAuth><ProtectedLayout><DashCursos /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/comisiones" element={<RequireAuth><ProtectedLayout><DashComisiones /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/comisiones/crear" element={<RequireAuth><ProtectedLayout><CreateComision /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/comisiones/:comisionId" element={<RequireAuth><ProtectedLayout><ListadoComisiones /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/alumno/:alumnoId" element={<RequireAuth><ProtectedLayout><DashAlumno /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/alumnos/crear" element={<RequireAuth><ProtectedLayout><CreateAlumno /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/listado-cajas" element={<RequireAuth><ProtectedLayout><ListadoCajas /></ProtectedLayout></RequireAuth>} />
+          
+          <Route path="*" element={<Error404 />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

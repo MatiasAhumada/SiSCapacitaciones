@@ -6,16 +6,19 @@ import { useAuth } from '../context/AuthContext';
 import { navigationVendedor } from '../constants/navigations';
 
 const DashVendedorNav = () => {
-  const {
-    logout,
-    user: { id },
-  } = useAuth();
-
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const clickBtn = (name) => {
-    const formattedName = name.toLowerCase().replace(/\s+/g, '');
-    navigate(`/${id}/${formattedName}`);
+    const routeMap = {
+      'inscribir': '/vendedor/inscribir',
+      'caja': '/vendedor/caja',
+      'nuevo': '/vendedor/listado-cajas',
+      'cursos': '/vendedor/cursos',
+      'comisiones': '/vendedor/comisiones',
+      'alumnos': '/vendedor/alumnos/crear'
+    };
+    navigate(routeMap[name.toLowerCase()] || `/vendedor/${name.toLowerCase()}`);
   };
   return (
     <div className="min-h-full ">
@@ -28,7 +31,7 @@ const DashVendedorNav = () => {
                   alt="Your Company"
                   src={simplificado}
                   className="size-8"
-                  onClick={() => navigate(`/${id}`)}
+                  onClick={() => navigate('/vendedor')}
                 />
               </div>
               <div className="hidden lg:block">

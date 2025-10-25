@@ -56,7 +56,7 @@ const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
         }
         break;
       default:
-        navigate(`/${idVend}/${ruta}`);
+        navigate(`/vendedor/${ruta}`);
     }
   };
 

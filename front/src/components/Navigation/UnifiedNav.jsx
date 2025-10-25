@@ -117,14 +117,13 @@ const UnifiedNav = () => {
         <div className="flex h-18 items-center justify-between">
           {/* Logo and Branch Selector */}
           <div className="flex items-center gap-6">
-            <div className="relative group">
+            <div className="relative group cursor-pointer" onClick={() => navigate(isAdmin ? '/admin' : '/vendedor')}>
               <img
                 alt="SiS Capacitaciones"
                 src={simplificado}
-                className="h-12 w-12 cursor-pointer hover:scale-110 transition-all duration-300 drop-shadow-lg group-hover:drop-shadow-2xl"
-                onClick={() => navigate(isAdmin ? '/admin' : '/vendedor')}
+                className="h-12 w-12 hover:scale-110 transition-all duration-300 drop-shadow-lg group-hover:drop-shadow-2xl"
               />
-              <div className="absolute inset-0 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
             {isAdmin && sucursales.length > 0 && (
               <div className="relative group">
@@ -165,7 +164,7 @@ const UnifiedNav = () => {
             </div>
             <button
               onClick={logout}
-              className="group flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              className="group flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
               <ArrowRightOnRectangleIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               Cerrar Sesión

@@ -1,41 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
 import { useAuth } from '../../context/AuthContext';
-import { getComisionBySucursal } from '../../services/Comisiones.service';
+import { useApp } from '../../context/AppContext';
+import { getComisiones } from '../../services/Comisiones.service';
 import { getAluByDNI, postAluSimple } from '../../services/Alumnos.service';
 import { postInscripcion } from '../../services/Inscripciones.service';
+import { getVendedores } from '../../services/Vendedores.service';
 
 const Inscribir = () => {
   const { user } = useAuth();
+  const { sucursalSeleccionada } = useApp();
   const [pause, setPause] = useState(false);
   const [comisiones, setComisiones] = useState([]);
+  const [vendedores, setVendedores] = useState([]);
   const [alumnoEncontrado, setAlumnoEncontrado] = useState(null);
   const [formData, setFormData] = useState({
     dni: '',
     nombre: '',
     comisionId: '',
-    vendedorId: user?.id,
+    vendedorId: "",
   });
+  const [comisionSearch, setComisionSearch] = useState('');
+  const [showComisiones, setShowComisiones] = useState(false);
+  const [filteredComisiones, setFilteredComisiones] = useState([]);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
-    if (!user?.sucursalId) return;
-    
-    const cargarComisiones = async () => {
+    const cargarDatos = async () => {
       try {
-        const data = await getComisionBySucursal(user.sucursalId);
-        setComisiones(data);
+        const [comisionesData, vendedoresData] = await Promise.all([
+          getComisiones(1, 100),
+          getVendedores()
+        ]);
+        setComisiones(comisionesData.data || comisionesData);
+        setVendedores(vendedoresData);
       } catch (error) {
         Swal.fire({
           icon: 'error',
-          title: 'Error al cargar comisiones',
-          text: error.message || 'Error al cargar las comisiones',
+          title: 'Error al cargar datos',
+          text: error.message || 'Error al cargar los datos',
         });
       }
     };
 
-    cargarComisiones();
-  }, [user?.sucursalId]);
+    cargarDatos();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,6 +54,45 @@ const Inscribir = () => {
       [name]: value,
     });
   };
+
+  const handleComisionSearch = (e) => {
+    const value = e.target.value;
+    setComisionSearch(value);
+    setShowComisiones(true);
+    
+    // Filtrar comisiones
+    const filtered = comisiones.filter(c => {
+      const comisionText = `${c.name} - ${c.curso?.name} (${c.day} ${c.hour?.start}-${c.hour?.end})`;
+      return comisionText.toLowerCase().includes(value.toLowerCase());
+    });
+    setFilteredComisiones(filtered);
+  };
+
+  const selectComision = (comision) => {
+    const comisionText = `${comision.name} - ${comision.curso?.name} (${comision.day} ${comision.hour?.start}-${comision.hour?.end})`;
+    setComisionSearch(comisionText);
+    setFormData({
+      ...formData,
+      comisionId: comision.id
+    });
+    setShowComisiones(false);
+  };
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowComisiones(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Inicializar comisiones filtradas
+  useEffect(() => {
+    setFilteredComisiones(comisiones);
+  }, [comisiones]);
 
   const buscarAlumno = async () => {
     if (!formData.dni) return;
@@ -92,9 +141,12 @@ const Inscribir = () => {
 
       // Crear la inscripción
       await postInscripcion({
-        alumnoId,
+        alumnoId: formData.dni, // El backend espera DNI, no ID
         comisionId: formData.comisionId,
-        vendedorId: user?.id,
+        vendedorId: formData.vendedorId,
+        sucursalId: vendedores.find(v => v.id === formData.vendedorId)?.sucursales?.[0]?.id || '', // Usar sucursal del vendedor seleccionado
+        fechaRegistro: new Date().toISOString(),
+        state: true
       });
 
       Swal.fire({
@@ -111,6 +163,7 @@ const Inscribir = () => {
         comisionId: '',
         vendedorId: user?.id,
       });
+      setComisionSearch('');
       setAlumnoEncontrado(null);
     } catch (error) {
       Swal.fire({
@@ -175,24 +228,57 @@ const Inscribir = () => {
         </div>
 
         <div className="pb-2">
-          <label htmlFor="comisionId" className="block mb-2 text-sm principal">
-            Comisión
+          <label htmlFor="vendedorId" className="block mb-2 text-sm principal">
+            Vendedor
           </label>
           <select
-            name="comisionId"
-            id="comisionId"
-            value={formData.comisionId}
+            name="vendedorId"
+            id="vendedorId"
+            value={formData.vendedorId}
             onChange={handleChange}
             className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg p-2.5"
             required
           >
-            <option value="">Seleccione una comisión</option>
-            {comisiones.map((comision) => (
-              <option key={comision.id} value={comision.id}>
-                {comision.name} - {comision.curso?.name} ({comision.day} {comision.hour?.start}-{comision.hour?.end})
+            <option value="">Seleccione un vendedor</option>
+            {vendedores.map((vendedor) => (
+              <option key={vendedor.id} value={vendedor.id}>
+                {vendedor.name}
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="pb-2 relative" ref={dropdownRef}>
+          <label htmlFor="comisionSearch" className="block mb-2 text-sm principal">
+            Comisión
+          </label>
+          <input
+            type="text"
+            name="comisionSearch"
+            id="comisionSearch"
+            value={comisionSearch}
+            onChange={handleComisionSearch}
+            onFocus={() => setShowComisiones(true)}
+            className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg p-2.5"
+            placeholder="Buscar comisión..."
+            required
+          />
+          {showComisiones && filteredComisiones.length > 0 && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              {filteredComisiones.map((comision) => (
+                <div
+                  key={comision.id}
+                  onClick={() => selectComision(comision)}
+                  className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 text-sm text-gray-700 hover:text-blue-700 transition-colors"
+                >
+                  <div className="font-medium">{comision.name}</div>
+                  <div className="text-xs text-gray-500">
+                    {comision.curso?.name} • {comision.day} {comision.hour?.start}-{comision.hour?.end}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {alumnoEncontrado && (

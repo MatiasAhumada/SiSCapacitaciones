@@ -23,11 +23,11 @@ export class VendedorService {
     const { sucursal, inscripciones, password, ...vendedorData } =
       createVendedorDto;
 
-    const sucursalesEntities = await this.sucursalRepository.findOne({
+    const sucursalesEntities = await this.sucursalRepository.find({
       where: { id: In(sucursal) },
     });
 
-    if (!sucursalesEntities) {
+    if (!sucursalesEntities || sucursalesEntities.length === 0) {
       throw new Error('Sucursal no encontrada');
     }
 
@@ -43,7 +43,7 @@ export class VendedorService {
     const newVendedor = this.vendedorRepository.create({
       ...vendedorData,
       password: hashedPassword,
-      sucursales: [sucursalesEntities],
+      sucursales: sucursalesEntities,
       inscripciones: inscripcionesEntities,
     });
 
@@ -51,13 +51,38 @@ export class VendedorService {
   }
 
   async findAll() {
-    return this.vendedorRepository.find();
+    return this.vendedorRepository.find({
+      relations: ['inscripciones', 'sucursales'],
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        tel: true,
+        isAdmin: true,
+        inscripciones: {
+          id: true,
+        },
+        sucursales: {
+          id: true,
+          name: true,
+        },
+      },
+    });
   }
 
   async getVendedoresBySucursal(id: string) {
     return this.vendedorRepository.find({
       where: { sucursales: { id } },
-      select: ['id', 'name', 'email', 'tel'],
+      relations: ['inscripciones'],
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        tel: true,
+        inscripciones: {
+          id: true,
+        },
+      },
     });
   }
 
@@ -126,7 +151,42 @@ export class VendedorService {
   }
 
   async update(id: string, updateVendedorDto: UpdateVendedorDto) {
-    return `This action updates a #${id} vendedor`;
+    const { sucursal, inscripciones, password, ...vendedorData } = updateVendedorDto;
+    
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id },
+      relations: ['sucursales', 'inscripciones'],
+    });
+    
+    if (!vendedor) {
+      throw new Error(`Vendedor con ID ${id} no encontrado`);
+    }
+    
+    // Actualizar datos básicos
+    Object.assign(vendedor, vendedorData);
+    
+    // Actualizar contraseña si se proporciona
+    if (password) {
+      vendedor.password = await bcrypt.hash(password, 10);
+    }
+    
+    // Actualizar sucursales si se proporcionan
+    if (sucursal && sucursal.length > 0) {
+      const sucursalesEntities = await this.sucursalRepository.find({
+        where: { id: In(sucursal) },
+      });
+      vendedor.sucursales = sucursalesEntities;
+    }
+    
+    // Actualizar inscripciones si se proporcionan
+    if (inscripciones && inscripciones.length > 0) {
+      const inscripcionesEntities = await this.inscripcionRepository.find({
+        where: { id: In(inscripciones) },
+      });
+      vendedor.inscripciones = inscripcionesEntities;
+    }
+    
+    return await this.vendedorRepository.save(vendedor);
   }
 
   async remove(id: string) {
@@ -134,5 +194,6 @@ export class VendedorService {
     if (deleted.affected === 0) {
       throw new Error(`Vendedor con ID ${id} no encontrado`);
     }
+    return { message: 'Vendedor eliminado exitosamente' };
   }
 }

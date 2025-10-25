@@ -10,9 +10,14 @@ export const getVendedores = async () => {
   }
 };
 
-export const getVendID = async (id) => {
+export const getVendID = async (id, fechaDesde, fechaHasta) => {
   try {
-    const response = await axios.get(`${API_URL}/vendedor/${id}`);
+    const params = new URLSearchParams();
+    if (fechaDesde) params.append('fechaDesde', fechaDesde);
+    if (fechaHasta) params.append('fechaHasta', fechaHasta);
+    
+    const url = `${API_URL}/vendedor/${id}${params.toString() ? `?${params.toString()}` : ''}`;
+    const response = await axios.get(url);
     return response.data;
   } catch (error) {
     throw error;
@@ -40,6 +45,15 @@ export const postVend = async (vendedor) => {
 export const deleteVend = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/vendedor/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateVend = async (id, vendedor) => {
+  try {
+    const response = await axios.patch(`${API_URL}/vendedor/${id}`, vendedor);
     return response.data;
   } catch (error) {
     throw error;

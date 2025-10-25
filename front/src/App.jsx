@@ -1,5 +1,6 @@
-import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { AppProvider } from './context/AppContext';
 import RequireAuth from './context/RequireAuth';
 import ProtectedLayout from './layouts/ProtectedLayout';
 
@@ -35,8 +36,10 @@ import DashAlumno from './components/DashAlumno/DashAlumno';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <AppProvider>
+        <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/inicio" element={<Home />} />
           
@@ -78,7 +81,8 @@ function App() {
           
           <Route path="*" element={<Error404 />} />
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AppProvider>
     </AuthProvider>
   );
 }

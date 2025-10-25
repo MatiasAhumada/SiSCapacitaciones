@@ -28,6 +28,7 @@ export class CreateVendedorDto {
   @IsUUID('all', { each: true }) // Valida que cada elemento sea un UUID
   inscripciones: string[];
 
-  @IsUUID()
+  @IsArray()
+  @IsUUID('all', { each: true })
   sucursal: string[];
 }

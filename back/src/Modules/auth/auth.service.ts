@@ -74,6 +74,7 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       id: user.id,
       isAdmin: user.isAdmin,
+      // sucursalId:user.
     };
   }
 }

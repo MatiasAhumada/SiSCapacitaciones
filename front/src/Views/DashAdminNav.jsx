@@ -5,12 +5,12 @@ import simplificado from '../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSucursales } from '../services/Sucursales.service';
 import { useAuth } from '../context/AuthContext';
+import { useApp } from '../context/AppContext';
 import { navigationAdmin } from '../constants/navigations';
 
 const DashAdminNav = () => {
-  const { logout, user } = useAuth();
-  const [sucs, setSucs] = useState([]);
-  const [sucursalActual, setSucursalActual] = useState(null);
+  const { logout } = useAuth();
+  const { sucursales, sucursalSeleccionada, cambiarSucursal } = useApp();
 
   const navigate = useNavigate();
 
@@ -28,22 +28,8 @@ const DashAdminNav = () => {
     navigate(routeMap[name.toLowerCase()] || `/admin/${name.toLowerCase()}`);
   };
 
-  useEffect(() => {
-    const selectSuc = async () => {
-      const data = await getSucursales();
-      const nombresYIds = data.map(({ id, name }) => ({ id, name }));
-      setSucs(nombresYIds);
-      const encontrada = nombresYIds.find((suc) => suc.id === user?.sucursalId);
-      setSucursalActual(encontrada || null);
-    };
-    if (user?.sucursalId) {
-      selectSuc();
-    }
-  }, [user?.sucursalId]);
-
   const handleChange = (e) => {
-    // Funcionalidad de cambio de sucursal se manejará a través del contexto
-    console.log('Cambio de sucursal:', e.target.value);
+    cambiarSucursal(e.target.value);
   };
 
   return (
@@ -59,20 +45,16 @@ const DashAdminNav = () => {
             />
             <select
               name="sucId"
-              value={navigationAdmin.id}
+              value={sucursalSeleccionada?.id || ''}
               onChange={handleChange}
               className="border p-1 rounded"
             >
-              <option value={sucursalActual?.id}>
-                {sucursalActual?.name || 'Seleccionar sucursal'}
-              </option>
-              {sucs
-                .filter((suc) => suc.id !== sucursalActual?.id)
-                .map((suc) => (
-                  <option key={suc.id} value={suc.id}>
-                    {suc.name}
-                  </option>
-                ))}
+              <option value="">Seleccionar sucursal</option>
+              {sucursales.map((suc) => (
+                <option key={suc.id} value={suc.id}>
+                  {suc.name}
+                </option>
+              ))}
             </select>
           </div>
 

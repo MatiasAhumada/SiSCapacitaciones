@@ -2,18 +2,14 @@ import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
 import { getAlu, getAluID } from '../../services/Alumnos.service';
-import { getVendID } from '../../services/Vendedores.service';
+import { useAuth } from '../../context/AuthContext';
 import { postCaja } from '../../services/Cajas.service';
-import { Modal } from 'antd';
-import ReciboComprobante from './Comprobante';
+import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import Opciones from './Opciones';
 import { Spinner } from '../Spinner/Spinner';
 const CreateCaja = () => {
-  const idVende = localStorage.getItem('token');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imprimir, setImprimir] = useState({
-    tipoComprobante: 'Factura de venta',
-  });
+  const { user } = useAuth();
+  const [movimientoId, setMovimientoId] = useState(null);
   const [infoComprobante, setInfoComprobante] = useState({
     apellidoNombre: '',
     dni: '',
@@ -32,7 +28,6 @@ const CreateCaja = () => {
   const [generatePDF, setGeneratePDF] = useState(false);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [pause, setPause] = useState(false);
-  const [vend, setVend] = useState({});
   const [alumnoComisiones, setAlumnocomisiones] = useState([]);
   const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
@@ -73,20 +68,6 @@ const CreateCaja = () => {
   };
 
   useEffect(() => {
-    const vendedor = async () => {
-      await getVendID(idVende).then((data) => {
-        setVend(data);
-        setFormData((prev) => ({
-          ...prev,
-          vendedorId: data.id,
-        }));
-      });
-    };
-    // const vendedores = async () => {
-    //   await getVendedores().then((data) => {
-    //     setVendores(data);
-    //   });
-    // };
     const alumnos = async () => {
       await getAlu().then((data) => {
         try {
@@ -97,16 +78,18 @@ const CreateCaja = () => {
       });
     };
 
-    vendedor();
-    // vendedores();
     alumnos();
+    setFormData((prev) => ({
+      ...prev,
+      vendedorId: user?.id,
+    }));
 
     const intervalId = setInterval(() => {
       setFecha(new Date());
     }, 60000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [user?.id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -150,7 +133,7 @@ const CreateCaja = () => {
         descripcion: descripcion.value,
         monto: monto.value,
         tipo: tipo.value,
-        vendedorId: idVende,
+        vendedorId: user?.id,
         comprobante: cargaComprobante,
       };
 
@@ -161,11 +144,7 @@ const CreateCaja = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          setImprimir({
-            ...data.comprobante,
-            fecha: formatToDisplay(data.comprobante.fecha),
-          });
-
+          setMovimientoId(data.id);
           setGeneratePDF(true);
         });
       });
@@ -181,11 +160,23 @@ const CreateCaja = () => {
     }
   };
 
-  const handleOpen = () => {
-    setIsModalOpen(true);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const handleDescargarPDF = async () => {
+    try {
+      await descargarComprobantePDF(movimientoId);
+      Swal.fire({
+        icon: 'success',
+        title: 'Comprobante descargado',
+        text: 'El comprobante se ha descargado correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al descargar comprobante',
+        text: error.message,
+      });
+    }
   };
   const handleAlumnoClick = async (e) => {
     e.preventDefault();
@@ -270,7 +261,7 @@ const CreateCaja = () => {
                   name="vendedorId"
                   id="vendedorId"
                   disabled
-                  defaultValue={vend.name || ''}
+                  defaultValue={user?.name || ''}
                   className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
                 />
               </div>
@@ -437,16 +428,13 @@ const CreateCaja = () => {
             {generatePDF && (
               <button
                 type="button"
-                onClick={handleOpen}
+                onClick={handleDescargarPDF}
                 className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6 mt-2"
               >
-                Generar PDF
+                Descargar Comprobante
               </button>
             )}
           </form>
-          <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
-            <ReciboComprobante {...imprimir}></ReciboComprobante>
-          </Modal>
         </div>
       ) : (
         <Opciones setCambio={setCambio} setCuotavieja={setCuotavieja}></Opciones>

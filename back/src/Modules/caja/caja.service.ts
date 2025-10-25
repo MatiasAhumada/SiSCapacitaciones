@@ -217,7 +217,7 @@ export class CajaService {
     }
     if (alumnoComisionId) {
       const alumnoComision = await this.alumnoComisionRepository.findOne({
-        where: { alumno: { id: alumnoComisionId } },
+        where: { id: alumnoComisionId },
       });
       if (!alumnoComision) {
         throw new NotFoundException(

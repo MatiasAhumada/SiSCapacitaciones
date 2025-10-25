@@ -36,8 +36,13 @@ export class ComisionController {
   }
 
   @Get()
-  findAll() {
-    return this.comisionService.findAll();
+  findAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('name') name?: string,
+    @Query('day') day?: string,
+  ) {
+    return this.comisionService.findAll(Number(page), Number(limit), name, day);
   }
   @Get('/aluCom/:idAluCom')
   findAluCom(@Param('idAluCom') id: string) {

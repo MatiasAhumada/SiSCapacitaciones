@@ -4,8 +4,10 @@ import Swal from 'sweetalert2';
 import { deleteCurso, getCursos } from '../../services/Cursos.service';
 import Pagination from '../Pagination/Pagination';
 import { AREAS } from '../../constants/areas';
+import { useAuth } from '../../context/AuthContext';
 
 const DashCursos = () => {
+  const { user } = useAuth();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -91,12 +93,14 @@ const DashCursos = () => {
               </option>
             ))}
           </select>
-          <button
-            onClick={() => navigate('/admin/cursos/crear')}
-            className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
-          >
-            Nuevo Curso
-          </button>
+          {user?.isAdmin && (
+            <button
+              onClick={() => navigate('/admin/cursos/crear')}
+              className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
+            >
+              Nuevo Curso
+            </button>
+          )}
         </div>
       </div>
       <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
@@ -117,8 +121,19 @@ const DashCursos = () => {
                 <td colSpan="6" className="px-6 py-4 text-center">
                   <div className="flex justify-center items-center">
                     <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Cargando cursos...
                   </div>
@@ -132,70 +147,70 @@ const DashCursos = () => {
               </tr>
             ) : (
               tableItems.map((item) => (
-              <tr key={item.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                      item.area === 'Digital'
-                        ? 'bg-blue-200 text-blue-800'
-                        : item.area === 'Idiomas'
-                          ? 'bg-yellow-200 text-yellow-800'
-                          : item.area === 'Administrativa'
-                            ? 'bg-red-200 text-red-800'
-                            : item.area === 'Belleza'
-                              ? 'bg-pink-200 text-pink-800'
-                              : item.area === 'Técnica'
-                                ? 'bg-purple-200 text-purple-800'
-                                : item.area === 'Salud'
-                                  ? 'bg-green-200 text-green-800'
-                                  : 'bg-gray-200 text-gray-800'
-                    }`}
-                  >
-                    {item.area}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.duration}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                      item.tipo === 'Distancia'
-                        ? 'bg-blue-200 text-blue-800'
-                        : 'bg-green-200 text-green-800'
-                    }`}
-                  >
-                    {item.tipo}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">${item.price}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => clickDelete(item.id)}
-                    className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
-                  >
-                    {pause[item.id] ? (
-                      <svg
-                        fill="white"
-                        className="w-6 h-6 mx-auto"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                          <animateTransform
-                            attributeName="transform"
-                            type="rotate"
-                            dur="0.75s"
-                            values="0 12 12;360 12 12"
-                            repeatCount="indefinite"
-                          />
-                        </path>
-                      </svg>
-                    ) : (
-                      <i className="fa-solid fa-trash"></i>
-                    )}
-                  </button>
-                </td>
-              </tr>
+                <tr key={item.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                        item.area === 'Digital'
+                          ? 'bg-blue-200 text-blue-800'
+                          : item.area === 'Idiomas'
+                            ? 'bg-yellow-200 text-yellow-800'
+                            : item.area === 'Administrativa'
+                              ? 'bg-red-200 text-red-800'
+                              : item.area === 'Belleza'
+                                ? 'bg-pink-200 text-pink-800'
+                                : item.area === 'Técnica'
+                                  ? 'bg-purple-200 text-purple-800'
+                                  : item.area === 'Salud'
+                                    ? 'bg-green-200 text-green-800'
+                                    : 'bg-gray-200 text-gray-800'
+                      }`}
+                    >
+                      {item.area}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.duration}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                        item.tipo === 'Distancia'
+                          ? 'bg-blue-200 text-blue-800'
+                          : 'bg-green-200 text-green-800'
+                      }`}
+                    >
+                      {item.tipo}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">${item.price}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() => clickDelete(item.id)}
+                      className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                    >
+                      {pause[item.id] ? (
+                        <svg
+                          fill="white"
+                          className="w-6 h-6 mx-auto"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                            <animateTransform
+                              attributeName="transform"
+                              type="rotate"
+                              dur="0.75s"
+                              values="0 12 12;360 12 12"
+                              repeatCount="indefinite"
+                            />
+                          </path>
+                        </svg>
+                      ) : (
+                        <i className="fa-solid fa-trash"></i>
+                      )}
+                    </button>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>

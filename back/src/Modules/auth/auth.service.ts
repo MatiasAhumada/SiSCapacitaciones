@@ -33,7 +33,7 @@ export class AuthService {
     if (admin) {
       const isPasswordValid = await bcrypt.compare(password, admin.password);
       if (isPasswordValid) {
-        return { id: admin.id, isAdmin: true };
+        return { id: admin.id, isAdmin: true,  };
       } else {
         throw new BadRequestException('Contraseña incorrecta');
       }
@@ -45,7 +45,7 @@ export class AuthService {
     if (vendedor) {
       const isPasswordValid = await bcrypt.compare(password, vendedor.password);
       if (isPasswordValid) {
-        return { id: vendedor.id, isAdmin: false };
+        return { id: vendedor.id, isAdmin: false, name: vendedor.name };
       } else {
         throw new BadRequestException('Contraseña incorrecta');
       }

@@ -1,12 +1,19 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const getComisiones = async () => {
+export const getComisiones = async (page = 1, limit = 10, name = '', day = '') => {
   try {
-    const response = await axios.get(`${API_URL}/comision`);
+    const params = { page, limit };
+    if (name && name !== '') {
+      params.name = name;
+    }
+    if (day && day !== '') {
+      params.day = day;
+    }
+    const response = await axios.get(`${API_URL}/comision`, { params });
     return response.data;
   } catch (error) {
-    throw error('Error al obtener vendedor', error.response?.data);
+    throw error('Error al obtener comisiones', error.response?.data);
   }
 };
 

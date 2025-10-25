@@ -5,16 +5,13 @@ import { getAlu, getAluID } from '../../services/Alumnos.service';
 import { useAuth } from '../../context/AuthContext';
 import { postCaja } from '../../services/Cajas.service';
 import { Modal } from 'antd';
-import ReciboComprobante from '../caja/Comprobante';
+import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import Opciones from '../caja/Opciones';
 import { Spinner } from '../Spinner/Spinner';
 
 const CreateCaja = () => {
   const { user } = useAuth();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imprimir, setImprimir] = useState({
-    tipoComprobante: 'Factura de venta',
-  });
+  const [movimientoId, setMovimientoId] = useState(null);
   const [infoComprobante, setInfoComprobante] = useState({
     apellidoNombre: '',
     dni: '',
@@ -148,11 +145,7 @@ const CreateCaja = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          setImprimir({
-            ...data.comprobante,
-            fecha: formatToDisplay(data.comprobante.fecha),
-          });
-
+          setMovimientoId(data.id);
           setGeneratePDF(true);
         });
       });
@@ -168,11 +161,23 @@ const CreateCaja = () => {
     }
   };
 
-  const handleOpen = () => {
-    setIsModalOpen(true);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const handleDescargarPDF = async () => {
+    try {
+      await descargarComprobantePDF(movimientoId);
+      Swal.fire({
+        icon: 'success',
+        title: 'Comprobante descargado',
+        text: 'El comprobante se ha descargado correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al descargar comprobante',
+        text: error.message,
+      });
+    }
   };
   const handleAlumnoClick = async (e) => {
     e.preventDefault();
@@ -424,16 +429,13 @@ const CreateCaja = () => {
             {generatePDF && (
               <button
                 type="button"
-                onClick={handleOpen}
+                onClick={handleDescargarPDF}
                 className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6 mt-2"
               >
-                Generar PDF
+                Descargar Comprobante
               </button>
             )}
           </form>
-          <Modal title="Comprobante" open={isModalOpen} onCancel={handleCancel} footer={null}>
-            <ReciboComprobante {...imprimir}></ReciboComprobante>
-          </Modal>
         </div>
       ) : (
         <Opciones setCambio={setCambio} setCuotavieja={setCuotavieja}></Opciones>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Spinner } from '../Spinner/Spinner.jsx';
 
-export const ModalEditar = ({ formData, onClose, onSave, onChange, vend, alu }) => {
+export const ModalEditar = ({ formData, onClose, onSave, onChange, vend, alu, isFromAlumno = false }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -69,34 +69,36 @@ export const ModalEditar = ({ formData, onClose, onSave, onChange, vend, alu }) 
 
           <div>
             <label className="block text-sm font-medium mb-1">Alumno</label>
-            <select
-              name="alumnoComisionId"
-              value={formData.alumnoComisionId || ''}
-              onChange={onChange}
-              className="w-full p-2 border rounded"
-            >
-              <option value="">Seleccione un alumno</option>
-              {alu?.map((alumno) => (
-                <option key={alumno.id} value={alumno.id}>
-                  {alumno.name}
-                </option>
-              ))}
-            </select>
+            <input
+              type="text"
+              value={formData.alumnoNombre || ''}
+              disabled
+              className="w-full p-2 border rounded bg-gray-100"
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Tipo</label>
-            <select
-              name="tipo"
-              value={formData.tipo || ''}
-              onChange={onChange}
-              className="w-full p-2 border rounded"
-            >
-              <option value="">Seleccione</option>
-              <option value="Ingreso">Ingreso</option>
-              <option value="Egreso">Egreso</option>
-              <option value="Transferencia">Transferencia de caja</option>
-            </select>
+            {isFromAlumno ? (
+              <input
+                type="text"
+                value="Ingreso"
+                disabled
+                className="w-full p-2 border rounded bg-gray-100"
+              />
+            ) : (
+              <select
+                name="tipo"
+                value={formData.tipo || ''}
+                onChange={onChange}
+                className="w-full p-2 border rounded"
+              >
+                <option value="">Seleccione</option>
+                <option value="Ingreso">Ingreso</option>
+                <option value="Egreso">Egreso</option>
+                <option value="Transferencia">Transferencia de caja</option>
+              </select>
+            )}
           </div>
 
           <div>
@@ -125,6 +127,41 @@ export const ModalEditar = ({ formData, onClose, onSave, onChange, vend, alu }) 
               onChange={onChange}
               className="w-full p-2 border rounded"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Cuota</label>
+            <input
+              type="number"
+              name="cuota"
+              value={formData.cuota || ''}
+              onChange={onChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Mes de Cuota</label>
+            <select
+              name="mesCuota"
+              value={formData.mesCuota || ''}
+              onChange={onChange}
+              className="w-full p-2 border rounded"
+            >
+              <option value="">Seleccione un mes</option>
+              <option value="Enero">Enero</option>
+              <option value="Febrero">Febrero</option>
+              <option value="Marzo">Marzo</option>
+              <option value="Abril">Abril</option>
+              <option value="Mayo">Mayo</option>
+              <option value="Junio">Junio</option>
+              <option value="Julio">Julio</option>
+              <option value="Agosto">Agosto</option>
+              <option value="Septiembre">Septiembre</option>
+              <option value="Octubre">Octubre</option>
+              <option value="Noviembre">Noviembre</option>
+              <option value="Diciembre">Diciembre</option>
+            </select>
           </div>
 
           <div>

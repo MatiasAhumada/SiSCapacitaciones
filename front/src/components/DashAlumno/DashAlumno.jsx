@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getAluComID } from '../../services/Comisiones.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
+import { deleteMovCaja, editMovCaja } from '../../services/Cajas.service';
+import { getVendedores } from '../../services/Vendedores.service';
+import { ModalEditar } from '../caja/ModalEditar';
 import { Spinner } from '../Spinner/Spinner';
 import Swal from 'sweetalert2';
 
@@ -9,10 +12,27 @@ const DashAlumno = () => {
   const { alumnoId } = useParams();
   const [alumno, setAlumno] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPago, setEditingPago] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [vendedores, setVendedores] = useState([]);
 
   const handleEditPago = (pago) => {
-    console.log('Editar pago:', pago);
-    // TODO: Abrir modal de edición
+    setEditingPago(pago);
+    setFormData({
+      id: pago.id,
+      fecha: pago.fecha,
+      vendedorId: pago.vendedor?.id || '',
+      alumnoComisionId: pago.alumnoComision?.id || '',
+      alumnoNombre: pago.alumnoComision?.alumno?.name || alumno?.alumno?.name || alumno?.name || '',
+      tipo: 'Ingreso',
+      metodoPago: pago.metodoPago || '',
+      descripcion: pago.descripcion || '',
+      monto: pago.monto || '',
+      cuota: pago.cuota || '',
+      mesCuota: pago.mesCuota || ''
+    });
+    setIsModalOpen(true);
   };
 
   const handlePrintPago = async (pago) => {
@@ -34,22 +54,84 @@ const DashAlumno = () => {
     }
   };
 
-  const handleDeletePago = (pagoId) => {
-    console.log('Eliminar pago:', pagoId);
-    // TODO: Confirmar y eliminar pago
-  };
+  const handleDeletePago = async (pagoId) => {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
 
-  useEffect(() => {
-    const cargarAlumno = async () => {
-      if (!alumnoId) return;
-      
+    if (result.isConfirmed) {
       try {
+        await deleteMovCaja(pagoId);
+        Swal.fire({
+          icon: 'success',
+          title: 'Pago eliminado',
+          text: 'El pago se ha eliminado correctamente',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        // Recargar datos
         const data = await getAluComID(alumnoId);
         setAlumno(data);
       } catch (error) {
         Swal.fire({
           icon: 'error',
-          title: 'Error al cargar alumno',
+          title: 'Error al eliminar pago',
+          text: error.response?.data?.message || error.message,
+        });
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await editMovCaja(formData.id, formData);
+      Swal.fire({
+        icon: 'success',
+        title: 'Pago actualizado',
+        text: 'El pago se ha actualizado correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      setIsModalOpen(false);
+      // Recargar datos
+      const data = await getAluComID(alumnoId);
+      setAlumno(data);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al actualizar pago',
+        text: error.response?.data?.message || error.message,
+      });
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      if (!alumnoId) return;
+      
+      try {
+        const [alumnoData, vendedoresData] = await Promise.all([
+          getAluComID(alumnoId),
+          getVendedores()
+        ]);
+        setAlumno(alumnoData);
+        setVendedores(vendedoresData);
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al cargar datos',
           text: error.response?.data?.message || error.message,
         });
       } finally {
@@ -57,7 +139,7 @@ const DashAlumno = () => {
       }
     };
 
-    cargarAlumno();
+    cargarDatos();
   }, [alumnoId]);
 
   if (loading) {
@@ -280,6 +362,18 @@ const DashAlumno = () => {
             ))}
           </div>
         </div>
+      )}
+      
+      {isModalOpen && (
+        <ModalEditar
+          formData={formData}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
+          onChange={handleChange}
+          vend={vendedores}
+          alu={[alumno]}
+          isFromAlumno={true}
+        />
       )}
     </div>
   );

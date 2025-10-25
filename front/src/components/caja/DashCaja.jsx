@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
+import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import Swal from 'sweetalert2';
 import AccionesDropdown from './Dropdowns/AccionesDropdown';
 import FiltrosDropDown from './Dropdowns/FiltrosDropDown';
@@ -90,12 +91,16 @@ const DashCaja = () => {
     setIsModalOpen(true);
     setEditMode(mov.id);
     setFormEdit({
+      id: mov.id,
       fecha: mov.fecha,
-      tipo: mov.tipo,
-      metodoPago: mov.metodoPago,
-      monto: mov.monto,
-      descripcion: mov.descripcion,
-      alumnoComisionId: mov.alumnoComision?.alumno?.id || '',
+      tipo: mov.tipo || '',
+      metodoPago: mov.metodoPago || '',
+      monto: mov.monto || '',
+      descripcion: mov.descripcion || '',
+      cuota: mov.cuota || '',
+      mesCuota: mov.mesCuota || '',
+      alumnoComisionId: mov.alumnoComision?.id || '',
+      alumnoNombre: mov.alumnoComision?.alumno?.name || '',
       vendedorId: mov.vendedor?.id || idVend,
     });
   };
@@ -114,6 +119,28 @@ const DashCaja = () => {
       ...prev,
       alumnoComisionId: e.target.value,
     }));
+  };
+
+  const handlePrintPago = async (pago) => {
+    setPause(prev => ({ ...prev, [pago.id]: true }));
+    try {
+      await descargarComprobantePDF(pago.id);
+      Swal.fire({
+        icon: 'success',
+        title: 'Comprobante descargado',
+        text: 'El comprobante se ha descargado correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al descargar comprobante',
+        text: error.message,
+      });
+    } finally {
+      setPause(prev => ({ ...prev, [pago.id]: false }));
+    }
   };
 
   const handleSave = async () => {
@@ -272,36 +299,33 @@ const DashCaja = () => {
                       >
                         <i className="fa-solid fa-pen"></i>
                       </button>
-                      {item.tipo == 'Egreso' ? (
-                        <>
-                          <button
-                            value={item.id}
-                            className=" px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
-                          >
-                            {pause[item.id] ? (
-                              <svg
-                                fill="white"
-                                className="w-6 h-6 mx-auto"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                                  <animateTransform
-                                    attributeName="transform"
-                                    type="rotate"
-                                    dur="0.75s"
-                                    values="0 12 12;360 12 12"
-                                    repeatCount="indefinite"
-                                  />
-                                </path>
-                              </svg>
-                            ) : (
-                              <i className="fa-solid fa-print"></i>
-                            )}
-                          </button>
-                        </>
-                      ) : (
-                        <div></div>
+                      {item.tipo === 'Ingreso' && (
+                        <button
+                          onClick={() => handlePrintPago(item)}
+                          className="px-4 py-2 text-white bg-green-500 hover:bg-green-600 md:text-sm rounded ms-2"
+                          title="Descargar comprobante"
+                        >
+                          {pause[item.id] ? (
+                            <svg
+                              fill="white"
+                              className="w-6 h-6 mx-auto"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                                <animateTransform
+                                  attributeName="transform"
+                                  type="rotate"
+                                  dur="0.75s"
+                                  values="0 12 12;360 12 12"
+                                  repeatCount="indefinite"
+                                />
+                              </path>
+                            </svg>
+                          ) : (
+                            <i className="fa-solid fa-print"></i>
+                          )}
+                        </button>
                       )}
                     </td>
                   </tr>

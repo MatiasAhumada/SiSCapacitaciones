@@ -9,6 +9,7 @@ import { getProfes } from '../../services/Profesores.service';
 import {
   deleteComision,
   getComisionBySucursal,
+  getComisiones,
   putComision,
 } from '../../services/Comisiones.service';
 
@@ -61,12 +62,18 @@ const DashComisiones = () => {
   };
 
   const cargarComisiones = async (page = 1, name = '', day = '') => {
-    const sucursalId = getSucursalActiva()?.id;
-    if (!sucursalId) return;
-    
     setLoading(true);
     try {
-      const data = await getComisionBySucursal(sucursalId, page, 10, name, day);
+      let data;
+      if (user?.isadmin) {
+        // Admin: solo comisiones de su sucursal activa
+        const sucursalId = getSucursalActiva()?.id;
+        if (!sucursalId) return;
+        data = await getComisionBySucursal(sucursalId, page, 10, name, day);
+      } else {
+        // Vendedor: todas las comisiones
+        data = await getComisiones(page, 10, name, day);
+      }
       setTableItems(data.data || []);
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
@@ -96,7 +103,7 @@ const DashComisiones = () => {
     };
     cargarDatos();
     cargarComisiones(currentPage, searchName, selectedDay);
-  }, [currentPage, searchName, selectedDay, getSucursalActiva()?.id]);
+  }, [currentPage, searchName, selectedDay, getSucursalActiva()?.id, user?.isadmin]);
 
   const handleEdit = (comision) => {
     setEditing(comision.id);
@@ -206,12 +213,14 @@ const DashComisiones = () => {
             <option value="Sabado">Sábado</option>
             <option value="Domingo">Domingo</option>
           </select>
-          <button
-            onClick={() => navigate('/admin/comisiones/crear')}
-            className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
-          >
-            Nueva Comision
-          </button>
+          {user?.isadmin && (
+            <button
+              onClick={() => navigate('/admin/comisiones/crear')}
+              className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
+            >
+              Nueva Comision
+            </button>
+          )}
         </div>
       </div>
       <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
@@ -372,35 +381,37 @@ const DashComisiones = () => {
                 <td className="px-6 py-4 whitespace-nowrap">{item.alumnoComisiones?.length}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
-                    value={item.id}
-                    onClick={() => navigate(`/admin/comisiones/${item.id}`)}
-                    className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                    onClick={() => navigate(user?.isadmin ? `/admin/comisiones/${item.id}` : `/vendedor/comisiones/${item.id}`)}
+                    className="px-4 py-2 text-white principal bg-blue-500 hover:bg-blue-600 md:text-sm rounded"
                   >
-                    <i className="fa-solid fa-plus"></i>
+                    <i className="fa-solid fa-eye"></i>
                   </button>
 
-                  {editing === item.id ? (
-                    <button
-                      onClick={() => handleSave(item.id)}
-                      className="px-4 py-2 text-white bg-green-500 rounded ms-3"
-                    >
-                      <i className="fa-solid fa-floppy-disk"></i>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="px-4 py-2 text-white btnAz rounded ms-3"
-                    >
-                      <i className="fa-solid fa-pen"></i>
-                    </button>
+                  {user?.isadmin && (
+                    <>
+                      {editing === item.id ? (
+                        <button
+                          onClick={() => handleSave(item.id)}
+                          className="px-4 py-2 text-white bg-green-500 rounded ms-3"
+                        >
+                          <i className="fa-solid fa-floppy-disk"></i>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="px-4 py-2 text-white btnAz rounded ms-3"
+                        >
+                          <i className="fa-solid fa-pen"></i>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => clickDelete(item.id)}
+                        className="px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                      >
+                        <i className="fa-solid fa-trash"></i>
+                      </button>
+                    </>
                   )}
-                  <button
-                    value={item.id}
-                    onClick={() => clickDelete(item.id)}
-                    className="px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
                 </td>
               </tr>
               ))

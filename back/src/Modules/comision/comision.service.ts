@@ -78,16 +78,49 @@ export class ComisionService {
     return this.comisionRepository.save(nuevaComision);
   }
 
-  async findAll() {
-    return this.comisionRepository.find({
-      relations: ['profesor', 'alumnoComisiones'],
+  async findAll(page = 1, limit = 10, name?: string, day?: string) {
+    const whereConditions: any = {};
+    
+    if (name) {
+      whereConditions.name = ILike(`%${name}%`);
+    }
+    
+    if (day) {
+      whereConditions.day = day;
+    }
+
+    const totalItems = await this.comisionRepository.count({
+      where: whereConditions,
+    });
+
+    const comisiones = await this.comisionRepository.find({
+      where: whereConditions,
+      relations: ['curso', 'profesor', 'alumnoComisiones', 'sucursal'],
+      skip: (page - 1) * limit,
+      take: limit,
       select: {
-        alumnoComisiones: {
+        curso: {
           id: true,
-          state: true,
+          name: true,
+        },
+        sucursal: {
+          id: true,
+          name: true,
+        },
+        profesor: {
+          id: true,
+          name: true,
+          apellido: true,
         },
       },
     });
+
+    return {
+      data: comisiones,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+    };
   }
 
   async findOneAluCom(id: string) {

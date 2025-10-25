@@ -6,7 +6,6 @@ import { getVendSucID } from '../../services/Vendedores.service';
 import Swal from 'sweetalert2';
 
 const DashVendedor = () => {
-  const { user } = useAuth();
   const { getSucursalActiva } = useApp();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
@@ -50,14 +49,6 @@ const DashVendedor = () => {
           <p className="text-gray-600 mt-2">
             En esta tabla estaran todos los vendedores de esta sucursal
           </p>
-        </div>
-        <div className="mt-3 md:mt-0">
-          <button
-            onClick={() => navigate('/admin/vendedores/crear')}
-            className="inline-block px-4 py-2 text-white principal btnAz md:text-sm"
-          >
-            Nuevo Vendedor
-          </button>
         </div>
       </div>
       <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">

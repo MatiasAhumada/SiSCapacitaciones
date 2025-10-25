@@ -112,12 +112,6 @@ const DashAlumnos = () => {
         </div>
         <div className="mt-3 md:mt-0 flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 items-center">
           <FilterAlus onFiltrar={filtrarAlumnos} />
-          <button
-            onClick={() => navigate('/admin/alumnos/crear')}
-            className="w-full md:w-auto px-4 py-2 text-white principal btnAz md:text-sm"
-          >
-            Nuevo Alumno
-          </button>
         </div>
       </div>
       <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">

@@ -18,6 +18,7 @@ export const getVendID = async (id) => {
     throw error;
   }
 };
+
 export const getVendSucID = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/vendedor/sucursal/${id}`);
@@ -26,6 +27,7 @@ export const getVendSucID = async (id) => {
     throw error;
   }
 };
+
 export const postVend = async (vendedor) => {
   try {
     const response = await axios.post(`${API_URL}/vendedor`, vendedor);

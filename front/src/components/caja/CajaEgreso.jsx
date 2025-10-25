@@ -1,15 +1,9 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
-import {
-  getCategorias,
-  getProfes,
-  getVendedores,
-  getVendID,
-  postEgresoProfesor,
-  postEgresoSiemple,
-  postEgresoVendedor,
-} from '../queris/queris';
+import { getCategorias, postEgresoProfesor, postEgresoSiemple, postEgresoVendedor } from '../../services/Cajas.service';
+import { getProfes } from '../../services/Profesores.service';
+import { getVendedores, getVendID } from '../../services/Vendedores.service';
 const CajaEgreso = () => {
   const idVende = localStorage.getItem('token');
   const [profesores, setProfesores] = useState([]);

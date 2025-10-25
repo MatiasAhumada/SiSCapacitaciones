@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import logo from '../../../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { getCursos, getProfes, getVendID, postComision } from '../../queris/queris';
+import { getCursos } from '../../../services/Cursos.service';
+import { getProfes } from '../../../services/Profesores.service';
+import { getVendID } from '../../../services/Vendedores.service';
+import { postComision } from '../../../services/Comisiones.service';
 
 const CreateComVend = () => {
   const areas = ['Digital', 'Idiomas', 'Salud', 'Administrativa', 'Belleza', 'Técnica'];

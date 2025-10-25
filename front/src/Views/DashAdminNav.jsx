@@ -3,7 +3,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import simplificado from '../assets/simplificado_a_color.png';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getSucursales } from '../helpers/Sucursales.service';
+import { getSucursales } from '../services/Sucursales.service';
 import { useAuth } from '../context/AuthContext';
 import { navigationAdmin } from '../constants/navigations';
 

@@ -8,7 +8,7 @@ import {
   fetchEnrollmentsByMonth,
   fetchPaymentMethods,
   fetchSalesBySeller,
-} from '../../helpers/Metrics.service';
+} from '../../services/Metrics.service';
 
 const DashboardMetrics = () => {
   const [salesData, setSalesData] = useState([]);

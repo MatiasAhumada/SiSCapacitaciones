@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { deleteAlumnoId } from '../../../helpers/Alumnos.service';
-import { getAluSucID } from '../../../helpers/Alumnos.service';
+import { deleteAlumnoId } from '../../../services/Alumnos.service';
+import { getAluSucID } from '../../../services/Alumnos.service';
 import FilterAlus from './DropDowns/FilterAlus';
 import { Spinner } from '../../Spinner/Spinner';
 import Pagination from '../../Pagination/Pagination';

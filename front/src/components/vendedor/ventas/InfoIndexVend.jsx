@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GetCajaByVendedor, getVendID } from '../../queris/queris';
+import { GetCajaByVendedor } from '../../../services/Cajas.service';
+import { getVendID } from '../../../services/Vendedores.service';
 import Swal from 'sweetalert2';
 
 const InfoIndexVend = () => {

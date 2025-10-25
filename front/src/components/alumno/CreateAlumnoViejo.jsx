@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Swal from 'sweetalert2';
-import { postAluSimple } from '../queris/queris';
+import { postAluSimple } from '../../services/Alumnos.service';
 
 const CreateAlumnoViejo = () => {
   const [pause, setPause] = useState(false);

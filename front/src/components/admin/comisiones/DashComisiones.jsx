@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { getCursos } from '../../../helpers/Cursos.service';
-import { getProfes } from '../../../helpers/Profesores.service';
+import { getCursos } from '../../../services/Cursos.service';
+import { getProfes } from '../../../services/Profesores.service';
 import {
   deleteComision,
   getComisionBySucursal,
   putComision,
-} from '../../../helpers/Comisiones.service';
+} from '../../../services/Comisiones.service';
 
 const DashComisiones = () => {
   const { id, comId } = useParams();

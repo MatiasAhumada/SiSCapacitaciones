@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { getSucursalId, postVend } from '../queris/queris';
+import { getSucursalId } from '../../services/Sucursales.service';
+import { postVend } from '../../services/Vendedores.service';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 
 const AggVend = () => {

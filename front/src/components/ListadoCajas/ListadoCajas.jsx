@@ -6,12 +6,12 @@ import {
   descargarExcelAdmin,
   descargarExcelCaja,
   GetByVendedorMock,
-} from '../../helpers/Cajas.service';
+} from '../../services/Cajas.service';
 import { Spinner } from '../Spinner/Spinner';
 import Swal from 'sweetalert2';
 import Pagination from '../Pagination/Pagination';
 import { CardSelectVendedor } from './CardSelectVendedor';
-import { getMockVendedores } from '../../helpers/Cajas.service';
+import { getMockVendedores } from '../../services/Cajas.service';
 
 const ListadoCajas = () => {
   // Estado para las cajas del vendedor actual

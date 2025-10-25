@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../helpers/Cajas.service';
-import { getAlu } from '../../helpers/Alumnos.service';
-import { getVendedores } from '../../helpers/Vendedores.service';
+import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
+import { getAlu } from '../../services/Alumnos.service';
+import { getVendedores } from '../../services/Vendedores.service';
 import Swal from 'sweetalert2';
 import AccionesDropdown from './Dropdowns/AccionesDropdown';
 import FiltrosDropDown from './Dropdowns/FiltrosDropDown';

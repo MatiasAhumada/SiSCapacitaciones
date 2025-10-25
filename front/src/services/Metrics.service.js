@@ -8,7 +8,7 @@ const api = axios.create({
 export const fetchSalesByMonth = async () => {
   try {
     const response = await api.get('/metrics/sales-by-month');
-    return response.data; // Axios ya parsea el JSON por ti
+    return response.data;
   } catch (error) {
     console.error('Fallo en la llamada a la API de ventas:', error);
     return [];

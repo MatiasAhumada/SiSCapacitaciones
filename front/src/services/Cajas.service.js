@@ -9,6 +9,7 @@ export const GetCajaByVendedor = async (vendedorId) => {
     throw error;
   }
 };
+
 export const GetMovsByVendedor = async (vendedorId, page, limit) => {
   try {
     const response = await axios.get(`${API_URL}/caja/vendedor/${vendedorId}`, {
@@ -19,6 +20,7 @@ export const GetMovsByVendedor = async (vendedorId, page, limit) => {
     throw error;
   }
 };
+
 export const GetByVendedorMock = async (vendedorId, currentPage = 1, limit = 10, filterDate = '') => {
   try {
     const params = { limit, page: currentPage, useCustom: true };
@@ -33,6 +35,7 @@ export const GetByVendedorMock = async (vendedorId, currentPage = 1, limit = 10,
     throw error;
   }
 };
+
 export const deleteMovCaja = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/caja/${id}`);
@@ -41,6 +44,7 @@ export const deleteMovCaja = async (id) => {
     throw error;
   }
 };
+
 export const editMovCaja = async (id, mov) => {
   try {
     const response = await axios.put(`${API_URL}/caja/${id}`, mov);
@@ -49,6 +53,7 @@ export const editMovCaja = async (id, mov) => {
     throw error;
   }
 };
+
 export const postCaja = async (movimiento) => {
   try {
     const response = await axios.post(`${API_URL}/caja`, movimiento);
@@ -57,6 +62,7 @@ export const postCaja = async (movimiento) => {
     throw error;
   }
 };
+
 export const getCajas = async (page = 1, limit = 10, vendedorId = null) => {
   try {
     const params = { page, limit };
@@ -69,6 +75,7 @@ export const getCajas = async (page = 1, limit = 10, vendedorId = null) => {
     throw error;
   }
 };
+
 export const getMovimientosPorDia = async (fecha) => {
   try {
     const response = await axios.get(`${API_URL}/caja/movimientos/${fecha}`);
@@ -77,6 +84,7 @@ export const getMovimientosPorDia = async (fecha) => {
     throw error;
   }
 };
+
 export const getResumenPorDia = async (fecha) => {
   try {
     const response = await axios.get(`${API_URL}/caja/resumen/${fecha}`);
@@ -85,24 +93,25 @@ export const getResumenPorDia = async (fecha) => {
     throw error;
   }
 };
+
 export const getResumenTotal = async () => {
   try {
     const response = await axios.get(`${API_URL}/caja/resumen-total`);
-
     return response.data;
   } catch (error) {
     throw error;
   }
 };
+
 export const getCategorias = async () => {
   try {
     const response = await axios.get(`${API_URL}/caja/con-subcategorias`);
-
     return response.data;
   } catch (error) {
     throw error;
   }
 };
+
 export const postEgresoProfesor = async (dataProfe) => {
   try {
     const response = await axios.post(`${API_URL}/caja/egreso/profesor`, dataProfe);
@@ -111,6 +120,7 @@ export const postEgresoProfesor = async (dataProfe) => {
     throw error;
   }
 };
+
 export const postEgresoVendedor = async (dataVendedor) => {
   try {
     const response = await axios.post(`${API_URL}/caja/egreso/vendedor`, dataVendedor);
@@ -119,6 +129,7 @@ export const postEgresoVendedor = async (dataVendedor) => {
     throw error;
   }
 };
+
 export const postEgresoSiemple = async (data) => {
   try {
     const response = await axios.post(`${API_URL}/caja/egreso`, data);
@@ -127,6 +138,7 @@ export const postEgresoSiemple = async (data) => {
     throw error;
   }
 };
+
 export const postTransferencia = async (data) => {
   try {
     const response = await axios.post(`${API_URL}/caja/transferencia`, data);
@@ -135,6 +147,7 @@ export const postTransferencia = async (data) => {
     throw error;
   }
 };
+
 export const aperturaCaja = async (idVend) => {
   try {
     const response = await axios.post(`${API_URL}/caja/aperturaCaja/${idVend}`);
@@ -143,6 +156,7 @@ export const aperturaCaja = async (idVend) => {
     throw error;
   }
 };
+
 export const cerrarCaja = async (idVend) => {
   try {
     const response = await axios.patch(`${API_URL}/caja/cerrarCaja/${idVend}`);

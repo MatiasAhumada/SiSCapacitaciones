@@ -9,6 +9,7 @@ export const getComisiones = async () => {
     throw error('Error al obtener vendedor', error.response?.data);
   }
 };
+
 export const getComisionId = async (id, page = 1, limit = 10, dni = '') => {
   try {
     const params = { page, limit };
@@ -23,6 +24,7 @@ export const getComisionId = async (id, page = 1, limit = 10, dni = '') => {
     throw error;
   }
 };
+
 export const deleteComision = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/comision/${id}`);
@@ -31,6 +33,7 @@ export const deleteComision = async (id) => {
     throw error;
   }
 };
+
 export const getComisionBySucursal = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/comision/suc/${id}`);
@@ -39,6 +42,7 @@ export const getComisionBySucursal = async (id) => {
     throw error;
   }
 };
+
 export const postComision = async (comision) => {
   try {
     const response = await axios.post(`${API_URL}/comision`, comision);
@@ -47,6 +51,7 @@ export const postComision = async (comision) => {
     throw error;
   }
 };
+
 export const putComision = async (id, comision) => {
   try {
     const response = await axios.put(`${API_URL}/comision/${id}`, comision);
@@ -55,6 +60,7 @@ export const putComision = async (id, comision) => {
     throw error;
   }
 };
+
 export const getAluCom = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/comision/aluCom/${id}`);

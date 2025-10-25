@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import {
-  deleteComision,
-  getComisiones,
-  getCursos,
-  getProfes,
-  putComision,
-} from '../../queris/queris';
+import { deleteComision, getComisiones, putComision } from '../../../services/Comisiones.service';
+import { getCursos } from '../../../services/Cursos.service';
+import { getProfes } from '../../../services/Profesores.service';
 
 const DashComVend = () => {
   const { id, idVend } = useParams();

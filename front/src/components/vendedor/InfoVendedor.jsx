@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { deleteVend, getVendID } from '../queris/queris';
+import { deleteVend, getVendID } from '../../services/Vendedores.service';
 import Button from '../common/Button';
 const InfoVendedor = () => {
   const location = useLocation();

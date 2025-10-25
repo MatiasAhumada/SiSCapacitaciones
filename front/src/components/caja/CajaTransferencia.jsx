@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
-import {
-  getVendedores,
-  getVendID,
-  postTransferencia,
-} from '../queris/queris';
+import { postTransferencia } from '../../services/Cajas.service';
+import { getVendedores, getVendID } from '../../services/Vendedores.service';
 const CajaTransferencia = () => {
   const idVende = localStorage.getItem('token');
   const [vendedores, setVendedores] = useState([]);

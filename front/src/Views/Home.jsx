@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSucursales } from '../components/queris/queris';
+import { getSucursales } from '../services/Sucursales.service';
 import { Spinner } from '../components/Spinner/Spinner';
 
 const Home = () => {

@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import logo from '../../../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
-import {
-  getAluID,
-  getComisiones,
-  getVendedores,
-  getVendID,
-  postInscripcion,
-} from '../../../queris/queris';
+import { getAluID } from '../../../../services/Alumnos.service';
+import { getComisiones } from '../../../../services/Comisiones.service';
+import { getVendedores, getVendID } from '../../../../services/Vendedores.service';
+import { postInscripcion } from '../../../../services/Inscripciones.service';
 const Inscribir = () => {
   const idVende = localStorage.getItem('token');
   const [pause, setPause] = useState(false);

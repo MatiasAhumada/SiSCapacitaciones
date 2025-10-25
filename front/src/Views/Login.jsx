@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import imagen from '../assets/simplificado_a_color.png';
-import { AuthLogin } from '../helpers/Auth.service';
+import { AuthLogin } from '../services/Auth.service';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';

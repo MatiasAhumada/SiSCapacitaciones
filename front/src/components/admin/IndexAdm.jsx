@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import CardInfo from './CardInfo';
 import { useParams } from 'react-router-dom';
-import { getSucursalId } from '../../helpers/Sucursales.service';
+import { getSucursalId } from '../../services/Sucursales.service';
 import { Spinner } from '../Spinner/Spinner';
 import DashboardMetrics from '../DashboardMetrics/DashboardMetrics';
 

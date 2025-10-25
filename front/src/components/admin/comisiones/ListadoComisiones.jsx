@@ -4,7 +4,7 @@ import {
   editStateComision,
   getComisionId,
   postAsistenciaComision,
-} from '../../../helpers/Comisiones.service';
+} from '../../../services/Comisiones.service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Spinner } from '../../Spinner/Spinner';

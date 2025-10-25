@@ -8,9 +8,9 @@ import {
   GetMovsByVendedor,
   getResumenPorDia,
   getResumenTotal,
-} from '../../../helpers/Cajas.service';
-import { getAlu } from '../../../helpers/Alumnos.service';
-import { getVendedores } from '../../../helpers/Vendedores.service';
+} from '../../../services/Cajas.service';
+import { getAlu } from '../../../services/Alumnos.service';
+import { getVendedores } from '../../../services/Vendedores.service';
 import Pagination from '../../Pagination/Pagination';
 import Swal from 'sweetalert2';
 import { ModalEditar } from '../../caja/ModalEditar';

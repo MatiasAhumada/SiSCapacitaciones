@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { deleteComision, deleteMovCaja, getAluCom, putComision } from '../../queris/queris';
+import { deleteMovCaja } from '../../../services/Cajas.service';
+import { getAluCom, putComision } from '../../../services/Comisiones.service';
 import ReciboComprobante from '../../caja/Comprobante';
 import { Modal } from 'antd';
 

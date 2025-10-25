@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
-import { getAlu, getAluID, getVendID, postCaja } from '../queris/queris';
+import { getAlu, getAluID } from '../../services/Alumnos.service';
+import { getVendID } from '../../services/Vendedores.service';
+import { postCaja } from '../../services/Cajas.service';
 import { Modal } from 'antd';
 import ReciboComprobante from './Comprobante';
 import Opciones from './Opciones';

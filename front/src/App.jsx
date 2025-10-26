@@ -6,7 +6,6 @@ import ProtectedLayout from './layouts/ProtectedLayout';
 
 // Views
 import Login from './Views/Login';
-import Home from './Views/Home';
 import Error404 from './Views/Error404';
 
 // Components
@@ -41,7 +40,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/inicio" element={<Home />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<RequireAuth><ProtectedLayout><IndexAdm /></ProtectedLayout></RequireAuth>} />

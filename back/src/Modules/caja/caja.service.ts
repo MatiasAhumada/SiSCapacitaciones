@@ -862,20 +862,17 @@ export class CajaService {
     return sesionAbierta;
   }
 
-  async obtenerSesionPorFecha(vendedorId: string) {
-    if (!vendedorId) {
-      throw new NotFoundException('ID Vendedor no enviado');
-    }
-    const vendedor = await this.vendedorRepository.findOne({
-      where: { id: vendedorId },
-    });
-    if (!vendedor) {
-      throw new NotFoundException('Vendedor no encontrado');
+  async obtenerSesionPorFecha(userId: string, page = 1, limit = 10) {
+    if (!userId) {
+      throw new NotFoundException('ID de usuario no enviado');
     }
 
-    // 1. Buscar sesión abierta sin importar la fecha
+    // 1. Buscar sesión abierta sin importar la fecha (vendedor o admin)
     const sesionAbierta = await this.sesionRepository.findOne({
-      where: { vendedor: { id: vendedorId }, fechaCierre: IsNull() },
+      where: [
+        { vendedor: { id: userId }, fechaCierre: IsNull() },
+        { admin: { id: userId }, fechaCierre: IsNull() }
+      ],
       order: { fechaApertura: 'ASC' },
     });
 
@@ -885,7 +882,7 @@ export class CajaService {
       // si hay una sesión abierta, usar esa
       sesiones = [sesionAbierta];
     } else {
-      // 2. Buscar sesiones del día (como ya tenías)
+      // 2. Buscar sesiones del día (vendedor o admin)
       const fecha = new Date();
       const inicioDelDia = new Date(fecha);
       inicioDelDia.setHours(0, 0, 0, 0);
@@ -893,10 +890,16 @@ export class CajaService {
       finDelDia.setHours(23, 59, 59, 999);
 
       sesiones = await this.sesionRepository.find({
-        where: {
-          vendedor: { id: vendedorId },
-          fechaApertura: Between(inicioDelDia, finDelDia),
-        },
+        where: [
+          {
+            vendedor: { id: userId },
+            fechaApertura: Between(inicioDelDia, finDelDia),
+          },
+          {
+            admin: { id: userId },
+            fechaApertura: Between(inicioDelDia, finDelDia),
+          }
+        ],
         order: { fechaApertura: 'ASC' },
       });
 
@@ -909,7 +912,7 @@ export class CajaService {
 
     const sesionesConMovimientos = await Promise.all(
       sesiones.map(async (sesion) => {
-        const movimientos = await this.cajaRepository.find({
+        const [movimientos, total] = await this.cajaRepository.findAndCount({
           where: { sesionCaja: { id: sesion.id } },
           relations: ['alumnoComision.alumno'],
           select: {
@@ -923,6 +926,8 @@ export class CajaService {
             },
           },
           order: { fecha: 'ASC' },
+          skip: (page - 1) * limit,
+          take: limit,
         });
 
         // Usar totales ya calculados automáticamente
@@ -935,11 +940,18 @@ export class CajaService {
           ...sesion,
           movimientos,
           montoCierre,
+          totalMovimientos: total,
+          totalPages: Math.ceil(total / limit),
+          currentPage: page,
         };
       }),
     );
 
-    return sesionesConMovimientos;
+    return {
+      data: sesionesConMovimientos,
+      totalPages: sesionesConMovimientos[0]?.totalPages || 1,
+      currentPage: page,
+    };
   }
 
   private async duplicarEnCajaPerpetua(
@@ -1230,26 +1242,26 @@ export class CajaService {
   }
 
   async getTotalesPorVendedor() {
-    // Buscar sesiones abiertas por vendedor
-    const sesionesAbiertas = await this.sesionRepository.find({
-      where: { fechaCierre: IsNull() },
+    // Buscar todas las sesiones ordenadas por fecha de apertura descendente
+    const todasLasSesiones = await this.sesionRepository.find({
       relations: ['vendedor', 'admin'],
       order: { fechaApertura: 'DESC' },
     });
 
-    // Agrupar por vendedor y quedarnos con la última sesión
+    // Agrupar por vendedor y quedarnos con la última sesión (más reciente)
     const sesionesPorUsuario = new Map<string, SesionCaja>();
 
-    for (const sesion of sesionesAbiertas) {
+    for (const sesion of todasLasSesiones) {
       const usuarioId = sesion.vendedor?.id || sesion.admin?.id;
       if (!usuarioId) continue;
 
+      // Solo agregar si no existe o si esta sesión es más reciente
       if (!sesionesPorUsuario.has(usuarioId)) {
         sesionesPorUsuario.set(usuarioId, sesion);
       }
     }
 
-    // Formatear resultado como mock
+    // Formatear resultado
     return Array.from(sesionesPorUsuario.values()).map((sesion) => {
       const isAdmin = !!sesion.admin;
       const usuario = isAdmin ? sesion.admin : sesion.vendedor;

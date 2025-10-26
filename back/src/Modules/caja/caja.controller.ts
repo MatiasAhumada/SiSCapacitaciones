@@ -116,8 +116,12 @@ export class CajaController {
     return this.cajaService.aperturaCaja(vendedorId);
   }
   @Get('/sesionDiariaVendedor/:vendedorId')
-  findBySesionesVendedor(@Param('vendedorId') id: string) {
-    return this.cajaService.obtenerSesionPorFecha(id);
+  findBySesionesVendedor(
+    @Param('vendedorId') id: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.cajaService.obtenerSesionPorFecha(id, Number(page), Number(limit));
   }
 
   @Get('/export-excel/:vendedorId')

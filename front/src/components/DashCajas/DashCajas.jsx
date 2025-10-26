@@ -47,7 +47,8 @@ const DashCajas = () => {
   const recargarDatos = async () => {
     if (!user?.id) return;
     try {
-      const data = await GetCajaByVendedor(user.id);
+      const response = await GetCajaByVendedor(user.id);
+      const data = response.data || response;
       const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
       setSesionCaja(ultimaSesion);
       const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);

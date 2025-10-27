@@ -3,7 +3,7 @@ import logo from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
-import { getCursos } from '../../services/Cursos.service';
+import { getAllCursos } from '../../services/Cursos.service';
 import { getProfes } from '../../services/Profesores.service';
 import { postComision } from '../../services/Comisiones.service';
 
@@ -13,6 +13,9 @@ const CreateComision = () => {
   const [pause, setPause] = useState(false);
   const [profes, setProfes] = useState([]);
   const [cursos, setcursos] = useState([]);
+  const [filteredCursos, setFilteredCursos] = useState([]);
+  const [searchCurso, setSearchCurso] = useState('');
+  const [showCursos, setShowCursos] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     day: '',
@@ -67,10 +70,11 @@ const CreateComision = () => {
       try {
         const [profesData, cursosData] = await Promise.all([
           getProfes(),
-          getCursos()
+          getAllCursos()
         ]);
         setProfes(profesData);
-        setcursos(cursosData);
+        setcursos(cursosData || []);
+        setFilteredCursos(cursosData || []);
       } catch (error) {
         Swal.fire({
           icon: 'error',
@@ -80,6 +84,16 @@ const CreateComision = () => {
       }
     };
     cargarDatos();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.curso-dropdown')) {
+        setShowCursos(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const dias = [
@@ -189,7 +203,7 @@ const CreateComision = () => {
             className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
           >
             <option value="">Seleccionar Profesor</option>
-            {profes.map((profe) => (
+            {Array.isArray(profes) && profes.map((profe) => (
               <option key={profe.id} value={profe.id}>
                 {`${profe.name} ${profe.apellido}`}
               </option>
@@ -199,21 +213,46 @@ const CreateComision = () => {
 
         <div className="pb-2">
           <label className="block mb-2 text-sm principal">Curso</label>
-          <select
-            type="text"
-            name="cursoId"
-            id="cursoId"
-            value={formData.cursoId}
-            onChange={handleChange}
-            className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
-          >
-            <option value="">Seleccionar Curso</option>
-            {cursos.map((curso) => (
-              <option key={curso.id} value={curso.id}>
-                {curso.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative curso-dropdown">
+            <input
+              type="text"
+              value={searchCurso}
+              onChange={(e) => {
+                setSearchCurso(e.target.value);
+                const filtered = cursos.filter(curso => 
+                  curso.name.toLowerCase().includes(e.target.value.toLowerCase())
+                );
+                setFilteredCursos(filtered);
+                setShowCursos(true);
+              }}
+              onFocus={() => setShowCursos(true)}
+              placeholder="Buscar curso..."
+              className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
+            />
+            {showCursos && (
+              <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                {filteredCursos.map((curso) => (
+                  <div
+                    key={curso.id}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, cursoId: curso.id }));
+                      setSearchCurso(curso.name);
+                      setShowCursos(false);
+                    }}
+                    className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0"
+                  >
+                    <div className="font-medium text-gray-900">{curso.name}</div>
+                    <div className="text-sm text-gray-600">
+                      {curso.area} • {curso.duration}h • ${curso.price}
+                    </div>
+                  </div>
+                ))}
+                {filteredCursos.length === 0 && (
+                  <div className="p-3 text-gray-500 text-center">No se encontraron cursos</div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <button

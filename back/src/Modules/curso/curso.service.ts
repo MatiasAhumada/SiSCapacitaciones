@@ -18,11 +18,19 @@ export class CursoService {
     return this.cursoRepository.save(curso);
   }
 
-  async findAll(page = 1, limit = 10, area?: string) {
+  async findAll(page = 1, limit = 10, area?: string, all = false) {
     const whereConditions: any = {};
     
     if (area) {
       whereConditions.area = area;
+    }
+
+    if (all) {
+      const cursos = await this.cursoRepository.find({
+        where: whereConditions,
+        order: { name: 'ASC' },
+      });
+      return cursos;
     }
 
     const totalItems = await this.cursoRepository.count({

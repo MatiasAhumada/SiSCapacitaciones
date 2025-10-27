@@ -28,8 +28,9 @@ export class CursoController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('area') area?: string,
+    @Query('all') all?: string,
   ) {
-    return this.cursoService.findAll(Number(page), Number(limit), area);
+    return this.cursoService.findAll(Number(page), Number(limit), area, all === 'true');
   }
 
   @Get(':id')

@@ -14,6 +14,15 @@ export const getCursos = async (page = 1, limit = 10, area = '') => {
   }
 };
 
+export const getAllCursos = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/curso`, { params: { all: 'true' } });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 
 export const deleteCurso = async (id) => {

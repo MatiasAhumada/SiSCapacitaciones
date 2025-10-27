@@ -5,7 +5,7 @@ import { getAlu, getAluID } from '../../services/Alumnos.service';
 import { useAuth } from '../../context/AuthContext';
 import { postCaja } from '../../services/Cajas.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
-import Opciones from './Opciones';
+import Opciones from '../Opciones/Opciones';
 import { Spinner } from '../Spinner/Spinner';
 const CreateCaja = () => {
   const { user } = useAuth();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
@@ -130,8 +130,8 @@ const DashProfesor = () => {
               </tr>
             ) : (
               tableItems.map((item) => (
-                <>
-                  <tr key={item.id}>
+                <React.Fragment key={item.id}>
+                  <tr>
                     <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.apellido}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{item.cantidadComisiones}</td>
@@ -190,7 +190,7 @@ const DashProfesor = () => {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))
             )}
           </tbody>

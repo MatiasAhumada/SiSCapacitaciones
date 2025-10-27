@@ -10,7 +10,7 @@ import {
 import { Spinner } from '../Spinner/Spinner';
 import Swal from 'sweetalert2';
 import Pagination from '../Pagination/Pagination';
-import { CardSelectVendedor } from './CardSelectVendedor';
+import { CardSelectVendedor } from '../CardSelectVendedor/CardSelectVendedor';
 import { getMockVendedores } from '../../services/Cajas.service';
 
 const ListadoCajas = () => {

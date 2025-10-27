@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
+import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import Swal from 'sweetalert2';
-import AccionesDropdown from '../caja/Dropdowns/AccionesDropdown';
-import FiltrosDropDown from '../caja/Dropdowns/FiltrosDropDown';
-import CajaResumen from '../caja/Dropdowns/CajaResumen';
-import { ModalEditar } from '../caja/ModalEditar';
+import AccionesDropdown from '../AccionesDropdown/AccionesDropdown';
+import { ModalEditar } from '../ModalEditar/ModalEditar';
 
 const DashCaja = () => {
-  const { user } = useAuth();
+  const idVend = localStorage.getItem('token');
   const fecha = new Date();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -24,15 +22,16 @@ const DashCaja = () => {
     tipo: '',
     metodoPago: '',
     monto: '',
-    dexcripcion: '',
+    descripcion: '',
     alumnoComisionId: '',
-    vendedorId: user?.id,
+    vendedorId: idVend,
   });
   const [filtrados, setFiltrados] = useState(tableItems);
   const [sesionCaja, setSesionCaja] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const navigate = useNavigate();
+  const isSubRoute = location.pathname.includes('crear');
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -45,9 +44,8 @@ const DashCaja = () => {
   };
 
   const recargarDatos = async () => {
-    if (!user?.id) return;
     try {
-      const data = await GetCajaByVendedor(user.id);
+      const data = await GetCajaByVendedor(idVend);
       const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
       setSesionCaja(ultimaSesion);
       const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
@@ -80,7 +78,7 @@ const DashCaja = () => {
     };
     cargarDatos();
     recargarDatos();
-  }, [refreshKey, user?.id]);
+  }, [refreshKey]);
 
   useEffect(() => {
     if (isModalOpen) document.body.style.overflow = 'hidden';
@@ -91,13 +89,17 @@ const DashCaja = () => {
     setIsModalOpen(true);
     setEditMode(mov.id);
     setFormEdit({
+      id: mov.id,
       fecha: mov.fecha,
-      tipo: mov.tipo,
-      metodoPago: mov.metodoPago,
-      monto: mov.monto,
-      descripcion: mov.descripcion,
-      alumnoComisionId: mov.alumnoComision?.alumno?.id || '',
-      vendedorId: mov.vendedor?.id || user?.id,
+      tipo: mov.tipo || '',
+      metodoPago: mov.metodoPago || '',
+      monto: mov.monto || '',
+      descripcion: mov.descripcion || '',
+      cuota: mov.cuota || '',
+      mesCuota: mov.mesCuota || '',
+      alumnoComisionId: mov.alumnoComision?.id || '',
+      alumnoNombre: mov.alumnoComision?.alumno?.name || '',
+      vendedorId: mov.vendedor?.id || idVend,
     });
   };
 
@@ -115,6 +117,28 @@ const DashCaja = () => {
       ...prev,
       alumnoComisionId: e.target.value,
     }));
+  };
+
+  const handlePrintPago = async (pago) => {
+    setPause(prev => ({ ...prev, [pago.id]: true }));
+    try {
+      await descargarComprobantePDF(pago.id);
+      Swal.fire({
+        icon: 'success',
+        title: 'Comprobante descargado',
+        text: 'El comprobante se ha descargado correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al descargar comprobante',
+        text: error.message,
+      });
+    } finally {
+      setPause(prev => ({ ...prev, [pago.id]: false }));
+    }
   };
 
   const handleSave = async () => {
@@ -139,13 +163,12 @@ const DashCaja = () => {
       setEditMode(null);
     }
   };
-
   const filtrar = async (filtros, setPaused) => {
     const filtrosVacios = Object.values(filtros).every((v) => v.trim() === '');
     if (filtrosVacios) {
       setPaused(true);
-      const data = await GetCajaByVendedor(user?.id);
-      setTableItems(data.movimientos);
+      const data = await GetCajaByVendedor(idVend); // ⏳ espera la respuesta
+      setTableItems(data.movimientos); // ✅ actualiza tabla
       setPaused(false);
       return;
     }
@@ -190,9 +213,11 @@ const DashCaja = () => {
     } catch (error) {
       let errorMessage = 'No se pudo descargar el Excel';
 
+      // Verificar si es un error de respuesta del servidor
       if (error?.response?.status === 400 || error?.response?.status === 404) {
         errorMessage = error.response.data?.message || errorMessage;
       } else if (error?.response?.data) {
+        // Si hay datos en la respuesta pero es un blob de error
         try {
           const text = await error.response.data.text();
           const errorData = JSON.parse(text);
@@ -210,104 +235,104 @@ const DashCaja = () => {
       });
     }
   };
-
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
-      <CajaResumen sesionCaja={sesionCaja}></CajaResumen>
-      <div className="items-start justify-between flex flex-col md:flex-row">
-        <div className="max-w-lg mt-5">
-          <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">CAJA</h3>
-        </div>
+      {/* CajaResumen component removed */}
+      {!isSubRoute && (
+        <>
+          <div className="items-start justify-between flex flex-col md:flex-row">
+            <div className="max-w-lg mt-5">
+              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">CAJA</h3>
+            </div>
 
-        <div className="flex flex-col md:flex-row md:items-center md:space-x-2 md:ml-auto mt-4 md:mt-0">
-          <FiltrosDropDown onFiltrar={filtrar} />
-          <AccionesDropdown
-            idVend={user?.id}
-            onCajaAction={() => setRefreshKey((prev) => prev + 1)}
-            onDescargarExcel={descargarExcel}
-          />
-        </div>
-      </div>
-      <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
-        <table className="w-full table-auto text-sm text-center">
-          <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
-            <tr>
-              <th className="py-3 px-6">Fecha</th>
-              <th className="py-3 px-6">Alumno</th>
-              <th className="py-3 px-6">Dni</th>
-              <th className="py-3 px-6">Tipo</th>
-              <th className="py-3 px-6">Metodo de Pago</th>
-              <th className="py-3 px-6">Descripcion</th>
-              <th className="py-3 px-6">Monto</th>
-              <th className="py-3 px-6">Categoria</th>
-              <th className="py-3 px-6">Sub Categorias</th>
-              <th className="py-3 px-6"></th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 divide-y text-center">
-            {tableItems.map((item) => (
-              <tr key={item.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{formatToDisplay(item.fecha)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {item.alumnoComision?.alumno.name || '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {item.alumnoComision?.alumno.dni || '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.tipo}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.metodoPago}</td>
-                <td className="px-6 py-4">{item.descripcion || '-'}</td>
-                <td className="px-6 py-4">{item.monto}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {item.subcategoria?.categoria.nombre || '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {item.subcategoria?.nombre || '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="px-4 py-2 text-white btnAz rounded me-2"
-                  >
-                    <i className="fa-solid fa-pen"></i>
-                  </button>
-                  {item.tipo == 'Egreso' ? (
-                    <>
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-2 md:ml-auto mt-4 md:mt-0">
+              <AccionesDropdown
+                idVend={idVend}
+                onCajaAction={() => setRefreshKey((prev) => prev + 1)}
+                onDescargarExcel={descargarExcel}
+              />
+            </div>
+          </div>
+          <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
+            <table className="w-full table-auto text-sm  text-center">
+              <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
+                <tr>
+                  <th className="py-3 px-6">Fecha</th>
+                  <th className="py-3 px-6">Alumno</th>
+                  <th className="py-3 px-6">Dni</th>
+                  <th className="py-3 px-6">Tipo</th>
+                  <th className="py-3 px-6">Metodo de Pago</th>
+                  <th className="py-3 px-6">Descripcion</th>
+                  <th className="py-3 px-6">Monto</th>
+                  <th className="py-3 px-6">Categoria</th>
+                  <th className="py-3 px-6">Sub Categorias</th>
+                  <th className="py-3 px-6"></th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-600 divide-y text-center">
+                {tableItems.map((item) => (
+                  <tr key={item.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">{formatToDisplay(item.fecha)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.alumnoComision?.alumno.name || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.alumnoComision?.alumno.dni || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.tipo}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.metodoPago}</td>
+                    <td className="px-6 py-4">{item.descripcion || '-'}</td>
+                    <td className="px-6 py-4">{item.monto}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.subcategoria?.categoria.nombre || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.subcategoria?.nombre || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <button
-                        value={item.id}
-                        className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                        onClick={() => handleEdit(item)}
+                        className="px-4 py-2 text-white btnAz rounded me-2"
                       >
-                        {pause[item.id] ? (
-                          <svg
-                            fill="white"
-                            className="w-6 h-6 mx-auto"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                              <animateTransform
-                                attributeName="transform"
-                                type="rotate"
-                                dur="0.75s"
-                                values="0 12 12;360 12 12"
-                                repeatCount="indefinite"
-                              />
-                            </path>
-                          </svg>
-                        ) : (
-                          <i className="fa-solid fa-print"></i>
-                        )}
+                        <i className="fa-solid fa-pen"></i>
                       </button>
-                    </>
-                  ) : (
-                    <div></div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                      {item.tipo === 'Ingreso' && (
+                        <button
+                          onClick={() => handlePrintPago(item)}
+                          className="px-4 py-2 text-white bg-green-500 hover:bg-green-600 md:text-sm rounded ms-2"
+                          title="Descargar comprobante"
+                        >
+                          {pause[item.id] ? (
+                            <svg
+                              fill="white"
+                              className="w-6 h-6 mx-auto"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
+                                <animateTransform
+                                  attributeName="transform"
+                                  type="rotate"
+                                  dur="0.75s"
+                                  values="0 12 12;360 12 12"
+                                  repeatCount="indefinite"
+                                />
+                              </path>
+                            </svg>
+                          ) : (
+                            <i className="fa-solid fa-print"></i>
+                          )}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+      <Outlet />
       {isModalOpen && (
         <ModalEditar
           formData={formEdit}

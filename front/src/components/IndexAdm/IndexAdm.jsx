@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getSucursalId } from '../../services/Sucursales.service';
 import { Spinner } from '../Spinner/Spinner';
 import DashboardMetrics from '../DashboardMetrics/DashboardMetrics';
-import CardInfo from './CardInfo';
+import CardInfo from '../CardInfo/CardInfo';
 
 const IndexAdm = () => {
   const { user } = useAuth();

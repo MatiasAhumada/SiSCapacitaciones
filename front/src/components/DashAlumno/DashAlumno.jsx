@@ -4,7 +4,7 @@ import { getAluComID } from '../../services/Comisiones.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import { deleteMovCaja, editMovCaja } from '../../services/Cajas.service';
 import { getVendedores } from '../../services/Vendedores.service';
-import { ModalEditar } from '../caja/ModalEditar';
+import { ModalEditar } from '../ModalEditar/ModalEditar';
 import { Spinner } from '../Spinner/Spinner';
 import Swal from 'sweetalert2';
 

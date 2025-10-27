@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { deleteAlumnoId, getAluSucID } from '../../services/Alumnos.service';
-import FilterAlus from './FilterAlus';
+import FilterAlus from '../FilterAlus/FilterAlus';
 import { Spinner } from '../Spinner/Spinner';
 import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';

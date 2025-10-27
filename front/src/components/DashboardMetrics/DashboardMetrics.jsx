@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import SalesChart from './SalesChart';
-import EnrollmentChart from './EnrollmentChart';
-import MethodPaymentChart from './MethodPaymentChart';
-import SalesBySellerChart from './SalesBySellerChart';
+import SalesChart from '../SalesChart/SalesChart';
+import EnrollmentChart from '../EnrollmentChart/EnrollmentChart';
+import MethodPaymentChart from '../MethodPaymentChart/MethodPaymentChart';
+import SalesBySellerChart from '../SalesBySellerChart/SalesBySellerChart';
 import {
   fetchSalesByMonth,
   fetchEnrollmentsByMonth,

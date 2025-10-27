@@ -5,10 +5,8 @@ import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../servic
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import Swal from 'sweetalert2';
-import AccionesDropdown from '../caja/Dropdowns/AccionesDropdown';
-import FiltrosDropDown from '../caja/Dropdowns/FiltrosDropDown';
-import CajaResumen from '../caja/Dropdowns/CajaResumen';
-import { ModalEditar } from '../caja/ModalEditar';
+import AccionesDropdown from '../AccionesDropdown/AccionesDropdown';
+import { ModalEditar } from '../ModalEditar/ModalEditar';
 
 const DashCajas = () => {
   const { user } = useAuth();
@@ -214,14 +212,13 @@ const DashCajas = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
-      <CajaResumen sesionCaja={sesionCaja}></CajaResumen>
+      {/* CajaResumen component removed */}
       <div className="items-start justify-between flex flex-col md:flex-row">
         <div className="max-w-lg mt-5">
           <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">CAJA</h3>
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center md:space-x-2 md:ml-auto mt-4 md:mt-0">
-          <FiltrosDropDown onFiltrar={filtrar} />
           <AccionesDropdown
             idVend={user?.id}
             onCajaAction={() => setRefreshKey((prev) => prev + 1)}

@@ -22,10 +22,11 @@ import CreateCurso from './components/CreateCurso/CreateCurso';
 import DashComisiones from './components/DashComisiones/DashComisiones';
 import CreateComision from './components/CreateComision/CreateComision';
 import ListadoComisiones from './components/ListadoComisiones/ListadoComisiones';
-import DashCaja from './components/caja/DashCaja';
-import CreateCaja from './components/caja/CreateCaja';
-import CajaEgreso from './components/caja/CajaEgreso';
-import CajaTransferencia from './components/caja/CajaTransferencia';
+import DashCaja from './components/DashCaja/DashCaja';
+import CreateCaja from './components/CreateCaja/CreateCaja';
+import CajaEgreso from './components/CajaEgreso/CajaEgreso';
+import CajaTransferencia from './components/CajaTransferencia/CajaTransferencia';
+
 import DashCajas from './components/DashCajas/DashCajas';
 import ListadoCajas from './components/ListadoCajas/ListadoCajas';
 import Certificados from './components/Certificados/Certificados';
@@ -59,6 +60,7 @@ function App() {
           <Route path="/admin/cajas" element={<RequireAuth><ProtectedLayout><DashCajas /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/cobrar" element={<RequireAuth><ProtectedLayout><CreateCaja /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/egreso" element={<RequireAuth><ProtectedLayout><CajaEgreso /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/transferencia" element={<RequireAuth><ProtectedLayout><CajaTransferencia /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/certificados" element={<RequireAuth><ProtectedLayout><Certificados /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/listado-cajas" element={<RequireAuth><ProtectedLayout><ListadoCajas /></ProtectedLayout></RequireAuth>} />
           

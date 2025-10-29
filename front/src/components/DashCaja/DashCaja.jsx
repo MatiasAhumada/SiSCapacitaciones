@@ -7,6 +7,7 @@ import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import Swal from 'sweetalert2';
 import AccionesDropdown from '../AccionesDropdown/AccionesDropdown';
 import { ModalEditar } from '../ModalEditar/ModalEditar';
+import CajaResumen from '../CajaResumen/CajaResumen';
 
 const DashCaja = () => {
   const idVend = localStorage.getItem('token');
@@ -46,11 +47,11 @@ const DashCaja = () => {
   const recargarDatos = async () => {
     try {
       const data = await GetCajaByVendedor(idVend);
+      console.log(data);
       const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
       setSesionCaja(ultimaSesion);
       const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
       setTableItems(movimientosAplanados);
-      console.log(movimientosAplanados);
     } catch (error) {
       const msg = error?.response?.data?.message;
       Swal.fire({
@@ -120,7 +121,7 @@ const DashCaja = () => {
   };
 
   const handlePrintPago = async (pago) => {
-    setPause(prev => ({ ...prev, [pago.id]: true }));
+    setPause((prev) => ({ ...prev, [pago.id]: true }));
     try {
       await descargarComprobantePDF(pago.id);
       Swal.fire({
@@ -128,7 +129,7 @@ const DashCaja = () => {
         title: 'Comprobante descargado',
         text: 'El comprobante se ha descargado correctamente',
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (error) {
       Swal.fire({
@@ -137,7 +138,7 @@ const DashCaja = () => {
         text: error.message,
       });
     } finally {
-      setPause(prev => ({ ...prev, [pago.id]: false }));
+      setPause((prev) => ({ ...prev, [pago.id]: false }));
     }
   };
 
@@ -236,103 +237,136 @@ const DashCaja = () => {
     }
   };
   return (
-    <div className="max-w-screen-xl mx-auto px-4 md:px-8">
-      {/* CajaResumen component removed */}
-      {!isSubRoute && (
-        <>
-          <div className="items-start justify-between flex flex-col md:flex-row">
-            <div className="max-w-lg mt-5">
-              <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">CAJA</h3>
-            </div>
-
-            <div className="flex flex-col md:flex-row md:items-center md:space-x-2 md:ml-auto mt-4 md:mt-0">
-              <AccionesDropdown
-                idVend={idVend}
-                onCajaAction={() => setRefreshKey((prev) => prev + 1)}
-                onDescargarExcel={descargarExcel}
-              />
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard de Caja</h1>
+            <p className="text-gray-600 mt-1">Gestiona los movimientos de tu caja diaria</p>
           </div>
-          <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
-            <table className="w-full table-auto text-sm  text-center">
-              <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
+          <AccionesDropdown
+            idVend={idVend}
+            onCajaAction={() => setRefreshKey((prev) => prev + 1)}
+            onDescargarExcel={descargarExcel}
+          />
+        </div>
+
+        {/* Resumen integrado */}
+        <CajaResumen sesionCaja={sesionCaja} />
+
+        {/* Tabla de movimientos */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+            <h2 className="text-xl font-semibold text-white">Movimientos del Día</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="py-3 px-6">Fecha</th>
-                  <th className="py-3 px-6">Alumno</th>
-                  <th className="py-3 px-6">Dni</th>
-                  <th className="py-3 px-6">Tipo</th>
-                  <th className="py-3 px-6">Metodo de Pago</th>
-                  <th className="py-3 px-6">Descripcion</th>
-                  <th className="py-3 px-6">Monto</th>
-                  <th className="py-3 px-6">Categoria</th>
-                  <th className="py-3 px-6">Sub Categorias</th>
-                  <th className="py-3 px-6"></th>
+                  <th className="py-4 px-6 text-left font-semibold text-gray-700">Fecha</th>
+                  <th className="py-4 px-6 text-left font-semibold text-gray-700">Alumno</th>
+                  <th className="py-4 px-6 text-left font-semibold text-gray-700">DNI</th>
+                  <th className="py-4 px-6 text-center font-semibold text-gray-700">Tipo</th>
+                  <th className="py-4 px-6 text-center font-semibold text-gray-700">
+                    Método de Pago
+                  </th>
+                  <th className="py-4 px-6 text-left font-semibold text-gray-700">Descripción</th>
+                  <th className="py-4 px-6 text-right font-semibold text-gray-700">Monto</th>
+                  <th className="py-4 px-6 text-left font-semibold text-gray-700">Categoría</th>
+                  <th className="py-4 px-6 text-left font-semibold text-gray-700">Subcategoría</th>
+                  <th className="py-4 px-6 text-center font-semibold text-gray-700">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-600 divide-y text-center">
-                {tableItems.map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{formatToDisplay(item.fecha)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+              <tbody className="divide-y divide-gray-200">
+                {tableItems.map((item, index) => (
+                  <tr
+                    key={item.id}
+                    className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}
+                  >
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {formatToDisplay(item.fecha)}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {item.alumnoComision?.alumno.name || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 text-sm text-gray-600">
                       {item.alumnoComision?.alumno.dni || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.tipo}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.metodoPago}</td>
-                    <td className="px-6 py-4">{item.descripcion || '-'}</td>
-                    <td className="px-6 py-4">{item.monto}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 text-center">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          item.tipo === 'Ingreso'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {item.tipo}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          item.metodoPago === 'Efectivo'
+                            ? 'bg-green-100 text-green-800'
+                            : item.metodoPago === 'Digital Tobias'
+                              ? 'bg-purple-100 text-purple-800'
+                              : item.metodoPago === 'Digital Javier'
+                                ? 'bg-orange-100 text-orange-800'
+                                : item.metodoPago === 'Credito'
+                                  ? 'bg-pink-100 text-pink-800'
+                                  : item.metodoPago === 'Ferro'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {item.metodoPago}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{item.descripcion || '-'}</td>
+                    <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">
+                      ${new Intl.NumberFormat('es-AR').format(item.monto)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
                       {item.subcategoria?.categoria.nombre || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 text-sm text-gray-600">
                       {item.subcategoria?.nombre || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="px-4 py-2 text-white btnAz rounded me-2"
-                      >
-                        <i className="fa-solid fa-pen"></i>
-                      </button>
-                      {item.tipo === 'Ingreso' && (
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center space-x-2">
                         <button
-                          onClick={() => handlePrintPago(item)}
-                          className="px-4 py-2 text-white bg-green-500 hover:bg-green-600 md:text-sm rounded ms-2"
-                          title="Descargar comprobante"
+                          onClick={() => handleEdit(item)}
+                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                          title="Editar"
                         >
-                          {pause[item.id] ? (
-                            <svg
-                              fill="white"
-                              className="w-6 h-6 mx-auto"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                                <animateTransform
-                                  attributeName="transform"
-                                  type="rotate"
-                                  dur="0.75s"
-                                  values="0 12 12;360 12 12"
-                                  repeatCount="indefinite"
-                                />
-                              </path>
-                            </svg>
-                          ) : (
-                            <i className="fa-solid fa-print"></i>
-                          )}
+                          <i className="fa-solid fa-pen text-sm"></i>
                         </button>
-                      )}
+                        {item.tipo === 'Ingreso' && (
+                          <button
+                            onClick={() => handlePrintPago(item)}
+                            className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                            title="Descargar comprobante"
+                          >
+                            {pause[item.id] ? (
+                              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                                <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z" />
+                              </svg>
+                            ) : (
+                              <i className="fa-solid fa-print text-sm"></i>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </>
-      )}
-      <Outlet />
+        </div>
+      </div>
+
       {isModalOpen && (
         <ModalEditar
           formData={formEdit}

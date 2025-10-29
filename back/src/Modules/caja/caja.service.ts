@@ -947,11 +947,7 @@ export class CajaService {
       }),
     );
 
-    return {
-      data: sesionesConMovimientos,
-      totalPages: sesionesConMovimientos[0]?.totalPages || 1,
-      currentPage: page,
-    };
+    return sesionesConMovimientos;
   }
 
   private async duplicarEnCajaPerpetua(

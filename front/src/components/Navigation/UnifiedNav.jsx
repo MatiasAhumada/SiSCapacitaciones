@@ -19,79 +19,132 @@ import simplificado from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
+import { useCaja } from '../../context/CajaContext';
+import { aperturaCaja, cerrarCaja } from '../../services/Cajas.service';
+import Swal from 'sweetalert2';
 
 const UnifiedNav = () => {
   const { logout, user } = useAuth();
   const { sucursales, sucursalSeleccionada, cambiarSucursal } = useApp();
+  const { descargarExcelFn, cajaAbierta } = useCaja();
   const navigate = useNavigate();
   const isAdmin = user?.isAdmin;
 
-  const navigationConfig = isAdmin
-    ? {
-        personas: {
-          name: 'Personas',
-          icon: UsersIcon,
-          items: [
-            { name: 'Vendedores', path: '/admin/vendedores' },
-            { name: 'Crear Vendedor', path: '/admin/vendedores/crear' },
-            { name: 'Profesores', path: '/admin/profesores' },
-            { name: 'Crear Profesor', path: '/admin/profesores/crear' },
-            { name: 'Alumnos', path: '/admin/alumnos' },
-            { name: 'Crear Alumno', path: '/admin/alumnos/crear' },
-          ],
-        },
-        academico: {
-          name: 'Académico',
-          icon: AcademicCapIcon,
-          items: [
-            { name: 'Cursos', path: '/admin/cursos' },
-            { name: 'Crear Curso', path: '/admin/cursos/crear' },
-            { name: 'Comisiones', path: '/admin/comisiones' },
-            { name: 'Crear Comisión', path: '/admin/comisiones/crear' },
-            { name: 'Certificados', path: '/admin/certificados' },
-          ],
-        },
-        cajas: {
-          name: 'Cajas',
-          icon: CurrencyDollarIcon,
-          items: [
-            { name: 'Cajas', path: '/admin/cajas' },
-            { name: 'Cobrar', path: '/admin/cobrar' },
-            { name: 'Egreso', path: '/admin/egreso' },
-            { name: 'Listado Cajas', path: '/admin/listado-cajas' },
-          ],
-        },
-      }
-    : {
-        academico: {
-          name: 'Académico',
-          icon: AcademicCapIcon,
-          items: [
-            { name: 'Inscribir', path: '/vendedor/inscribir' },
-            { name: 'Cursos', path: '/vendedor/cursos' },
-            { name: 'Comisiones', path: '/vendedor/comisiones' },
-          ],
-        },
-        cajas: {
-          name: 'Cajas',
-          icon: CurrencyDollarIcon,
-          items: [
-            { name: 'Caja', path: '/vendedor/caja' },
-            { name: 'Cobrar', path: '/vendedor/cobrar' },
-            { name: 'Egreso', path: '/vendedor/egreso' },
-            { name: 'Transferencia', path: '/vendedor/transferencia' },
-            { name: 'Listado Cajas', path: '/vendedor/listado-cajas' },
-          ],
-        },
-        alumnos: {
-          name: 'Alumnos',
-          icon: UsersIcon,
-          items: [{ name: 'Crear Alumno', path: '/vendedor/alumnos/crear' }],
-        },
-      };
+  const navigationConfig = isAdmin ? {
+    personas: {
+      name: 'Personas',
+      icon: UsersIcon,
+      items: [
+        { name: 'Vendedores', path: '/admin/vendedores' },
+        { name: 'Crear Vendedor', path: '/admin/vendedores/crear' },
+        { name: 'Profesores', path: '/admin/profesores' },
+        { name: 'Crear Profesor', path: '/admin/profesores/crear' },
+        { name: 'Alumnos', path: '/admin/alumnos' },
+        { name: 'Crear Alumno', path: '/admin/alumnos/crear' }
+      ]
+    },
+    academico: {
+      name: 'Académico',
+      icon: AcademicCapIcon,
+      items: [
+        { name: 'Cursos', path: '/admin/cursos' },
+        { name: 'Crear Curso', path: '/admin/cursos/crear' },
+        { name: 'Comisiones', path: '/admin/comisiones' },
+        { name: 'Crear Comisión', path: '/admin/comisiones/crear' },
+        { name: 'Certificados', path: '/admin/certificados' }
+      ]
+    },
+    cajas: {
+      name: 'Cajas',
+      icon: CurrencyDollarIcon,
+      items: [
+        { name: 'Caja', path: '/admin/caja' },
+        { name: cajaAbierta ? 'Cerrar Caja' : 'Abrir Caja', action: cajaAbierta ? 'cerrarCaja' : 'aperturaCaja' },
+        { name: 'Cobrar', path: '/admin/cobrar' },
+        { name: 'Egreso', path: '/admin/egreso' },
+        { name: 'Listado Cajas', path: '/admin/listado-cajas' },
+        { name: 'Descargar Excel', action: 'descargarExcel' }
+      ]
+    }
+  } : {
+    academico: {
+      name: 'Académico',
+      icon: AcademicCapIcon,
+      items: [
+        { name: 'Inscribir', path: '/vendedor/inscribir' },
+        { name: 'Cursos', path: '/vendedor/cursos' },
+        { name: 'Comisiones', path: '/vendedor/comisiones' }
+      ]
+    },
+    cajas: {
+      name: 'Cajas',
+      icon: CurrencyDollarIcon,
+      items: [
+        { name: 'Caja', path: '/vendedor/caja' },
+        { name: cajaAbierta ? 'Cerrar Caja' : 'Abrir Caja', action: cajaAbierta ? 'cerrarCaja' : 'aperturaCaja' },
+        { name: 'Cobrar', path: '/vendedor/cobrar' },
+        { name: 'Egreso', path: '/vendedor/egreso' },
+        { name: 'Transferencia', path: '/vendedor/transferencia' },
+        { name: 'Listado Cajas', path: '/vendedor/listado-cajas' }
+      ]
+    },
+    alumnos: {
+      name: 'Alumnos',
+      icon: UsersIcon,
+      items: [
+        { name: 'Crear Alumno', path: '/vendedor/alumnos/crear' }
+      ]
+    }
+  };
 
   const handleNavigation = (path) => {
     navigate(path);
+  };
+
+  const handleMenuAction = async (item) => {
+    if (item.action === 'descargarExcel') {
+      if (descargarExcelFn) {
+        descargarExcelFn();
+      }
+    } else if (item.action === 'aperturaCaja') {
+      try {
+        await aperturaCaja(user?.id);
+        Swal.fire({
+          icon: 'success',
+          title: 'Caja Abierta',
+          text: 'La caja se ha abierto correctamente',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        navigate(isAdmin ? '/admin/caja' : '/vendedor/caja');
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error?.response?.data?.message || 'No se pudo abrir la caja',
+        });
+      }
+    } else if (item.action === 'cerrarCaja') {
+      try {
+        await cerrarCaja(user?.id);
+        Swal.fire({
+          icon: 'success',
+          title: 'Caja Cerrada',
+          text: 'La caja se ha cerrado correctamente',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        navigate(isAdmin ? '/admin/caja' : '/vendedor/caja');
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error?.response?.data?.message || 'No se pudo cerrar la caja',
+        });
+      }
+    } else if (item.path) {
+      handleNavigation(item.path);
+    }
   };
 
   const handleSucursalChange = (e) => {
@@ -115,7 +168,7 @@ const UnifiedNav = () => {
             <MenuItem key={item.name}>
               {({ active }) => (
                 <button
-                  onClick={() => handleNavigation(item.path)}
+                  onClick={() => handleMenuAction(item)}
                   className={`${active ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md' : 'text-gray-700 hover:bg-gray-50'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-full transition-all duration-150 ${index === 0 ? 'mt-0' : 'mt-1'}`}
                 >
                   <div

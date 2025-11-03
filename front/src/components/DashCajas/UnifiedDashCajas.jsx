@@ -2,19 +2,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCaja } from '../../context/CajaContext';
-import { editMovCaja, GetByVendedorMock, descargarExcelCaja } from '../../services/Cajas.service';
+import { editMovCaja, GetByVendedorMock, descargarExcelCaja, aperturaCaja, cerrarCaja } from '../../services/Cajas.service';
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
 import Swal from 'sweetalert2';
-import AccionesDropdown from '../AccionesDropdown/AccionesDropdown';
+
 import { ModalEditar } from '../ModalEditar/ModalEditar';
 import CajaResumen from '../CajaResumen/CajaResumen';
 import Pagination from '../Pagination/Pagination';
 
 const UnifiedDashCajas = () => {
   const { user } = useAuth();
-  const { registrarDescargarExcel } = useCaja();
+  const { registrarDescargarExcel, registrarAbrirCaja, registrarCerrarCaja } = useCaja();
   const isAdmin = user?.isAdmin;
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -85,9 +85,53 @@ const UnifiedDashCajas = () => {
     recargarDatos();
   }, [refreshKey, user?.id, currentPage]);
 
+  const handleAbrirCaja = async () => {
+    try {
+      await aperturaCaja(user?.id);
+      Swal.fire({
+        icon: 'success',
+        title: 'Caja abierta',
+        text: 'La caja se ha abierto correctamente',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      setRefreshKey((prev) => prev + 1);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al abrir caja',
+        text: error.response?.data?.message || error.message,
+      });
+    }
+  };
+
+  const handleCerrarCaja = async () => {
+    try {
+      await cerrarCaja(user?.id);
+      Swal.fire({
+        icon: 'success',
+        title: 'Caja cerrada',
+        text: 'La caja se ha cerrado correctamente',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      setRefreshKey((prev) => prev + 1);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al cerrar caja',
+        text: error.response?.data?.message || error.message,
+      });
+    }
+  };
+
   useEffect(() => {
     registrarDescargarExcel(descargarExcel);
-  }, [sesionCaja]);
+    if (!isAdmin) {
+      registrarAbrirCaja(handleAbrirCaja);
+      registrarCerrarCaja(handleCerrarCaja);
+    }
+  }, [sesionCaja, isAdmin]);
 
   useEffect(() => {
     if (isModalOpen) document.body.style.overflow = 'hidden';
@@ -221,13 +265,7 @@ const UnifiedDashCajas = () => {
             {!isAdmin && <p className="text-gray-600 mt-1">Gestiona los movimientos de tu caja diaria</p>}
           </div>
 
-          {!isAdmin && (
-            <AccionesDropdown
-              idVend={user?.id}
-              onCajaAction={() => setRefreshKey((prev) => prev + 1)}
-              onDescargarExcel={descargarExcel}
-            />
-          )}
+
         </div>
 
         {!isAdmin && <CajaResumen sesionCaja={sesionCaja} />}

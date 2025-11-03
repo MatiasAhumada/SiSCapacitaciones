@@ -44,7 +44,7 @@ export class ComprobanteGeneratorService {
         comprobante?.domicilioComercial || alumno?.address || '';
       const iva = comprobante?.iva || '-';
       const formaPago = comprobante?.formaPago || pago.metodoPago;
-      const observacion = comprobante?.observacion || '';
+      const observacion = pago.descripcion || comprobante?.observacion || '';
       const numeroComprobante = comprobante?.numeroComprobante || '';
       const tipoComprobante = comprobante?.tipoComprobante || '';
       const numero = comprobante?.numero || '';

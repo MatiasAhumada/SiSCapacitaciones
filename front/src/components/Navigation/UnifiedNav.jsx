@@ -6,13 +6,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { useCaja } from '../../context/CajaContext';
+import { useLocation } from 'react-router-dom';
 
 const UnifiedNav = () => {
   const { logout, user } = useAuth();
   const { sucursales, sucursalSeleccionada, cambiarSucursal } = useApp();
-  const { descargarExcelFn } = useCaja();
+  const { descargarExcelFn, abrirCajaFn, cerrarCajaFn } = useCaja();
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdmin = user?.isAdmin;
+  const isInCajaPage = location.pathname.includes('/caja');
 
   const navigationConfig = isAdmin ? {
     personas: {
@@ -42,7 +45,7 @@ const UnifiedNav = () => {
       name: 'Cajas',
       icon: CurrencyDollarIcon,
       items: [
-        { name: 'Cajas', path: '/admin/cajas' },
+        { name: 'Caja', path: '/admin/caja' },
         { name: 'Cobrar', path: '/admin/cobrar' },
         { name: 'Egreso', path: '/admin/egreso' },
         { name: 'Listado Cajas', path: '/admin/listado-cajas' },
@@ -64,9 +67,12 @@ const UnifiedNav = () => {
       icon: CurrencyDollarIcon,
       items: [
         { name: 'Caja', path: '/vendedor/caja' },
+        { name: 'Abrir Caja', action: 'abrirCaja' },
         { name: 'Cobrar', path: '/vendedor/cobrar' },
         { name: 'Egreso', path: '/vendedor/egreso' },
         { name: 'Transferencia', path: '/vendedor/transferencia' },
+        { name: 'Descargar Excel', action: 'descargarExcel' },
+        { name: 'Cerrar Caja', action: 'cerrarCaja' },
         { name: 'Listado Cajas', path: '/vendedor/listado-cajas' }
       ]
     },
@@ -85,9 +91,11 @@ const UnifiedNav = () => {
 
   const handleMenuAction = (item) => {
     if (item.action === 'descargarExcel') {
-      if (descargarExcelFn) {
-        descargarExcelFn();
-      }
+      descargarExcelFn?.();
+    } else if (item.action === 'abrirCaja') {
+      abrirCajaFn?.();
+    } else if (item.action === 'cerrarCaja') {
+      cerrarCajaFn?.();
     } else if (item.path) {
       handleNavigation(item.path);
     }

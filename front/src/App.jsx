@@ -57,7 +57,7 @@ function App() {
           <Route path="/admin/comisiones" element={<RequireAuth><ProtectedLayout><DashComisiones /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/comisiones/crear" element={<RequireAuth><ProtectedLayout><CreateComision /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/comisiones/:comisionId" element={<RequireAuth><ProtectedLayout><ListadoComisiones /></ProtectedLayout></RequireAuth>} />
-          <Route path="/admin/cajas" element={<RequireAuth><ProtectedLayout><UnifiedDashCajas /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/caja" element={<RequireAuth><ProtectedLayout><UnifiedDashCajas /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/cobrar" element={<RequireAuth><ProtectedLayout><CreateCaja /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/egreso" element={<RequireAuth><ProtectedLayout><CajaEgreso /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/transferencia" element={<RequireAuth><ProtectedLayout><CajaTransferencia /></ProtectedLayout></RequireAuth>} />

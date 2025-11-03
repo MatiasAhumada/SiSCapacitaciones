@@ -1,6 +1,7 @@
 import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
+import { CajaProvider } from './context/CajaContext';
 import RequireAuth from './context/RequireAuth';
 import ProtectedLayout from './layouts/ProtectedLayout';
 
@@ -22,12 +23,10 @@ import CreateCurso from './components/CreateCurso/CreateCurso';
 import DashComisiones from './components/DashComisiones/DashComisiones';
 import CreateComision from './components/CreateComision/CreateComision';
 import ListadoComisiones from './components/ListadoComisiones/ListadoComisiones';
-import DashCaja from './components/DashCaja/DashCaja';
 import CreateCaja from './components/CreateCaja/CreateCaja';
 import CajaEgreso from './components/CajaEgreso/CajaEgreso';
 import CajaTransferencia from './components/CajaTransferencia/CajaTransferencia';
-
-import DashCajas from './components/DashCajas/DashCajas';
+import UnifiedDashCajas from './components/DashCajas/UnifiedDashCajas';
 import ListadoCajas from './components/ListadoCajas/ListadoCajas';
 import Certificados from './components/Certificados/Certificados';
 import Inscribir from './components/Inscribir/Inscribir';
@@ -37,6 +36,7 @@ function App() {
   return (
     <AuthProvider>
       <AppProvider>
+        <CajaProvider>
         <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
@@ -57,7 +57,7 @@ function App() {
           <Route path="/admin/comisiones" element={<RequireAuth><ProtectedLayout><DashComisiones /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/comisiones/crear" element={<RequireAuth><ProtectedLayout><CreateComision /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/comisiones/:comisionId" element={<RequireAuth><ProtectedLayout><ListadoComisiones /></ProtectedLayout></RequireAuth>} />
-          <Route path="/admin/cajas" element={<RequireAuth><ProtectedLayout><DashCajas /></ProtectedLayout></RequireAuth>} />
+          <Route path="/admin/cajas" element={<RequireAuth><ProtectedLayout><UnifiedDashCajas /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/cobrar" element={<RequireAuth><ProtectedLayout><CreateCaja /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/egreso" element={<RequireAuth><ProtectedLayout><CajaEgreso /></ProtectedLayout></RequireAuth>} />
           <Route path="/admin/transferencia" element={<RequireAuth><ProtectedLayout><CajaTransferencia /></ProtectedLayout></RequireAuth>} />
@@ -67,7 +67,7 @@ function App() {
           {/* Vendedor Routes */}
           <Route path="/vendedor" element={<RequireAuth><ProtectedLayout><InfoIndexVend /></ProtectedLayout></RequireAuth>} />
           <Route path="/vendedor/inscribir" element={<RequireAuth><ProtectedLayout><Inscribir /></ProtectedLayout></RequireAuth>} />
-          <Route path="/vendedor/caja" element={<RequireAuth><ProtectedLayout><DashCaja /></ProtectedLayout></RequireAuth>} />
+          <Route path="/vendedor/caja" element={<RequireAuth><ProtectedLayout><UnifiedDashCajas /></ProtectedLayout></RequireAuth>} />
           <Route path="/vendedor/cobrar" element={<RequireAuth><ProtectedLayout><CreateCaja /></ProtectedLayout></RequireAuth>} />
           <Route path="/vendedor/egreso" element={<RequireAuth><ProtectedLayout><CajaEgreso /></ProtectedLayout></RequireAuth>} />
           <Route path="/vendedor/transferencia" element={<RequireAuth><ProtectedLayout><CajaTransferencia /></ProtectedLayout></RequireAuth>} />
@@ -82,6 +82,7 @@ function App() {
           <Route path="*" element={<Error404 />} />
         </Routes>
         </BrowserRouter>
+        </CajaProvider>
       </AppProvider>
     </AuthProvider>
   );

@@ -5,10 +5,12 @@ import simplificado from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
+import { useCaja } from '../../context/CajaContext';
 
 const UnifiedNav = () => {
   const { logout, user } = useAuth();
   const { sucursales, sucursalSeleccionada, cambiarSucursal } = useApp();
+  const { descargarExcelFn } = useCaja();
   const navigate = useNavigate();
   const isAdmin = user?.isAdmin;
 
@@ -43,7 +45,8 @@ const UnifiedNav = () => {
         { name: 'Cajas', path: '/admin/cajas' },
         { name: 'Cobrar', path: '/admin/cobrar' },
         { name: 'Egreso', path: '/admin/egreso' },
-        { name: 'Listado Cajas', path: '/admin/listado-cajas' }
+        { name: 'Listado Cajas', path: '/admin/listado-cajas' },
+        { name: 'Descargar Excel', action: 'descargarExcel' }
       ]
     }
   } : {
@@ -80,6 +83,16 @@ const UnifiedNav = () => {
     navigate(path);
   };
 
+  const handleMenuAction = (item) => {
+    if (item.action === 'descargarExcel') {
+      if (descargarExcelFn) {
+        descargarExcelFn();
+      }
+    } else if (item.path) {
+      handleNavigation(item.path);
+    }
+  };
+
   const handleSucursalChange = (e) => {
     cambiarSucursal(e.target.value);
   };
@@ -97,7 +110,7 @@ const UnifiedNav = () => {
             <MenuItem key={item.name}>
               {({ active }) => (
                 <button
-                  onClick={() => handleNavigation(item.path)}
+                  onClick={() => handleMenuAction(item)}
                   className={`${active ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md' : 'text-gray-700 hover:bg-gray-50'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-full transition-all duration-150 ${index === 0 ? 'mt-0' : 'mt-1'}`}
                 >
                   <div className={`w-2 h-2 rounded-full mr-3 ${active ? 'bg-blue-500' : 'bg-gray-300'} transition-colors duration-150`}></div>

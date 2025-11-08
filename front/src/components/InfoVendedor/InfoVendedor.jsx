@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { deleteVend, getVendID } from '../../services/Vendedores.service';
-import Button from '../common/Button';
+import Button from '../Common/Button';
 import Swal from 'sweetalert2';
 
 const InfoVendedor = () => {

@@ -7,7 +7,7 @@ import { getComisiones } from '../../services/Comisiones.service';
 import { getAluByDNI, postAluSimple } from '../../services/Alumnos.service';
 import { postInscripcion } from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
-import ComisionSelector from '../Common/ComisionSelector';
+import ComisionSelector from '../Common/ComisionSelector'
 
 const Inscribir = () => {
   const { user } = useAuth();

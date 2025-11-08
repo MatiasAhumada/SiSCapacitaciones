@@ -12,6 +12,8 @@ import { Asistencia } from './entities/asistencia.entity';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
 import { ChangeStateDto } from './dto/changeState.dto';
 import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
+import { TransferAlumnoDto } from './dto/transfer-alumno.dto';
+import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 
 @Injectable()
 export class ComisionService {
@@ -30,6 +32,8 @@ export class ComisionService {
     private readonly asistenciaRepository: Repository<Asistencia>,
     @InjectRepository(AsistenciaProfesor)
     private readonly asistenciaProfesorRepository: Repository<AsistenciaProfesor>,
+    @InjectRepository(Inscripcion)
+    private readonly inscripcionRepository: Repository<Inscripcion>,
   ) {}
   private cleanHour(hour: any): { start: string; end: string } {
     if (hour && hour.start && hour.end) {
@@ -411,5 +415,41 @@ export class ComisionService {
       },
       order: { fecha: 'DESC' },
     });
+  }
+
+  async transferirAlumno(transferData: TransferAlumnoDto) {
+    const { alumnoComisionId, nuevaComisionId } = transferData;
+
+    const alumnoComision = await this.alumnoComisionRepository.findOne({
+      where: { id: alumnoComisionId },
+      relations: ['comision', 'alumno'],
+    });
+
+    if (!alumnoComision) {
+      throw new NotFoundException('Relación alumno-comisión no encontrada');
+    }
+
+    const nuevaComision = await this.comisionRepository.findOne({
+      where: { id: nuevaComisionId },
+    });
+
+    if (!nuevaComision) {
+      throw new NotFoundException('Nueva comisión no encontrada');
+    }
+
+    const comisionAnteriorId = alumnoComision.comision.id;
+
+    alumnoComision.comision = nuevaComision;
+    await this.alumnoComisionRepository.save(alumnoComision);
+
+    await this.inscripcionRepository.update(
+      {
+        alumno: { id: alumnoComision.alumno.id },
+        comision: { id: comisionAnteriorId },
+      },
+      { comision: nuevaComision },
+    );
+
+    return { message: 'Alumno transferido exitosamente' };
   }
 }

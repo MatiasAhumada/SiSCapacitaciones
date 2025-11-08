@@ -13,6 +13,7 @@ import { CreateComisionDto } from './dto/create-comision.dto';
 import { ChangeStateDto } from './dto/changeState.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
+import { TransferAlumnoDto } from './dto/transfer-alumno.dto';
 
 @Controller('comision')
 export class ComisionController {
@@ -76,6 +77,10 @@ export class ComisionController {
   cambiarEstado(@Body() change: ChangeStateDto) {
     console.log(change);
     return this.comisionService.cambiarEstadoAlumnoComision(change);
+  }
+  @Put('/transferir')
+  transferirAlumno(@Body() transferData: TransferAlumnoDto) {
+    return this.comisionService.transferirAlumno(transferData);
   }
   @Put(':id')
   update(

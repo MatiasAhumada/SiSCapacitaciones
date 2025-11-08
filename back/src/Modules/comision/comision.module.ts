@@ -10,6 +10,7 @@ import { Asistencia } from './entities/asistencia.entity';
 import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Caja } from '../caja/entities/caja.entity';
 import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
+import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
       AlumnoComision,
       Asistencia,
       Caja,
-      AsistenciaProfesor
+      AsistenciaProfesor,
+      Inscripcion
     ]),
   ],
   controllers: [ComisionController],

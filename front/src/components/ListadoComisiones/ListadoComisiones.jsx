@@ -5,12 +5,17 @@ import {
   editStateComision,
   getComisionId,
   postAsistenciaComision,
+  transferirAlumno,
+  getComisionBySucursal,
 } from '../../services/Comisiones.service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Spinner } from '../Spinner/Spinner';
 import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';
+import TransferModal from './TransferModal';
+import ComisionHeader from './ComisionHeader';
+import AsistenciaControls from './AsistenciaControls';
+import AlumnoRow from './AlumnoRow';
 
 const ListadoComisiones = () => {
   const { comisionId } = useParams();
@@ -32,6 +37,10 @@ const ListadoComisiones = () => {
   const [dniFiltro, setDniFiltro] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [selectedAlumno, setSelectedAlumno] = useState(null);
+  const [comisionesDisponibles, setComisionesDisponibles] = useState([]);
+  const [nuevaComisionId, setNuevaComisionId] = useState('');
 
   const itemsPerPage = 10;
 
@@ -195,6 +204,17 @@ const ListadoComisiones = () => {
     setOnAsistenciaClicked(true);
   };
 
+  const handleAsistenciaChange = (updates) => {
+    setAsistencia({ ...asistencia, ...updates });
+  };
+
+  const handleAsistenciaCheck = (alumnoId) => {
+    setAsistencia({
+      ...asistencia,
+      alumnosComisionIds: [...asistencia.alumnosComisionIds, alumnoId],
+    });
+  };
+
   const onGuardar = async () => {
     try {
       await postAsistenciaComision(asistencia);
@@ -219,202 +239,177 @@ const ListadoComisiones = () => {
     setOnAsistenciaClicked(false);
   };
 
+  const handleTransferClick = async (alumno) => {
+    setSelectedAlumno(alumno);
+    try {
+      const data = await getComisionBySucursal(comisionDate.sucursal.id);
+      setComisionesDisponibles(data.data.filter(c => c.id !== comisionId));
+      setShowTransferModal(true);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron cargar las comisiones',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
+
+  const handleTransferConfirm = async () => {
+    if (!nuevaComisionId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Selecciona una comisión',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
+
+    try {
+      await transferirAlumno(selectedAlumno.id, nuevaComisionId);
+      Swal.fire({
+        icon: 'success',
+        title: 'Alumno transferido',
+        text: 'El alumno fue transferido exitosamente',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setShowTransferModal(false);
+      setNuevaComisionId('');
+      setReload(!reload);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al transferir',
+        text: 'Hubo un error al transferir el alumno',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
+
   return (
-    <div className="max-w-screen-xl mx-auto px-4 md:px-8">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-0">
-        <div className="max-w-lg">
-          <h2 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-            {comisionDate.name}
-          </h2>
-          <h4 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-            Dias {comisionDate.day} {comisionDate.hour?.start} - {comisionDate.hour?.end}
-          </h4>
-          <h5 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
-            Profesor {comisionDate.profesor?.name} {comisionDate.profesor?.apellido}
-          </h5>
-        </div>
-        <div className="flex flex-col md:ml-auto md:flex-row md:items-start md:gap-6 w-full md:w-auto">
-          <div className="flex flex-col gap-2 w-full md:w-64">
+    <div className="max-w-screen-2xl mx-auto px-4 md:px-8 py-6">
+      <ComisionHeader comision={comisionDate} />
+
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
+        <div className="flex flex-col gap-3 w-full lg:w-80">
+          <div className="relative">
+            <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             <input
               type="text"
               placeholder="Filtrar por DNI"
               value={dniFiltro}
               onChange={handleFiltrarDni}
-              className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm 
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-               transition-all duration-200 w-full"
+              className="pl-11 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm 
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                transition-all duration-200 w-full"
             />
-
-            {onAsistenciaClicked && (
-              <>
-                <select
-                  value={asistencia.estadoProfesor}
-                  onChange={(e) =>
-                    setAsistencia({ ...asistencia, estadoProfesor: e.target.value })
-                  }
-                  className={`px-4 py-2 border border-gray-300 rounded-lg shadow-sm 
-                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                   transition-all duration-200 w-full 
-                   ${asistencia.estadoProfesor === '' ? 'text-gray-500' : 'text-gray-900'}`}
-                >
-                  <option value="" className="text-gray-500">
-                    Asistencia profesor
-                  </option>
-                  <option value="Presente" className="text-gray-900">
-                    Presente
-                  </option>
-                  <option value="Ausente" className="text-gray-900">
-                    Ausente
-                  </option>
-                  <option value="Feriado" className="text-gray-900">
-                    Feriado
-                  </option>
-                </select>
-
-                {asistencia.estadoProfesor === 'Ausente' && (
-                  <input
-                    type="text"
-                    placeholder="Descripción"
-                    value={asistencia.descripcion}
-                    onChange={(e) =>
-                      setAsistencia({ ...asistencia, descripcion: e.target.value })
-                    }
-                    className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm 
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                     transition-all duration-200 w-full"
-                  />
-                )}
-              </>
-            )}
           </div>
+          <AsistenciaControls
+            asistencia={asistencia}
+            onAsistenciaChange={handleAsistenciaChange}
+            showAsistencia={onAsistenciaClicked}
+          />
+        </div>
 
-          <div className="mt-1 md:mt-0 flex justify-center md:justify-start">
-            <div className="flex flex-col md:flex-row gap-2 w-fit">
-              <button
-                onClick={generatePDF}
-                className="px-3 py-1 text-white principal rounded bg-red-500 hover:bg-red-600 text-sm"
-              >
-                PDF
-              </button>
+        <div className="flex gap-3">
+          <button
+            onClick={generatePDF}
+            className="px-5 py-3 text-white font-medium rounded bg-red-600 hover:bg-red-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+          >
+            <i className="fa-solid fa-file-pdf"></i>
+            Exportar PDF
+          </button>
 
-              {onAsistenciaClicked ? (
-                <button
-                  onClick={onGuardar}
-                  className="min-w-[120px] px-3 py-1 text-white principal rounded bg-green-500 hover:bg-green-600 text-sm"
-                >
-                  Guardar
-                </button>
-              ) : (
-                <button
-                  onClick={onAsist}
-                  className="min-w-[120px] px-3 py-1 text-white principal rounded btnAz text-sm"
-                >
-                  Asistencia
-                </button>
-              )}
-            </div>
-          </div>
+          {onAsistenciaClicked ? (
+            <button
+              onClick={onGuardar}
+              className="px-5 py-3 text-white font-medium rounded bg-green-600 hover:bg-green-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+            >
+              <i className="fa-solid fa-save"></i>
+              Guardar
+            </button>
+          ) : (
+            <button
+              onClick={onAsist}
+              className="px-5 py-3 text-white font-medium rounded bg-blue-600 hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+            >
+              <i className="fa-solid fa-clipboard-check"></i>
+              Asistencia
+            </button>
+          )}
         </div>
       </div>
-      <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
-        <table className="w-full table-auto text-sm text-center">
-          <thead className="bg-gray-50 text-gray-600 font-medium border-b principal">
-            <tr>
-              <th className="py-3 px-6"></th>
-              <th className="py-3 px-6">Nombre</th>
-              <th className="py-3 px-6">DNI</th>
-              <th className="py-3 px-6">Telefono</th>
-              <th className="py-3 px-6">Estado</th>
-              {allDates.map((date) => (
-                <th key={date} className="py-3 px-6">
-                  {date}
-                </th>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto text-sm">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 font-semibold border-b-2 border-gray-200">
+              <tr>
+                <th className="py-4 px-6 text-left">Acciones</th>
+                <th className="py-4 px-6 text-left">Nombre</th>
+                <th className="py-4 px-6 text-left">DNI</th>
+                <th className="py-4 px-6 text-left">Teléfono</th>
+                <th className="py-4 px-6 text-center">Estado</th>
+                {allDates.map((date) => (
+                  <th key={date} className="py-4 px-6 text-center">
+                    {date}
+                  </th>
+                ))}
+                {onAsistenciaClicked && (
+                  <th className="py-4 px-6 text-center">
+                    <input
+                      className="py-2 px-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      type="date"
+                      onChange={(e) => handleAsistenciaChange({ fecha: e.target.value })}
+                    />
+                  </th>
+                )}
+              </tr>
+            </thead>
+            <tbody className="text-gray-600 divide-y divide-gray-200">
+              {alumnosComision?.map((item) => (
+                <AlumnoRow
+                  key={item.id}
+                  item={item}
+                  allDates={allDates}
+                  formatFecha={formatFecha}
+                  getRowBgColor={getRowBgColor}
+                  onNavigate={navegacion}
+                  onTransfer={handleTransferClick}
+                  onStateChange={clickEdit}
+                  onAsistenciaCheck={handleAsistenciaCheck}
+                  pause={pause}
+                  showAsistencia={onAsistenciaClicked}
+                />
               ))}
-              {onAsistenciaClicked ? (
-                <th className="py-1">
-                  <input
-                    className="py-3 px-2 text-gray-600 rounded focus:outline-blue-600 focus ring-blue-400"
-                    type="date"
-                    onChange={(e) => setAsistencia({ ...asistencia, fecha: e.target.value })}
-                  />
-                </th>
-              ) : null}
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 divide-y">
-            {alumnosComision?.map((item) => {
-              return (
-                <tr key={item.id} className={getRowBgColor(item)}>
-                  <td className="px-6 py-4">
-                    <button
-                      value={item.id}
-                      onClick={() => navegacion(item)}
-                      className="px-4 py-2 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
-                    >
-                      {pause[item.id] ? (
-                        <Spinner color="white" />
-                      ) : (
-                        <i className="fa-solid fa-plus"></i>
-                      )}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4">{item.alumno.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
-                  <td className="px-6 py-4">
-                    <button
-                      name={item.state ? 'activo' : 'inactivo'}
-                      onClick={(e) => clickEdit(e, item.id)}
-                      className={`text-xs px-2 py-0.5 rounded text-white 
-                      ${item.state ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}
-                      disabled={pause[item.id]}
-                    >
-                      {pause[item.id] ? (
-                        <Spinner color="white" />
-                      ) : item.state ? (
-                        'Activo'
-                      ) : (
-                        'Inactivo'
-                      )}
-                    </button>
-                  </td>
-                  {allDates.map((date) => {
-                    const asistencia = item.asistencias.find(
-                      (a) => formatFecha(a.fecha) === date
-                    );
-
-                    return (
-                      <td key={date} className="px-6 py-4">
-                        {asistencia ? (asistencia.presente ? '✔️' : '❌') : '❌'}
-                      </td>
-                    );
-                  })}
-                  {onAsistenciaClicked ? (
-                    <th className="text-center py-2">
-                      <input
-                        className="w-6 h-6"
-                        style={{ accentColor: '#2563eb' }}
-                        onChange={() =>
-                          setAsistencia({
-                            ...asistencia,
-                            alumnosComisionIds: [...asistencia.alumnosComisionIds, item.id],
-                          })
-                        }
-                        type="checkbox"
-                      />
-                    </th>
-                  ) : null}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
-      />
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
+      </div>
+
+      {showTransferModal && (
+        <TransferModal
+          alumno={selectedAlumno?.alumno}
+          comisiones={comisionesDisponibles}
+          selectedComisionId={nuevaComisionId}
+          onComisionChange={setNuevaComisionId}
+          onConfirm={handleTransferConfirm}
+          onCancel={() => {
+            setShowTransferModal(false);
+            setNuevaComisionId('');
+          }}
+        />
+      )}
     </div>
   );
 };

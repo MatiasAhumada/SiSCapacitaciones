@@ -110,3 +110,15 @@ export const postAsistenciaComision = async (asistenciaComision) => {
     throw error;
   }
 };
+
+export const transferirAlumno = async (alumnoComisionId, nuevaComisionId) => {
+  try {
+    const response = await axios.put(`${API_URL}/comision/transferir`, {
+      alumnoComisionId,
+      nuevaComisionId,
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

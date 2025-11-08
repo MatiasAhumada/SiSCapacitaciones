@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
 import { useAuth } from '../../context/AuthContext';
@@ -7,6 +7,7 @@ import { getComisiones } from '../../services/Comisiones.service';
 import { getAluByDNI, postAluSimple } from '../../services/Alumnos.service';
 import { postInscripcion } from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
+import ComisionSelector from '../Common/ComisionSelector';
 
 const Inscribir = () => {
   const { user } = useAuth();
@@ -23,8 +24,6 @@ const Inscribir = () => {
   });
   const [comisionSearch, setComisionSearch] = useState('');
   const [showComisiones, setShowComisiones] = useState(false);
-  const [filteredComisiones, setFilteredComisiones] = useState([]);
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -55,20 +54,7 @@ const Inscribir = () => {
     });
   };
 
-  const handleComisionSearch = (e) => {
-    const value = e.target.value;
-    setComisionSearch(value);
-    setShowComisiones(true);
-    
-    // Filtrar comisiones
-    const filtered = comisiones.filter(c => {
-      const comisionText = `${c.name} - ${c.curso?.name} (${c.day} ${c.hour?.start}-${c.hour?.end})`;
-      return comisionText.toLowerCase().includes(value.toLowerCase());
-    });
-    setFilteredComisiones(filtered);
-  };
-
-  const selectComision = (comision) => {
+  const handleComisionSelect = (comision) => {
     const comisionText = `${comision.name} - ${comision.curso?.name} (${comision.day} ${comision.hour?.start}-${comision.hour?.end})`;
     setComisionSearch(comisionText);
     setFormData({
@@ -77,22 +63,6 @@ const Inscribir = () => {
     });
     setShowComisiones(false);
   };
-
-  // Cerrar dropdown al hacer click fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowComisiones(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Inicializar comisiones filtradas
-  useEffect(() => {
-    setFilteredComisiones(comisiones);
-  }, [comisiones]);
 
   const buscarAlumno = async () => {
     if (!formData.dni) return;
@@ -248,37 +218,20 @@ const Inscribir = () => {
           </select>
         </div>
 
-        <div className="pb-2 relative" ref={dropdownRef}>
+        <div className="pb-2">
           <label htmlFor="comisionSearch" className="block mb-2 text-sm principal">
             Comisión
           </label>
-          <input
-            type="text"
-            name="comisionSearch"
-            id="comisionSearch"
-            value={comisionSearch}
-            onChange={handleComisionSearch}
-            onFocus={() => setShowComisiones(true)}
-            className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg p-2.5"
+          <ComisionSelector
+            comisiones={comisiones}
+            selectedComisionId={formData.comisionId}
+            onComisionSelect={handleComisionSelect}
+            searchValue={comisionSearch}
+            onSearchChange={setComisionSearch}
+            showDropdown={showComisiones}
+            onShowDropdown={setShowComisiones}
             placeholder="Buscar comisión..."
-            required
           />
-          {showComisiones && filteredComisiones.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {filteredComisiones.map((comision) => (
-                <div
-                  key={comision.id}
-                  onClick={() => selectComision(comision)}
-                  className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 text-sm text-gray-700 hover:text-blue-700 transition-colors"
-                >
-                  <div className="font-medium">{comision.name}</div>
-                  <div className="text-xs text-gray-500">
-                    {comision.curso?.name} • {comision.day} {comision.hour?.start}-{comision.hour?.end}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {alumnoEncontrado && (

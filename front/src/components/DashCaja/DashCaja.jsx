@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import AccionesDropdown from '../AccionesDropdown/AccionesDropdown';
 import { ModalEditar } from '../ModalEditar/ModalEditar';
 import CajaResumen from '../CajaResumen/CajaResumen';
+import Pagination from '../Pagination/Pagination';
 
 const DashCaja = () => {
   const idVend = localStorage.getItem('token');
@@ -27,6 +28,8 @@ const DashCaja = () => {
   });
   const [sesionCaja, setSesionCaja] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -40,12 +43,14 @@ const DashCaja = () => {
 
   const recargarDatos = async () => {
     try {
-      const data = await GetCajaByVendedor(idVend);
+      const data = await GetCajaByVendedor(idVend, currentPage, 10);
       console.log(data);
-      const ultimaSesion = data.length > 0 ? data[data.length - 1] : null;
+      const ultimaSesion = data.length > 0 ? data[0] : null;
       setSesionCaja(ultimaSesion);
-      const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
-      setTableItems(movimientosAplanados);
+      if (ultimaSesion) {
+        setTableItems(ultimaSesion.movimientos || []);
+        setTotalPages(ultimaSesion.totalPages || 1);
+      }
     } catch (error) {
       const msg = error?.response?.data?.message;
       Swal.fire({
@@ -74,7 +79,7 @@ const DashCaja = () => {
     cargarDatos();
     recargarDatos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshKey]);
+  }, [refreshKey, currentPage]);
 
   useEffect(() => {
     if (isModalOpen) document.body.style.overflow = 'hidden';
@@ -323,6 +328,13 @@ const DashCaja = () => {
             </table>
           </div>
         </div>
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        )}
       </div>
 
       {isModalOpen && (

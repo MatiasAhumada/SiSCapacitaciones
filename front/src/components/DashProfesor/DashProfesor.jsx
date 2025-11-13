@@ -76,7 +76,7 @@ const DashProfesor = () => {
     };
     peticion();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  }, [currentPage, getSucursalActiva()?.id]);
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">

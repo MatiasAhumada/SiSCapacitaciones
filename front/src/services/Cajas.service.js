@@ -1,8 +1,10 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const GetCajaByVendedor = async (vendedorId) => {
-  const response = await axios.get(`${API_URL}/caja/sesionDiariaVendedor/${vendedorId}`);
+export const GetCajaByVendedor = async (vendedorId, page = 1, limit = 10) => {
+  const response = await axios.get(`${API_URL}/caja/sesionDiariaVendedor/${vendedorId}`, {
+    params: { page, limit },
+  });
   return response.data;
 };
 

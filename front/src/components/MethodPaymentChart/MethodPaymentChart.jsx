@@ -1,17 +1,28 @@
 import PropTypes from 'prop-types';
 import { PieChart, Pie, Tooltip, Cell, Legend, ResponsiveContainer } from 'recharts';
 
-// Colores para cada porción del gráfico
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ['#8b5cf6', '#ec4899', '#f59e0b', '#3b82f6', '#10b981'];
 
 const MethodPaymentChart = ({ data }) => {
-  // Los datos de ejemplo deberían lucir así:
-  // [
-  //   { name: 'Efectivo', value: 400 },
-  //   { name: 'Crédito', value: 300 },
-  //   { name: 'Digital Tobias', value: 300 },
-  //   { name: 'Digital Javier', value: 200 },
-  // ]
+  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 30;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#374151" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        style={{ fontSize: '13px', fontWeight: '600' }}
+      >
+        {`${(percent * 100).toFixed(1)}%`}
+      </text>
+    );
+  };
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -22,16 +33,22 @@ const MethodPaymentChart = ({ data }) => {
           nameKey="name"
           cx="50%"
           cy="50%"
-          outerRadius={100}
-          fill="#8884d8"
-          label
+          outerRadius={90}
+          label={renderCustomLabel}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip />
-        <Legend />
+        <Tooltip 
+          contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+          formatter={(value) => [`$${value.toLocaleString()}`, 'Monto']}
+        />
+        <Legend 
+          verticalAlign="bottom" 
+          height={36}
+          iconType="circle"
+        />
       </PieChart>
     </ResponsiveContainer>
   );

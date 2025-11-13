@@ -5,9 +5,11 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-export const fetchSalesByMonth = async (year) => {
+export const fetchSalesByMonth = async (year, vendedorIds) => {
   try {
-    const params = year ? { year } : {};
+    const params = {};
+    if (year) params.year = year;
+    if (vendedorIds && vendedorIds.length > 0) params.vendedorIds = vendedorIds.join(',');
     const response = await api.get('/metrics/sales-by-month', { params });
     return response.data;
   } catch (error) {
@@ -26,11 +28,13 @@ export const fetchAvailableYears = async () => {
   }
 };
 
-export const fetchEnrollmentsByMonth = async (vendedorIds, months) => {
+export const fetchEnrollmentsByMonth = async (vendedorIds, months, year, cursoId) => {
   try {
     const params = {};
     if (vendedorIds && vendedorIds.length > 0) params.vendedorIds = vendedorIds.join(',');
     if (months && months.length > 0) params.months = months.join(',');
+    if (year) params.year = year;
+    if (cursoId) params.cursoId = cursoId;
     const response = await api.get('/metrics/enrollments-by-month', { params });
     return response.data;
   } catch (error) {
@@ -39,9 +43,12 @@ export const fetchEnrollmentsByMonth = async (vendedorIds, months) => {
   }
 };
 
-export const fetchPaymentMethods = async () => {
+export const fetchPaymentMethods = async (month, vendedorIds) => {
   try {
-    const response = await api.get('/metrics/payment-methods');
+    const params = {};
+    if (month) params.month = month;
+    if (vendedorIds && vendedorIds.length > 0) params.vendedorIds = vendedorIds.join(',');
+    const response = await api.get('/metrics/payment-methods', { params });
     return response.data;
   } catch (error) {
     console.error('Fallo en la llamada a la API de métodos de pago:', error);
@@ -49,9 +56,11 @@ export const fetchPaymentMethods = async () => {
   }
 };
 
-export const fetchSalesBySeller = async (vendedorIds) => {
+export const fetchSalesBySeller = async (vendedorIds, month) => {
   try {
-    const params = vendedorIds && vendedorIds.length > 0 ? { vendedorIds: vendedorIds.join(',') } : {};
+    const params = {};
+    if (vendedorIds && vendedorIds.length > 0) params.vendedorIds = vendedorIds.join(',');
+    if (month) params.month = month;
     const response = await api.get('/metrics/sales-by-seller', { params });
     return response.data;
   } catch (error) {
@@ -66,6 +75,16 @@ export const fetchAvailableSellers = async () => {
     return response.data;
   } catch (error) {
     console.error('Fallo en la llamada a la API de vendedores disponibles:', error);
+    return [];
+  }
+};
+
+export const fetchAvailableCourses = async () => {
+  try {
+    const response = await api.get('/metrics/available-courses');
+    return response.data;
+  } catch (error) {
+    console.error('Fallo en la llamada a la API de cursos disponibles:', error);
     return [];
   }
 };

@@ -11,11 +11,11 @@ const MethodPaymentChart = ({ data }) => {
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="#374151" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="#374151"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         style={{ fontSize: '13px', fontWeight: '600' }}
       >
@@ -40,15 +40,15 @@ const MethodPaymentChart = ({ data }) => {
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip 
-          contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+        <Tooltip
+          contentStyle={{
+            backgroundColor: '#fff',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+          }}
           formatter={(value) => [`$${value.toLocaleString()}`, 'Monto']}
         />
-        <Legend 
-          verticalAlign="bottom" 
-          height={36}
-          iconType="circle"
-        />
+        <Legend verticalAlign="bottom" height={36} iconType="circle" />
       </PieChart>
     </ResponsiveContainer>
   );

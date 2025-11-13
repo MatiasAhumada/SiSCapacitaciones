@@ -24,12 +24,17 @@ const FilterButton = ({ color, activeFiltersCount, dropdownId, children }) => {
         <i className="fa-solid fa-filter"></i>
         Filtros
         {activeFiltersCount > 0 && (
-          <span className={`bg-white ${badgeColorClasses[color]} px-2 py-0.5 rounded-full text-xs font-bold`}>
+          <span
+            className={`bg-white ${badgeColorClasses[color]} px-2 py-0.5 rounded-full text-xs font-bold`}
+          >
             {activeFiltersCount}
           </span>
         )}
       </button>
-      <div id={dropdownId} className="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-10 max-h-96 overflow-y-auto">
+      <div
+        id={dropdownId}
+        className="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-10 max-h-96 overflow-y-auto"
+      >
         {children}
       </div>
     </div>

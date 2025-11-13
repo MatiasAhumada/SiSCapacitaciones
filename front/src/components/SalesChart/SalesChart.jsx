@@ -16,12 +16,12 @@ const COLORS = ['#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#f59e0b'
 
 const SalesChart = ({ data }) => {
   // Detectar si hay múltiples vendedores (cuando name es diferente de month)
-  const hasMultipleSellers = data.some(item => item.month && item.name !== item.month);
+  const hasMultipleSellers = data.some((item) => item.month && item.name !== item.month);
 
   if (hasMultipleSellers) {
     // Agrupar por mes y vendedor
     const groupedData = data.reduce((acc, item) => {
-      const existing = acc.find(d => d.month === item.month);
+      const existing = acc.find((d) => d.month === item.month);
       if (existing) {
         existing[item.name] = item.sales;
       } else {
@@ -30,7 +30,7 @@ const SalesChart = ({ data }) => {
       return acc;
     }, []);
 
-    const sellers = [...new Set(data.map(item => item.name))];
+    const sellers = [...new Set(data.map((item) => item.name))];
 
     return (
       <ResponsiveContainer width="100%" height={300}>
@@ -39,7 +39,11 @@ const SalesChart = ({ data }) => {
           <XAxis dataKey="month" stroke="#6b7280" style={{ fontSize: '12px' }} />
           <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
           <Tooltip
-            contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+            contentStyle={{
+              backgroundColor: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+            }}
             formatter={(value) => [`$${value.toLocaleString()}`, 'Ventas']}
           />
           <Legend />
@@ -64,15 +68,19 @@ const SalesChart = ({ data }) => {
       <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <defs>
           <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.9}/>
-            <stop offset="95%" stopColor="#2563eb" stopOpacity={0.7}/>
+            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.9} />
+            <stop offset="95%" stopColor="#2563eb" stopOpacity={0.7} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
         <XAxis dataKey="name" stroke="#6b7280" style={{ fontSize: '12px' }} />
         <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
-        <Tooltip 
-          contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+        <Tooltip
+          contentStyle={{
+            backgroundColor: '#fff',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+          }}
           formatter={(value) => [`$${value.toLocaleString()}`, 'Ventas']}
         />
         <Bar dataKey="sales" fill="url(#colorSales)" radius={[8, 8, 0, 0]} />

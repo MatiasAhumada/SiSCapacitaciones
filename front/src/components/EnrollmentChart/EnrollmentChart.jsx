@@ -14,13 +14,13 @@ const COLORS = ['#10b981', '#3b82f6', '#f97316', '#8b5cf6', '#ec4899', '#f59e0b'
 
 const EnrollmentChart = ({ data }) => {
   // Determinar si es agrupación por semana o mes
-  const isWeekly = data.some(item => item.week);
+  const isWeekly = data.some((item) => item.week);
   const xAxisKey = isWeekly ? 'week' : 'month';
 
   // Agrupar datos
   const groupedData = data.reduce((acc, item) => {
     const key = item.week || item.month;
-    const existing = acc.find(d => d[xAxisKey] === key);
+    const existing = acc.find((d) => d[xAxisKey] === key);
     if (existing) {
       existing[item.name] = item.inscripciones;
     } else {
@@ -30,7 +30,7 @@ const EnrollmentChart = ({ data }) => {
   }, []);
 
   // Obtener vendedores únicos
-  const sellers = [...new Set(data.map(item => item.name))];
+  const sellers = [...new Set(data.map((item) => item.name))];
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -38,8 +38,12 @@ const EnrollmentChart = ({ data }) => {
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
         <XAxis dataKey={xAxisKey} stroke="#6b7280" style={{ fontSize: '12px' }} />
         <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
-        <Tooltip 
-          contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+        <Tooltip
+          contentStyle={{
+            backgroundColor: '#fff',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+          }}
           formatter={(value) => [value, 'Inscripciones']}
         />
         <Legend />

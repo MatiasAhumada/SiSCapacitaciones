@@ -1,11 +1,7 @@
-import { API_URL } from "../constants/ApiUrl";
+import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const registrarAsistencia = async (data) => {
-  try {
-    const response = await axios.post(`${API_URL}/comision/asistencia`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+export const postAsistencia = async (asistencia) => {
+  const response = await axios.post(`${API_URL}/asistencia`, asistencia);
+  return response.data;
 };

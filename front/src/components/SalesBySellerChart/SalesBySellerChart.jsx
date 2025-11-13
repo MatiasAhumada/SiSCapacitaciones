@@ -1,14 +1,5 @@
-// src/components/SalesBySellerChart.jsx
-import React from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts';
+import PropTypes from 'prop-types';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const SalesBySellerChart = ({ data }) => {
   // Los datos de la API deberían lucir así:
@@ -21,10 +12,7 @@ const SalesBySellerChart = ({ data }) => {
 
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <BarChart
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
+      <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
@@ -33,6 +21,10 @@ const SalesBySellerChart = ({ data }) => {
       </BarChart>
     </ResponsiveContainer>
   );
+};
+
+SalesBySellerChart.propTypes = {
+  data: PropTypes.array.isRequired,
 };
 
 export default SalesBySellerChart;

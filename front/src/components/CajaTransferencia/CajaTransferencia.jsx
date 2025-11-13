@@ -8,8 +8,6 @@ const CajaTransferencia = () => {
   const [vendedores, setVendedores] = useState([]);
   const [pause, setPause] = useState(false);
   const [vend, setVend] = useState({});
-  const [categorias, setCategorias] = useState([]);
-  const [categoriaSelec, setCategoriaSelec] = useState(null);
   const [fecha, setFecha] = useState(new Date());
   const [formData, setFormData] = useState({
     fecha: '',
@@ -39,11 +37,11 @@ const CajaTransferencia = () => {
             vendedorOrigenId: data.id,
           }));
         })
-        .catch((error) => {
+        .catch(() => {
           Swal.fire({
             icon: 'error',
             title: 'Error al cargar vendedor',
-            text: error.message || 'Ocurrió un error al cargar el vendedor.',
+            text: 'Ocurrió un error al cargar el vendedor.',
           });
         });
     };
@@ -52,11 +50,11 @@ const CajaTransferencia = () => {
         .then((data) => {
           setVendedores(data);
         })
-        .catch((error) => {
+        .catch(() => {
           Swal.fire({
             icon: 'error',
             title: 'Error al cargar vendedores',
-            text: error.message || 'Ocurrió un error al cargar los vendedores.',
+            text: 'Ocurrió un error al cargar los vendedores.',
           });
         });
     };
@@ -69,7 +67,7 @@ const CajaTransferencia = () => {
     }, 60000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [idVende]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

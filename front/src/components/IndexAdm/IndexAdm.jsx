@@ -12,7 +12,7 @@ const IndexAdm = () => {
 
   useEffect(() => {
     if (!user?.sucursalId) return;
-    
+
     setPause(true);
     getSucursalId(user.sucursalId).then((data) => {
       setPause(false);

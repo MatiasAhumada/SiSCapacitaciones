@@ -22,11 +22,7 @@ const AlumnoRow = ({
             className="px-3 py-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors shadow-sm hover:shadow-md"
             title="Ver detalles"
           >
-            {pause[item.id] ? (
-              <Spinner color="white" />
-            ) : (
-              <i className="fa-solid fa-eye"></i>
-            )}
+            {pause[item.id] ? <Spinner color="white" /> : <i className="fa-solid fa-eye"></i>}
           </button>
           <button
             onClick={() => onTransfer(item)}
@@ -48,13 +44,7 @@ const AlumnoRow = ({
             ${item.state ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}
           disabled={pause[item.id]}
         >
-          {pause[item.id] ? (
-            <Spinner color="white" />
-          ) : item.state ? (
-            'Activo'
-          ) : (
-            'Inactivo'
-          )}
+          {pause[item.id] ? <Spinner color="white" /> : item.state ? 'Activo' : 'Inactivo'}
         </button>
       </td>
       {allDates.map((date) => {

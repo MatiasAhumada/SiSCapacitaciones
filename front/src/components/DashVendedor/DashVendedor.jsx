@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { getVendSucID } from '../../services/Vendedores.service';
+import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';
 
 const DashVendedor = () => {
@@ -10,6 +10,8 @@ const DashVendedor = () => {
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const click = (idVend) => {
     navigate(`/admin/vendedores/info/${idVend}`);
@@ -22,8 +24,10 @@ const DashVendedor = () => {
     const peticion = async () => {
       setLoading(true);
       try {
-        const data = await getVendSucID(sucursalId);
-        setTableItems(data || []);
+        const data = await getVendSucID(sucursalId, currentPage, 10);
+        setTableItems(data.data || []);
+        setTotalPages(data.totalPages || 1);
+        setCurrentPage(data.currentPage || 1);
       } catch (error) {
         console.error('Error al cargar vendedores:', error);
         setTableItems([]);
@@ -37,7 +41,8 @@ const DashVendedor = () => {
       }
     };
     peticion();
-  }, [getSucursalActiva()?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -114,6 +119,11 @@ const DashVendedor = () => {
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
 };

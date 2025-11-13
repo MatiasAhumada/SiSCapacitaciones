@@ -4,6 +4,8 @@ import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
 
+import PropTypes from 'prop-types';
+
 export const AppProvider = ({ children }) => {
   const { user } = useAuth();
   const [sucursales, setSucursales] = useState([]);
@@ -13,7 +15,7 @@ export const AppProvider = ({ children }) => {
   // Cargar sucursales cuando el usuario es admin
   useEffect(() => {
     if (!user?.isAdmin) return;
-    
+
     const cargarSucursales = async () => {
       setLoading(true);
       try {
@@ -28,12 +30,12 @@ export const AppProvider = ({ children }) => {
         setLoading(false);
       }
     };
-    
+
     cargarSucursales();
   }, [user?.isAdmin]);
 
   const cambiarSucursal = (sucursalId) => {
-    const sucursal = sucursales.find(s => s.id === sucursalId);
+    const sucursal = sucursales.find((s) => s.id === sucursalId);
     if (sucursal) {
       setSucursalSeleccionada(sucursal);
     }
@@ -55,16 +57,16 @@ export const AppProvider = ({ children }) => {
     cambiarSucursal,
     getSucursalActiva,
     loading,
-    
+
     // Aquí puedes agregar más datos globales como:
     // cursos, profesores, etc.
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+AppProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useApp = () => {

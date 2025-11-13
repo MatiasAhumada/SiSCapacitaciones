@@ -1,10 +1,6 @@
 import PropTypes from 'prop-types';
 
-const AsistenciaControls = ({ 
-  asistencia, 
-  onAsistenciaChange, 
-  showAsistencia 
-}) => {
+const AsistenciaControls = ({ asistencia, onAsistenciaChange, showAsistencia }) => {
   if (!showAsistencia) return null;
 
   return (

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import PropTypes from 'prop-types';
+
 const FilterAlus = ({ onFiltrar }) => {
   const [open, setOpen] = useState(false);
   const [pause, setPaused] = useState(false);
@@ -115,6 +117,10 @@ const FilterAlus = ({ onFiltrar }) => {
       )}
     </div>
   );
+};
+
+FilterAlus.propTypes = {
+  onFiltrar: PropTypes.func.isRequired,
 };
 
 export default FilterAlus;

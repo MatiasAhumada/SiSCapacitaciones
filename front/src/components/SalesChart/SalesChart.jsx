@@ -1,5 +1,4 @@
-// src/components/SalesChart.jsx
-import React from 'react';
+import PropTypes from 'prop-types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const SalesChart = ({ data }) => {
@@ -17,6 +16,10 @@ const SalesChart = ({ data }) => {
       </BarChart>
     </ResponsiveContainer>
   );
+};
+
+SalesChart.propTypes = {
+  data: PropTypes.array.isRequired,
 };
 
 export default SalesChart;

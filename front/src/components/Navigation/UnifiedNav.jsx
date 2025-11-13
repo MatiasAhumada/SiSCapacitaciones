@@ -1,6 +1,20 @@
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-import { AcademicCapIcon, CurrencyDollarIcon, DocumentTextIcon, UsersIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import {
+  AcademicCapIcon,
+  CurrencyDollarIcon,
+  UsersIcon,
+  ArrowRightOnRectangleIcon,
+} from '@heroicons/react/24/solid';
+import PropTypes from 'prop-types';
 import simplificado from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -12,69 +26,69 @@ const UnifiedNav = () => {
   const navigate = useNavigate();
   const isAdmin = user?.isAdmin;
 
-  const navigationConfig = isAdmin ? {
-    personas: {
-      name: 'Personas',
-      icon: UsersIcon,
-      items: [
-        { name: 'Vendedores', path: '/admin/vendedores' },
-        { name: 'Crear Vendedor', path: '/admin/vendedores/crear' },
-        { name: 'Profesores', path: '/admin/profesores' },
-        { name: 'Crear Profesor', path: '/admin/profesores/crear' },
-        { name: 'Alumnos', path: '/admin/alumnos' },
-        { name: 'Crear Alumno', path: '/admin/alumnos/crear' }
-      ]
-    },
-    academico: {
-      name: 'Académico',
-      icon: AcademicCapIcon,
-      items: [
-        { name: 'Cursos', path: '/admin/cursos' },
-        { name: 'Crear Curso', path: '/admin/cursos/crear' },
-        { name: 'Comisiones', path: '/admin/comisiones' },
-        { name: 'Crear Comisión', path: '/admin/comisiones/crear' },
-        { name: 'Certificados', path: '/admin/certificados' }
-      ]
-    },
-    cajas: {
-      name: 'Cajas',
-      icon: CurrencyDollarIcon,
-      items: [
-        { name: 'Cajas', path: '/admin/cajas' },
-        { name: 'Cobrar', path: '/admin/cobrar' },
-        { name: 'Egreso', path: '/admin/egreso' },
-        { name: 'Listado Cajas', path: '/admin/listado-cajas' }
-      ]
-    }
-  } : {
-    academico: {
-      name: 'Académico',
-      icon: AcademicCapIcon,
-      items: [
-        { name: 'Inscribir', path: '/vendedor/inscribir' },
-        { name: 'Cursos', path: '/vendedor/cursos' },
-        { name: 'Comisiones', path: '/vendedor/comisiones' }
-      ]
-    },
-    cajas: {
-      name: 'Cajas',
-      icon: CurrencyDollarIcon,
-      items: [
-        { name: 'Caja', path: '/vendedor/caja' },
-        { name: 'Cobrar', path: '/vendedor/cobrar' },
-        { name: 'Egreso', path: '/vendedor/egreso' },
-        { name: 'Transferencia', path: '/vendedor/transferencia' },
-        { name: 'Listado Cajas', path: '/vendedor/listado-cajas' }
-      ]
-    },
-    alumnos: {
-      name: 'Alumnos',
-      icon: UsersIcon,
-      items: [
-        { name: 'Crear Alumno', path: '/vendedor/alumnos/crear' }
-      ]
-    }
-  };
+  const navigationConfig = isAdmin
+    ? {
+        personas: {
+          name: 'Personas',
+          icon: UsersIcon,
+          items: [
+            { name: 'Vendedores', path: '/admin/vendedores' },
+            { name: 'Crear Vendedor', path: '/admin/vendedores/crear' },
+            { name: 'Profesores', path: '/admin/profesores' },
+            { name: 'Crear Profesor', path: '/admin/profesores/crear' },
+            { name: 'Alumnos', path: '/admin/alumnos' },
+            { name: 'Crear Alumno', path: '/admin/alumnos/crear' },
+          ],
+        },
+        academico: {
+          name: 'Académico',
+          icon: AcademicCapIcon,
+          items: [
+            { name: 'Cursos', path: '/admin/cursos' },
+            { name: 'Crear Curso', path: '/admin/cursos/crear' },
+            { name: 'Comisiones', path: '/admin/comisiones' },
+            { name: 'Crear Comisión', path: '/admin/comisiones/crear' },
+            { name: 'Certificados', path: '/admin/certificados' },
+          ],
+        },
+        cajas: {
+          name: 'Cajas',
+          icon: CurrencyDollarIcon,
+          items: [
+            { name: 'Cajas', path: '/admin/cajas' },
+            { name: 'Cobrar', path: '/admin/cobrar' },
+            { name: 'Egreso', path: '/admin/egreso' },
+            { name: 'Listado Cajas', path: '/admin/listado-cajas' },
+          ],
+        },
+      }
+    : {
+        academico: {
+          name: 'Académico',
+          icon: AcademicCapIcon,
+          items: [
+            { name: 'Inscribir', path: '/vendedor/inscribir' },
+            { name: 'Cursos', path: '/vendedor/cursos' },
+            { name: 'Comisiones', path: '/vendedor/comisiones' },
+          ],
+        },
+        cajas: {
+          name: 'Cajas',
+          icon: CurrencyDollarIcon,
+          items: [
+            { name: 'Caja', path: '/vendedor/caja' },
+            { name: 'Cobrar', path: '/vendedor/cobrar' },
+            { name: 'Egreso', path: '/vendedor/egreso' },
+            { name: 'Transferencia', path: '/vendedor/transferencia' },
+            { name: 'Listado Cajas', path: '/vendedor/listado-cajas' },
+          ],
+        },
+        alumnos: {
+          name: 'Alumnos',
+          icon: UsersIcon,
+          items: [{ name: 'Crear Alumno', path: '/vendedor/alumnos/crear' }],
+        },
+      };
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -86,12 +100,16 @@ const UnifiedNav = () => {
 
   const DropdownMenu = ({ config, isMobile = false }) => (
     <Menu as="div" className="relative">
-      <MenuButton className={`group flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 ${isMobile ? 'w-full justify-center' : 'min-w-[120px] justify-center'}`}>
+      <MenuButton
+        className={`group flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 ${isMobile ? 'w-full justify-center' : 'min-w-[120px] justify-center'}`}
+      >
         <config.icon className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
         {config.name}
         <ChevronDownIcon className="w-4 h-4 group-hover:rotate-180 transition-transform duration-200" />
       </MenuButton>
-      <MenuItems className={`absolute ${isMobile ? 'left-0 right-0' : 'right-0'} z-20 mt-3 w-56 bg-white rounded-3xl shadow-2xl ring-1 ring-gray-200 focus:outline-none backdrop-blur-sm`}>
+      <MenuItems
+        className={`absolute ${isMobile ? 'left-0 right-0' : 'right-0'} z-20 mt-3 w-56 bg-white rounded-3xl shadow-2xl ring-1 ring-gray-200 focus:outline-none backdrop-blur-sm`}
+      >
         <div className="p-3">
           {config.items.map((item, index) => (
             <MenuItem key={item.name}>
@@ -100,7 +118,9 @@ const UnifiedNav = () => {
                   onClick={() => handleNavigation(item.path)}
                   className={`${active ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md' : 'text-gray-700 hover:bg-gray-50'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-full transition-all duration-150 ${index === 0 ? 'mt-0' : 'mt-1'}`}
                 >
-                  <div className={`w-2 h-2 rounded-full mr-3 ${active ? 'bg-blue-500' : 'bg-gray-300'} transition-colors duration-150`}></div>
+                  <div
+                    className={`w-2 h-2 rounded-full mr-3 ${active ? 'bg-blue-500' : 'bg-gray-300'} transition-colors duration-150`}
+                  ></div>
                   {item.name}
                 </button>
               )}
@@ -111,13 +131,33 @@ const UnifiedNav = () => {
     </Menu>
   );
 
+  DropdownMenu.propTypes = {
+    config: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      icon: PropTypes.elementType.isRequired,
+      items: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          path: PropTypes.string.isRequired,
+        })
+      ).isRequired,
+    }).isRequired,
+    isMobile: PropTypes.bool,
+  };
+
   return (
-    <Disclosure as="nav" className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 shadow-2xl border-b border-blue-500/20">
+    <Disclosure
+      as="nav"
+      className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 shadow-2xl border-b border-blue-500/20"
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-18 items-center justify-between">
           {/* Logo and Branch Selector */}
           <div className="flex items-center gap-6">
-            <div className="relative group cursor-pointer" onClick={() => navigate(isAdmin ? '/admin' : '/vendedor')}>
+            <div
+              className="relative group cursor-pointer"
+              onClick={() => navigate(isAdmin ? '/admin' : '/vendedor')}
+            >
               <img
                 alt="SiS Capacitaciones"
                 src={simplificado}
@@ -133,7 +173,9 @@ const UnifiedNav = () => {
                   onChange={handleSucursalChange}
                   className="appearance-none bg-gradient-to-r from-white/95 to-white/90 backdrop-blur-sm text-gray-800 px-4 py-2.5 pr-10 rounded-full text-sm font-semibold shadow-xl border-2 border-white/30 focus:ring-4 focus:ring-white/50 focus:border-white hover:bg-white hover:shadow-2xl transition-all duration-300 cursor-pointer w-48"
                 >
-                  <option value="" className="text-gray-600">🏢 Seleccionar sucursal</option>
+                  <option value="" className="text-gray-600">
+                    🏢 Seleccionar sucursal
+                  </option>
                   {sucursales.map((suc) => (
                     <option key={suc.id} value={suc.id} className="text-gray-800 font-medium">
                       📍 {suc.name}
@@ -158,9 +200,7 @@ const UnifiedNav = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                 {(user?.name || 'U').charAt(0).toUpperCase()}
               </div>
-              <span className="text-white text-sm font-semibold">
-                {user?.name || 'Usuario'}
-              </span>
+              <span className="text-white text-sm font-semibold">{user?.name || 'Usuario'}</span>
             </div>
             <button
               onClick={logout}
@@ -188,14 +228,11 @@ const UnifiedNav = () => {
             <DropdownMenu key={config.name} config={config} isMobile />
           ))}
           <div className="border-t border-blue-500/30 pt-4 mt-4">
-
             <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full border border-white/20 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                 {(user?.name || 'U').charAt(0).toUpperCase()}
               </div>
-              <span className="text-white text-sm font-semibold">
-                {user?.name || 'Usuario'}
-              </span>
+              <span className="text-white text-sm font-semibold">{user?.name || 'Usuario'}</span>
             </div>
             <button
               onClick={logout}

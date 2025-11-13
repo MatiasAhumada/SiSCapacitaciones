@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 
 const STORAGE_KEY = 'auth_user';
 
@@ -6,7 +7,7 @@ const AuthContext = createContext({
   user: null,
   isAdmin: false,
   role: null,
-  login: async (userData) => {},
+  login: async () => {},
   logout: () => {},
 });
 
@@ -46,6 +47,10 @@ export const AuthProvider = ({ children }) => {
   const value = useMemo(() => ({ user, isAdmin, role, login, logout }), [user, isAdmin, role]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useAuth = () => useContext(AuthContext);

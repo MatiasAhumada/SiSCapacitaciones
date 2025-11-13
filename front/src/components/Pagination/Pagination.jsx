@@ -1,6 +1,6 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import PropTypes from 'prop-types';
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const maxButtons = 5;
@@ -84,6 +84,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       </button>
     </div>
   );
+};
+
+Pagination.propTypes = {
+  currentPage: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
 };
 
 export default Pagination;

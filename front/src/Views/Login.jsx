@@ -37,7 +37,6 @@ const Login = () => {
       } else {
         navigate('/vendedor');
       }
-
     } catch (error) {
       Swal.fire({
         icon: 'error',

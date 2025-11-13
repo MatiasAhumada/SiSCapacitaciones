@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 const ComisionSelector = ({
   comisiones,
-  selectedComisionId,
   onComisionSelect,
   searchValue,
   onSearchChange,
@@ -61,7 +60,6 @@ const ComisionSelector = ({
 
 ComisionSelector.propTypes = {
   comisiones: PropTypes.array.isRequired,
-  selectedComisionId: PropTypes.string,
   onComisionSelect: PropTypes.func.isRequired,
   searchValue: PropTypes.string.isRequired,
   onSearchChange: PropTypes.func.isRequired,

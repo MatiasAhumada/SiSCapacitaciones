@@ -28,7 +28,7 @@ const Certificados = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPause(true);
-    
+
     try {
       await postCert(formData);
       Swal.fire({
@@ -59,7 +59,7 @@ const Certificados = () => {
 
   const handleBuscar = async () => {
     if (!busqueda) return;
-    
+
     setPause(true);
     try {
       const data = await getCertId(busqueda);
@@ -89,9 +89,7 @@ const Certificados = () => {
           <h3 className="text-gray-800 text-xl font-bold sm:text-2xl principal">
             Gestión de Certificados
           </h3>
-          <p className="text-gray-600 mt-2">
-            Crear y buscar certificados de cursos
-          </p>
+          <p className="text-gray-600 mt-2">Crear y buscar certificados de cursos</p>
         </div>
       </div>
 
@@ -119,12 +117,24 @@ const Certificados = () => {
           {certificado && (
             <div className="mt-4 p-4 bg-gray-50 rounded">
               <h5 className="font-semibold">Certificado #{certificado.numero}</h5>
-              <p><strong>Nombre:</strong> {certificado.nombre}</p>
-              <p><strong>DNI:</strong> {certificado.dni}</p>
-              <p><strong>Curso:</strong> {certificado.curso}</p>
-              <p><strong>Horas:</strong> {certificado.horas}</p>
-              <p><strong>Fecha Inicio:</strong> {certificado.fechaInicio}</p>
-              <p><strong>Fecha Fin:</strong> {certificado.fechaFin}</p>
+              <p>
+                <strong>Nombre:</strong> {certificado.nombre}
+              </p>
+              <p>
+                <strong>DNI:</strong> {certificado.dni}
+              </p>
+              <p>
+                <strong>Curso:</strong> {certificado.curso}
+              </p>
+              <p>
+                <strong>Horas:</strong> {certificado.horas}
+              </p>
+              <p>
+                <strong>Fecha Inicio:</strong> {certificado.fechaInicio}
+              </p>
+              <p>
+                <strong>Fecha Fin:</strong> {certificado.fechaFin}
+              </p>
             </div>
           )}
         </div>
@@ -222,11 +232,7 @@ const Certificados = () => {
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full btnAz text-white py-2 rounded"
-              disabled={pause}
-            >
+            <button type="submit" className="w-full btnAz text-white py-2 rounded" disabled={pause}>
               {pause ? 'Creando...' : 'Crear Certificado'}
             </button>
           </form>

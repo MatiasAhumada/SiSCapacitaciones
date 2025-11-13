@@ -109,7 +109,7 @@ const CreateCaja = () => {
       if (formData.monto === '') throw new Error('El monto es obligatorio');
       if (formData.monto <= 0) throw new Error('El monto debe ser mayor a cero');
 
-      const { vendedorId, tipo, alumnoId, cuota, descripcion, monto, metodoPago } = e.target;
+      const { tipo, descripcion, monto, metodoPago } = e.target;
 
       const fechaISO = fecha.toISOString();
 
@@ -168,7 +168,7 @@ const CreateCaja = () => {
         title: 'Comprobante descargado',
         text: 'El comprobante se ha descargado correctamente',
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (error) {
       Swal.fire({

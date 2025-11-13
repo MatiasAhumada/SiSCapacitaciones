@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
-import { getCategorias, postEgresoProfesor, postEgresoSiemple, postEgresoVendedor } from '../../services/Cajas.service';
+import {
+  getCategorias,
+  postEgresoProfesor,
+  postEgresoSiemple,
+  postEgresoVendedor,
+} from '../../services/Cajas.service';
 import { getProfes } from '../../services/Profesores.service';
 import { getVendedores, getVendID } from '../../services/Vendedores.service';
 const CajaEgreso = () => {
@@ -49,11 +54,11 @@ const CajaEgreso = () => {
         .then((data) => {
           setVendedores(data);
         })
-        .catch((error) => {
+        .catch(() => {
           Swal.fire({
             icon: 'error',
             title: 'Error al cargar vendedores',
-            text: error.message || 'Ocurrió un error al cargar los vendedores.',
+            text: 'Ocurrió un error al cargar los vendedores.',
           });
         });
     };
@@ -62,11 +67,11 @@ const CajaEgreso = () => {
       const data = await getCategorias();
       try {
         setCategorias(data);
-      } catch (error) {
+      } catch {
         Swal.fire({
           icon: 'error',
           title: 'Error al cargar categorias',
-          text: error.message || 'Ocurrió un error al cargar las categorias.',
+          text: 'Ocurrió un error al cargar las categorias.',
         });
       }
     };
@@ -80,14 +85,14 @@ const CajaEgreso = () => {
     }, 60000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [idVende]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   const handleChangeCategoria = async (e) => {
-    const { name, value } = e.target;
+    const { value } = e.target;
     setCategoriaSelec(value);
     if (value === 'PROFESORES') {
       await getProfes().then((data) => {
@@ -96,8 +101,8 @@ const CajaEgreso = () => {
     }
   };
   const handleChangeSubCat = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { value } = e.target;
+    setFormData((prev) => ({ ...prev, subcategoriaId: value }));
   };
   const categoriaActual = categorias.find((cat) => cat.nombre === categoriaSelec);
 

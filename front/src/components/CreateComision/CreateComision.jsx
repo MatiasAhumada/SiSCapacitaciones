@@ -68,10 +68,7 @@ const CreateComision = () => {
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const [profesData, cursosData] = await Promise.all([
-          getProfes(),
-          getAllCursos()
-        ]);
+        const [profesData, cursosData] = await Promise.all([getProfes(), getAllCursos()]);
         setProfes(profesData);
         setcursos(cursosData || []);
         setFilteredCursos(cursosData || []);
@@ -203,11 +200,12 @@ const CreateComision = () => {
             className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
           >
             <option value="">Seleccionar Profesor</option>
-            {Array.isArray(profes) && profes.map((profe) => (
-              <option key={profe.id} value={profe.id}>
-                {`${profe.name} ${profe.apellido}`}
-              </option>
-            ))}
+            {Array.isArray(profes) &&
+              profes.map((profe) => (
+                <option key={profe.id} value={profe.id}>
+                  {`${profe.name} ${profe.apellido}`}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -219,7 +217,7 @@ const CreateComision = () => {
               value={searchCurso}
               onChange={(e) => {
                 setSearchCurso(e.target.value);
-                const filtered = cursos.filter(curso => 
+                const filtered = cursos.filter((curso) =>
                   curso.name.toLowerCase().includes(e.target.value.toLowerCase())
                 );
                 setFilteredCursos(filtered);
@@ -235,7 +233,7 @@ const CreateComision = () => {
                   <div
                     key={curso.id}
                     onClick={() => {
-                      setFormData(prev => ({ ...prev, cursoId: curso.id }));
+                      setFormData((prev) => ({ ...prev, cursoId: curso.id }));
                       setSearchCurso(curso.name);
                       setShowCursos(false);
                     }}

@@ -2,13 +2,13 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import ComisionSelector from '../Common/ComisionSelector';
 
-const TransferModal = ({ 
-  alumno, 
-  comisiones, 
-  selectedComisionId, 
-  onComisionChange, 
-  onConfirm, 
-  onCancel 
+const TransferModal = ({
+  alumno,
+  comisiones,
+  selectedComisionId,
+  onComisionChange,
+  onConfirm,
+  onCancel,
 }) => {
   const [comisionSearch, setComisionSearch] = useState('');
   const [showComisiones, setShowComisiones] = useState(false);
@@ -28,9 +28,7 @@ const TransferModal = ({
             <div className="w-12 h-12 rounded-full bgColor flex items-center justify-center">
               <i className="fa-solid fa-exchange-alt text-white text-xl"></i>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 principal">
-              Transferir Alumno
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-800 principal">Transferir Alumno</h3>
           </div>
           <button
             onClick={onCancel}
@@ -39,7 +37,7 @@ const TransferModal = ({
             <i className="fa-solid fa-times text-2xl"></i>
           </button>
         </div>
-        
+
         <div className="mb-8">
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 mb-6 border border-blue-100">
             <div className="flex items-center gap-3">
@@ -50,7 +48,7 @@ const TransferModal = ({
               </div>
             </div>
           </div>
-          
+
           <label className="block text-sm font-semibold text-gray-700 mb-3 principal">
             <i className="fa-solid fa-arrow-right text-blue-600 mr-2"></i>
             Nueva comisión
@@ -66,7 +64,7 @@ const TransferModal = ({
             placeholder="Buscar comisión..."
           />
         </div>
-        
+
         <div className="flex gap-4">
           <button
             onClick={onCancel}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { aperturaCaja, cerrarCaja } from '../../services/Cajas.service';
+import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 
 const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
@@ -56,10 +57,7 @@ const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="px-4 py-2 text-white rounded btnAz"
-      >
+      <button onClick={() => setOpen(!open)} className="px-4 py-2 text-white rounded btnAz">
         Acciones
       </button>
 
@@ -108,6 +106,12 @@ const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
       )}
     </div>
   );
+};
+
+AccionesDropdown.propTypes = {
+  idVend: PropTypes.string.isRequired,
+  onCajaAction: PropTypes.func.isRequired,
+  onDescargarExcel: PropTypes.func.isRequired,
 };
 
 export default AccionesDropdown;

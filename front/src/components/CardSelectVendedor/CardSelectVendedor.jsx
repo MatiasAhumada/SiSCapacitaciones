@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 export const CardSelectVendedor = ({ vendedor, onSelect, isSelected }) => {
   return (
     <div
@@ -51,4 +53,17 @@ export const CardSelectVendedor = ({ vendedor, onSelect, isSelected }) => {
       </div>
     </div>
   );
+};
+
+CardSelectVendedor.propTypes = {
+  vendedor: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    totalEfectivo: PropTypes.number,
+    totalDigitalJavier: PropTypes.number,
+    totalDigitalTobias: PropTypes.number,
+    totalIngreso: PropTypes.number,
+    totalEgreso: PropTypes.number,
+  }).isRequired,
+  onSelect: PropTypes.func.isRequired,
+  isSelected: PropTypes.bool.isRequired,
 };

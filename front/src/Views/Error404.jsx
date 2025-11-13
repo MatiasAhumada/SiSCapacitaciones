@@ -1,4 +1,3 @@
-
 const Error404 = () => {
   return (
     <main>

@@ -1,4 +1,5 @@
 import { Col, Row } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 const CardInfo = ({ sede }) => {
   return (
@@ -29,6 +30,15 @@ const CardInfo = ({ sede }) => {
       </Col>
     </Row>
   );
+};
+
+CardInfo.propTypes = {
+  sede: PropTypes.shape({
+    profesorComisiones: PropTypes.number,
+    alumnos: PropTypes.number,
+    vendedores: PropTypes.number,
+    comisiones: PropTypes.number,
+  }).isRequired,
 };
 
 export default CardInfo;

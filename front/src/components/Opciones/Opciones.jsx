@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const Opciones = ({ setCambio, setCuotavieja }) => {
   return (
     <div className="max-w-md mx-auto mt-10">
@@ -23,6 +25,11 @@ const Opciones = ({ setCambio, setCuotavieja }) => {
       </div>
     </div>
   );
+};
+
+Opciones.propTypes = {
+  setCambio: PropTypes.func.isRequired,
+  setCuotavieja: PropTypes.func.isRequired,
 };
 
 export default Opciones;

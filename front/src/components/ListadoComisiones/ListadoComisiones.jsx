@@ -71,10 +71,12 @@ const ListadoComisiones = () => {
     }, 300);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dniFiltro]);
 
   useEffect(() => {
     fetchAlumnos(currentPage, dniFiltro);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, comisionId, reload]);
 
   const formatFecha = (fechaISO) => {
@@ -87,8 +89,8 @@ const ListadoComisiones = () => {
 
   const allDates = Array.from(
     new Set(
-      alumnosComision.flatMap(
-        (item) => item.asistencias.map((asistencia) => asistencia.fecha.split('T')[0])
+      alumnosComision.flatMap((item) =>
+        item.asistencias.map((asistencia) => asistencia.fecha.split('T')[0])
       )
     )
   )
@@ -225,7 +227,7 @@ const ListadoComisiones = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-    } catch (error) {
+    } catch {
       Swal.fire({
         icon: 'error',
         title: 'Error al guardar la asistencia',
@@ -243,9 +245,9 @@ const ListadoComisiones = () => {
     setSelectedAlumno(alumno);
     try {
       const data = await getComisionBySucursal(comisionDate.sucursal.id);
-      setComisionesDisponibles(data.data.filter(c => c.id !== comisionId));
+      setComisionesDisponibles(data.data.filter((c) => c.id !== comisionId));
       setShowTransferModal(true);
-    } catch (error) {
+    } catch {
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -279,7 +281,7 @@ const ListadoComisiones = () => {
       setShowTransferModal(false);
       setNuevaComisionId('');
       setReload(!reload);
-    } catch (error) {
+    } catch {
       Swal.fire({
         icon: 'error',
         title: 'Error al transferir',

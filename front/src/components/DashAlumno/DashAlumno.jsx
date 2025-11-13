@@ -13,12 +13,10 @@ const DashAlumno = () => {
   const [alumno, setAlumno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPago, setEditingPago] = useState(null);
   const [formData, setFormData] = useState({});
   const [vendedores, setVendedores] = useState([]);
 
   const handleEditPago = (pago) => {
-    setEditingPago(pago);
     setFormData({
       id: pago.id,
       fecha: pago.fecha,
@@ -30,7 +28,7 @@ const DashAlumno = () => {
       descripcion: pago.descripcion || '',
       monto: pago.monto || '',
       cuota: pago.cuota || '',
-      mesCuota: pago.mesCuota || ''
+      mesCuota: pago.mesCuota || '',
     });
     setIsModalOpen(true);
   };
@@ -43,7 +41,7 @@ const DashAlumno = () => {
         title: 'Comprobante descargado',
         text: 'El comprobante se ha descargado correctamente',
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (error) {
       Swal.fire({
@@ -63,7 +61,7 @@ const DashAlumno = () => {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     });
 
     if (result.isConfirmed) {
@@ -74,7 +72,7 @@ const DashAlumno = () => {
           title: 'Pago eliminado',
           text: 'El pago se ha eliminado correctamente',
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         // Recargar datos
         const data = await getAluComID(alumnoId);
@@ -97,7 +95,7 @@ const DashAlumno = () => {
         title: 'Pago actualizado',
         text: 'El pago se ha actualizado correctamente',
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
       setIsModalOpen(false);
       // Recargar datos
@@ -114,17 +112,17 @@ const DashAlumno = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   useEffect(() => {
     const cargarDatos = async () => {
       if (!alumnoId) return;
-      
+
       try {
         const [alumnoData, vendedoresData] = await Promise.all([
           getAluComID(alumnoId),
-          getVendedores()
+          getVendedores(),
         ]);
         setAlumno(alumnoData);
         setVendedores(vendedoresData);
@@ -154,9 +152,7 @@ const DashAlumno = () => {
     return (
       <div className="max-w-screen-xl mx-auto px-4 md:px-8">
         <div className="text-center">
-          <h3 className="text-gray-800 text-xl font-bold sm:text-2xl">
-            Alumno no encontrado
-          </h3>
+          <h3 className="text-gray-800 text-xl font-bold sm:text-2xl">Alumno no encontrado</h3>
         </div>
       </div>
     );
@@ -212,17 +208,17 @@ const DashAlumno = () => {
           {alumno.comision ? (
             <div className="p-3 bg-gray-50 rounded border">
               <div className="font-medium">{alumno.comision.name}</div>
-              <div className="text-sm text-gray-600">
-                Día: {alumno.comision.day}
-              </div>
+              <div className="text-sm text-gray-600">Día: {alumno.comision.day}</div>
               <div className="text-sm text-gray-600">
                 Horario: {alumno.comision.hour?.start}-{alumno.comision.hour?.end}
               </div>
               <div className="text-sm">
-                Estado: 
-                <span className={`ml-1 px-2 py-1 rounded text-xs ${
-                  alumno.state ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
+                Estado:
+                <span
+                  className={`ml-1 px-2 py-1 rounded text-xs ${
+                    alumno.state ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}
+                >
                   {alumno.state ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
@@ -237,79 +233,101 @@ const DashAlumno = () => {
       {alumno.pagos && alumno.pagos.length > 0 && (
         <div className="mt-8">
           <h4 className="text-xl font-bold mb-6 principal">Historial de Pagos</h4>
-          
+
           {/* Vista Desktop */}
           <div className="hidden md:block bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="overflow-x-auto">
-            <table className="w-full table-auto text-sm">
-              <thead className="bg-gray-50 text-gray-600 font-medium border-b">
-                <tr>
-                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Fecha</th>
-                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Monto</th>
-                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Método</th>
-                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Cuota</th>
-                  <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Mes</th>
-                  <th className="py-4 px-6 text-center font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {alumno.pagos.map((pago, index) => (
-                  <tr key={pago.id} className={`hover:bg-gray-50 transition-colors ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                  }`}>
-                    <td className="px-6 py-4 text-gray-900">
-                      {new Date(pago.fecha).toLocaleDateString('es-ES')}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="font-semibold text-green-600">${pago.monto}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        pago.metodoPago === 'Efectivo' ? 'bg-green-100 text-green-800' :
-                        pago.metodoPago === 'Transferencia' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {pago.metodoPago}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-900">{pago.cuota}</td>
-                    <td className="px-6 py-4 text-gray-900">{pago.mesCuota}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => handleEditPago(pago)}
-                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
-                          title="Editar pago"
-                        >
-                          <i className="fa-solid fa-pen text-sm"></i>
-                        </button>
-                        <button
-                          onClick={() => handlePrintPago(pago)}
-                          className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
-                          title="Imprimir comprobante"
-                        >
-                          <i className="fa-solid fa-print text-sm"></i>
-                        </button>
-                        <button
-                          onClick={() => handleDeletePago(pago.id)}
-                          className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-                          title="Eliminar pago"
-                        >
-                          <i className="fa-solid fa-trash text-sm"></i>
-                        </button>
-                      </div>
-                    </td>
+              <table className="w-full table-auto text-sm">
+                <thead className="bg-gray-50 text-gray-600 font-medium border-b">
+                  <tr>
+                    <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Fecha
+                    </th>
+                    <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Monto
+                    </th>
+                    <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Método
+                    </th>
+                    <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Cuota
+                    </th>
+                    <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Mes
+                    </th>
+                    <th className="py-4 px-6 text-center font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Acciones
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {alumno.pagos.map((pago, index) => (
+                    <tr
+                      key={pago.id}
+                      className={`hover:bg-gray-50 transition-colors ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      }`}
+                    >
+                      <td className="px-6 py-4 text-gray-900">
+                        {new Date(pago.fecha).toLocaleDateString('es-ES')}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-semibold text-green-600">${pago.monto}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            pago.metodoPago === 'Efectivo'
+                              ? 'bg-green-100 text-green-800'
+                              : pago.metodoPago === 'Transferencia'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {pago.metodoPago}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-900">{pago.cuota}</td>
+                      <td className="px-6 py-4 text-gray-900">{pago.mesCuota}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => handleEditPago(pago)}
+                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                            title="Editar pago"
+                          >
+                            <i className="fa-solid fa-pen text-sm"></i>
+                          </button>
+                          <button
+                            onClick={() => handlePrintPago(pago)}
+                            className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
+                            title="Imprimir comprobante"
+                          >
+                            <i className="fa-solid fa-print text-sm"></i>
+                          </button>
+                          <button
+                            onClick={() => handleDeletePago(pago.id)}
+                            className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                            title="Eliminar pago"
+                          >
+                            <i className="fa-solid fa-trash text-sm"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
           {/* Vista Mobile */}
           <div className="md:hidden space-y-4">
             {alumno.pagos.map((pago) => (
-              <div key={pago.id} className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+              <div
+                key={pago.id}
+                className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500"
+              >
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <div className="font-semibold text-lg text-green-600">${pago.monto}</div>
@@ -341,11 +359,15 @@ const DashAlumno = () => {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-gray-600">Método:</span>
-                    <span className={`ml-2 px-2 py-1 rounded text-xs ${
-                      pago.metodoPago === 'Efectivo' ? 'bg-green-100 text-green-800' :
-                      pago.metodoPago === 'Transferencia' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`ml-2 px-2 py-1 rounded text-xs ${
+                        pago.metodoPago === 'Efectivo'
+                          ? 'bg-green-100 text-green-800'
+                          : pago.metodoPago === 'Transferencia'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {pago.metodoPago}
                     </span>
                   </div>
@@ -363,7 +385,7 @@ const DashAlumno = () => {
           </div>
         </div>
       )}
-      
+
       {isModalOpen && (
         <ModalEditar
           formData={formData}

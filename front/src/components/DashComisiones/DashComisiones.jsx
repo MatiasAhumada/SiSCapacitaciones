@@ -18,7 +18,6 @@ const DashComisiones = () => {
   const { getSucursalActiva } = useApp();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
-  const [pause, setPause] = useState({});
   const [editing, setEditing] = useState(null);
   const [editData, setEditData] = useState({
     name: '',
@@ -35,6 +34,7 @@ const DashComisiones = () => {
   const [searchName, setSearchName] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [loading, setLoading] = useState(true);
+  const [, setPause] = useState({});
 
   const clickDelete = async (id) => {
     const comisionId = id;
@@ -91,19 +91,17 @@ const DashComisiones = () => {
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const [cursosData, profesoresData] = await Promise.all([
-          getCursos(),
-          getProfes()
-        ]);
+        const [cursosData, profesoresData] = await Promise.all([getCursos(), getProfes()]);
         setCursos(cursosData.data || cursosData);
         setProfesores(profesoresData);
-      } catch (error) {
-        console.error('Error al cargar datos:', error);
+      } catch {
+        console.error('Error al cargar datos');
       }
     };
     cargarDatos();
     cargarComisiones(currentPage, searchName, selectedDay);
-  }, [currentPage, searchName, selectedDay, getSucursalActiva()?.id, user?.isadmin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, searchName, selectedDay]);
 
   const handleEdit = (comision) => {
     setEditing(comision.id);
@@ -151,7 +149,7 @@ const DashComisiones = () => {
             : item
         )
       );
-    } catch (error) {
+    } catch {
       Swal.fire({ title: 'Error al actualizar', icon: 'error' });
     } finally {
       setPause((prev) => ({ ...prev, [comisionId]: false }));
@@ -242,8 +240,19 @@ const DashComisiones = () => {
                 <td colSpan="7" className="px-6 py-4 text-center">
                   <div className="flex justify-center items-center">
                     <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Cargando comisiones...
                   </div>
@@ -257,163 +266,169 @@ const DashComisiones = () => {
               </tr>
             ) : (
               tableItems?.map((item) => (
-              <tr key={item.id}>
-                <td className="px-6 py-4">
-                  {editing === item.id ? (
-                    <input
-                      type="text"
-                      value={editData.name}
-                      name="name"
-                      onChange={handleChange}
-                      className="border rounded px-2"
-                    />
-                  ) : (
-                    item.name
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                      item.day === 'Lunes'
-                        ? 'bg-blue-200 text-blue-800'
-                        : item.day === 'Martes'
-                          ? 'bg-yellow-200 text-yellow-800'
-                          : item.day === 'Miercoles'
-                            ? 'bg-red-200 text-red-800'
-                            : item.day === 'Jueves'
-                              ? 'bg-pink-200 text-pink-800'
-                              : item.day === 'Viernes'
-                                ? 'bg-purple-200 text-purple-800'
-                                : item.day === 'Sabado'
-                                  ? 'bg-green-200 text-green-800'
-                                  : 'bg-gray-200 text-gray-800'
-                    }`}
-                  >
+                <tr key={item.id}>
+                  <td className="px-6 py-4">
+                    {editing === item.id ? (
+                      <input
+                        type="text"
+                        value={editData.name}
+                        name="name"
+                        onChange={handleChange}
+                        className="border rounded px-2"
+                      />
+                    ) : (
+                      item.name
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                        item.day === 'Lunes'
+                          ? 'bg-blue-200 text-blue-800'
+                          : item.day === 'Martes'
+                            ? 'bg-yellow-200 text-yellow-800'
+                            : item.day === 'Miercoles'
+                              ? 'bg-red-200 text-red-800'
+                              : item.day === 'Jueves'
+                                ? 'bg-pink-200 text-pink-800'
+                                : item.day === 'Viernes'
+                                  ? 'bg-purple-200 text-purple-800'
+                                  : item.day === 'Sabado'
+                                    ? 'bg-green-200 text-green-800'
+                                    : 'bg-gray-200 text-gray-800'
+                      }`}
+                    >
+                      {editing === item.id ? (
+                        <select
+                          name="day"
+                          value={editData?.day || ''}
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        >
+                          <option value="">Seleccionar</option>
+                          {dias.map((dia, idx) => (
+                            <option key={idx} value={dia.value}>
+                              {dia.value}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        item.day
+                      )}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editing === item.id ? (
+                      <>
+                        <select
+                          name="start"
+                          value={editData.hour?.start || ''}
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        >
+                          <option value=""> Inicio</option>
+                          {horarios.map((horario, index) => (
+                            <option key={index} value={horario}>
+                              {horario}
+                            </option>
+                          ))}
+                        </select>
+                        <span>-</span>
+                        <select
+                          name="end"
+                          value={editData.hour?.end || ''}
+                          onChange={handleChange}
+                          className="border rounded px-2"
+                        >
+                          <option value=""> Fin</option>
+                          {horarios.map((horario, index) => (
+                            <option key={index} value={horario}>
+                              {horario}
+                            </option>
+                          ))}
+                        </select>
+                      </>
+                    ) : (
+                      `${item?.hour?.start || 'Hora no definida'} - ${item?.hour?.end || 'Hora no definida'}`
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
                     {editing === item.id ? (
                       <select
-                        name="day"
-                        value={editData?.day || ''}
+                        name="cursoId"
                         onChange={handleChange}
                         className="border rounded px-2"
                       >
-                        <option value="">Seleccionar</option>
-                        {dias.map((dia, idx) => (
-                          <option key={idx} value={dia.value}>
-                            {dia.value}
+                        <option value="">{item.curso?.name}</option>
+                        {cursos.map((curso) => (
+                          <option key={curso.id} value={curso.id}>
+                            {curso.name}
                           </option>
                         ))}
                       </select>
                     ) : (
-                      item.day
+                      item.curso?.name
                     )}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {editing === item.id ? (
-                    <>
+                  </td>
+                  <td className="px-6 py-4">
+                    {editing === item.id ? (
                       <select
-                        name="start"
-                        value={editData.hour?.start || ''}
+                        name="profesorId"
                         onChange={handleChange}
                         className="border rounded px-2"
                       >
-                        <option value=""> Inicio</option>
-                        {horarios.map((horario, index) => (
-                          <option key={index} value={horario}>
-                            {horario}
+                        {profesores.map((profesor) => (
+                          <option key={profesor.id} value={profesor.id}>
+                            {profesor.name} {profesor.apellido}
                           </option>
                         ))}
                       </select>
-                      <span>-</span>
-                      <select
-                        name="end"
-                        value={editData.hour?.end || ''}
-                        onChange={handleChange}
-                        className="border rounded px-2"
-                      >
-                        <option value=""> Fin</option>
-                        {horarios.map((horario, index) => (
-                          <option key={index} value={horario}>
-                            {horario}
-                          </option>
-                        ))}
-                      </select>
-                    </>
-                  ) : (
-                    `${item?.hour?.start || 'Hora no definida'} - ${item?.hour?.end || 'Hora no definida'}`
-                  )}
-                </td>
-                <td className="px-6 py-4">
-                  {editing === item.id ? (
-                    <select
-                      name="cursoId"
-                      onChange={handleChange}
-                      className="border rounded px-2"
+                    ) : (
+                      `${item.profesor?.name} ${item.profesor?.apellido}`
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.alumnoComisiones?.length}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() =>
+                        navigate(
+                          user?.isadmin
+                            ? `/admin/comisiones/${item.id}`
+                            : `/vendedor/comisiones/${item.id}`
+                        )
+                      }
+                      className="px-4 py-2 text-white principal bg-blue-500 hover:bg-blue-600 md:text-sm rounded"
                     >
-                      <option value="">{item.curso?.name}</option>
-                      {cursos.map((curso) => (
-                        <option key={curso.id} value={curso.id}>
-                          {curso.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    item.curso?.name
-                  )}
-                </td>
-                <td className="px-6 py-4">
-                  {editing === item.id ? (
-                    <select
-                      name="profesorId"
-                      onChange={handleChange}
-                      className="border rounded px-2"
-                    >
-                      {profesores.map((profesor) => (
-                        <option key={profesor.id} value={profesor.id}>
-                          {profesor.name} {profesor.apellido}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    `${item.profesor?.name} ${item.profesor?.apellido}`
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.alumnoComisiones?.length}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => navigate(user?.isadmin ? `/admin/comisiones/${item.id}` : `/vendedor/comisiones/${item.id}`)}
-                    className="px-4 py-2 text-white principal bg-blue-500 hover:bg-blue-600 md:text-sm rounded"
-                  >
-                    <i className="fa-solid fa-eye"></i>
-                  </button>
+                      <i className="fa-solid fa-eye"></i>
+                    </button>
 
-                  {user?.isadmin && (
-                    <>
-                      {editing === item.id ? (
+                    {user?.isadmin && (
+                      <>
+                        {editing === item.id ? (
+                          <button
+                            onClick={() => handleSave(item.id)}
+                            className="px-4 py-2 text-white bg-green-500 rounded ms-3"
+                          >
+                            <i className="fa-solid fa-floppy-disk"></i>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="px-4 py-2 text-white btnAz rounded ms-3"
+                          >
+                            <i className="fa-solid fa-pen"></i>
+                          </button>
+                        )}
                         <button
-                          onClick={() => handleSave(item.id)}
-                          className="px-4 py-2 text-white bg-green-500 rounded ms-3"
+                          onClick={() => clickDelete(item.id)}
+                          className="px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
                         >
-                          <i className="fa-solid fa-floppy-disk"></i>
+                          <i className="fa-solid fa-trash"></i>
                         </button>
-                      ) : (
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="px-4 py-2 text-white btnAz rounded ms-3"
-                        >
-                          <i className="fa-solid fa-pen"></i>
-                        </button>
-                      )}
-                      <button
-                        onClick={() => clickDelete(item.id)}
-                        className="px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
+                      </>
+                    )}
+                  </td>
+                </tr>
               ))
             )}
           </tbody>

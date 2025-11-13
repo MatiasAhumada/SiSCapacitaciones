@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
 import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
@@ -11,7 +10,6 @@ import CajaResumen from '../CajaResumen/CajaResumen';
 
 const DashCaja = () => {
   const idVend = localStorage.getItem('token');
-  const fecha = new Date();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [editMode, setEditMode] = useState(null);
@@ -27,12 +25,8 @@ const DashCaja = () => {
     alumnoComisionId: '',
     vendedorId: idVend,
   });
-  const [filtrados, setFiltrados] = useState(tableItems);
   const [sesionCaja, setSesionCaja] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
-
-  const navigate = useNavigate();
-  const isSubRoute = location.pathname.includes('crear');
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -79,6 +73,7 @@ const DashCaja = () => {
     };
     cargarDatos();
     recargarDatos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshKey]);
 
   useEffect(() => {
@@ -110,14 +105,6 @@ const DashCaja = () => {
       ...formEdit,
       [name]: value,
     });
-  };
-
-  const handleAlumnoChange = (e) => {
-    console.log(e.target.value);
-    setFormEdit((prev) => ({
-      ...prev,
-      alumnoComisionId: e.target.value,
-    }));
   };
 
   const handlePrintPago = async (pago) => {
@@ -163,35 +150,6 @@ const DashCaja = () => {
     } finally {
       setEditMode(null);
     }
-  };
-  const filtrar = async (filtros, setPaused) => {
-    const filtrosVacios = Object.values(filtros).every((v) => v.trim() === '');
-    if (filtrosVacios) {
-      setPaused(true);
-      const data = await GetCajaByVendedor(idVend); // ⏳ espera la respuesta
-      setTableItems(data.movimientos); // ✅ actualiza tabla
-      setPaused(false);
-      return;
-    }
-    const filtrado = tableItems.filter((item) => {
-      return (
-        (!filtros.alumno ||
-          item.alumnoComision?.alumno?.dni?.toString().includes(filtros.alumno)) &&
-        (!filtros.tipo || item.tipo.toLowerCase().includes(filtros.tipo.toLowerCase())) &&
-        (!filtros.metodoPago ||
-          item.metodoPago.toLowerCase().includes(filtros.metodoPago.toLowerCase())) &&
-        (!filtros.descripcion ||
-          item.descripcion?.toLowerCase().includes(filtros.descripcion.toLowerCase())) &&
-        (!filtros.fecha || formatToDisplay(item.fecha).startsWith(filtros.fecha)) &&
-        (!filtros.categoria ||
-          item.subcategoria?.categoria?.nombre?.toLowerCase() ===
-            filtros.categoria.toLowerCase()) &&
-        (!filtros.subcategoria ||
-          item.subcategoria?.nombre?.toLowerCase() === filtros.subcategoria.toLowerCase())
-      );
-    });
-
-    setTableItems(filtrado);
   };
 
   const descargarExcel = async () => {

@@ -70,8 +70,10 @@ export class VendedorService {
     });
   }
 
-  async getVendedoresBySucursal(id: string) {
-    return this.vendedorRepository.find({
+  async getVendedoresBySucursal(id: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    
+    const [data, total] = await this.vendedorRepository.findAndCount({
       where: { sucursales: { id } },
       relations: ['inscripciones'],
       select: {
@@ -83,7 +85,16 @@ export class VendedorService {
           id: true,
         },
       },
+      skip,
+      take: limit,
     });
+    
+    return {
+      data,
+      totalItems: total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    };
   }
 
   async findOne(id: string, fechaDesde?: string, fechaHasta?: string): Promise<VendedorResponseDto | undefined> {

@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ProfesorService } from './profesor.service';
 import { CreateProfesorDto } from './dto/create-profesor.dto';
@@ -25,8 +26,12 @@ export class ProfesorController {
     return this.profesorService.findAll();
   }
   @Get('sucursal/:id')
-  getProfesoresBySucursal(@Param('id') sucursalId: string) {
-    return this.profesorService.getProfesoresBySucursal(sucursalId);
+  getProfesoresBySucursal(
+    @Param('id') sucursalId: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.profesorService.getProfesoresBySucursal(sucursalId, +page, +limit);
   }
 
   @Put('edit/:id')

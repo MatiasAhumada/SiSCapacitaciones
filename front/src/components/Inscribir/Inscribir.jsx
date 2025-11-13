@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import Swal from 'sweetalert2';
 import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
 import { getComisiones } from '../../services/Comisiones.service';
 import { getAluByDNI, postAluSimple } from '../../services/Alumnos.service';
 import { postInscripcion } from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
-import ComisionSelector from '../Common/ComisionSelector'
+import ComisionSelector from '../Common/ComisionSelector';
 
 const Inscribir = () => {
   const { user } = useAuth();
-  const { sucursalSeleccionada } = useApp();
   const [pause, setPause] = useState(false);
   const [comisiones, setComisiones] = useState([]);
   const [vendedores, setVendedores] = useState([]);
@@ -20,7 +18,7 @@ const Inscribir = () => {
     dni: '',
     nombre: '',
     comisionId: '',
-    vendedorId: "",
+    vendedorId: '',
   });
   const [comisionSearch, setComisionSearch] = useState('');
   const [showComisiones, setShowComisiones] = useState(false);
@@ -30,15 +28,15 @@ const Inscribir = () => {
       try {
         const [comisionesData, vendedoresData] = await Promise.all([
           getComisiones(1, 100),
-          getVendedores()
+          getVendedores(),
         ]);
         setComisiones(comisionesData.data || comisionesData);
         setVendedores(vendedoresData);
-      } catch (error) {
+      } catch {
         Swal.fire({
           icon: 'error',
           title: 'Error al cargar datos',
-          text: error.message || 'Error al cargar los datos',
+          text: 'Error al cargar los datos',
         });
       }
     };
@@ -59,7 +57,7 @@ const Inscribir = () => {
     setComisionSearch(comisionText);
     setFormData({
       ...formData,
-      comisionId: comision.id
+      comisionId: comision.id,
     });
     setShowComisiones(false);
   };
@@ -81,7 +79,7 @@ const Inscribir = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-    } catch (error) {
+    } catch {
       setAlumnoEncontrado(null);
       Swal.fire({
         icon: 'info',
@@ -98,15 +96,12 @@ const Inscribir = () => {
     setPause(true);
 
     try {
-      let alumnoId = alumnoEncontrado?.id;
-
       // Si no existe el alumno, crearlo
       if (!alumnoEncontrado) {
-        const nuevoAlumno = await postAluSimple({
+        await postAluSimple({
           dni: formData.dni,
           name: formData.nombre,
         });
-        alumnoId = nuevoAlumno.id;
       }
 
       // Crear la inscripción
@@ -114,9 +109,9 @@ const Inscribir = () => {
         alumnoId: formData.dni, // El backend espera DNI, no ID
         comisionId: formData.comisionId,
         vendedorId: formData.vendedorId,
-        sucursalId: vendedores.find(v => v.id === formData.vendedorId)?.sucursales?.[0]?.id || '', // Usar sucursal del vendedor seleccionado
+        sucursalId: vendedores.find((v) => v.id === formData.vendedorId)?.sucursales?.[0]?.id || '', // Usar sucursal del vendedor seleccionado
         fechaRegistro: new Date().toISOString(),
-        state: true
+        state: true,
       });
 
       Swal.fire({
@@ -135,11 +130,11 @@ const Inscribir = () => {
       });
       setComisionSearch('');
       setAlumnoEncontrado(null);
-    } catch (error) {
+    } catch (err) {
       Swal.fire({
         title: 'Error al inscribir',
         icon: 'error',
-        text: error.response?.data?.message || error.message,
+        text: err.response?.data?.message || err.message,
       });
     } finally {
       setPause(false);

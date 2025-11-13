@@ -36,19 +36,30 @@ export class ProfesorService {
       relations:['asistencias'],
     });
   }
-  async getProfesoresBySucursal(id: string) {
-    const profesores = await this.profesorRepository.find({
+  async getProfesoresBySucursal(id: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    
+    const [profesores, total] = await this.profesorRepository.findAndCount({
       where: { sucursal: { id } },
       relations: ['comisiones'],
+      skip,
+      take: limit,
     });
 
-    return profesores.map((prof) => ({
+    const data = profesores.map((prof) => ({
       id: prof.id,
       name: prof.name,
       apellido: prof.apellido,
       cantidadComisiones: prof.comisiones?.length || 0,
       comisiones: prof.comisiones || [],
     }));
+    
+    return {
+      data,
+      totalItems: total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    };
   }
 
   async findOne(id: string) {

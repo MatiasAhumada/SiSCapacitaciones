@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 const ComisionHeader = ({ comision }) => {
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-sm mb-6">
-      <h2 className="text-3xl font-bold text-gray-800 mb-3 principal">
-        {comision.name}
-      </h2>
+      <h2 className="text-3xl font-bold text-gray-800 mb-3 principal">{comision.name}</h2>
       <div className="flex flex-wrap gap-4 text-gray-700">
         <div className="flex items-center gap-2">
           <i className="fa-solid fa-calendar-days text-blue-600"></i>

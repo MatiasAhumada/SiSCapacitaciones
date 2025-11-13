@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { deleteProfesId, getProfesSucId } from '../../services/Profesores.service';
+import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';
 
 const DashProfesor = () => {
-  const { user } = useAuth();
   const { getSucursalActiva } = useApp();
-  const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [loading, setLoading] = useState(true);
   const [expandedProfesor, setExpandedProfesor] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const clickDelete = async (e) => {
     e.preventDefault();
@@ -59,8 +58,10 @@ const DashProfesor = () => {
     const peticion = async () => {
       setLoading(true);
       try {
-        const data = await getProfesSucId(sucursalId);
-        setTableItems(data || []);
+        const data = await getProfesSucId(sucursalId, currentPage, 10);
+        setTableItems(data.data || []);
+        setTotalPages(data.totalPages || 1);
+        setCurrentPage(data.currentPage || 1);
       } catch (error) {
         console.error('Error al cargar profesores:', error);
         setTableItems([]);
@@ -74,7 +75,8 @@ const DashProfesor = () => {
       }
     };
     peticion();
-  }, [getSucursalActiva()?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -196,6 +198,11 @@ const DashProfesor = () => {
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
 };

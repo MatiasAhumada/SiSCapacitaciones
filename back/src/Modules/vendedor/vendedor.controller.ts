@@ -27,8 +27,12 @@ export class VendedorController {
   }
 
   @Get('sucursal/:id')
-  getVendedoresBySucursal(@Param('id') sucursalId: string) {
-    return this.vendedorService.getVendedoresBySucursal(sucursalId);
+  getVendedoresBySucursal(
+    @Param('id') sucursalId: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.vendedorService.getVendedoresBySucursal(sucursalId, +page, +limit);
   }
 
   @Get(':id')

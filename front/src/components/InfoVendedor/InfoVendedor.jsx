@@ -29,8 +29,8 @@ const InfoVendedor = () => {
         name: data.name,
         totalInscripciones: data.totalInscripciones || 0,
       });
-    } catch (error) {
-      console.error('Error al cargar datos:', error);
+    } catch {
+      console.error('Error al cargar datos');
     } finally {
       setLoadingData(false);
     }
@@ -39,6 +39,7 @@ const InfoVendedor = () => {
   useEffect(() => {
     if (!vendedorId) return;
     cargarDatos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vendedorId]);
 
   const aplicarFiltro = () => {
@@ -64,7 +65,7 @@ const InfoVendedor = () => {
       }).then(() => {
         navigate('/admin/vendedores');
       });
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: 'Error!',
         icon: 'error',
@@ -97,8 +98,19 @@ const InfoVendedor = () => {
             {pause ? (
               <div className="flex items-center">
                 <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Eliminando...
               </div>
@@ -162,8 +174,19 @@ const InfoVendedor = () => {
                 <td colSpan="5" className="px-6 py-4 text-center">
                   <div className="flex justify-center items-center">
                     <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Cargando inscripciones...
                   </div>

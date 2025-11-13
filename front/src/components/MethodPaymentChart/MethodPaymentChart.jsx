@@ -1,13 +1,5 @@
-// src/components/MethodPaymentChart.jsx
-import React from 'react';
-import {
-  PieChart,
-  Pie,
-  Tooltip,
-  Cell,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
+import PropTypes from 'prop-types';
+import { PieChart, Pie, Tooltip, Cell, Legend, ResponsiveContainer } from 'recharts';
 
 // Colores para cada porción del gráfico
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -43,6 +35,10 @@ const MethodPaymentChart = ({ data }) => {
       </PieChart>
     </ResponsiveContainer>
   );
+};
+
+MethodPaymentChart.propTypes = {
+  data: PropTypes.array.isRequired,
 };
 
 export default MethodPaymentChart;

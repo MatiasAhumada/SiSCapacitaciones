@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useAuth } from '../../context/AuthContext';
@@ -72,7 +72,7 @@ const ListadoCajas = () => {
       setLoading(true);
       setError(null);
       try {
-        const { data, totalItems, totalPages } = await GetByVendedorMock(
+        const { data, totalPages } = await GetByVendedorMock(
           selectedIdVendedor,
           currentPage,
           10,
@@ -89,6 +89,7 @@ const ListadoCajas = () => {
     };
     fetchVendedores();
     fetchCajas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIdVendedor, currentPage, isSelectedVendedor, debouncedFilterDate]);
 
   const handleVendedorSelect = (vendedor) => {

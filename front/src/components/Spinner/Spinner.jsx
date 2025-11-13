@@ -1,4 +1,6 @@
-export const Spinner = ({color}) => {
+import PropTypes from 'prop-types';
+
+export const Spinner = ({ color }) => {
   return (
     <svg
       fill={color}
@@ -17,4 +19,8 @@ export const Spinner = ({color}) => {
       </path>
     </svg>
   );
+};
+
+Spinner.propTypes = {
+  color: PropTypes.string.isRequired,
 };

@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Spinner } from '../Spinner/Spinner.jsx';
 
-export const ModalEditar = ({ formData, onClose, onSave, onChange, vend, alu, isFromAlumno = false }) => {
+export const ModalEditar = ({
+  formData,
+  onClose,
+  onSave,
+  onChange,
+  vend,
+  isFromAlumno = false,
+}) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -187,4 +195,13 @@ export const ModalEditar = ({ formData, onClose, onSave, onChange, vend, alu, is
       </div>
     </div>
   );
+};
+
+ModalEditar.propTypes = {
+  formData: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  vend: PropTypes.array.isRequired,
+  isFromAlumno: PropTypes.bool,
 };

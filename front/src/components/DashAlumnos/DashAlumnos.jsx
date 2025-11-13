@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { deleteAlumnoId, getAluSucID } from '../../services/Alumnos.service';
 import FilterAlus from '../FilterAlus/FilterAlus';
@@ -9,14 +8,12 @@ import Pagination from '../Pagination/Pagination';
 import Swal from 'sweetalert2';
 
 const DashAlumnos = () => {
-  const { user } = useAuth();
   const { getSucursalActiva } = useApp();
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalAlumnos, setTotalAlumnos] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isFiltered, setIsFiltered] = useState(false);
 
@@ -60,7 +57,6 @@ const DashAlumnos = () => {
       setTableItems(data.data);
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
-      setTotalAlumnos(data.totalItems || 0);
     } catch (error) {
       Swal.fire({
         title: 'Error al cargar los alumnos',
@@ -71,7 +67,11 @@ const DashAlumnos = () => {
   };
 
   useEffect(() => {
-    peticionAlumnos(currentPage);
+    const sucursalId = getSucursalActiva()?.id;
+    if (sucursalId) {
+      peticionAlumnos(currentPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, getSucursalActiva()?.id]);
 
   const filtrarAlumnos = async (filtros, setPaused) => {

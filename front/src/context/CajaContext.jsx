@@ -12,13 +12,30 @@ export const useCaja = () => {
 
 export const CajaProvider = ({ children }) => {
   const [descargarExcelFn, setDescargarExcelFn] = useState(null);
+  const [abrirCajaFn, setAbrirCajaFn] = useState(null);
+  const [cerrarCajaFn, setCerrarCajaFn] = useState(null);
 
   const registrarDescargarExcel = (fn) => {
     setDescargarExcelFn(() => fn);
   };
 
+  const registrarAbrirCaja = (fn) => {
+    setAbrirCajaFn(() => fn);
+  };
+
+  const registrarCerrarCaja = (fn) => {
+    setCerrarCajaFn(() => fn);
+  };
+
   return (
-    <CajaContext.Provider value={{ descargarExcelFn, registrarDescargarExcel }}>
+    <CajaContext.Provider value={{ 
+      descargarExcelFn, 
+      registrarDescargarExcel,
+      abrirCajaFn,
+      registrarAbrirCaja,
+      cerrarCajaFn,
+      registrarCerrarCaja
+    }}>
       {children}
     </CajaContext.Provider>
   );

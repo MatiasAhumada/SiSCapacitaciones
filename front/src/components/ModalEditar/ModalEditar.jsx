@@ -38,15 +38,15 @@ export const ModalEditar = ({
   };
 
   return (
-    <div className={`fixed inset-0 bg-black bg-opacity-50  flex items-center justify-center z-50 `}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div
-        className={`bg-white rounded-lg p-6 w-full max-w-md mx-4 transition-all duration-150 transform ${
+        className={`bg-white rounded-lg p-4 sm:p-6 w-full max-w-md my-8 transition-all duration-150 transform ${
           isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >
         <h3 className="text-lg font-semibold mb-4">Editar Movimiento</h3>
 
-        <form className="space-y-4">
+        <form className="space-y-3 sm:space-y-4 max-h-[60vh] overflow-y-auto pr-2">
           <div>
             <label className="block text-sm font-medium mb-1">Fecha</label>
             <input
@@ -184,11 +184,11 @@ export const ModalEditar = ({
           </div>
         </form>
 
-        <div className="flex justify-end space-x-2 mt-6 gap-1">
-          <button onClick={handleClose} className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded">
+        <div className="flex justify-end space-x-2 mt-4 sm:mt-6 gap-1 pt-4 border-t">
+          <button onClick={handleClose} className="px-3 sm:px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-sm sm:text-base">
             Cancelar
           </button>
-          <button onClick={isSaving ? null : handleSave} className="px-4 py-2 btnAz">
+          <button onClick={isSaving ? null : handleSave} className="px-3 sm:px-4 py-2 btnAz text-sm sm:text-base">
             {isSaving ? <Spinner color="white"></Spinner> : 'Guardar'}
           </button>
         </div>

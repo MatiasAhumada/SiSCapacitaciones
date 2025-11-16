@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCaja } from '../../context/CajaContext';
-import { editMovCaja, GetByVendedorMock, descargarExcelCaja, aperturaCaja, cerrarCaja } from '../../services/Cajas.service';
+import { editMovCaja, GetCajaByVendedor, descargarExcelCaja, aperturaCaja, cerrarCaja } from '../../services/Cajas.service';
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
@@ -14,7 +14,7 @@ import Pagination from '../Pagination/Pagination';
 
 const UnifiedDashCajas = () => {
   const { user } = useAuth();
-  const { registrarDescargarExcel, registrarAbrirCaja, registrarCerrarCaja } = useCaja();
+  const { registrarDescargarExcel, registrarAbrirCaja, registrarCerrarCaja, setCajaAbierta } = useCaja();
   const isAdmin = user?.isAdmin;
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -52,10 +52,14 @@ const UnifiedDashCajas = () => {
   const recargarDatos = async () => {
     if (!user?.id) return;
     try {
-      const response = await GetByVendedorMock(user.id, currentPage, limit);
-      setSesionCaja(response.sesionCaja);
-      setTableItems(response.movimientos || []);
-      setTotalPages(response.totalPages || 1);
+      const sesiones = await GetCajaByVendedor(user.id, currentPage, limit);
+      const ultimaSesion = sesiones.length > 0 ? sesiones[0] : null;
+      setSesionCaja(ultimaSesion);
+      setCajaAbierta(ultimaSesion?.fechaCierre === null || ultimaSesion?.fechaCierre === '');
+      if (ultimaSesion) {
+        setTableItems(ultimaSesion.movimientos || []);
+        setTotalPages(ultimaSesion.totalPages || 1);
+      }
     } catch (error) {
       const msg = error?.response?.data?.message;
       Swal.fire({

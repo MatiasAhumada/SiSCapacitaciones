@@ -55,7 +55,7 @@ const UnifiedDashCajas = () => {
       const sesiones = await GetCajaByVendedor(user.id, currentPage, limit);
       const ultimaSesion = sesiones.length > 0 ? sesiones[0] : null;
       setSesionCaja(ultimaSesion);
-      setCajaAbierta(ultimaSesion?.fechaCierre === null || ultimaSesion?.fechaCierre === '');
+      setCajaAbierta(!ultimaSesion?.fechaCierre || ultimaSesion?.fechaCierre === null || ultimaSesion?.fechaCierre === '');
       if (ultimaSesion) {
         setTableItems(ultimaSesion.movimientos || []);
         setTotalPages(ultimaSesion.totalPages || 1);

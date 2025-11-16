@@ -17,6 +17,7 @@ import {
 import PropTypes from 'prop-types';
 import simplificado from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { useCaja } from '../../context/CajaContext';
@@ -26,11 +27,13 @@ import Swal from 'sweetalert2';
 const UnifiedNav = () => {
   const { logout, user } = useAuth();
   const { sucursales, sucursalSeleccionada, cambiarSucursal } = useApp();
-  const { descargarExcelFn, cajaAbierta } = useCaja();
+  const { descargarExcelFn, cajaAbierta, setCajaAbierta } = useCaja();
   const navigate = useNavigate();
   const isAdmin = user?.isAdmin;
+  
+  console.log('Estado cajaAbierta en UnifiedNav:', cajaAbierta);
 
-  const navigationConfig = isAdmin ? {
+  const navigationConfig = useMemo(() => isAdmin ? {
     personas: {
       name: 'Personas',
       icon: UsersIcon,
@@ -95,7 +98,7 @@ const UnifiedNav = () => {
         { name: 'Crear Alumno', path: '/vendedor/alumnos/crear' }
       ]
     }
-  };
+  }, [isAdmin, cajaAbierta]);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -109,6 +112,7 @@ const UnifiedNav = () => {
     } else if (item.action === 'aperturaCaja') {
       try {
         await aperturaCaja(user?.id);
+        setCajaAbierta(true);
         Swal.fire({
           icon: 'success',
           title: 'Caja Abierta',
@@ -127,6 +131,7 @@ const UnifiedNav = () => {
     } else if (item.action === 'cerrarCaja') {
       try {
         await cerrarCaja(user?.id);
+        setCajaAbierta(false);
         Swal.fire({
           icon: 'success',
           title: 'Caja Cerrada',

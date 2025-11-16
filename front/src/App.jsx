@@ -1,6 +1,7 @@
 import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
+import { CajaProvider } from './context/CajaContext';
 import RequireAuth from './context/RequireAuth';
 import ProtectedLayout from './layouts/ProtectedLayout';
 
@@ -22,12 +23,10 @@ import CreateCurso from './components/CreateCurso/CreateCurso';
 import DashComisiones from './components/DashComisiones/DashComisiones';
 import CreateComision from './components/CreateComision/CreateComision';
 import ListadoComisiones from './components/ListadoComisiones/ListadoComisiones';
-import DashCaja from './components/DashCaja/DashCaja';
 import CreateCaja from './components/CreateCaja/CreateCaja';
 import CajaEgreso from './components/CajaEgreso/CajaEgreso';
 import CajaTransferencia from './components/CajaTransferencia/CajaTransferencia';
-
-import DashCajas from './components/DashCajas/DashCajas';
+import UnifiedDashCajas from './components/DashCajas/UnifiedDashCajas';
 import ListadoCajas from './components/ListadoCajas/ListadoCajas';
 import Certificados from './components/Certificados/Certificados';
 import Inscribir from './components/Inscribir/Inscribir';
@@ -37,7 +36,8 @@ function App() {
   return (
     <AuthProvider>
       <AppProvider>
-        <BrowserRouter>
+        <CajaProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<Login />} />
@@ -184,15 +184,16 @@ function App() {
               }
             />
             <Route
-              path="/admin/cajas"
+              path="/admin/caja"
               element={
                 <RequireAuth>
                   <ProtectedLayout>
-                    <DashCajas />
+                    <UnifiedDashCajas />
                   </ProtectedLayout>
                 </RequireAuth>
               }
             />
+            <Route path="/admin/cajas" element={<Navigate to="/admin/caja" replace />} />
             <Route
               path="/admin/cobrar"
               element={
@@ -270,7 +271,7 @@ function App() {
               element={
                 <RequireAuth>
                   <ProtectedLayout>
-                    <DashCaja />
+                    <UnifiedDashCajas />
                   </ProtectedLayout>
                 </RequireAuth>
               }
@@ -378,7 +379,8 @@ function App() {
 
             <Route path="*" element={<Error404 />} />
           </Routes>
-        </BrowserRouter>
+          </BrowserRouter>
+        </CajaProvider>
       </AppProvider>
     </AuthProvider>
   );

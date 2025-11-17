@@ -16,6 +16,7 @@ import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { EgresoCajaDTO } from './dto/egreso-caja.dto';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
+import { IngresoSimpleDto } from './dto/ingreso-simple.dto';
 import { format } from 'date-fns';
 @Controller('caja')
 export class CajaController {
@@ -182,6 +183,11 @@ export class CajaController {
   @Post('egreso/vendedor')
   createEgresoVendedor(@Body() data: EgresoCajaDTO) {
     return this.cajaService.createEgresoVendedor(data);
+  }
+
+  @Post('/ingreso-simple')
+  createIngresoSimple(@Body() data: IngresoSimpleDto) {
+    return this.cajaService.createIngresoSimple(data);
   }
 
   @Post('/crear-categoria')

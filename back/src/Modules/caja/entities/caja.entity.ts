@@ -17,6 +17,9 @@ import { SesionCaja } from './sesion-caja.entity';
 export enum TipoMovimiento {
   APERTURA = 'Apertura',
   INGRESO = 'Ingreso',
+  APORTE = 'Aporte',
+  COBRO_VARIOS = 'Cobro Varios',
+  CERTIFICACION_EXAMEN = 'Certificacion Examen',
   EGRESO = 'Egreso',
   TRANSFERENCIA = 'Transferencia',
   CIERRE = 'Cierre',

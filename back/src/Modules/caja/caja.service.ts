@@ -18,6 +18,7 @@ import { Comprobante } from '../comprobante/entities/comprobante.entity';
 import { Categoria } from './entities/categoria.entity';
 import { Subcategoria } from './entities/subcategoria.entity';
 import { EgresoCajaDTO } from './dto/egreso-caja.dto';
+import { IngresoSimpleDto } from './dto/ingreso-simple.dto';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
 import { SesionCaja } from './entities/sesion-caja.entity';
@@ -1276,6 +1277,47 @@ export class CajaService {
     });
   }
 
+  async createIngresoSimple(dto: IngresoSimpleDto) {
+    
+    const vendedor = await this.vendedorRepository.findOne({
+      where: { id: dto.vendedorId },
+    });
+    if (!vendedor) {
+      throw new HttpException('Vendedor no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    const sesionAbierta = await this.sesionRepository.findOne({
+      where: {
+        vendedor: { id: dto.vendedorId },
+        fechaCierre: IsNull(),
+      },
+    });
+    if (!sesionAbierta) {
+      throw new HttpException(
+        'No hay sesión de caja abierta',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const fechaLocal = dto.fecha
+      ? dayjs(dto.fecha).tz('America/Argentina/Buenos_Aires').toDate()
+      : dayjs().tz('America/Argentina/Buenos_Aires').toDate();
+
+    const caja = this.cajaRepository.create({
+      tipo: dto.tipo,
+      metodoPago: dto.metodoPago,
+      monto: dto.monto,
+      descripcion: dto.descripcion,
+      vendedor,
+      fecha: fechaLocal,
+      sesionCaja: sesionAbierta,
+    });
+
+    const movimientoGuardado = await this.cajaRepository.save(caja);
+    await this.actualizarConMovimiento(sesionAbierta.id, movimientoGuardado);
+    return movimientoGuardado;
+  }
+
   async generarComprobantePDF(movimientoId: string): Promise<Buffer> {
     const movimiento = await this.cajaRepository.findOne({
       where: { id: movimientoId },
@@ -1317,7 +1359,12 @@ export class CajaService {
     const montoMovimiento = Number(movimiento.monto);
 
     // Actualizar totales según el tipo de movimiento
-    if (movimiento.tipo === TipoMovimiento.INGRESO) {
+    if (
+      movimiento.tipo === TipoMovimiento.INGRESO ||
+      movimiento.tipo === TipoMovimiento.APORTE ||
+      movimiento.tipo === TipoMovimiento.COBRO_VARIOS ||
+      movimiento.tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+    ) {
       sesion.totalIngresos += montoMovimiento;
     } else if (movimiento.tipo === TipoMovimiento.EGRESO || movimiento.tipo === TipoMovimiento.TRANSFERENCIA) {
       sesion.totalEgresos += montoMovimiento;
@@ -1375,7 +1422,12 @@ export class CajaService {
       
       const monto = Number(mov.monto);
       
-      if (mov.tipo === TipoMovimiento.INGRESO) {
+      if (
+        mov.tipo === TipoMovimiento.INGRESO ||
+        mov.tipo === TipoMovimiento.APORTE ||
+        mov.tipo === TipoMovimiento.COBRO_VARIOS ||
+        mov.tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+      ) {
         sesion.totalIngresos += monto;
       } else if (mov.tipo === TipoMovimiento.EGRESO || mov.tipo === TipoMovimiento.TRANSFERENCIA) {
         sesion.totalEgresos += monto;
@@ -1383,23 +1435,56 @@ export class CajaService {
 
       switch (mov.metodoPago) {
         case MetodoPago.EFECTIVO:
-          if (mov.tipo === TipoMovimiento.INGRESO) {
+          if (
+            mov.tipo === TipoMovimiento.INGRESO ||
+            mov.tipo === TipoMovimiento.APORTE ||
+            mov.tipo === TipoMovimiento.COBRO_VARIOS ||
+            mov.tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+          ) {
             sesion.totalEfectivo += monto;
           } else if (mov.tipo === TipoMovimiento.EGRESO || mov.tipo === TipoMovimiento.TRANSFERENCIA) {
             sesion.totalEfectivo -= monto;
           }
           break;
         case MetodoPago.CREDITO:
-          sesion.totalCredito += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
+          sesion.totalCredito += (
+            mov.tipo === TipoMovimiento.INGRESO ||
+            mov.tipo === TipoMovimiento.APORTE ||
+            mov.tipo === TipoMovimiento.COBRO_VARIOS ||
+            mov.tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+              ? monto
+              : -monto
+          );
           break;
         case MetodoPago.DIGITAL_JAVIER:
-          sesion.totalDigitalJavier += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
+          sesion.totalDigitalJavier += (
+            mov.tipo === TipoMovimiento.INGRESO ||
+            mov.tipo === TipoMovimiento.APORTE ||
+            mov.tipo === TipoMovimiento.COBRO_VARIOS ||
+            mov.tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+              ? monto
+              : -monto
+          );
           break;
         case MetodoPago.DIGITAL_TOBIAS:
-          sesion.totalDigitalTobias += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
+          sesion.totalDigitalTobias += (
+            mov.tipo === TipoMovimiento.INGRESO ||
+            mov.tipo === TipoMovimiento.APORTE ||
+            mov.tipo === TipoMovimiento.COBRO_VARIOS ||
+            mov.tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+              ? monto
+              : -monto
+          );
           break;
         case MetodoPago.FERRO:
-          sesion.totalFerro += (mov.tipo === TipoMovimiento.INGRESO ? monto : -monto);
+          sesion.totalFerro += (
+            mov.tipo === TipoMovimiento.INGRESO ||
+            mov.tipo === TipoMovimiento.APORTE ||
+            mov.tipo === TipoMovimiento.COBRO_VARIOS ||
+            mov.tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+              ? monto
+              : -monto
+          );
           break;
       }
     }

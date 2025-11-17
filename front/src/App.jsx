@@ -223,6 +223,7 @@ function App() {
                 </RequireAuth>
               }
             />
+
             <Route
               path="/admin/certificados"
               element={
@@ -305,6 +306,7 @@ function App() {
                 </RequireAuth>
               }
             />
+
             <Route
               path="/vendedor/cursos"
               element={

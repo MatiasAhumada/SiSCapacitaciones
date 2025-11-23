@@ -15,7 +15,11 @@ import TransferModal from './TransferModal';
 import ComisionHeader from './ComisionHeader';
 import AsistenciaControls from './AsistenciaControls';
 import AlumnoRow from './AlumnoRow';
-import { clientErrorHandler, clientSuccessHandler, clientWarningHandler } from '../../utils/notificationHandler';
+import {
+  clientErrorHandler,
+  clientSuccessHandler,
+  clientWarningHandler,
+} from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const ListadoComisiones = () => {

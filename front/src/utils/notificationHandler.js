@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2';
 
 /**
  * Muestra una notificación de error en la esquina superior derecha
@@ -8,9 +8,9 @@ import Swal from "sweetalert2";
 export const clientErrorHandler = (message, timer = 3000) => {
   Swal.fire({
     toast: true,
-    position: "top-end",
-    icon: "error",
-    title: message || "Ha ocurrido un error",
+    position: 'top-end',
+    icon: 'error',
+    title: message || 'Ha ocurrido un error',
     showConfirmButton: false,
     timer,
     timerProgressBar: true,
@@ -25,9 +25,9 @@ export const clientErrorHandler = (message, timer = 3000) => {
 export const clientSuccessHandler = (message, timer = 3000) => {
   Swal.fire({
     toast: true,
-    position: "top-end",
-    icon: "success",
-    title: message || "Operación exitosa",
+    position: 'top-end',
+    icon: 'success',
+    title: message || 'Operación exitosa',
     showConfirmButton: false,
     timer,
     timerProgressBar: true,
@@ -42,9 +42,9 @@ export const clientSuccessHandler = (message, timer = 3000) => {
 export const clientWarningHandler = (message, timer = 3000) => {
   Swal.fire({
     toast: true,
-    position: "top-end",
-    icon: "warning",
-    title: message || "Advertencia",
+    position: 'top-end',
+    icon: 'warning',
+    title: message || 'Advertencia',
     showConfirmButton: false,
     timer,
     timerProgressBar: true,
@@ -59,8 +59,8 @@ export const clientWarningHandler = (message, timer = 3000) => {
 export const clientInfoHandler = (message, timer = 3000) => {
   Swal.fire({
     toast: true,
-    position: "top-end",
-    icon: "info",
+    position: 'top-end',
+    icon: 'info',
     title: message,
     showConfirmButton: false,
     timer,

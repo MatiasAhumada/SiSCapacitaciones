@@ -53,7 +53,14 @@ export const getAluComID = async (id) => {
   }
 };
 
-export const getComisionBySucursal = async (id, page = 1, limit = 10, name = '', day = '', all = false) => {
+export const getComisionBySucursal = async (
+  id,
+  page = 1,
+  limit = 10,
+  name = '',
+  day = '',
+  all = false
+) => {
   try {
     const params = { page, limit };
     if (name && name !== '') {

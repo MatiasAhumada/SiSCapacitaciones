@@ -220,9 +220,7 @@ const Certificados = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
-                Alumno
-              </label>
+              <label className="block text-sm font-medium mb-2 text-gray-700">Alumno</label>
               <div className="relative">
                 <input
                   type="number"
@@ -247,9 +245,7 @@ const Certificados = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
-                Curso
-              </label>
+              <label className="block text-sm font-medium mb-2 text-gray-700">Curso</label>
               <select
                 name="cursoId"
                 value={formData.cursoId}

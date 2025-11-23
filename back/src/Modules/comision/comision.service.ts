@@ -82,7 +82,7 @@ export class ComisionService {
     return this.comisionRepository.save(nuevaComision);
   }
 
-  async findAll(page = 1, limit = 10, name?: string, day?: string) {
+  async findAll(page = 1, limit = 10, name?: string, day?: string, all?: boolean) {
     const whereConditions: any = {};
     
     if (name) {
@@ -93,15 +93,10 @@ export class ComisionService {
       whereConditions.day = day;
     }
 
-    const totalItems = await this.comisionRepository.count({
-      where: whereConditions,
-    });
-
     const comisiones = await this.comisionRepository.find({
       where: whereConditions,
       relations: ['curso', 'profesor', 'alumnoComisiones', 'sucursal'],
-      skip: (page - 1) * limit,
-      take: limit,
+      ...(!all && { skip: (page - 1) * limit, take: limit }),
       select: {
         curso: {
           id: true,
@@ -117,6 +112,14 @@ export class ComisionService {
           apellido: true,
         },
       },
+    });
+
+    if (all) {
+      return { data: comisiones };
+    }
+
+    const totalItems = await this.comisionRepository.count({
+      where: whereConditions,
     });
 
     return {
@@ -304,7 +307,7 @@ export class ComisionService {
     }
   }
 
-  async findBySucursal(sucursalId: string, page = 1, limit = 10, name?: string, day?: string) {
+  async findBySucursal(sucursalId: string, page = 1, limit = 10, name?: string, day?: string, all?: boolean) {
     const whereConditions: any = { sucursal: { id: sucursalId } };
     
     if (name) {
@@ -315,15 +318,10 @@ export class ComisionService {
       whereConditions.day = day;
     }
 
-    const totalItems = await this.comisionRepository.count({
-      where: whereConditions,
-    });
-
     const comisiones = await this.comisionRepository.find({
       where: whereConditions,
       relations: ['curso', 'profesor', 'alumnoComisiones', 'sucursal'],
-      skip: (page - 1) * limit,
-      take: limit,
+      ...(!all && { skip: (page - 1) * limit, take: limit }),
       select: {
         curso: {
           id: true,
@@ -339,6 +337,14 @@ export class ComisionService {
           apellido: true,
         },
       },
+    });
+
+    if (all) {
+      return { data: comisiones };
+    }
+
+    const totalItems = await this.comisionRepository.count({
+      where: whereConditions,
     });
 
     return {
@@ -437,15 +443,13 @@ export class ComisionService {
       throw new NotFoundException('Nueva comisión no encontrada');
     }
 
-    const comisionAnteriorId = alumnoComision.comision.id;
-
     alumnoComision.comision = nuevaComision;
     await this.alumnoComisionRepository.save(alumnoComision);
 
     await this.inscripcionRepository.update(
       {
         alumno: { id: alumnoComision.alumno.id },
-        comision: { id: comisionAnteriorId },
+        comision: { id: alumnoComision.comision.id },
       },
       { comision: nuevaComision },
     );

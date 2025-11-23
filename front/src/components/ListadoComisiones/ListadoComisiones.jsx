@@ -6,16 +6,17 @@ import {
   getComisionId,
   postAsistenciaComision,
   transferirAlumno,
-  getComisionBySucursal,
+  getComisiones,
 } from '../../services/Comisiones.service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Pagination from '../Pagination/Pagination';
-import Swal from 'sweetalert2';
 import TransferModal from './TransferModal';
 import ComisionHeader from './ComisionHeader';
 import AsistenciaControls from './AsistenciaControls';
 import AlumnoRow from './AlumnoRow';
+import { clientErrorHandler, clientSuccessHandler, clientWarningHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const ListadoComisiones = () => {
   const { comisionId } = useParams();
@@ -220,21 +221,9 @@ const ListadoComisiones = () => {
   const onGuardar = async () => {
     try {
       await postAsistenciaComision(asistencia);
-      Swal.fire({
-        icon: 'success',
-        title: 'Asistencia guardada',
-        text: 'La asistencia se guardó correctamente',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.ASISTENCIA_GUARDADA);
     } catch {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al guardar la asistencia',
-        text: 'Hubo un error al guardar la asistencia',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientErrorHandler(ERROR_MESSAGES.ERROR_GUARDAR_ASISTENCIA);
     } finally {
       setReload(!reload);
     }
@@ -244,51 +233,28 @@ const ListadoComisiones = () => {
   const handleTransferClick = async (alumno) => {
     setSelectedAlumno(alumno);
     try {
-      const data = await getComisionBySucursal(comisionDate.sucursal.id);
+      const data = await getComisiones(1, 10, '', '', true);
       setComisionesDisponibles(data.data.filter((c) => c.id !== comisionId));
       setShowTransferModal(true);
     } catch {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudieron cargar las comisiones',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientErrorHandler(ERROR_MESSAGES.ERROR_CARGAR_COMISIONES);
     }
   };
 
   const handleTransferConfirm = async () => {
     if (!nuevaComisionId) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Selecciona una comisión',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientWarningHandler(ERROR_MESSAGES.SELECCIONAR_COMISION);
       return;
     }
 
     try {
       await transferirAlumno(selectedAlumno.id, nuevaComisionId);
-      Swal.fire({
-        icon: 'success',
-        title: 'Alumno transferido',
-        text: 'El alumno fue transferido exitosamente',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.ALUMNO_TRANSFERIDO);
       setShowTransferModal(false);
       setNuevaComisionId('');
       setReload(!reload);
     } catch {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al transferir',
-        text: 'Hubo un error al transferir el alumno',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientErrorHandler(ERROR_MESSAGES.ERROR_TRANSFERIR);
     }
   };
 

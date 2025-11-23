@@ -6,6 +6,8 @@ import { deleteMovCaja, editMovCaja } from '../../services/Cajas.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import { ModalEditar } from '../ModalEditar/ModalEditar';
 import { Spinner } from '../Spinner/Spinner';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 import Swal from 'sweetalert2';
 
 const DashAlumno = () => {
@@ -36,19 +38,9 @@ const DashAlumno = () => {
   const handlePrintPago = async (pago) => {
     try {
       await descargarComprobantePDF(pago.id);
-      Swal.fire({
-        icon: 'success',
-        title: 'Comprobante descargado',
-        text: 'El comprobante se ha descargado correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.COMPROBANTE_DESCARGADO);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al descargar comprobante',
-        text: error.message,
-      });
+      clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_DESCARGAR_COMPROBANTE);
     }
   };
 
@@ -67,22 +59,11 @@ const DashAlumno = () => {
     if (result.isConfirmed) {
       try {
         await deleteMovCaja(pagoId);
-        Swal.fire({
-          icon: 'success',
-          title: 'Pago eliminado',
-          text: 'El pago se ha eliminado correctamente',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        // Recargar datos
+        clientSuccessHandler(SUCCESS_MESSAGES.PAGO_ELIMINADO);
         const data = await getAluComID(alumnoId);
         setAlumno(data);
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al eliminar pago',
-          text: error.response?.data?.message || error.message,
-        });
+        clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_ELIMINAR_PAGO);
       }
     }
   };
@@ -90,23 +71,12 @@ const DashAlumno = () => {
   const handleSave = async () => {
     try {
       await editMovCaja(formData.id, formData);
-      Swal.fire({
-        icon: 'success',
-        title: 'Pago actualizado',
-        text: 'El pago se ha actualizado correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.PAGO_ACTUALIZADO);
       setIsModalOpen(false);
-      // Recargar datos
       const data = await getAluComID(alumnoId);
       setAlumno(data);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al actualizar pago',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_PAGO);
     }
   };
 
@@ -127,11 +97,7 @@ const DashAlumno = () => {
         setAlumno(alumnoData);
         setVendedores(vendedoresData);
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar datos',
-          text: error.response?.data?.message || error.message,
-        });
+        clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
       } finally {
         setLoading(false);
       }

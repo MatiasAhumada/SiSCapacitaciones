@@ -1,7 +1,7 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const getComisiones = async (page = 1, limit = 10, name = '', day = '') => {
+export const getComisiones = async (page = 1, limit = 10, name = '', day = '', all = false) => {
   try {
     const params = { page, limit };
     if (name && name !== '') {
@@ -9,6 +9,9 @@ export const getComisiones = async (page = 1, limit = 10, name = '', day = '') =
     }
     if (day && day !== '') {
       params.day = day;
+    }
+    if (all) {
+      params.all = 'true';
     }
     const response = await axios.get(`${API_URL}/comision`, { params });
     return response.data;
@@ -50,7 +53,7 @@ export const getAluComID = async (id) => {
   }
 };
 
-export const getComisionBySucursal = async (id, page = 1, limit = 10, name = '', day = '') => {
+export const getComisionBySucursal = async (id, page = 1, limit = 10, name = '', day = '', all = false) => {
   try {
     const params = { page, limit };
     if (name && name !== '') {
@@ -58,6 +61,9 @@ export const getComisionBySucursal = async (id, page = 1, limit = 10, name = '',
     }
     if (day && day !== '') {
       params.day = day;
+    }
+    if (all) {
+      params.all = 'true';
     }
     const response = await axios.get(`${API_URL}/comision/suc/${id}`, { params });
     return response.data;

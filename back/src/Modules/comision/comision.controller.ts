@@ -42,8 +42,9 @@ export class ComisionController {
     @Query('limit') limit?: number,
     @Query('name') name?: string,
     @Query('day') day?: string,
+    @Query('all') all?: string,
   ) {
-    return this.comisionService.findAll(Number(page), Number(limit), name, day);
+    return this.comisionService.findAll(Number(page), Number(limit), name, day, all === 'true');
   }
   @Get('/aluCom/:idAluCom')
   findAluCom(@Param('idAluCom') id: string) {
@@ -61,8 +62,9 @@ export class ComisionController {
     @Query('limit') limit?: number,
     @Query('name') name?: string,
     @Query('day') day?: string,
+    @Query('all') all?: string,
   ) {
-    return this.comisionService.findBySucursal(id, Number(page), Number(limit), name, day);
+    return this.comisionService.findBySucursal(id, Number(page), Number(limit), name, day, all === 'true');
   }
   @Get(':id')
   findOne(

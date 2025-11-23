@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
-import Swal from 'sweetalert2';
 import { useAuth } from '../../context/AuthContext';
 import { getComisiones } from '../../services/Comisiones.service';
 import { getAluByDNI, postAluSimple } from '../../services/Alumnos.service';
 import { postInscripcion } from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import ComisionSelector from '../Common/ComisionSelector';
+import { clientErrorHandler, clientSuccessHandler, clientInfoHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const Inscribir = () => {
   const { user } = useAuth();
@@ -32,12 +33,8 @@ const Inscribir = () => {
         ]);
         setComisiones(comisionesData.data || comisionesData);
         setVendedores(vendedoresData);
-      } catch {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar datos',
-          text: 'Error al cargar los datos',
-        });
+      } catch (error) {
+        clientErrorHandler(error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
       }
     };
 
@@ -72,22 +69,10 @@ const Inscribir = () => {
         ...formData,
         nombre: alumno.name,
       });
-      Swal.fire({
-        icon: 'success',
-        title: 'Alumno encontrado',
-        text: `${alumno.name}`,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.ALUMNO_ENCONTRADO);
     } catch {
       setAlumnoEncontrado(null);
-      Swal.fire({
-        icon: 'info',
-        title: 'Alumno no encontrado',
-        text: 'Deberá crear un nuevo alumno',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientInfoHandler(ERROR_MESSAGES.ALUMNO_NO_ENCONTRADO);
     }
   };
 
@@ -114,12 +99,7 @@ const Inscribir = () => {
         state: true,
       });
 
-      Swal.fire({
-        title: 'Inscripción realizada',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.INSCRIPCION_REALIZADA);
 
       // Limpiar formulario
       setFormData({
@@ -131,11 +111,7 @@ const Inscribir = () => {
       setComisionSearch('');
       setAlumnoEncontrado(null);
     } catch (err) {
-      Swal.fire({
-        title: 'Error al inscribir',
-        icon: 'error',
-        text: err.response?.data?.message || err.message,
-      });
+      clientErrorHandler(err.response?.data?.message || err.message || ERROR_MESSAGES.ERROR_INSCRIBIR);
     } finally {
       setPause(false);
     }

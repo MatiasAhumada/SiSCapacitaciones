@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { deleteProfesId, getProfesSucId } from '../../services/Profesores.service';
 import Pagination from '../Pagination/Pagination';
-import Swal from 'sweetalert2';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const DashProfesor = () => {
   const { getSucursalActiva } = useApp();
@@ -21,19 +22,10 @@ const DashProfesor = () => {
 
     try {
       await deleteProfesId(profesorId);
-      Swal.fire({
-        title: 'Profesor Eliminado',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.PROFESOR_ELIMINADO);
       setTableItems((prev) => prev.filter((item) => item.id !== profesorId));
     } catch (error) {
-      Swal.fire({
-        title: 'Error',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-      });
+      clientErrorHandler(error.response?.data?.message || error.message);
     } finally {
       setPause((prev) => {
         const newPause = { ...prev };
@@ -65,11 +57,7 @@ const DashProfesor = () => {
       } catch (error) {
         console.error('Error al cargar profesores:', error);
         setTableItems([]);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar profesores',
-          text: error.response?.data?.message || error.message,
-        });
+        clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_PROFESORES);
       } finally {
         setLoading(false);
       }

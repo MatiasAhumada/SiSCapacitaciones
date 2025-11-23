@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { postVend } from '../../services/Vendedores.service';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
-import Swal from 'sweetalert2';
 import logo from '../../assets/simplificado_a_color.png';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const CreateVendedor = () => {
   const { sucursales } = useApp();
@@ -45,20 +46,10 @@ const CreateVendedor = () => {
       };
 
       await postVend(updatedFormData);
-      Swal.fire({
-        title: 'Vendedor Registrado',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        navigate('/admin/vendedores');
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.VENDEDOR_CREADO);
+      navigate('/admin/vendedores');
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al registrar vendedor',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_VENDEDOR);
     } finally {
       setLoading(false);
     }

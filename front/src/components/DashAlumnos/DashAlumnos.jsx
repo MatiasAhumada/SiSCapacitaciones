@@ -5,7 +5,8 @@ import { deleteAlumnoId, getAluSucID } from '../../services/Alumnos.service';
 import FilterAlus from '../FilterAlus/FilterAlus';
 import { Spinner } from '../Spinner/Spinner';
 import Pagination from '../Pagination/Pagination';
-import Swal from 'sweetalert2';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const DashAlumnos = () => {
   const { getSucursalActiva } = useApp();
@@ -20,12 +21,7 @@ const DashAlumnos = () => {
   const click = (item) => {
     const idAlu = item.idAluCom[0];
     if (!idAlu) {
-      Swal.fire({
-        title: 'No hay comisiones asignadas',
-        icon: 'error',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientErrorHandler('No hay comisiones asignadas');
       return;
     }
     navigate(`/admin/alumno/${idAlu}`);
@@ -34,12 +30,7 @@ const DashAlumnos = () => {
   const clickDelete = async (id) => {
     setPause((prev) => ({ ...prev, [id]: true }));
     await deleteAlumnoId(id).then(() => {
-      Swal.fire({
-        title: 'Alumno Eliminado',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.ALUMNO_ELIMINADO);
       setPause((prev) => {
         const newPause = { ...prev };
         delete newPause[id];
@@ -58,11 +49,7 @@ const DashAlumnos = () => {
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
     } catch (error) {
-      Swal.fire({
-        title: 'Error al cargar los alumnos',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_ALUMNOS);
     }
   };
 
@@ -89,11 +76,7 @@ const DashAlumnos = () => {
       await peticionAlumnos(1, itemsPerPage, filtros);
       setIsFiltered(true);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al filtrar alumnos',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_ALUMNOS);
     } finally {
       setPaused(false);
     }

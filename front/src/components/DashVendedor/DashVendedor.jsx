@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { getVendSucID } from '../../services/Vendedores.service';
 import Pagination from '../Pagination/Pagination';
-import Swal from 'sweetalert2';
+import { clientErrorHandler } from '../../utils/notificationHandler';
+import { ERROR_MESSAGES } from '../../constants/messages';
 
 const DashVendedor = () => {
   const { getSucursalActiva } = useApp();
@@ -31,11 +32,7 @@ const DashVendedor = () => {
       } catch (error) {
         console.error('Error al cargar vendedores:', error);
         setTableItems([]);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar vendedores',
-          text: error.response?.data?.message || error.message,
-        });
+        clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_VENDEDORES);
       } finally {
         setLoading(false);
       }

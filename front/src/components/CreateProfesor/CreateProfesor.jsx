@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { postProfes } from '../../services/Profesores.service';
-import Swal from 'sweetalert2';
 import logo from '../../assets/simplificado_a_color.png';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const CreateProfesor = () => {
   const { sucursales } = useApp();
@@ -34,20 +35,10 @@ const CreateProfesor = () => {
       };
 
       await postProfes(updatedFormData);
-      Swal.fire({
-        title: 'Profesor Registrado',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        navigate('/admin/profesores');
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.PROFESOR_CREADO);
+      navigate('/admin/profesores');
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al registrar profesor',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_PROFESOR);
     } finally {
       setPause(false);
     }

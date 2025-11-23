@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { aperturaCaja, cerrarCaja } from '../../services/Cajas.service';
 import PropTypes from 'prop-types';
-import Swal from 'sweetalert2';
+import { clientSuccessHandler, clientErrorHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES } from '../../constants/messages';
 
 const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
   const [open, setOpen] = useState(false);
@@ -11,20 +12,10 @@ const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
   const handleAbrirCaja = async () => {
     try {
       await aperturaCaja(idVend);
-      Swal.fire({
-        icon: 'success',
-        title: 'Caja abierta',
-        text: 'La caja se ha abierto correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.CAJA_ABIERTA);
       onCajaAction();
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al abrir caja',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.message || 'Error al abrir caja');
     }
     setOpen(false);
   };
@@ -32,20 +23,10 @@ const AccionesDropdown = ({ idVend, onCajaAction, onDescargarExcel }) => {
   const handleCerrarCaja = async () => {
     try {
       await cerrarCaja(idVend);
-      Swal.fire({
-        icon: 'success',
-        title: 'Caja cerrada',
-        text: 'La caja se ha cerrado correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.CAJA_CERRADA);
       onCajaAction();
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al cerrar caja',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.message || 'Error al cerrar caja');
     }
     setOpen(false);
   };

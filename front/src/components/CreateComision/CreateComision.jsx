@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import Swal from 'sweetalert2';
 import { getAllCursos } from '../../services/Cursos.service';
 import { getProfes } from '../../services/Profesores.service';
 import { postComision } from '../../services/Comisiones.service';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const CreateComision = () => {
   const { user } = useAuth();
@@ -46,20 +47,10 @@ const CreateComision = () => {
     setPause(true);
     try {
       await postComision(formData);
-      Swal.fire({
-        title: 'Comision Creada',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        navigate('/admin/comisiones');
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.COMISION_CREADA);
+      navigate('/admin/comisiones');
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al crear comisión',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_COMISION);
     } finally {
       setPause(false);
     }
@@ -73,11 +64,7 @@ const CreateComision = () => {
         setcursos(cursosData || []);
         setFilteredCursos(cursosData || []);
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar datos',
-          text: error.response?.data?.message || error.message,
-        });
+        clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
       }
     };
     cargarDatos();

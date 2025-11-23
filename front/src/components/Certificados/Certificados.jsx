@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
-import Swal from 'sweetalert2';
 import { getCertId, postCert } from '../../services/Certificados.service';
 import { getAluID } from '../../services/Alumnos.service';
 import { getAllCursos } from '../../services/Cursos.service';
 import { Spinner } from '../Spinner/Spinner';
+import { clientErrorHandler, clientSuccessHandler, clientWarningHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const Certificados = () => {
   const [pause, setPause] = useState(false);
@@ -27,11 +28,7 @@ const Certificados = () => {
         const cursosData = await getAllCursos();
         setCursos(cursosData);
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar datos',
-          text: error.message || 'Intente nuevamente',
-        });
+        clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
       }
     };
     fetchData();
@@ -56,11 +53,7 @@ const Certificados = () => {
         alumnoId: data.id,
       }));
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se encontró el alumno, verifique el DNI ingresado.',
-      });
+      clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_ALUMNO_NO_ENCONTRADO);
       setAlumnoSeleccionado(null);
     } finally {
       setPauseAlumno(false);
@@ -78,12 +71,7 @@ const Certificados = () => {
       if (!formData.cursoId) throw new Error('Debe seleccionar un curso');
 
       await postCert(formData);
-      Swal.fire({
-        title: 'Certificado Creado',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.CERTIFICADO_GENERADO);
       setFormData({
         numero: '',
         link: '',
@@ -93,11 +81,7 @@ const Certificados = () => {
       setAlumnoSeleccionado(null);
       setDniAlumno('');
     } catch (error) {
-      Swal.fire({
-        title: 'Error al crear certificado',
-        icon: 'error',
-        text: error.message || 'Intente nuevamente',
-      });
+      clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_CREAR_CERTIFICADO);
     } finally {
       setPause(false);
     }
@@ -105,11 +89,7 @@ const Certificados = () => {
 
   const handleBuscar = async () => {
     if (!busqueda) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Ingrese un número',
-        text: 'Debe ingresar el número de certificado',
-      });
+      clientWarningHandler(ERROR_MESSAGES.NUMERO_CERTIFICADO_REQUERIDO);
       return;
     }
 
@@ -118,21 +98,11 @@ const Certificados = () => {
       const data = await getCertId(busqueda);
       if (data?.link) {
         window.open(data.link, '_blank');
-        Swal.fire({
-          title: 'Certificado Encontrado',
-          icon: 'success',
-          text: 'Se abrió el certificado en una nueva pestaña',
-          showConfirmButton: false,
-          timer: 2000,
-        });
+        clientSuccessHandler(SUCCESS_MESSAGES.CERTIFICADO_ENCONTRADO);
       }
       setCertificado(data);
     } catch (error) {
-      Swal.fire({
-        title: 'Certificado no encontrado',
-        icon: 'error',
-        text: error.message || 'Verifique el número ingresado',
-      });
+      clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_BUSCAR_CERTIFICADO);
       setCertificado(null);
     } finally {
       setPause(false);

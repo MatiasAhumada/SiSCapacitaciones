@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { GetCajaByVendedor } from '../../services/Cajas.service';
 import { getVendID } from '../../services/Vendedores.service';
-import Swal from 'sweetalert2';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES } from '../../constants/messages';
 
 const InfoIndexVend = () => {
   const { user } = useAuth();
@@ -15,21 +16,10 @@ const InfoIndexVend = () => {
     const vendedor = async () => {
       try {
         const data = await getVendID(user.id);
-        Swal.fire({
-          icon: 'success',
-          title: 'Bienvenido!',
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        clientSuccessHandler(SUCCESS_MESSAGES.BIENVENIDO);
         setVendedor(data);
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'ERROR!',
-          text: error?.response?.data?.message || error?.message,
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        clientErrorHandler(error?.response?.data?.message || error?.message);
       }
     };
 
@@ -38,13 +28,7 @@ const InfoIndexVend = () => {
         const data = await GetCajaByVendedor(user.id);
         setTotalCaja(data[0]?.totalEfectivo || 0);
       } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'ERROR!',
-          text: error?.response?.data?.message || error?.message,
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        clientErrorHandler(error?.response?.data?.message || error?.message);
       }
     };
 

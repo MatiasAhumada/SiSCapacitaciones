@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import { deleteCurso, getCursos } from '../../services/Cursos.service';
 import Pagination from '../Pagination/Pagination';
 import { AREAS } from '../../constants/areas';
 import { useAuth } from '../../context/AuthContext';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const DashCursos = () => {
   const { user } = useAuth();
@@ -22,19 +23,10 @@ const DashCursos = () => {
 
     try {
       await deleteCurso(cursoId);
-      Swal.fire({
-        title: 'Curso Eliminado',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.CURSO_ELIMINADO);
       setTableItems((prev) => prev.filter((item) => item.id !== cursoId));
     } catch (error) {
-      Swal.fire({
-        title: 'Error',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-      });
+      clientErrorHandler(error.response?.data?.message || error.message);
     } finally {
       setPause((prev) => {
         const newPause = { ...prev };
@@ -52,11 +44,7 @@ const DashCursos = () => {
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
     } catch (error) {
-      Swal.fire({
-        title: 'Error al cargar cursos',
-        text: error.response?.data?.message || error.message,
-        icon: 'error',
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_CURSOS);
     } finally {
       setLoading(false);
     }

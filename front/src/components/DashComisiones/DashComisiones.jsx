@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
-import Swal from 'sweetalert2';
 import { getCursos } from '../../services/Cursos.service';
 import Pagination from '../Pagination/Pagination';
 import { getProfes } from '../../services/Profesores.service';
@@ -12,6 +11,8 @@ import {
   getComisiones,
   putComision,
 } from '../../services/Comisiones.service';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const DashComisiones = () => {
   const { user } = useAuth();
@@ -42,19 +43,13 @@ const DashComisiones = () => {
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     await deleteComision(id).then(() => {
       try {
-        Swal.fire({
-          title: 'Comision Eliminada',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setPause((prev) => {
-            const newPause = { ...prev };
-            delete newPause[comisionId];
-            return newPause;
-          });
-          setTableItems((prev) => prev.filter((item) => item.id !== comisionId));
+        clientSuccessHandler(SUCCESS_MESSAGES.COMISION_ELIMINADA);
+        setPause((prev) => {
+          const newPause = { ...prev };
+          delete newPause[comisionId];
+          return newPause;
         });
+        setTableItems((prev) => prev.filter((item) => item.id !== comisionId));
       } catch (error) {
         console.log(error);
       }
@@ -78,11 +73,7 @@ const DashComisiones = () => {
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al cargar comisiones',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_COMISIONES);
     } finally {
       setLoading(false);
     }
@@ -131,12 +122,7 @@ const DashComisiones = () => {
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     try {
       await putComision(comisionId, editData);
-      Swal.fire({
-        title: 'Comisión actualizada',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.COMISION_ACTUALIZADA);
       setTableItems((prev) =>
         prev.map((item) =>
           item.id === comisionId
@@ -149,8 +135,8 @@ const DashComisiones = () => {
             : item
         )
       );
-    } catch {
-      Swal.fire({ title: 'Error al actualizar', icon: 'error' });
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_PAGO);
     } finally {
       setPause((prev) => ({ ...prev, [comisionId]: false }));
       setEditing(null);

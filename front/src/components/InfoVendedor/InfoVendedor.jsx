@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { deleteVend, getVendID } from '../../services/Vendedores.service';
 import Button from '../Common/Button';
-import Swal from 'sweetalert2';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES } from '../../constants/messages';
 
 const InfoVendedor = () => {
   const { vendedorId } = useParams();
@@ -57,21 +58,10 @@ const InfoVendedor = () => {
     setPause(true);
     try {
       await deleteVend(e.target.value);
-      Swal.fire({
-        title: 'Eliminado!',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        navigate('/admin/vendedores');
-      });
-    } catch {
-      Swal.fire({
-        title: 'Error!',
-        icon: 'error',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.VENDEDOR_ELIMINADO);
+      navigate('/admin/vendedores');
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message);
     } finally {
       setPause(false);
     }

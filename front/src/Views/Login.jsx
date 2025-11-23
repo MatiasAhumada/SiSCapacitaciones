@@ -2,10 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import imagen from '../assets/simplificado_a_color.png';
 import { login as AuthLogin } from '../services/Auth.service';
 import { useState } from 'react';
-import Swal from 'sweetalert2';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 import { Spinner } from '../components/Spinner/Spinner';
+import { clientErrorHandler, clientSuccessHandler } from '../utils/notificationHandler';
+import { SUCCESS_MESSAGES } from '../constants/messages';
 
 const Login = () => {
   const { login } = useAuth();
@@ -25,12 +26,7 @@ const Login = () => {
       const data = await AuthLogin(formData);
       login(data);
       localStorage.setItem('token', data.id);
-      Swal.fire({
-        icon: 'success',
-        title: 'Inicio de sesión exitoso',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.LOGIN_EXITOSO);
       setPause(false);
       if (data.isAdmin) {
         navigate('/admin');
@@ -38,12 +34,7 @@ const Login = () => {
         navigate('/vendedor');
       }
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: error?.response?.data?.message || error?.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientErrorHandler(error?.response?.data?.message || error?.message);
       setPause(false);
       return;
     }

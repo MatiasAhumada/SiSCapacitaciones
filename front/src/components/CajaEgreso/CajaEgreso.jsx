@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
-import Swal from 'sweetalert2';
 import {
   getCategorias,
   postEgresoProfesor,
@@ -9,6 +8,8 @@ import {
 } from '../../services/Cajas.service';
 import { getProfes } from '../../services/Profesores.service';
 import { getVendedores, getVendID } from '../../services/Vendedores.service';
+import { clientSuccessHandler, clientErrorHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES } from '../../constants/messages';
 const CajaEgreso = () => {
   const idVende = localStorage.getItem('token');
   const [profesores, setProfesores] = useState([]);
@@ -54,25 +55,17 @@ const CajaEgreso = () => {
         .then((data) => {
           setVendedores(data);
         })
-        .catch(() => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al cargar vendedores',
-            text: 'Ocurrió un error al cargar los vendedores.',
-          });
+        .catch((error) => {
+          clientErrorHandler(error.message || 'Error al cargar vendedores');
         });
     };
 
     const categorias = async () => {
-      const data = await getCategorias();
       try {
+        const data = await getCategorias();
         setCategorias(data);
-      } catch {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar categorias',
-          text: 'Ocurrió un error al cargar las categorias.',
-        });
+      } catch (error) {
+        clientErrorHandler(error.message || 'Error al cargar categorias');
       }
     };
 
@@ -116,61 +109,20 @@ const CajaEgreso = () => {
       fecha: fechaISO,
     };
     console.log(nuevoFormData);
-    if (categoriaSelec === 'PROFESORES') {
-      await postEgresoProfesor(nuevoFormData)
-        .then(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Egreso registrado correctamente',
-            text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
-          });
-          setPause(false);
-        })
-        .catch((error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al registrar el egreso',
-            text: error.message || 'Ocurrió un error al registrar el egreso.',
-          });
-          setPause(false);
-        });
+    try {
+      if (categoriaSelec === 'PROFESORES') {
+        await postEgresoProfesor(nuevoFormData);
+      } else if (categoriaSelec === 'COMISIONES' || categoriaSelec === 'SUELDOS') {
+        await postEgresoVendedor(nuevoFormData);
+      } else {
+        await postEgresoSiemple(nuevoFormData);
+      }
+      clientSuccessHandler(SUCCESS_MESSAGES.EGRESO_REGISTRADO);
+    } catch (error) {
+      clientErrorHandler(error.message || 'Error al registrar el egreso');
+    } finally {
+      setPause(false);
     }
-    if (categoriaSelec === 'COMISIONES' || categoriaSelec === 'SUELDOS') {
-      await postEgresoVendedor(nuevoFormData)
-        .then(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Egreso registrado correctamente',
-            text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
-          });
-          setPause(false);
-        })
-        .catch((error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al registrar el egreso',
-            text: error.message || 'Ocurrió un error al registrar el egreso.',
-          });
-          setPause(false);
-        });
-    }
-    await postEgresoSiemple(nuevoFormData)
-      .then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Egreso registrado correctamente',
-          text: `Egreso de ${nuevoFormData.monto} registrado exitosamente.`,
-        });
-        setPause(false);
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al registrar el egreso',
-          text: error.message || 'Ocurrió un error al registrar el egreso.',
-        });
-        setPause(false);
-      });
   };
 
   return (

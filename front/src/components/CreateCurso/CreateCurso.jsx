@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import { postCurso } from '../../services/Cursos.service';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const CreateCurso = () => {
   const areas = ['Digital', 'Idiomas', 'Salud', 'Administrativa', 'Belleza', 'Técnica'];
@@ -32,20 +33,10 @@ const CreateCurso = () => {
     setPause(true);
     try {
       await postCurso(formData);
-      Swal.fire({
-        title: 'Curso Creado',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        navigate('/admin/cursos');
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.CURSO_CREADO);
+      navigate('/admin/cursos');
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al crear curso',
-        text: error.response?.data?.message || error.message,
-      });
+      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_CURSO);
     } finally {
       setPause(false);
     }

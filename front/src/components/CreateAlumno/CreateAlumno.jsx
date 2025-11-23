@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 import { getSucursales } from '../../services/Sucursales.service';
 import { postAlu, editAlumnoId, getAluByDNI } from '../../services/Alumnos.service';
 import { Spinner } from '../Spinner/Spinner';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const CreateAlumno = () => {
   const [pause, setPause] = useState(false);
@@ -65,38 +66,26 @@ const CreateAlumno = () => {
       const data = await postAlu(formAlu);
       setPause(false);
       setFormAlu((prev) => ({ ...prev, alumnoId: data.id, sucursalId: formAlu.sucursalId }));
-      Swal.fire({
-        icon: 'success',
-        title: 'Alumno Cargado',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        setFormAlu({
-          dni: '',
-          name: '',
-          fNac: '',
-          tel: '',
-          telex: '',
-          ocupation: '',
-          nationality: '',
-          address: '',
-          province: '',
-          locality: '',
-          email: '',
-          age: '',
-          gender: '',
-          sucursalId: '',
-        });
+      clientSuccessHandler(SUCCESS_MESSAGES.ALUMNO_CREADO);
+      setFormAlu({
+        dni: '',
+        name: '',
+        fNac: '',
+        tel: '',
+        telex: '',
+        ocupation: '',
+        nationality: '',
+        address: '',
+        province: '',
+        locality: '',
+        email: '',
+        age: '',
+        gender: '',
+        sucursalId: '',
       });
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: error?.response?.data?.message,
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        setPause(false);
-      });
+      clientErrorHandler(error?.response?.data?.message || error?.message);
+      setPause(false);
     }
   };
 
@@ -108,22 +97,12 @@ const CreateAlumno = () => {
         fNac: data.fNac ? new Date(data.fNac).toISOString().split('T')[0] : '',
         sucursalId: data.sucursal?.id || '',
       };
-      Swal.fire({
-        icon: 'success',
-        title: 'Alumno Encontrado',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.ALUMNO_ENCONTRADO);
       setSearchDni('');
       setEdit(true);
       setFormAlu(formattedData);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: error?.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientErrorHandler(error?.message || ERROR_MESSAGES.ERROR_ALUMNO_NO_ENCONTRADO);
       setEdit(false);
     }
   };
@@ -132,12 +111,7 @@ const CreateAlumno = () => {
     const { id, ...restoData } = formAlu;
     try {
       await editAlumnoId(id, restoData);
-      Swal.fire({
-        icon: 'success',
-        title: 'Alumno Editado exitosamente',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.ALUMNO_ACTUALIZADO);
       setEdit(false);
       setSearchDni('');
       setFormAlu({
@@ -157,12 +131,7 @@ const CreateAlumno = () => {
         sucursalId: '',
       });
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: error?.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientErrorHandler(error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_PAGO);
     }
   };
 

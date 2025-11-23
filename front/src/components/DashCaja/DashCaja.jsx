@@ -3,11 +3,12 @@ import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../servic
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
-import Swal from 'sweetalert2';
 import AccionesDropdown from '../AccionesDropdown/AccionesDropdown';
 import { ModalEditar } from '../ModalEditar/ModalEditar';
 import CajaResumen from '../CajaResumen/CajaResumen';
 import Pagination from '../Pagination/Pagination';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const DashCaja = () => {
   const idVend = localStorage.getItem('token');
@@ -52,12 +53,8 @@ const DashCaja = () => {
         setTotalPages(ultimaSesion.totalPages || 1);
       }
     } catch (error) {
-      const msg = error?.response?.data?.message;
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: msg,
-      });
+      const msg = error?.response?.data?.message || error?.message;
+      clientErrorHandler(msg || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
     }
   };
 
@@ -68,12 +65,8 @@ const DashCaja = () => {
         setAlu(aluData);
         setVend(vendData);
       } catch (error) {
-        const msg = error?.response?.data?.message || 'Error al obtener los datos.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: msg,
-        });
+        const msg = error?.response?.data?.message || error?.message;
+        clientErrorHandler(msg || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
       }
     };
     cargarDatos();
@@ -116,19 +109,9 @@ const DashCaja = () => {
     setPause((prev) => ({ ...prev, [pago.id]: true }));
     try {
       await descargarComprobantePDF(pago.id);
-      Swal.fire({
-        icon: 'success',
-        title: 'Comprobante descargado',
-        text: 'El comprobante se ha descargado correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.COMPROBANTE_DESCARGADO);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al descargar comprobante',
-        text: error.message,
-      });
+      clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_DESCARGAR_COMPROBANTE);
     } finally {
       setPause((prev) => ({ ...prev, [pago.id]: false }));
     }
@@ -139,19 +122,14 @@ const DashCaja = () => {
 
     try {
       await editMovCaja(editMode, formEdit);
-      Swal.fire({
-        title: 'Caja Editada',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.CAJA_EDITADA);
       setIsModalOpen(false);
       setTimeout(() => {
         recargarDatos();
       }, 100);
     } catch (error) {
       console.error('Error al editar:', error);
-      Swal.fire({ title: 'Error al actualizar', icon: 'error' });
+      clientErrorHandler(error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_CAJA);
     } finally {
       setEditMode(null);
     }
@@ -167,13 +145,7 @@ const DashCaja = () => {
       a.click();
       window.URL.revokeObjectURL(url);
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Excel descargado',
-        text: 'El archivo se ha descargado correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.EXCEL_DESCARGADO);
     } catch (error) {
       let errorMessage = 'No se pudo descargar el Excel';
 
@@ -191,12 +163,7 @@ const DashCaja = () => {
         }
       }
 
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al generar Excel',
-        text: errorMessage,
-        confirmButtonText: 'Entendido',
-      });
+      clientErrorHandler(errorMessage);
     }
   };
   return (

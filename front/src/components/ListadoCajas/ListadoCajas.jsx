@@ -8,10 +8,11 @@ import {
   GetByVendedorMock,
 } from '../../services/Cajas.service';
 import { Spinner } from '../Spinner/Spinner';
-import Swal from 'sweetalert2';
 import Pagination from '../Pagination/Pagination';
 import { CardSelectVendedor } from '../CardSelectVendedor/CardSelectVendedor';
 import { getMockVendedores } from '../../services/Cajas.service';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const ListadoCajas = () => {
   // Estado para las cajas del vendedor actual
@@ -116,13 +117,7 @@ const ListadoCajas = () => {
       a.click();
       window.URL.revokeObjectURL(url);
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Excel descargado',
-        text: 'El archivo se ha descargado correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler(SUCCESS_MESSAGES.EXCEL_DESCARGADO);
     } catch (error) {
       let errorMessage = 'No se pudo descargar el Excel';
 
@@ -140,12 +135,7 @@ const ListadoCajas = () => {
         }
       }
 
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al generar Excel',
-        text: errorMessage,
-        confirmButtonText: 'Entendido',
-      });
+      clientErrorHandler(errorMessage);
     } finally {
       setLoadingId(null);
     }

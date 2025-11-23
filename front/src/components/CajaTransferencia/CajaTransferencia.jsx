@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import logo from '../../assets/simplificado_a_color.png';
-import Swal from 'sweetalert2';
 import { postTransferencia } from '../../services/Cajas.service';
 import { getVendedores, getVendID } from '../../services/Vendedores.service';
+import { clientSuccessHandler, clientErrorHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES } from '../../constants/messages';
 const CajaTransferencia = () => {
   const idVende = localStorage.getItem('token');
   const [vendedores, setVendedores] = useState([]);
@@ -37,12 +38,8 @@ const CajaTransferencia = () => {
             vendedorOrigenId: data.id,
           }));
         })
-        .catch(() => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al cargar vendedor',
-            text: 'Ocurrió un error al cargar el vendedor.',
-          });
+        .catch((error) => {
+          clientErrorHandler(error.message || 'Error al cargar vendedor');
         });
     };
     const vendedores = async () => {
@@ -50,12 +47,8 @@ const CajaTransferencia = () => {
         .then((data) => {
           setVendedores(data);
         })
-        .catch(() => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al cargar vendedores',
-            text: 'Ocurrió un error al cargar los vendedores.',
-          });
+        .catch((error) => {
+          clientErrorHandler(error.message || 'Error al cargar vendedores');
         });
     };
 
@@ -83,26 +76,14 @@ const CajaTransferencia = () => {
       ...formData,
       fecha: fechaISO,
     };
-    console.log(nuevoFormData);
-    setPause(false);
-
-    await postTransferencia(nuevoFormData)
-      .then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Transferencia realizada correctamente',
-          text: `Transferencia de ${nuevoFormData.monto} registrada exitosamente.`,
-        });
-        setPause(false);
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al registrar la transferencia',
-          text: error.message || 'Ocurrió un error al registrar la transferencia.',
-        });
-        setPause(false);
-      });
+    try {
+      await postTransferencia(nuevoFormData);
+      clientSuccessHandler(SUCCESS_MESSAGES.TRANSFERENCIA_REGISTRADA);
+    } catch (error) {
+      clientErrorHandler(error.message || 'Error al registrar la transferencia');
+    } finally {
+      setPause(false);
+    }
   };
 
   return (

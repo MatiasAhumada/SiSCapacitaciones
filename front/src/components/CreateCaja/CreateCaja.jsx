@@ -5,7 +5,7 @@ import { getAlu, getAluID } from '../../services/Alumnos.service';
 import { useAuth } from '../../context/AuthContext';
 import { postCaja, postIngresoSimple } from '../../services/Cajas.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
-
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { Spinner } from '../Spinner/Spinner';
 const CreateCaja = () => {
   const { user } = useAuth();
@@ -157,25 +157,15 @@ const CreateCaja = () => {
       }
       
       if (response) {
-        Swal.fire({
-          title: 'Ingreso Registrado',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          if (tipoIngreso === 'Ingreso' || (alumnoSeleccionado && (tipoIngreso === 'Cobro Varios' || tipoIngreso === 'Certificacion Examen'))) {
-            setMovimientoId(response.id);
-            setGeneratePDF(true);
-          }
-        });
+        clientSuccessHandler('Ingreso registrado exitosamente');
+        if (tipoIngreso === 'Ingreso' || (alumnoSeleccionado && (tipoIngreso === 'Cobro Varios' || tipoIngreso === 'Certificacion Examen'))) {
+          setMovimientoId(response.id);
+          setGeneratePDF(true);
+        }
       }
     } catch (error) {
       console.log(error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al registrar el movimiento',
-        text: error.message || 'Error inesperado,intente nuevamente',
-      });
+      clientErrorHandler(error.message || 'Error al registrar el movimiento');
     } finally {
       setPause(false);
     }
@@ -184,19 +174,9 @@ const CreateCaja = () => {
   const handleDescargarPDF = async () => {
     try {
       await descargarComprobantePDF(movimientoId);
-      Swal.fire({
-        icon: 'success',
-        title: 'Comprobante descargado',
-        text: 'El comprobante se ha descargado correctamente',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      clientSuccessHandler('Comprobante descargado correctamente');
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al descargar comprobante',
-        text: error.message,
-      });
+      clientErrorHandler(error.message || 'Error al descargar comprobante');
     }
   };
   const handleAlumnoClick = async (e) => {
@@ -223,11 +203,7 @@ const CreateCaja = () => {
         });
     } catch (error) {
       console.log(error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: `No se encontró el alumno, verifique el ID ingresado.`,
-      });
+      clientErrorHandler('No se encontró el alumno, verifique el ID ingresado');
     } finally {
       setPause(false);
     }

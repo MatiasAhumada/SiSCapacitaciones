@@ -20,6 +20,7 @@ import { CertificadoModule } from './certificado/certificado.module';
 import { ComprobanteModule } from './comprobante/comprobante.module';
 import { SeederModule } from '@modules/Seeds/seeders.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -48,6 +49,7 @@ import { MetricsModule } from './metrics/metrics.module';
     CertificadoModule,
     ComprobanteModule,
     MetricsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,6 +12,7 @@ import { Subcategoria } from './entities/subcategoria.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { SesionCaja } from './entities/sesion-caja.entity';
 import { ComprobanteGeneratorService } from './comprobante-generator.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ComprobanteGeneratorService } from './comprobante-generator.service';
       Profesor,
       SesionCaja,
     ]),
+    MailModule,
   ],
   controllers: [CajaController],
   providers: [CajaService, ComprobanteGeneratorService],

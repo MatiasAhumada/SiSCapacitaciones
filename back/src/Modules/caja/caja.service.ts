@@ -30,6 +30,7 @@ import { formatNumber } from '@modules/common/utils/formatters.utils';
 import { formatPostgresDate } from '@modules/common/utils/date.utils';
 import { isNull } from 'lodash';
 import { ComprobanteGeneratorService } from './comprobante-generator.service';
+import { MailService } from '../mail/mail.service';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -54,6 +55,7 @@ export class CajaService {
     @InjectRepository(SesionCaja)
     private readonly sesionRepository: Repository<SesionCaja>,
     private readonly comprobanteGeneratorService: ComprobanteGeneratorService,
+    private readonly mailService: MailService,
   ) {}
   get fechaLocal(): Date {
     return dayjs().tz('America/Argentina/Buenos_Aires').toDate();
@@ -147,6 +149,20 @@ export class CajaService {
         restoCaja.metodoPago === MetodoPago.FERRO
       ) {
         await this.duplicarEnCajaPerpetua(cajaGuardada, restoCaja.metodoPago);
+      }
+
+      // Enviar email con comprobante si el alumno tiene email
+      if (alumnoComision.alumno.email) {
+        try {
+          const pdfBuffer = await this.comprobanteGeneratorService.generarComprobantePDF(cajaGuardada);
+          await this.mailService.sendReceiptEmail(
+            alumnoComision.alumno.email,
+            alumnoComision.alumno.name,
+            pdfBuffer,
+          );
+        } catch (error) {
+          console.error('Error enviando email:', error);
+        }
       }
 
       return cajaGuardada;

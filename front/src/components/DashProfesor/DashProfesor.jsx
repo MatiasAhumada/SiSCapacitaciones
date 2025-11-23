@@ -55,9 +55,10 @@ const DashProfesor = () => {
         setTotalPages(data.totalPages || 1);
         setCurrentPage(data.currentPage || 1);
       } catch (error) {
-        console.error('Error al cargar profesores:', error);
         setTableItems([]);
-        clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_PROFESORES);
+        clientErrorHandler(
+          error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_PROFESORES
+        );
       } finally {
         setLoading(false);
       }

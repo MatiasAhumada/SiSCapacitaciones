@@ -6,7 +6,11 @@ import { getAluByDNI, postAluSimple } from '../../services/Alumnos.service';
 import { postInscripcion } from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import ComisionSelector from '../Common/ComisionSelector';
-import { clientErrorHandler, clientSuccessHandler, clientInfoHandler } from '../../utils/notificationHandler';
+import {
+  clientErrorHandler,
+  clientSuccessHandler,
+  clientInfoHandler,
+} from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const Inscribir = () => {
@@ -34,7 +38,9 @@ const Inscribir = () => {
         setComisiones(comisionesData.data || comisionesData);
         setVendedores(vendedoresData);
       } catch (error) {
-        clientErrorHandler(error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
+        clientErrorHandler(
+          error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS
+        );
       }
     };
 
@@ -81,7 +87,6 @@ const Inscribir = () => {
     setPause(true);
 
     try {
-      // Si no existe el alumno, crearlo
       if (!alumnoEncontrado) {
         await postAluSimple({
           dni: formData.dni,
@@ -89,19 +94,16 @@ const Inscribir = () => {
         });
       }
 
-      // Crear la inscripción
       await postInscripcion({
-        alumnoId: formData.dni, // El backend espera DNI, no ID
+        alumnoId: formData.dni,
         comisionId: formData.comisionId,
         vendedorId: formData.vendedorId,
-        sucursalId: vendedores.find((v) => v.id === formData.vendedorId)?.sucursales?.[0]?.id || '', // Usar sucursal del vendedor seleccionado
+        sucursalId: vendedores.find((v) => v.id === formData.vendedorId)?.sucursales?.[0]?.id || '',
         fechaRegistro: new Date().toISOString(),
         state: true,
       });
 
       clientSuccessHandler(SUCCESS_MESSAGES.INSCRIPCION_REALIZADA);
-
-      // Limpiar formulario
       setFormData({
         dni: '',
         nombre: '',
@@ -111,7 +113,9 @@ const Inscribir = () => {
       setComisionSearch('');
       setAlumnoEncontrado(null);
     } catch (err) {
-      clientErrorHandler(err.response?.data?.message || err.message || ERROR_MESSAGES.ERROR_INSCRIBIR);
+      clientErrorHandler(
+        err.response?.data?.message || err.message || ERROR_MESSAGES.ERROR_INSCRIBIR
+      );
     } finally {
       setPause(false);
     }

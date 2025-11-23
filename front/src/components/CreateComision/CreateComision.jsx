@@ -50,7 +50,9 @@ const CreateComision = () => {
       clientSuccessHandler(SUCCESS_MESSAGES.COMISION_CREADA);
       navigate('/admin/comisiones');
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_COMISION);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_COMISION
+      );
     } finally {
       setPause(false);
     }
@@ -64,7 +66,9 @@ const CreateComision = () => {
         setcursos(cursosData || []);
         setFilteredCursos(cursosData || []);
       } catch (error) {
-        clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
+        clientErrorHandler(
+          error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS
+        );
       }
     };
     cargarDatos();

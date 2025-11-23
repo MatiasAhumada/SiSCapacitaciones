@@ -47,7 +47,6 @@ const DashCajas = () => {
       setSesionCaja(ultimaSesion);
       const movimientosAplanados = data.flatMap((sesion) => sesion.movimientos || []);
       setTableItems(movimientosAplanados);
-      console.log(movimientosAplanados);
     } catch (error) {
       const msg = error?.response?.data?.message || error?.message;
       clientErrorHandler(msg || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
@@ -108,8 +107,9 @@ const DashCajas = () => {
         recargarDatos();
       }, 100);
     } catch (error) {
-      console.error('Error al editar:', error);
-      clientErrorHandler(error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_CAJA);
+      clientErrorHandler(
+        error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_CAJA
+      );
     } finally {
       setEditMode(null);
     }

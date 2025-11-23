@@ -4,7 +4,11 @@ import { getCertId, postCert } from '../../services/Certificados.service';
 import { getAluID } from '../../services/Alumnos.service';
 import { getAllCursos } from '../../services/Cursos.service';
 import { Spinner } from '../Spinner/Spinner';
-import { clientErrorHandler, clientSuccessHandler, clientWarningHandler } from '../../utils/notificationHandler';
+import {
+  clientErrorHandler,
+  clientSuccessHandler,
+  clientWarningHandler,
+} from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const Certificados = () => {

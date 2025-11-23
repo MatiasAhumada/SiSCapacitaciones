@@ -36,7 +36,9 @@ const CreateCurso = () => {
       clientSuccessHandler(SUCCESS_MESSAGES.CURSO_CREADO);
       navigate('/admin/cursos');
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_CURSO);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_CURSO
+      );
     } finally {
       setPause(false);
     }

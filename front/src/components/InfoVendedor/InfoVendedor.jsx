@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { deleteVend, getVendID } from '../../services/Vendedores.service';
 import Button from '../Common/Button';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
-import { SUCCESS_MESSAGES } from '../../constants/messages';
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const InfoVendedor = () => {
   const { vendedorId } = useParams();
@@ -30,8 +30,10 @@ const InfoVendedor = () => {
         name: data.name,
         totalInscripciones: data.totalInscripciones || 0,
       });
-    } catch {
-      console.error('Error al cargar datos');
+    } catch (error) {
+      clientErrorHandler(
+        error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS
+      );
     } finally {
       setLoadingData(false);
     }

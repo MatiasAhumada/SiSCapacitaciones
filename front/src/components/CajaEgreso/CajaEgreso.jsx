@@ -108,7 +108,6 @@ const CajaEgreso = () => {
       ...formData,
       fecha: fechaISO,
     };
-    console.log(nuevoFormData);
     try {
       if (categoriaSelec === 'PROFESORES') {
         await postEgresoProfesor(nuevoFormData);

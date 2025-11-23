@@ -49,7 +49,9 @@ const CreateVendedor = () => {
       clientSuccessHandler(SUCCESS_MESSAGES.VENDEDOR_CREADO);
       navigate('/admin/vendedores');
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_VENDEDOR);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_VENDEDOR
+      );
     } finally {
       setLoading(false);
     }

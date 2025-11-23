@@ -49,7 +49,9 @@ const DashAlumnos = () => {
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_ALUMNOS);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_ALUMNOS
+      );
     }
   };
 
@@ -76,7 +78,9 @@ const DashAlumnos = () => {
       await peticionAlumnos(1, itemsPerPage, filtros);
       setIsFiltered(true);
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_ALUMNOS);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_ALUMNOS
+      );
     } finally {
       setPaused(false);
     }

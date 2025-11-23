@@ -17,7 +17,7 @@ const IndexAdm = () => {
     setLoading(true);
     getSucursalId(sucursalId)
       .then((data) => setSede(data))
-      .catch((error) => console.error('Error al cargar sucursal:', error))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [sucursalSeleccionada?.id]);
 

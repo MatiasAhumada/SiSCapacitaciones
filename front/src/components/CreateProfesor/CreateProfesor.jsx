@@ -38,7 +38,9 @@ const CreateProfesor = () => {
       clientSuccessHandler(SUCCESS_MESSAGES.PROFESOR_CREADO);
       navigate('/admin/profesores');
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_PROFESOR);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CREAR_PROFESOR
+      );
     } finally {
       setPause(false);
     }

@@ -30,9 +30,10 @@ const DashVendedor = () => {
         setTotalPages(data.totalPages || 1);
         setCurrentPage(data.currentPage || 1);
       } catch (error) {
-        console.error('Error al cargar vendedores:', error);
         setTableItems([]);
-        clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_VENDEDORES);
+        clientErrorHandler(
+          error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_VENDEDORES
+        );
       } finally {
         setLoading(false);
       }

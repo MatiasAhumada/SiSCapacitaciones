@@ -65,7 +65,9 @@ const ListadoComisiones = () => {
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
     } catch (error) {
-      console.error(error);
+      clientErrorHandler(
+        error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_COMISIONES
+      );
     }
   };
 
@@ -130,17 +132,12 @@ const ListadoComisiones = () => {
     };
 
     try {
-      await editStateComision(change).then(() => {
-        try {
-          setAlumnosComision((prev) =>
-            prev.map((item) => (item.id === ID ? { ...item, state: nuevoEstado } : item))
-          );
-        } catch (error) {
-          console.log(error);
-        }
-      });
+      await editStateComision(change);
+      setAlumnosComision((prev) =>
+        prev.map((item) => (item.id === ID ? { ...item, state: nuevoEstado } : item))
+      );
     } catch (error) {
-      console.log(error);
+      clientErrorHandler(error?.response?.data?.message || error?.message);
     } finally {
       setPause((prev) => ({ ...prev, [ID]: false }));
     }

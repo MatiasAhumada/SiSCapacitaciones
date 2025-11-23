@@ -15,7 +15,6 @@ import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificati
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const ListadoCajas = () => {
-  // Estado para las cajas del vendedor actual
   const [sellerCajas, setSellerCajas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +29,6 @@ const ListadoCajas = () => {
 
   const { user } = useAuth();
 
-  // Debounce para el filtro de fecha
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedFilterDate(filterDate);
@@ -39,7 +37,6 @@ const ListadoCajas = () => {
     return () => clearTimeout(timer);
   }, [filterDate]);
 
-  // Cargar datos de Cajas del usuario actual
   useEffect(() => {
     const fetchVendedores = async () => {
       if (isSelectedVendedor) return;
@@ -55,7 +52,6 @@ const ListadoCajas = () => {
         const vendData = await getMockVendedores();
         setVend(vendData || []);
       } catch (error) {
-        console.error('Error al cargar los vendedores:', error);
         setError('Error al cargar los vendedores. Intenta de nuevo más tarde.');
       } finally {
         setLoading(false);
@@ -82,7 +78,6 @@ const ListadoCajas = () => {
         setSellerCajas(data || []);
         setTotalPages(totalPages);
       } catch (err) {
-        console.error('Error al cargar las cajas:', err);
         setError('Error al cargar las cajas. Intenta de nuevo más tarde.');
       } finally {
         setLoading(false);
@@ -96,7 +91,7 @@ const ListadoCajas = () => {
   const handleVendedorSelect = (vendedor) => {
     setSelectedIdVendedor(vendedor.id);
     setIsSelectedVendedor(true);
-    setCurrentPage(1); // Reiniciar a la primera página al seleccionar un vendedor
+    setCurrentPage(1);
   };
 
   const handleDownload = async (id_caja) => {
@@ -121,11 +116,9 @@ const ListadoCajas = () => {
     } catch (error) {
       let errorMessage = 'No se pudo descargar el Excel';
 
-      // Verificar si es un error de respuesta del servidor
       if (error?.response?.status === 400 || error?.response?.status === 404) {
         errorMessage = error.response.data?.message || errorMessage;
       } else if (error?.response?.data) {
-        // Si hay datos en la respuesta pero es un blob de error
         try {
           const text = await error.response.data.text();
           const errorData = JSON.parse(text);

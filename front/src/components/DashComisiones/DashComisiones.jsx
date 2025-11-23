@@ -41,19 +41,23 @@ const DashComisiones = () => {
     const comisionId = id;
 
     setPause((prev) => ({ ...prev, [comisionId]: true }));
-    await deleteComision(id).then(() => {
-      try {
-        clientSuccessHandler(SUCCESS_MESSAGES.COMISION_ELIMINADA);
-        setPause((prev) => {
-          const newPause = { ...prev };
-          delete newPause[comisionId];
-          return newPause;
-        });
-        setTableItems((prev) => prev.filter((item) => item.id !== comisionId));
-      } catch (error) {
-        console.log(error);
-      }
-    });
+    try {
+      await deleteComision(id);
+      clientSuccessHandler(SUCCESS_MESSAGES.COMISION_ELIMINADA);
+      setPause((prev) => {
+        const newPause = { ...prev };
+        delete newPause[comisionId];
+        return newPause;
+      });
+      setTableItems((prev) => prev.filter((item) => item.id !== comisionId));
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message);
+      setPause((prev) => {
+        const newPause = { ...prev };
+        delete newPause[comisionId];
+        return newPause;
+      });
+    }
   };
 
   const cargarComisiones = async (page = 1, name = '', day = '') => {
@@ -61,19 +65,19 @@ const DashComisiones = () => {
     try {
       let data;
       if (user?.isadmin) {
-        // Admin: solo comisiones de su sucursal activa
         const sucursalId = getSucursalActiva()?.id;
         if (!sucursalId) return;
         data = await getComisionBySucursal(sucursalId, page, 10, name, day);
       } else {
-        // Vendedor: todas las comisiones
         data = await getComisiones(page, 10, name, day);
       }
       setTableItems(data.data || []);
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_COMISIONES);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_COMISIONES
+      );
     } finally {
       setLoading(false);
     }
@@ -85,8 +89,10 @@ const DashComisiones = () => {
         const [cursosData, profesoresData] = await Promise.all([getCursos(), getProfes()]);
         setCursos(cursosData.data || cursosData);
         setProfesores(profesoresData);
-      } catch {
-        console.error('Error al cargar datos');
+      } catch (error) {
+        clientErrorHandler(
+          error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS
+        );
       }
     };
     cargarDatos();
@@ -136,7 +142,9 @@ const DashComisiones = () => {
         )
       );
     } catch (error) {
-      clientErrorHandler(error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_PAGO);
+      clientErrorHandler(
+        error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_PAGO
+      );
     } finally {
       setPause((prev) => ({ ...prev, [comisionId]: false }));
       setEditing(null);

@@ -45,7 +45,6 @@ const DashCaja = () => {
   const recargarDatos = async () => {
     try {
       const data = await GetCajaByVendedor(idVend, currentPage, 10);
-      console.log(data);
       const ultimaSesion = data.length > 0 ? data[0] : null;
       setSesionCaja(ultimaSesion);
       if (ultimaSesion) {
@@ -128,8 +127,9 @@ const DashCaja = () => {
         recargarDatos();
       }, 100);
     } catch (error) {
-      console.error('Error al editar:', error);
-      clientErrorHandler(error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_CAJA);
+      clientErrorHandler(
+        error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_ACTUALIZAR_CAJA
+      );
     } finally {
       setEditMode(null);
     }
@@ -149,11 +149,9 @@ const DashCaja = () => {
     } catch (error) {
       let errorMessage = 'No se pudo descargar el Excel';
 
-      // Verificar si es un error de respuesta del servidor
       if (error?.response?.status === 400 || error?.response?.status === 404) {
         errorMessage = error.response.data?.message || errorMessage;
       } else if (error?.response?.data) {
-        // Si hay datos en la respuesta pero es un blob de error
         try {
           const text = await error.response.data.text();
           const errorData = JSON.parse(text);

@@ -12,7 +12,6 @@ export const AppProvider = ({ children }) => {
   const [sucursalSeleccionada, setSucursalSeleccionada] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Cargar sucursales cuando el usuario es admin
   useEffect(() => {
     if (!user?.isAdmin) return;
 
@@ -25,7 +24,6 @@ export const AppProvider = ({ children }) => {
           setSucursalSeleccionada(data[0]);
         }
       } catch (error) {
-        console.error('Error al cargar sucursales:', error);
       } finally {
         setLoading(false);
       }
@@ -41,12 +39,10 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Para vendedores, usar su sucursal directamente
   const getSucursalActiva = () => {
     if (user?.isAdmin) {
       return sucursalSeleccionada;
     }
-    // Para vendedores, necesitarías cargar su sucursal o tenerla en user
     return { id: user?.sucursalId };
   };
 

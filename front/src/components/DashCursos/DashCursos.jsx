@@ -44,7 +44,9 @@ const DashCursos = () => {
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
     } catch (error) {
-      clientErrorHandler(error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_CURSOS);
+      clientErrorHandler(
+        error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_CURSOS
+      );
     } finally {
       setLoading(false);
     }

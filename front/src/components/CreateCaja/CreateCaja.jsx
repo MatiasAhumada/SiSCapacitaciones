@@ -68,13 +68,13 @@ const CreateCaja = () => {
 
   useEffect(() => {
     const alumnos = async () => {
-      await getAlu().then((data) => {
-        try {
+      await getAlu()
+        .then((data) => {
           setAlu(data);
-        } catch (error) {
-          console.log(error);
-        }
-      });
+        })
+        .catch((error) => {
+          clientErrorHandler(error?.message || 'Error al cargar alumnos');
+        });
     };
 
     alumnos();
@@ -177,7 +177,6 @@ const CreateCaja = () => {
         }
       }
     } catch (error) {
-      console.log(error);
       clientErrorHandler(error.message || 'Error al registrar el movimiento');
     } finally {
       setPause(false);
@@ -215,8 +214,7 @@ const CreateCaja = () => {
           throw error;
         });
     } catch (error) {
-      console.log(error);
-      clientErrorHandler('No se encontró el alumno, verifique el ID ingresado');
+      clientErrorHandler(error?.message || 'No se encontró el alumno, verifique el ID ingresado');
     } finally {
       setPause(false);
     }

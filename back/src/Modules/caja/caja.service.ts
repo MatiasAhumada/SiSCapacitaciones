@@ -22,12 +22,12 @@ import { IngresoSimpleDto } from './dto/ingreso-simple.dto';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { CreateTransferenciaDto } from './dto/transferencia-caja.dto';
 import { SesionCaja } from './entities/sesion-caja.entity';
-import * as ExcelJS from 'exceljs';
 import dayjs = require('dayjs');
 import utc = require('dayjs/plugin/utc');
 import timezone = require('dayjs/plugin/timezone');
-import { formatNumber } from '@modules/common/utils/formatters.utils';
-import { formatPostgresDate } from '@modules/common/utils/date.utils';
+import { formatNumber } from '@common/utils/formatters.utils';
+import { formatPostgresDate } from '@common/utils/date.utils';
+import { ExcelService } from '../excel/excel.service';
 import { isNull } from 'lodash';
 import { ComprobanteGeneratorService } from './comprobante-generator.service';
 import { MailService } from '../mail/mail.service';
@@ -56,6 +56,7 @@ export class CajaService {
     private readonly sesionRepository: Repository<SesionCaja>,
     private readonly comprobanteGeneratorService: ComprobanteGeneratorService,
     private readonly mailService: MailService,
+    private readonly excelService: ExcelService,
   ) {}
   get fechaLocal(): Date {
     return dayjs().tz('America/Argentina/Buenos_Aires').toDate();
@@ -1016,13 +1017,13 @@ export class CajaService {
       relations: ['vendedor'],
     });
     if (!sesion) {
-      throw new NotFoundException('Caja no encontrada');
+      throw new NotFoundException('Sesión de caja no encontrada');
     }
 
     const movimientos = await this.cajaRepository.find({
       where: { sesionCaja: { id: sesionId } },
       relations: ['alumnoComision.alumno', 'subcategoria.categoria'],
-      order: { fecha: 'ASC' },
+      order: { fecha: 'DESC' },
     });
 
     if (!movimientos || movimientos.length === 0) {
@@ -1031,62 +1032,7 @@ export class CajaService {
       );
     }
 
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Movimientos de Caja');
-
-    // Información del vendedor y fecha
-    worksheet.addRow(['REPORTE DE CAJA']);
-    worksheet.addRow(['Vendedor:', sesion.vendedor?.name || '-']);
-    worksheet.addRow(['Fecha de descarga:', formatPostgresDate(new Date())]);
-    worksheet.addRow([]);
-
-    // Encabezados
-    const headers = [
-      'Fecha',
-      'Alumno',
-      'Tipo',
-      'Método de Pago',
-      'Descripción',
-      'Monto',
-      'Cuota',
-      'Mes Cuota',
-      'Categoría',
-      'Subcategoría',
-    ];
-    worksheet.addRow(headers);
-
-    // Datos
-    movimientos.forEach((mov) => {
-      worksheet.addRow([
-        formatPostgresDate(mov.fecha),
-        mov.alumnoComision?.alumno?.name || '-',
-        mov.tipo,
-        mov.metodoPago,
-        mov.descripcion || '-',
-        mov.monto,
-        mov.cuota || '-',
-        mov.mesCuota || '-',
-        mov.subcategoria?.categoria?.nombre || '-',
-        mov.subcategoria?.nombre || '-',
-      ]);
-    });
-
-    // Estilo para encabezados
-    const headerRow = worksheet.getRow(5);
-    headerRow.font = { bold: true };
-    headerRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FFE0E0E0' },
-    };
-
-    // Ajustar ancho de columnas
-    worksheet.columns.forEach((column) => {
-      column.width = 30;
-    });
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    return this.excelService.generarExcelCaja(sesion, movimientos);
   }
 
   // Método para obtener movimientos de caja perpetua
@@ -1126,60 +1072,15 @@ export class CajaService {
       );
     }
 
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet(`Caja Perpetua ${adminName}`);
+    // Ordenar movimientos por fecha descendente
+    const movimientosOrdenados = [...sesion.movimientos].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime(),
+    );
 
-    // Información del admin y fecha
-    worksheet.addRow([`REPORTE CAJA PERPETUA - ${adminName.toUpperCase()}`]);
-    worksheet.addRow(['Fecha de descarga:', formatPostgresDate(new Date())]);
-    worksheet.addRow(['Total movimientos:', sesion.movimientos.length]);
-    worksheet.addRow([]);
-
-    // Encabezados
-    const headers = [
-      'Fecha',
-      'Alumno',
-      'Tipo',
-      'Método de Pago',
-      'Descripción',
-      'Monto',
-      'Cuota',
-      'Mes Cuota',
-      'Vendedor',
-    ];
-    worksheet.addRow(headers);
-
-    // Datos
-    sesion.movimientos.forEach((mov) => {
-      worksheet.addRow([
-        formatPostgresDate(mov.fecha),
-        mov.alumnoComision?.alumno?.name || '-',
-        mov.tipo,
-        mov.metodoPago,
-        mov.descripcion || '-',
-        mov.monto,
-        mov.cuota || '-',
-        mov.mesCuota || '-',
-        mov.vendedor?.name,
-      ]);
-    });
-
-    // Estilo para encabezados
-    const headerRow = worksheet.getRow(5);
-    headerRow.font = { bold: true };
-    headerRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FFE0E0E0' },
-    };
-
-    // Ajustar ancho de columnas
-    worksheet.columns.forEach((column) => {
-      column.width = 30;
-    });
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    return this.excelService.generarExcelCajaPerpetua(
+      adminName,
+      movimientosOrdenados,
+    );
   }
 
   async getSesionesForUser(

@@ -125,12 +125,12 @@ export class CajaController {
     return this.cajaService.obtenerSesionPorFecha(id, Number(page), Number(limit));
   }
 
-  @Get('/export-excel/:vendedorId')
+  @Get('/export-excel/:sesionId')
   async exportarCajaExcel(
-    @Param('vendedorId') vendedorId: string,
+    @Param('sesionId') sesionId: string,
     @Res() res: Response,
   ) {
-    const buffer = await this.cajaService.generarExcelCaja(vendedorId);
+    const buffer = await this.cajaService.generarExcelCaja(sesionId);
 
     res.set({
       'Content-Type':

@@ -11,9 +11,9 @@ import { Categoria } from './entities/categoria.entity';
 import { Subcategoria } from './entities/subcategoria.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
 import { SesionCaja } from './entities/sesion-caja.entity';
-import { ComprobanteGeneratorService } from './comprobante-generator.service';
 import { MailModule } from '../mail/mail.module';
 import { ExcelModule } from '../excel/excel.module';
+import { PdfModule } from '../pdf/pdf.module';
 
 @Module({
   imports: [
@@ -30,9 +30,10 @@ import { ExcelModule } from '../excel/excel.module';
     ]),
     MailModule,
     ExcelModule,
+    PdfModule,
   ],
   controllers: [CajaController],
-  providers: [CajaService, ComprobanteGeneratorService],
+  providers: [CajaService],
   exports: [CajaService],
 })
 export class CajaModule {}

@@ -29,8 +29,8 @@ import { formatNumber } from 'src/common/utils/formatters.utils';
 import { formatPostgresDate } from 'src/common/utils/date.utils';
 import { ExcelService } from '../excel/excel.service';
 import { isNull } from 'lodash';
-import { ComprobanteGeneratorService } from './comprobante-generator.service';
 import { MailService } from '../mail/mail.service';
+import { PdfService } from '../pdf/pdf.service';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -54,9 +54,9 @@ export class CajaService {
     private readonly profesorRepository: Repository<Profesor>,
     @InjectRepository(SesionCaja)
     private readonly sesionRepository: Repository<SesionCaja>,
-    private readonly comprobanteGeneratorService: ComprobanteGeneratorService,
     private readonly mailService: MailService,
     private readonly excelService: ExcelService,
+    private readonly pdfService: PdfService,
   ) {}
   get fechaLocal(): Date {
     return dayjs().tz('America/Argentina/Buenos_Aires').toDate();
@@ -85,7 +85,7 @@ export class CajaService {
     if (tipo === TipoMovimiento.INGRESO) {
       const alumnoComision = await this.alumnoComisionRepository.findOne({
         where: { id: alumnoComisionId },
-        relations: ['alumno'],
+        relations: ['alumno', 'comision'],
       });
 
       if (!alumnoComision) {
@@ -117,7 +117,7 @@ export class CajaService {
       newComprobante.iva = '-'; // Ajusta esto según sea necesario
       newComprobante.fecha = restoCaja.fecha; // Fecha actual
       newComprobante.formaPago = comprobante.formaPago; // Forma de pago recibida en el DTO
-      newComprobante.observacion = comprobante.observacion; // Observación
+      newComprobante.observacion = `${comprobante.observacion} - Comisión: ${alumnoComision.comision?.name || 'N/A'}`; // Observación
       newComprobante.monto = restoCaja.monto; // Monto de la caja
       newComprobante.tipoComprobante = comprobante.tipoComprobante; // Tipo de comprobante
       newComprobante.numero = comprobante.numero; // Número de comprobante
@@ -155,7 +155,7 @@ export class CajaService {
       // Enviar email con comprobante si el alumno tiene email
       if (alumnoComision.alumno.email) {
         try {
-          const pdfBuffer = await this.comprobanteGeneratorService.generarComprobantePDF(cajaGuardada);
+          const pdfBuffer = await this.pdfService.generarComprobantePDF(cajaGuardada);
           await this.mailService.sendReceiptEmail(
             alumnoComision.alumno.email,
             alumnoComision.alumno.name,
@@ -1249,7 +1249,7 @@ export class CajaService {
       throw new NotFoundException('El movimiento no tiene comprobante asociado');
     }
 
-    return this.comprobanteGeneratorService.generarComprobantePDF(movimiento);
+    return this.pdfService.generarComprobantePDF(movimiento);
   }
 
   private async actualizarConMovimiento(

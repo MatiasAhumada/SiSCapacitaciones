@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class PdfService {
@@ -84,5 +87,187 @@ export class PdfService {
     });
 
     return Buffer.from(doc.output('arraybuffer'));
+  }
+
+  async generarComprobantePDF(pago: any): Promise<Buffer> {
+    try {
+      const comprobante = pago.comprobante;
+      const alumno = pago.alumnoComision?.alumno;
+
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([1190, 1684]);
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+      const plantillaPath = path.join(
+        process.cwd(),
+        'assets',
+        'comprobanteSis.jpg',
+      );
+      if (!fs.existsSync(plantillaPath)) {
+        throw new NotFoundException('Plantilla de comprobante no encontrada');
+      }
+
+      const imageBytes = fs.readFileSync(plantillaPath);
+      const image = await pdfDoc.embedJpg(imageBytes);
+
+      page.drawImage(image, {
+        x: 0,
+        y: 0,
+        width: 1190,
+        height: 1684,
+      });
+
+      const fecha = new Date(pago.fecha).toLocaleDateString('es-ES');
+      const apellidoNombre = comprobante?.apellidoNombre || alumno?.name || '';
+      const dni = comprobante?.dni || alumno?.dni || '';
+      const domicilio =
+        comprobante?.domicilioComercial || alumno?.address || '';
+      const iva = comprobante?.iva || '-';
+      const formaPago = comprobante?.formaPago || pago.metodoPago;
+      const observacion = comprobante?.observacion || '';
+      const numeroComprobante = comprobante?.numeroComprobante || '';
+      const tipoComprobante = comprobante?.tipoComprobante || '';
+      const numero = comprobante?.numero || '';
+
+      page.drawText(numeroComprobante, {
+        x: 760,
+        y: 1508,
+        size: 20,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(fecha, {
+        x: 840,
+        y: 1468,
+        size: 20,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(apellidoNombre, {
+        x: 375,
+        y: 1300,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(dni, {
+        x: 725,
+        y: 1300,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(domicilio, {
+        x: 880,
+        y: 1270,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(iva, {
+        x: 200,
+        y: 1250,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(fecha, {
+        x: 40,
+        y: 1125,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(formaPago, {
+        x: 220,
+        y: 1125,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(observacion, {
+        x: 370,
+        y: 1125,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(`$${pago.monto}`, {
+        x: 1030,
+        y: 1125,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(`$${pago.monto}`, {
+        x: 1053,
+        y: 1088,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(fecha, {
+        x: 60,
+        y: 960,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(tipoComprobante, {
+        x: 380,
+        y: 960,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(numero, {
+        x: 740,
+        y: 960,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(`$${pago.monto}`, {
+        x: 1030,
+        y: 960,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(`$${pago.monto}`, {
+        x: 1053,
+        y: 920,
+        size: 20,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      page.drawText(
+        'Controle el proceso de sus ventas utilizando SiSCapacitaciones',
+        {
+          x: 30,
+          y: 40,
+          size: 20,
+          font,
+          color: rgb(0.37, 0.36, 0.42),
+        },
+      );
+      page.drawText(
+        '2025 © Desarrollado por Matias Ahumada Desarrollador Tel: +54 9 381 352-8658',
+        {
+          x: 30,
+          y: 15,
+          size: 20,
+          font,
+          color: rgb(0.37, 0.36, 0.42),
+        },
+      );
+
+      const pdfBytes = await pdfDoc.save();
+      return Buffer.from(pdfBytes);
+    } catch (error) {
+      console.error('Error generando comprobante PDF:', error);
+      throw new Error(`Error al generar comprobante: ${error.message}`);
+    }
   }
 }

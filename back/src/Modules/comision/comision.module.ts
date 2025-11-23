@@ -11,6 +11,7 @@ import { AlumnoComision } from './entities/alumnocomision.entity';
 import { Caja } from '../caja/entities/caja.entity';
 import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
+import { PdfModule } from '../pdf/pdf.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
       AsistenciaProfesor,
       Inscripcion
     ]),
+    PdfModule,
   ],
   controllers: [ComisionController],
   providers: [ComisionService],

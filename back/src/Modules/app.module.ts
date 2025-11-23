@@ -21,6 +21,7 @@ import { ComprobanteModule } from './comprobante/comprobante.module';
 import { SeederModule } from '@modules/Seeds/seeders.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { MailModule } from './mail/mail.module';
+import { PdfModule } from './pdf/pdf.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,6 +51,7 @@ import { MailModule } from './mail/mail.module';
     ComprobanteModule,
     MetricsModule,
     MailModule,
+    PdfModule,
   ],
   controllers: [AppController],
   providers: [AppService],

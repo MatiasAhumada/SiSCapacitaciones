@@ -8,8 +8,7 @@ import {
   transferirAlumno,
   getComisiones,
 } from '../../services/Comisiones.service';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { API_URL } from '../../constants/ApiUrl';
 import Pagination from '../Pagination/Pagination';
 import TransferModal from './TransferModal';
 import ComisionHeader from './ComisionHeader';
@@ -105,42 +104,19 @@ const ListadoComisiones = () => {
       return `${day}-${month}-${year}`;
     });
 
-  const generatePDF = () => {
-    const doc = new jsPDF({ orientation: 'landscape' });
-
-    doc.setFontSize(12);
-    doc.text(`Profesor: ${comisionDate.profesor.name} ${comisionDate.profesor.apellido}`, 14, 20);
-    doc.text(`Horario: ${comisionDate.hour.start} - ${comisionDate.hour.end}`, 14, 28);
-    doc.text(`Días: ${comisionDate.day}`, 14, 36);
-
-    const fechas = Array.from(
-      new Set(
-        alumnosComision.flatMap((item) =>
-          item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString())
-        )
-      )
-    );
-
-    const headers = ['Alumno', 'DNI', 'Telefono', ...fechas];
-
-    const rows = alumnosComision.map((item) => {
-      const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
-      fechas.forEach((fecha) => {
-        const asistencia = item.asistencias.find(
-          (a) => new Date(a.fecha).toLocaleDateString() === fecha
-        );
-        row.push(asistencia ? (asistencia.presente ? 'P' : 'A') : 'A');
-      });
-      return row;
-    });
-
-    autoTable(doc, {
-      head: [headers],
-      body: rows,
-      startY: 42,
-    });
-
-    doc.save(`Asistencia-${comisionDate.name}.pdf`);
+  const generatePDF = async () => {
+    try {
+      const response = await fetch(`${API_URL}/comision/asistencia/${comisionId}/pdf`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Asistencia-${comisionDate.name}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      clientErrorHandler('Error al generar PDF');
+    }
   };
 
   const clickEdit = async (e, ID) => {

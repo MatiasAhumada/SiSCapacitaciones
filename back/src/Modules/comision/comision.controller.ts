@@ -7,7 +7,9 @@ import {
   Delete,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ComisionService } from './comision.service';
 import { CreateComisionDto } from './dto/create-comision.dto';
 import { ChangeStateDto } from './dto/changeState.dto';
@@ -34,6 +36,20 @@ export class ComisionController {
   @Get('asistencia/:comisionId')
   obtenerAsistenciasPorComision(@Param('comisionId') comisionId: string) {
     return this.comisionService.obtenerAsistenciasPorComision(comisionId);
+  }
+
+  @Get('asistencia/:comisionId/pdf')
+  async descargarPdfAsistencia(
+    @Param('comisionId') comisionId: string,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer = await this.comisionService.generarPdfAsistencia(comisionId);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=asistencia.pdf',
+      'Content-Length': pdfBuffer.length,
+    });
+    res.end(pdfBuffer);
   }
 
   @Get()

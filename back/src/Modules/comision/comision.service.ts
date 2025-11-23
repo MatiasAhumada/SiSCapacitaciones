@@ -14,6 +14,7 @@ import { ChangeStateDto } from './dto/changeState.dto';
 import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
 import { TransferAlumnoDto } from './dto/transfer-alumno.dto';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
+import { PdfService } from '../pdf/pdf.service';
 
 @Injectable()
 export class ComisionService {
@@ -34,6 +35,7 @@ export class ComisionService {
     private readonly asistenciaProfesorRepository: Repository<AsistenciaProfesor>,
     @InjectRepository(Inscripcion)
     private readonly inscripcionRepository: Repository<Inscripcion>,
+    private readonly pdfService: PdfService,
   ) {}
   private cleanHour(hour: any): { start: string; end: string } {
     if (hour && hour.start && hour.end) {
@@ -455,5 +457,37 @@ export class ComisionService {
     );
 
     return { message: 'Alumno transferido exitosamente' };
+  }
+
+  async generarPdfAsistencia(comisionId: string): Promise<Buffer> {
+    const comision = await this.comisionRepository.findOne({
+      where: { id: comisionId },
+      relations: ['profesor', 'curso'],
+    });
+
+    if (!comision) {
+      throw new NotFoundException('Comisión no encontrada');
+    }
+
+    const alumnosComision = await this.alumnoComisionRepository.find({
+      where: { comision: { id: comisionId } },
+      relations: ['alumno', 'asistencias'],
+      select: {
+        id: true,
+        alumno: {
+          id: true,
+          dni: true,
+          name: true,
+          tel: true,
+        },
+        asistencias: {
+          id: true,
+          presente: true,
+          fecha: true,
+        },
+      },
+    });
+
+    return this.pdfService.generarPdfAsistencia(comision, alumnosComision);
   }
 }

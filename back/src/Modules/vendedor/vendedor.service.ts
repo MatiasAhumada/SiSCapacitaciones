@@ -8,6 +8,7 @@ import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { VendedorResponseDto } from './dto/response.dto';
 import * as bcrypt from 'bcrypt';
+import { ExcelService } from '../excel/excel.service';
 
 @Injectable()
 export class VendedorService {
@@ -18,6 +19,7 @@ export class VendedorService {
     private readonly sucursalRepository: Repository<Sucursal>,
     @InjectRepository(Inscripcion)
     private readonly inscripcionRepository: Repository<Inscripcion>,
+    private readonly excelService: ExcelService,
   ) {}
   async create(createVendedorDto: CreateVendedorDto) {
     const { sucursal, inscripciones, password, ...vendedorData } =
@@ -206,5 +208,45 @@ export class VendedorService {
       throw new Error(`Vendedor con ID ${id} no encontrado`);
     }
     return { message: 'Vendedor eliminado exitosamente' };
+  }
+
+  async generateInscripcionesExcel(id: string, fechaDesde?: string, fechaHasta?: string): Promise<Buffer> {
+    let inscripcionWhere: any = { vendedor: { id } };
+    
+    if (fechaDesde && fechaHasta) {
+      inscripcionWhere.fechaRegistro = Between(new Date(fechaDesde), new Date(fechaHasta));
+    } else if (fechaDesde) {
+      inscripcionWhere.fechaRegistro = MoreThanOrEqual(new Date(fechaDesde));
+    } else if (fechaHasta) {
+      inscripcionWhere.fechaRegistro = LessThanOrEqual(new Date(fechaHasta));
+    }
+
+    const inscripciones = await this.inscripcionRepository.find({
+      where: inscripcionWhere,
+      relations: ['alumno', 'comision', 'comision.curso', 'vendedor'],
+      order: { fechaRegistro: 'DESC' },
+    });
+
+    const data = inscripciones.map((insc) => ({
+      fecha: new Date(insc.fechaRegistro).toLocaleDateString('es-ES'),
+      alumno: insc.alumno.name,
+      dni: insc.alumno.dni,
+      telefono: insc.alumno.tel,
+      curso: insc.comision.curso.name,
+      comision: insc.comision.name,
+      vendedor: insc.vendedor.name,
+    }));
+
+    const columns = [
+      { header: 'Fecha', key: 'fecha', width: 15 },
+      { header: 'Alumno', key: 'alumno', width: 30 },
+      { header: 'DNI', key: 'dni', width: 15 },
+      { header: 'Teléfono', key: 'telefono', width: 15 },
+      { header: 'Curso', key: 'curso', width: 30 },
+      { header: 'Comisión', key: 'comision', width: 20 },
+      { header: 'Vendedor', key: 'vendedor', width: 25 },
+    ];
+
+    return await this.excelService.generateExcel(data, columns, 'Inscripciones');
   }
 }

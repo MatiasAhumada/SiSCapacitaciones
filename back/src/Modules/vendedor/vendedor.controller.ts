@@ -7,7 +7,9 @@ import {
   Param,
   Delete,
   Query,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { VendedorService } from './vendedor.service';
 import { CreateVendedorDto } from './dto/create-vendedor.dto';
 import { UpdateVendedorDto } from './dto/update-vendedor.dto';
@@ -33,6 +35,20 @@ export class VendedorController {
     @Query('limit') limit: string = '10',
   ) {
     return this.vendedorService.getVendedoresBySucursal(sucursalId, +page, +limit);
+  }
+
+  @Get(':id/inscripciones/excel')
+  async downloadInscripcionesExcel(
+    @Param('id') id: string,
+    @Res() res: Response,
+    @Query('fechaDesde') fechaDesde?: string,
+    @Query('fechaHasta') fechaHasta?: string,
+  ) {
+    const buffer = await this.vendedorService.generateInscripcionesExcel(id, fechaDesde, fechaHasta);
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=inscripciones-vendedor-${id}.xlsx`);
+    res.send(buffer);
   }
 
   @Get(':id')

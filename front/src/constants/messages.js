@@ -57,4 +57,5 @@ export const ERROR_MESSAGES = {
   ERROR_INSCRIBIR: 'Error al inscribir',
   ALUMNO_NO_ENCONTRADO: 'Alumno no encontrado',
   NUMERO_CERTIFICADO_REQUERIDO: 'Ingrese un número',
+  ERROR_GENERAR_EXCEL: 'Error al generar Excel',
 };

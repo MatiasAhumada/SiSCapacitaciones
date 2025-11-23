@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { deleteVend, getVendID } from '../../services/Vendedores.service';
+import { deleteVend, getVendID, descargarInscripcionesExcel } from '../../services/Vendedores.service';
 import Button from '../Common/Button';
+import { Spinner } from '../Spinner/Spinner';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
@@ -17,8 +18,8 @@ const InfoVendedor = () => {
   });
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
-
   const [loadingData, setLoadingData] = useState(false);
+  const [downloadingExcel, setDownloadingExcel] = useState(false);
 
   const cargarDatos = async (desde, hasta) => {
     setLoadingData(true);
@@ -55,6 +56,24 @@ const InfoVendedor = () => {
     cargarDatos();
   };
 
+  const handleDownloadExcel = async () => {
+    setDownloadingExcel(true);
+    try {
+      const blob = await descargarInscripcionesExcel(vendedorId, fechaDesde, fechaHasta);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `inscripciones-${dataVend.name}-${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      clientSuccessHandler(SUCCESS_MESSAGES.EXCEL_DESCARGADO);
+    } catch (error) {
+      clientErrorHandler(error?.message || ERROR_MESSAGES.ERROR_GENERAR_EXCEL);
+    } finally {
+      setDownloadingExcel(false);
+    }
+  };
+
   const handClick = async (e) => {
     e.preventDefault();
     setPause(true);
@@ -70,139 +89,200 @@ const InfoVendedor = () => {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto px-4 md:px-8">
-      <div className="items-center justify-between md:flex mb-5">
-        <div className="max-w-lg">
-          <h3 className="text-xl font-bold sm:text-2xl principal mt-4">{dataVend.name}</h3>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <label className="text-sm font-medium text-gray-900 principal">
-            Total de inscripciones: {dataVend.totalInscripciones}
-          </label>
-        </div>
-        <div className="mt-3 md:mt-0">
-          <button
-            onClick={handClick}
-            value={dataVend.id}
-            disabled={pause}
-            className="inline-block px-4 py-2 text-white bg-red-600 hover:bg-red-700 principal rounded md:text-sm disabled:opacity-50"
-          >
-            {pause ? (
-              <div className="flex items-center">
-                <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Eliminando...
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                {dataVend.name.charAt(0).toUpperCase()}
               </div>
-            ) : (
-              'Eliminar'
-            )}
-          </button>
-        </div>
-      </div>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-        <h3 className="font-bold sm:text-2xl principal mt-4">Inscripciones Realizadas</h3>
-        <div className="flex flex-col md:flex-row gap-2 mt-4 md:mt-0 md:items-end">
-          <div className="flex flex-col">
-            <label className="text-xs text-gray-600 mb-1">Desde</label>
-            <input
-              type="date"
-              value={fechaDesde}
-              onChange={(e) => setFechaDesde(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-xl text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-            />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 principal">{dataVend.name}</h1>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="inline-flex items-center px-3 py-1 rounded text-sm font-semibold bg-green-100 text-green-800">
+                    <i className="fa-solid fa-graduation-cap mr-2"></i>
+                    {dataVend.totalInscripciones} inscripciones
+                  </span>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handClick}
+              value={dataVend.id}
+              disabled={pause}
+              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
+            >
+              {pause ? (
+                <>
+                  <Spinner color="white" />
+                  <span>Eliminando...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-trash"></i>
+                  <span>Eliminar Vendedor</span>
+                </>
+              )}
+            </button>
           </div>
-          <div className="flex flex-col">
-            <label className="text-xs text-gray-600 mb-1">Hasta</label>
-            <input
-              type="date"
-              value={fechaHasta}
-              onChange={(e) => setFechaHasta(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-xl text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-            />
-          </div>
-          <Button
-            onClick={aplicarFiltro}
-            disabled={loadingData}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm disabled:opacity-50"
-          >
-            {loadingData ? 'Filtrando...' : 'Filtrar'}
-          </Button>
-          <Button
-            onClick={limpiarFiltro}
-            disabled={loadingData}
-            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm disabled:opacity-50"
-          >
-            Limpiar
-          </Button>
         </div>
-      </div>
-      <div className="mt-3 shadow-sm border rounded-lg overflow-x-auto">
-        <table className="w-full table-auto text-sm text-left">
-          <thead className="bg-gray-50 text-gray-600 font-medium border-b principal text-center">
-            <tr>
-              <th className="py-3 px-6">Nombre y Apellido</th>
-              <th className="py-3 px-6">Telefono</th>
-              <th className="py-3 px-6">DNI</th>
-              <th className="py-3 px-6">Curso</th>
-              <th className="py-3 px-6">Comision</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 divide-y">
-            {loadingData ? (
-              <tr>
-                <td colSpan="5" className="px-6 py-4 text-center">
-                  <div className="flex justify-center items-center">
-                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Cargando inscripciones...
-                  </div>
-                </td>
-              </tr>
-            ) : tableItems.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                  No hay inscripciones para mostrar
-                </td>
-              </tr>
-            ) : (
-              tableItems.map((item, idx) => (
-                <tr key={idx} className="text-center">
-                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.tel}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.alumno.dni}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.comision.curso.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.comision.name}</td>
+
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-4">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                <i className="fa-solid fa-list"></i>
+                Inscripciones Realizadas
+              </h2>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
+                <div className="flex flex-col flex-1 min-w-[140px]">
+                  <label className="text-xs text-white mb-1">Desde</label>
+                  <input
+                    type="date"
+                    value={fechaDesde}
+                    onChange={(e) => setFechaDesde(e.target.value)}
+                    className="px-3 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded text-sm text-white placeholder-white/70 focus:ring-2 focus:ring-white focus:border-white focus:bg-white/30 transition-all"
+                  />
+                </div>
+                <div className="flex flex-col flex-1 min-w-[140px]">
+                  <label className="text-xs text-white mb-1">Hasta</label>
+                  <input
+                    type="date"
+                    value={fechaHasta}
+                    onChange={(e) => setFechaHasta(e.target.value)}
+                    className="px-3 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded text-sm text-white placeholder-white/70 focus:ring-2 focus:ring-white focus:border-white focus:bg-white/30 transition-all"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                  <Button
+                    onClick={aplicarFiltro}
+                    disabled={loadingData}
+                    className="px-4 py-2 bg-white text-blue-600 hover:bg-gray-100 font-semibold rounded shadow-md transition-all disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {loadingData ? 'Filtrando...' : 'Filtrar'}
+                  </Button>
+                  <Button
+                    onClick={limpiarFiltro}
+                    disabled={loadingData}
+                    className="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white font-semibold rounded shadow-md transition-all disabled:opacity-50 whitespace-nowrap"
+                  >
+                    Limpiar
+                  </Button>
+                  <Button
+                    onClick={handleDownloadExcel}
+                    disabled={downloadingExcel}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow-md transition-all disabled:opacity-50 flex items-center gap-2 justify-center whitespace-nowrap"
+                  >
+                    {downloadingExcel ? (
+                      <>
+                        <Spinner color="white" />
+                        <span>Descargando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fa-solid fa-file-excel"></i>
+                        <span>Excel</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <i className="fa-solid fa-user"></i>
+                      Alumno
+                    </div>
+                  </th>
+                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <i className="fa-solid fa-phone"></i>
+                      Teléfono
+                    </div>
+                  </th>
+                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <i className="fa-solid fa-id-card"></i>
+                      DNI
+                    </div>
+                  </th>
+                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <i className="fa-solid fa-book"></i>
+                      Curso
+                    </div>
+                  </th>
+                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <i className="fa-solid fa-users"></i>
+                      Comisión
+                    </div>
+                  </th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loadingData ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-12">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-4">
+                          <Spinner color="#2563eb" />
+                        </div>
+                        <p className="text-gray-600 font-medium">Cargando inscripciones...</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : tableItems.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-12">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                          <i className="fa-solid fa-inbox text-gray-400 text-2xl"></i>
+                        </div>
+                        <p className="text-gray-500 font-medium">No hay inscripciones para mostrar</p>
+                        <p className="text-gray-400 text-sm mt-1">Intenta ajustar los filtros de fecha</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  tableItems.map((item, idx) => (
+                    <tr
+                      key={idx}
+                      className={`hover:bg-blue-50 transition-colors duration-150 ${
+                        idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      }`}
+                    >
+                      <td className="px-6 py-4">
+                        <span className="font-semibold text-gray-900">{item.alumno.name}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-gray-700">{item.alumno.tel}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-gray-700">{item.alumno.dni}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-gray-700">{item.comision.curso.name}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-3 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800">
+                          {item.comision.name}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );

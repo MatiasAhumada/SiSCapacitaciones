@@ -61,3 +61,17 @@ export const updateVend = async (id, vendedor) => {
     throw error.response?.data || error;
   }
 };
+
+export const descargarInscripcionesExcel = async (id, fechaDesde, fechaHasta) => {
+  try {
+    const params = new URLSearchParams();
+    if (fechaDesde) params.append('fechaDesde', fechaDesde);
+    if (fechaHasta) params.append('fechaHasta', fechaHasta);
+
+    const url = `${API_URL}/vendedor/${id}/inscripciones/excel${params.toString() ? `?${params.toString()}` : ''}`;
+    const response = await axios.get(url, { responseType: 'blob' });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

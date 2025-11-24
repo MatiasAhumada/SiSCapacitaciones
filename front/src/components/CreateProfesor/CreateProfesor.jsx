@@ -14,6 +14,8 @@ const CreateProfesor = () => {
     name: '',
     apellido: '',
     tel: '',
+    email: '',
+    direccion: '',
     sucursalId: '',
   });
 
@@ -47,97 +49,134 @@ const CreateProfesor = () => {
   };
 
   return (
-    <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
-      <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
+    <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-6 md:p-8 bg-white rounded-2xl shadow-2xl border border-gray-100">
+      <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-6">
         <div>
           <img src={logo} alt="Logo" width="50" />
         </div>
-        <h2 className="my-auto principal">Registro de Profesores</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 principal">Nuevo Profesor</h2>
       </div>
 
-      <form className="flex flex-col" onSubmit={handleSubmit}>
-        <div className="pb-2">
-          <label htmlFor="name" className="block mb-2 text-sm principal">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-user text-blue-600 mr-2"></i>
             Nombre
           </label>
-          <div className="relative text-gray-400">
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="Nombre del profesor"
-              autoComplete="off"
-            />
-          </div>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="Juan"
+            autoComplete="off"
+            required
+          />
         </div>
-        <div className="pb-2">
-          <label htmlFor="apellido" className="block mb-2 text-sm principal text-[#111827]">
+        <div>
+          <label htmlFor="apellido" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-user-tag text-blue-600 mr-2"></i>
             Apellido
           </label>
-          <div className="relative text-gray-400">
-            <input
-              type="string"
-              name="apellido"
-              id="apellido"
-              value={formData.apellido}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="Apellido del profesor"
-              autoComplete="off"
-            />
-          </div>
+          <input
+            type="text"
+            name="apellido"
+            id="apellido"
+            value={formData.apellido}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="Pérez"
+            autoComplete="off"
+            required
+          />
         </div>
-        <div className="pb-2">
-          <label htmlFor="tel" className="block mb-2 text-sm principal text-[#111827]">
+        <div>
+          <label htmlFor="tel" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-phone text-blue-600 mr-2"></i>
             Teléfono
           </label>
-          <div className="relative text-gray-400">
-            <input
-              type="text"
-              name="tel"
-              id="tel"
-              value={formData.tel}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="3813528650"
-              autoComplete="off"
-            />
-          </div>
+          <input
+            type="tel"
+            name="tel"
+            id="tel"
+            value={formData.tel}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="3813528650"
+            autoComplete="off"
+            required
+          />
         </div>
-        <div className="pb-2">
-          <label htmlFor="sucursal" className="block mb-2 text-sm principal text-[#111827]">
+        <div>
+          <label htmlFor="email" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-envelope text-blue-600 mr-2"></i>
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="profesor@email.com"
+            autoComplete="off"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="direccion" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-location-dot text-blue-600 mr-2"></i>
+            Dirección
+          </label>
+          <input
+            type="text"
+            name="direccion"
+            id="direccion"
+            value={formData.direccion}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="Calle 123, Ciudad"
+            autoComplete="off"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="sucursalId" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-building text-blue-600 mr-2"></i>
             Sucursal
           </label>
-          <div className="relative text-gray-400">
-            <select
-              name="sucursalId"
-              id="sucursalId"
-              value={formData.sucursalId}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              required
-            >
-              <option value="">Seleccionar sucursal</option>
-              {sucursales.map((suc) => (
-                <option key={suc.id} value={suc.id}>
-                  {suc.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            name="sucursalId"
+            id="sucursalId"
+            value={formData.sucursalId}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md cursor-pointer"
+            required
+          >
+            <option value="">Seleccionar sucursal</option>
+            {sucursales.map((suc) => (
+              <option key={suc.id} value={suc.id}>
+                {suc.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button
           type="submit"
           disabled={pause}
-          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6 disabled:opacity-50"
+          className="w-full mt-2 px-6 py-3 text-white font-semibold btnAz rounded shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 group"
         >
           {pause ? (
-            <div className="flex items-center justify-center">
-              <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+            <>
+              <svg
+                className="animate-spin h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -152,10 +191,13 @@ const CreateProfesor = () => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Registrando...
-            </div>
+              <span>Registrando...</span>
+            </>
           ) : (
-            'Registrar Profesor'
+            <>
+              <i className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+              <span>Registrar Profesor</span>
+            </>
           )}
         </button>
       </form>

@@ -24,6 +24,12 @@ export class Profesor {
   @Column()
   tel: string;
 
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({ nullable: true })
+  direccion: string;
+
   @OneToMany(() => Comision, (comision) => comision.profesor)
   comisiones: Comision[];
 

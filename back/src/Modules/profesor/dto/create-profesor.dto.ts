@@ -13,6 +13,14 @@ export class CreateProfesorDto {
   @IsNotEmpty()
   tel: string;
 
+  @IsString()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  direccion: string;
+
   @IsUUID()
   @IsNotEmpty()
   sucursalId: string;

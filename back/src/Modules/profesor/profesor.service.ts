@@ -50,13 +50,16 @@ export class ProfesorService {
       take: limit,
     });
 
-    const data = profesores.map((prof) => ({
-      id: prof.id,
-      name: prof.name,
-      apellido: prof.apellido,
-      cantidadComisiones: prof.comisiones?.length || 0,
-      comisiones: prof.comisiones || [],
-    }));
+    const data = profesores.map((prof) => {
+      const comisionesActivas = prof.comisiones?.filter(c => c.status === true) || [];
+      return {
+        id: prof.id,
+        name: prof.name,
+        apellido: prof.apellido,
+        cantidadComisiones: comisionesActivas.length,
+        comisiones: comisionesActivas,
+      };
+    });
 
     return {
       data,

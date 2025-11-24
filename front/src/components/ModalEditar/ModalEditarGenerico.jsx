@@ -38,6 +38,19 @@ export const ModalEditarGenerico = ({
       case 'email':
       case 'tel':
       case 'number':
+        return (
+          <input
+            type={type}
+            name={name}
+            value={value}
+            onChange={onChange}
+            disabled={disabled}
+            placeholder={placeholder}
+            className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+              disabled ? 'bg-gray-50 text-gray-600' : ''
+            }`}
+          />
+        );
       case 'password':
         return (
           <div className="relative">

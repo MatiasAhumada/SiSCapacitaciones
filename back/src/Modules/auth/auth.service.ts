@@ -55,6 +55,8 @@ export class AuthService {
           isAdmin: false,
           name: vendedor.name,
           img: vendedor.img,
+          tel: vendedor.tel,
+          email: vendedor.email,
         };
       } else {
         throw new BadRequestException('Contraseña incorrecta');

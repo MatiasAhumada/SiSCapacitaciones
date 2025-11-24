@@ -136,9 +136,16 @@ export class VendedorService {
       relations: [
         'inscripciones.alumno',
         'inscripciones.comision.curso',
+        'inscripciones.comision',
         'sucursales',
       ],
       select: {
+        id: true,
+        name: true,
+        email: true,
+        tel: true,
+        img: true,
+        isAdmin: true,
         inscripciones: {
           id: true,
           fechaRegistro: true,
@@ -148,6 +155,7 @@ export class VendedorService {
             tel: true,
           },
           comision: {
+            id: true,
             name: true,
             curso: {
               name: true,
@@ -174,12 +182,24 @@ export class VendedorService {
       });
     }
 
+    // Obtener comisiones únicas del vendedor
+    const comisionesUnicas = Array.from(
+      new Set(inscripcionesFiltradas.map(insc => insc.comision.id))
+    ).map(id => {
+      const insc = inscripcionesFiltradas.find(i => i.comision.id === id);
+      return { id, name: insc?.comision?.name || '' };
+    }).filter(c => c.name);
+
     return {
       id: vend.id,
       name: vend.name,
+      email: vend.email,
+      tel: vend.tel,
+      img: vend.img,
       isAdmin: vend.isAdmin,
       inscripciones: inscripcionesFiltradas,
       sucursales: vend.sucursales,
+      comisiones: comisionesUnicas,
       totalInscripciones: inscripcionesFiltradas.length,
     };
   }

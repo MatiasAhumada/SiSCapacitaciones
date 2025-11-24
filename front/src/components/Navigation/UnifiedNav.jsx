@@ -20,6 +20,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { useState, useEffect } from 'react';
+import { ModalEditarGenerico } from '../ModalEditar/ModalEditarGenerico';
+import { putVendedor } from '../../services/Vendedores.service';
 import { aperturaCaja, cerrarCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES } from '../../constants/messages';
@@ -31,6 +33,8 @@ const UnifiedNav = () => {
   const isAdmin = user?.isAdmin;
   const [sesionCaja, setSesionCaja] = useState(null);
   const [loadingCaja, setLoadingCaja] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({});
 
   useEffect(() => {
     const cargarSesionCaja = async () => {
@@ -168,6 +172,40 @@ const UnifiedNav = () => {
     cambiarSucursal(e.target.value);
   };
 
+  const handleEditProfile = () => {
+    setEditData({
+      name: user?.name || '',
+      email: user?.email || '',
+      tel: user?.tel || '',
+      password: '',
+      img: user?.img || '',
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSave = async () => {
+    try {
+      await putVendedor(user.id, editData);
+      clientSuccessHandler(SUCCESS_MESSAGES.VENDEDOR_ACTUALIZADO);
+      setShowEditModal(false);
+      window.location.reload();
+    } catch (error) {
+      clientErrorHandler(error.response?.data?.message || error.message);
+    }
+  };
+
+  const editFields = [
+    { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
+    { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
+    { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
+    { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
+  ];
+
   const DropdownMenu = ({ config, isMobile = false }) => (
     <Menu as="div" className="relative">
       <MenuButton
@@ -221,7 +259,10 @@ const UnifiedNav = () => {
       items: PropTypes.arrayOf(
         PropTypes.shape({
           name: PropTypes.string.isRequired,
-          path: PropTypes.string.isRequired,
+          path: PropTypes.string,
+          action: PropTypes.func,
+          loading: PropTypes.bool,
+          disabled: PropTypes.bool,
         })
       ).isRequired,
     }).isRequired,
@@ -279,27 +320,49 @@ const UnifiedNav = () => {
 
           {/* User Menu */}
           <div className="hidden lg:flex items-center gap-4">
-            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-full border border-white/20">
-              {user?.img ? (
-                <img
-                  src={user.img}
-                  alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {(user?.name || 'U').charAt(0).toUpperCase()}
+            <Menu as="div" className="relative">
+              <MenuButton className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-full border border-white/20 hover:bg-white/20 transition-all duration-200">
+                {user?.img ? (
+                  <img
+                    src={user.img}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {(user?.name || 'U').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-white text-sm font-semibold">{user?.name || 'Usuario'}</span>
+                <ChevronDownIcon className="w-4 h-4 text-white" />
+              </MenuButton>
+              <MenuItems className="absolute right-0 z-20 mt-3 w-56 bg-white rounded-2xl shadow-2xl ring-1 ring-gray-200 focus:outline-none overflow-hidden">
+                <div className="p-2">
+                  <MenuItem>
+                    {({ active }) => (
+                      <button
+                        onClick={() => setShowEditModal(true)}
+                        className={`${active ? 'bg-blue-50 text-blue-700' : 'text-gray-700'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150`}
+                      >
+                        <i className="fa-solid fa-user-edit mr-3"></i>
+                        Editar Perfil
+                      </button>
+                    )}
+                  </MenuItem>
+                  <MenuItem>
+                    {({ active }) => (
+                      <button
+                        onClick={logout}
+                        className={`${active ? 'bg-red-50 text-red-700' : 'text-gray-700'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150`}
+                      >
+                        <ArrowRightOnRectangleIcon className="w-4 h-4 mr-3" />
+                        Cerrar Sesión
+                      </button>
+                    )}
+                  </MenuItem>
                 </div>
-              )}
-              <span className="text-white text-sm font-semibold">{user?.name || 'Usuario'}</span>
-            </div>
-            <button
-              onClick={logout}
-              className="group flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-            >
-              <ArrowRightOnRectangleIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-              Cerrar Sesión
-            </button>
+              </MenuItems>
+            </Menu>
           </div>
 
           {/* Mobile menu button */}
@@ -334,6 +397,13 @@ const UnifiedNav = () => {
               <span className="text-white text-sm font-semibold">{user?.name || 'Usuario'}</span>
             </div>
             <button
+              onClick={handleEditProfile}
+              className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 mb-2"
+            >
+              <i className="fa-solid fa-user-edit"></i>
+              Editar Perfil
+            </button>
+            <button
               onClick={logout}
               className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
@@ -343,6 +413,17 @@ const UnifiedNav = () => {
           </div>
         </div>
       </DisclosurePanel>
+
+      {showEditModal && (
+        <ModalEditarGenerico
+          title="Editar Perfil"
+          formData={editData}
+          fields={editFields}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleEditSave}
+          onChange={handleEditChange}
+        />
+      )}
     </Disclosure>
   );
 };

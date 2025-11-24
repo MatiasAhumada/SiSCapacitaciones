@@ -39,6 +39,8 @@ const ListadoComisiones = () => {
     fecha: '',
   });
   const [dniFiltro, setDniFiltro] = useState('');
+  const [fechaFiltro, setFechaFiltro] = useState('');
+  const [allDates, setAllDates] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -57,13 +59,25 @@ const ListadoComisiones = () => {
     navigate(redirectionPath);
   };
 
-  const fetchAlumnos = async (page = 1, dni = '') => {
+  const fetchAlumnos = async (page = 1, dni = '', fecha = '') => {
     try {
-      const data = await getComisionId(comisionId, page, itemsPerPage, dni);
+      const data = await getComisionId(comisionId, page, itemsPerPage, dni, fecha);
       setAlumnosComision(data.data);
       setComisionDate(data.comision || {});
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
+      
+      // Solo actualizar allDates si no hay filtro de fecha aplicado
+      if (!fecha && data.data.length > 0) {
+        const dates = Array.from(
+          new Set(
+            data.data.flatMap((item) =>
+              item.asistencias.map((asistencia) => asistencia.fecha.split('T')[0])
+            )
+          )
+        ).sort((a, b) => new Date(a) - new Date(b));
+        setAllDates(dates);
+      }
     } catch (error) {
       clientErrorHandler(
         error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_COMISIONES
@@ -73,7 +87,7 @@ const ListadoComisiones = () => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      fetchAlumnos(currentPage, dniFiltro);
+      fetchAlumnos(currentPage, dniFiltro, fechaFiltro);
     }, 300);
 
     return () => clearTimeout(timeoutId);
@@ -81,9 +95,9 @@ const ListadoComisiones = () => {
   }, [dniFiltro]);
 
   useEffect(() => {
-    fetchAlumnos(currentPage, dniFiltro);
+    fetchAlumnos(currentPage, dniFiltro, fechaFiltro);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, comisionId, reload]);
+  }, [currentPage, comisionId, reload, fechaFiltro]);
 
   const formatFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
@@ -93,18 +107,7 @@ const ListadoComisiones = () => {
     return `${day}-${month}-${year}`;
   };
 
-  const allDates = Array.from(
-    new Set(
-      alumnosComision.flatMap((item) =>
-        item.asistencias.map((asistencia) => asistencia.fecha.split('T')[0])
-      )
-    )
-  )
-    .sort((a, b) => new Date(a) - new Date(b))
-    .map((date) => {
-      const [year, month, day] = date.split('-');
-      return `${day}-${month}-${year}`;
-    });
+
 
   const generatePDF = async () => {
     try {
@@ -253,6 +256,30 @@ const ListadoComisiones = () => {
                 transition-all duration-300 w-full hover:shadow-md"
             />
           </div>
+          <div className="relative">
+            <i className="fa-solid fa-calendar absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <select
+              value={fechaFiltro}
+              onChange={(e) => {
+                setFechaFiltro(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-11 pr-4 py-3 border border-gray-300 rounded shadow-sm 
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:scale-[1.02]
+                transition-all duration-300 w-full hover:shadow-md cursor-pointer"
+            >
+              <option value="">Todos los alumnos</option>
+              {allDates.map((date, index) => {
+                const [year, month, day] = date.split('-');
+                const displayDate = `${day}-${month}-${year}`;
+                return (
+                  <option key={index} value={date}>
+                    Ausentes el {displayDate}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
           <AsistenciaControls
             asistencia={asistencia}
             onAsistenciaChange={handleAsistenciaChange}
@@ -298,11 +325,15 @@ const ListadoComisiones = () => {
                 <th className="py-5 px-6 text-left">DNI</th>
                 <th className="py-5 px-6 text-left">Teléfono</th>
                 <th className="py-5 px-6 text-center">Estado</th>
-                {allDates.map((date) => (
-                  <th key={date} className="py-5 px-6 text-center font-bold text-indigo-700">
-                    {date}
-                  </th>
-                ))}
+                {!fechaFiltro && allDates.map((date) => {
+                  const [year, month, day] = date.split('-');
+                  const displayDate = `${day}-${month}-${year}`;
+                  return (
+                    <th key={date} className="py-5 px-6 text-center font-bold text-indigo-700">
+                      {displayDate}
+                    </th>
+                  );
+                })}
                 {onAsistenciaClicked && (
                   <th className="py-5 px-6 text-center">
                     <input
@@ -328,6 +359,7 @@ const ListadoComisiones = () => {
                   onAsistenciaCheck={handleAsistenciaCheck}
                   pause={pause}
                   showAsistencia={onAsistenciaClicked}
+                  hideDates={!!fechaFiltro}
                 />
               ))}
             </tbody>

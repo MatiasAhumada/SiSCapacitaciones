@@ -3,7 +3,7 @@ import { CreateComisionDto } from './dto/create-comision.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comision } from './entities/comision.entity';
-import { Repository, Like, ILike } from 'typeorm';
+import { Repository, Like, ILike, Between, In } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Curso } from '../curso/entities/curso.entity';
 import { Profesor } from '../profesor/entities/profesor.entity';
@@ -244,7 +244,7 @@ export class ComisionService {
       select: ['id', 'name'],
     });
   }
-  async findOne(id: string, page = 1, limit = 10, dni?: string) {
+  async findOne(id: string, page = 1, limit = 10, dni?: string, fecha?: string) {
     // Traer datos generales de la comisión
     const comision = await this.comisionRepository.findOne({
       where: { id },
@@ -270,6 +270,35 @@ export class ComisionService {
     const whereAlumno: any = { comision: { id } };
     if (dni) {
       whereAlumno.alumno = { dni: Like(`%${dni}%`) };
+    }
+
+    // Si se proporciona fecha, filtrar solo alumnos ausentes en esa fecha
+    let alumnosIds: string[] | undefined;
+    if (fecha) {
+      const fechaInicio = new Date(fecha + 'T00:00:00');
+      const fechaFin = new Date(fecha + 'T23:59:59');
+
+      const asistencias = await this.asistenciaRepository.find({
+        where: {
+          alumnoComision: { comision: { id } },
+          presente: false,
+          fecha: Between(fechaInicio, fechaFin),
+        },
+        relations: ['alumnoComision'],
+      });
+
+      alumnosIds = asistencias.map(a => a.alumnoComision.id);
+      
+      if (alumnosIds.length === 0) {
+        return {
+          comision,
+          data: [],
+          totalPages: 0,
+          currentPage: page,
+        };
+      }
+
+      whereAlumno.id = In(alumnosIds);
     }
 
     // Contar total de alumnos (aplicando el mismo filtro)

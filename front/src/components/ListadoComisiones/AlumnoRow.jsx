@@ -12,6 +12,7 @@ const AlumnoRow = ({
   onAsistenciaCheck,
   pause,
   showAsistencia,
+  hideDates = false,
 }) => {
   return (
     <tr className={`${getRowBgColor(item)} hover:shadow-lg hover:scale-[1.01] transition-all duration-300`}>
@@ -47,8 +48,8 @@ const AlumnoRow = ({
           {pause[item.id] ? <Spinner color="white" /> : item.state ? '✓ Activo' : '✕ Inactivo'}
         </button>
       </td>
-      {allDates.map((date) => {
-        const asistencia = item.asistencias.find((a) => formatFecha(a.fecha) === date);
+      {!hideDates && allDates.map((date) => {
+        const asistencia = item.asistencias.find((a) => a.fecha.split('T')[0] === date);
         return (
           <td key={date} className="px-6 py-4 text-center text-xl">
             <span className={`inline-block transition-transform duration-300 hover:scale-125 ${
@@ -84,6 +85,7 @@ AlumnoRow.propTypes = {
   onAsistenciaCheck: PropTypes.func.isRequired,
   pause: PropTypes.object.isRequired,
   showAsistencia: PropTypes.bool.isRequired,
+  hideDates: PropTypes.bool,
 };
 
 export default AlumnoRow;

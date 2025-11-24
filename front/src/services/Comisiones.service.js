@@ -26,11 +26,14 @@ export const getComisiones = async (page = 1, limit = 10, name = '', day = '', a
   }
 };
 
-export const getComisionId = async (id, page = 1, limit = 10, dni = '') => {
+export const getComisionId = async (id, page = 1, limit = 10, dni = '', fecha = '') => {
   try {
     const params = { page, limit };
     if (dni) {
       params.dni = dni;
+    }
+    if (fecha) {
+      params.fecha = fecha;
     }
     const response = await axios.get(`${API_URL}/comision/${id}`, {
       params,

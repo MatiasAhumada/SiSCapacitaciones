@@ -12,6 +12,7 @@ export const ModalEditarGenerico = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState({});
 
   useEffect(() => {
     setIsVisible(true);
@@ -37,14 +38,46 @@ export const ModalEditarGenerico = ({
       case 'email':
       case 'tel':
       case 'number':
+      case 'password':
+        return (
+          <div className="relative">
+            <input
+              type={showPassword[name] ? 'text' : 'password'}
+              name={name}
+              value={value}
+              onChange={onChange}
+              disabled={disabled}
+              placeholder={placeholder}
+              className={`w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                disabled ? 'bg-gray-50 text-gray-600' : ''
+              }`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(prev => ({ ...prev, [name]: !prev[name] }))}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+            >
+              <i className={`fa-solid ${showPassword[name] ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </button>
+          </div>
+        );
+      case 'file':
         return (
           <input
-            type={type}
+            type="file"
             name={name}
-            value={value}
-            onChange={onChange}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  onChange({ target: { name, value: reader.result } });
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
             disabled={disabled}
-            placeholder={placeholder}
+            accept="image/*"
             className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
               disabled ? 'bg-gray-50 text-gray-600' : ''
             }`}
@@ -137,7 +170,7 @@ ModalEditarGenerico.propTypes = {
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(['text', 'email', 'tel', 'number', 'select', 'textarea']).isRequired,
+      type: PropTypes.oneOf(['text', 'email', 'tel', 'number', 'password', 'select', 'textarea', 'file']).isRequired,
       disabled: PropTypes.bool,
       options: PropTypes.arrayOf(
         PropTypes.shape({

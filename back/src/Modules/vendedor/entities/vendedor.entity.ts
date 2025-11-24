@@ -24,6 +24,8 @@ export class Vendedor {
   password: string;
   @Column()
   isAdmin: boolean;
+  @Column({ type: 'text', nullable: true })
+  img: string;
 
   @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.vendedor, {
     onDelete: 'CASCADE',

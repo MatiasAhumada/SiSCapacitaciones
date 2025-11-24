@@ -14,6 +14,8 @@ export class Admins {
   password: string;
   @Column()
   isAdmin: boolean;
+  @Column({ type: 'text', nullable: true })
+  img: string;
   @OneToMany(() => Sucursal, (sucursal) => sucursal.admin)
   sucursales: Sucursal[];
   @OneToMany(() => SesionCaja, (sesionCaja) => sesionCaja.admin)

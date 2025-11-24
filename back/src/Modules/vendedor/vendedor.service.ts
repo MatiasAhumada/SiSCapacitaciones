@@ -93,6 +93,7 @@ export class VendedorService {
         name: true,
         email: true,
         tel: true,
+        img: true,
         inscripciones: {
           id: true,
         },

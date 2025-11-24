@@ -47,6 +47,8 @@ const DashVendedor = () => {
       name: vendedor.name,
       email: vendedor.email,
       tel: vendedor.tel,
+      password: '',
+      img: vendedor.img || '',
     });
     setEditingId(vendedor.id);
     setShowEditModal(true);
@@ -75,6 +77,8 @@ const DashVendedor = () => {
     { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
     { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
     { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
+    { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
+    { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
   ];
 
   useEffect(() => {
@@ -187,9 +191,17 @@ const DashVendedor = () => {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
-                            {item.name.charAt(0).toUpperCase()}
-                          </div>
+                          {item.img ? (
+                            <img
+                              src={item.img}
+                              alt={item.name}
+                              className="w-10 h-10 rounded-full object-cover shadow-md"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                              {item.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
                           <span className="font-semibold text-gray-900">{item.name}</span>
                         </div>
                       </td>

@@ -52,7 +52,7 @@ const db_config = {
     Categoria,
     Subcategoria,
     SesionCaja,
-    AsistenciaProfesor
+    AsistenciaProfesor,
   ],
   migrationsRun: true,
   // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],

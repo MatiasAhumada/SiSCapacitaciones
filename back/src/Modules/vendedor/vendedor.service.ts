@@ -3,7 +3,13 @@ import { CreateVendedorDto } from './dto/create-vendedor.dto';
 import { UpdateVendedorDto } from './dto/update-vendedor.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendedor } from './entities/vendedor.entity';
-import { In, Repository, MoreThanOrEqual, LessThanOrEqual, Between } from 'typeorm';
+import {
+  In,
+  Repository,
+  MoreThanOrEqual,
+  LessThanOrEqual,
+  Between,
+} from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { VendedorResponseDto } from './dto/response.dto';
@@ -72,9 +78,13 @@ export class VendedorService {
     });
   }
 
-  async getVendedoresBySucursal(id: string, page: number = 1, limit: number = 10) {
+  async getVendedoresBySucursal(
+    id: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const [data, total] = await this.vendedorRepository.findAndCount({
       where: { sucursales: { id } },
       relations: ['inscripciones'],
@@ -90,7 +100,7 @@ export class VendedorService {
       skip,
       take: limit,
     });
-    
+
     return {
       data,
       totalItems: total,
@@ -99,15 +109,25 @@ export class VendedorService {
     };
   }
 
-  async findOne(id: string, fechaDesde?: string, fechaHasta?: string): Promise<VendedorResponseDto | undefined> {
+  async findOne(
+    id: string,
+    fechaDesde?: string,
+    fechaHasta?: string,
+  ): Promise<VendedorResponseDto | undefined> {
     let inscripcionWhere = {};
-    
+
     if (fechaDesde && fechaHasta) {
-      inscripcionWhere = { fechaRegistro: Between(new Date(fechaDesde), new Date(fechaHasta)) };
+      inscripcionWhere = {
+        fechaRegistro: Between(new Date(fechaDesde), new Date(fechaHasta)),
+      };
     } else if (fechaDesde) {
-      inscripcionWhere = { fechaRegistro: MoreThanOrEqual(new Date(fechaDesde)) };
+      inscripcionWhere = {
+        fechaRegistro: MoreThanOrEqual(new Date(fechaDesde)),
+      };
     } else if (fechaHasta) {
-      inscripcionWhere = { fechaRegistro: LessThanOrEqual(new Date(fechaHasta)) };
+      inscripcionWhere = {
+        fechaRegistro: LessThanOrEqual(new Date(fechaHasta)),
+      };
     }
 
     const vend = await this.vendedorRepository.findOne({
@@ -145,7 +165,7 @@ export class VendedorService {
 
     let inscripcionesFiltradas = vend.inscripciones;
     if (fechaDesde || fechaHasta) {
-      inscripcionesFiltradas = vend.inscripciones.filter(inscripcion => {
+      inscripcionesFiltradas = vend.inscripciones.filter((inscripcion) => {
         const fecha = new Date(inscripcion.fechaRegistro);
         if (fechaDesde && fecha < new Date(fechaDesde)) return false;
         if (fechaHasta && fecha > new Date(fechaHasta)) return false;
@@ -164,25 +184,26 @@ export class VendedorService {
   }
 
   async update(id: string, updateVendedorDto: UpdateVendedorDto) {
-    const { sucursal, inscripciones, password, ...vendedorData } = updateVendedorDto;
-    
+    const { sucursal, inscripciones, password, ...vendedorData } =
+      updateVendedorDto;
+
     const vendedor = await this.vendedorRepository.findOne({
       where: { id },
       relations: ['sucursales', 'inscripciones'],
     });
-    
+
     if (!vendedor) {
       throw new Error(`Vendedor con ID ${id} no encontrado`);
     }
-    
+
     // Actualizar datos básicos
     Object.assign(vendedor, vendedorData);
-    
+
     // Actualizar contraseña si se proporciona
     if (password) {
       vendedor.password = await bcrypt.hash(password, 10);
     }
-    
+
     // Actualizar sucursales si se proporcionan
     if (sucursal && sucursal.length > 0) {
       const sucursalesEntities = await this.sucursalRepository.find({
@@ -190,7 +211,7 @@ export class VendedorService {
       });
       vendedor.sucursales = sucursalesEntities;
     }
-    
+
     // Actualizar inscripciones si se proporcionan
     if (inscripciones && inscripciones.length > 0) {
       const inscripcionesEntities = await this.inscripcionRepository.find({
@@ -198,7 +219,7 @@ export class VendedorService {
       });
       vendedor.inscripciones = inscripcionesEntities;
     }
-    
+
     return await this.vendedorRepository.save(vendedor);
   }
 
@@ -210,11 +231,18 @@ export class VendedorService {
     return { message: 'Vendedor eliminado exitosamente' };
   }
 
-  async generateInscripcionesExcel(id: string, fechaDesde?: string, fechaHasta?: string): Promise<Buffer> {
-    let inscripcionWhere: any = { vendedor: { id } };
-    
+  async generateInscripcionesExcel(
+    id: string,
+    fechaDesde?: string,
+    fechaHasta?: string,
+  ): Promise<Buffer> {
+    const inscripcionWhere: any = { vendedor: { id } };
+
     if (fechaDesde && fechaHasta) {
-      inscripcionWhere.fechaRegistro = Between(new Date(fechaDesde), new Date(fechaHasta));
+      inscripcionWhere.fechaRegistro = Between(
+        new Date(fechaDesde),
+        new Date(fechaHasta),
+      );
     } else if (fechaDesde) {
       inscripcionWhere.fechaRegistro = MoreThanOrEqual(new Date(fechaDesde));
     } else if (fechaHasta) {
@@ -247,6 +275,10 @@ export class VendedorService {
       { header: 'Vendedor', key: 'vendedor', width: 25 },
     ];
 
-    return await this.excelService.generateExcel(data, columns, 'Inscripciones');
+    return await this.excelService.generateExcel(
+      data,
+      columns,
+      'Inscripciones',
+    );
   }
 }

@@ -31,7 +31,11 @@ export class ProfesorController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
   ) {
-    return this.profesorService.getProfesoresBySucursal(sucursalId, +page, +limit);
+    return this.profesorService.getProfesoresBySucursal(
+      sucursalId,
+      +page,
+      +limit,
+    );
   }
 
   @Put('edit/:id')

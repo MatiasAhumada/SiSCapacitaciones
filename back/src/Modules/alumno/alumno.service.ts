@@ -111,10 +111,10 @@ export class AlumnoService {
     filtros?: any,
   ): Promise<PaginatedAlumnos> {
     const { page = 1, limit = 10 } = pagination || {};
-    
+
     // Construir condiciones de filtro
     const whereConditions: any = { sucursal: { id } };
-    
+
     if (filtros?.nombre) {
       whereConditions.name = Like(`%${filtros.nombre}%`);
     }
@@ -147,18 +147,28 @@ export class AlumnoService {
       cantidadComisiones: alumno.alumnoComisiones?.length || 0,
       cantidadCertificados: alumno.certificados?.length || 0,
     }));
-    
+
     // Filtrar por cantidad de comisiones y certificados si se especifica
     if (filtros?.cantidadComisiones) {
-      data = data.filter(alumno => alumno.cantidadComisiones === parseInt(filtros.cantidadComisiones));
+      data = data.filter(
+        (alumno) =>
+          alumno.cantidadComisiones === parseInt(filtros.cantidadComisiones),
+      );
     }
     if (filtros?.cantidadCertificados) {
-      data = data.filter(alumno => alumno.cantidadCertificados === parseInt(filtros.cantidadCertificados));
+      data = data.filter(
+        (alumno) =>
+          alumno.cantidadCertificados ===
+          parseInt(filtros.cantidadCertificados),
+      );
     }
 
     // Si hay filtros aplicados, usar el total filtrado, sino el total original
-    const finalTotalItems = (filtros?.cantidadComisiones || filtros?.cantidadCertificados) ? data.length : totalItems;
-  
+    const finalTotalItems =
+      filtros?.cantidadComisiones || filtros?.cantidadCertificados
+        ? data.length
+        : totalItems;
+
     return {
       data,
       totalItems: finalTotalItems,

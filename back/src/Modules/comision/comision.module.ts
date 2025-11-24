@@ -25,7 +25,7 @@ import { PdfModule } from '../pdf/pdf.module';
       Asistencia,
       Caja,
       AsistenciaProfesor,
-      Inscripcion
+      Inscripcion,
     ]),
     PdfModule,
   ],

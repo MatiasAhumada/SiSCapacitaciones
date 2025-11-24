@@ -7,9 +7,7 @@ import { MetricsController } from './metrics.controller';
 import { MetricsService } from './metrics.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Caja, Inscripcion]),
-  ],
+  imports: [TypeOrmModule.forFeature([Caja, Inscripcion])],
   controllers: [MetricsController],
   providers: [MetricsService],
 })

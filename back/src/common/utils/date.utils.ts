@@ -1,4 +1,4 @@
-import { format, toZonedTime } from 'date-fns-tz';
+import { format } from 'date-fns-tz';
 import { es } from 'date-fns/locale';
 const TIME_ZONE = 'America/Argentina/Buenos_Aires';
 export function getArgentinaTime(): Date {

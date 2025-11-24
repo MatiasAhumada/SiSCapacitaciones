@@ -24,16 +24,20 @@ export class PdfService {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.text(`Comisión: ${comision.name}`, 14, 30);
-    doc.text(`Profesor: ${comision.profesor.name} ${comision.profesor.apellido}`, 14, 37);
+    doc.text(
+      `Profesor: ${comision.profesor.name} ${comision.profesor.apellido}`,
+      14,
+      37,
+    );
     doc.text(`Horario: ${comision.hour.start} - ${comision.hour.end}`, 14, 44);
     doc.text(`Días: ${comision.day}`, 150, 37);
 
     const fechas = Array.from(
       new Set(
         alumnos.flatMap((item) =>
-          item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString())
-        )
-      )
+          item.asistencias.map((a) => new Date(a.fecha).toLocaleDateString()),
+        ),
+      ),
     ).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
     const headers = ['Alumno', 'DNI', 'Teléfono', ...fechas];
@@ -42,7 +46,7 @@ export class PdfService {
       const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
       fechas.forEach((fecha) => {
         const asistencia = item.asistencias.find(
-          (a) => new Date(a.fecha).toLocaleDateString() === fecha
+          (a) => new Date(a.fecha).toLocaleDateString() === fecha,
         );
         row.push(asistencia ? (asistencia.presente ? 'P' : 'A') : 'A');
       });

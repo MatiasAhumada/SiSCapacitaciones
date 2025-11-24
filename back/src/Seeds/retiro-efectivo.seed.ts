@@ -5,16 +5,26 @@ import { Repository } from 'typeorm';
 import { SesionCaja } from '../Modules/caja/entities/sesion-caja.entity';
 import { Vendedor } from '../Modules/vendedor/entities/vendedor.entity';
 import { Subcategoria } from '../Modules/caja/entities/subcategoria.entity';
-import { Caja, MetodoPago, TipoMovimiento } from '../Modules/caja/entities/caja.entity';
+import {
+  Caja,
+  MetodoPago,
+  TipoMovimiento,
+} from '../Modules/caja/entities/caja.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 async function runRetiroEfectivo() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  
+
   const cajaService = app.get(CajaService);
-  const sesionRepository = app.get<Repository<SesionCaja>>(getRepositoryToken(SesionCaja));
-  const vendedorRepository = app.get<Repository<Vendedor>>(getRepositoryToken(Vendedor));
-  const subcategoriaRepository = app.get<Repository<Subcategoria>>(getRepositoryToken(Subcategoria));
+  const sesionRepository = app.get<Repository<SesionCaja>>(
+    getRepositoryToken(SesionCaja),
+  );
+  const vendedorRepository = app.get<Repository<Vendedor>>(
+    getRepositoryToken(Vendedor),
+  );
+  const subcategoriaRepository = app.get<Repository<Subcategoria>>(
+    getRepositoryToken(Subcategoria),
+  );
   const cajaRepository = app.get<Repository<Caja>>(getRepositoryToken(Caja));
 
   try {
@@ -22,11 +32,11 @@ async function runRetiroEfectivo() {
 
     // 1. Inicializar categoría RETIRO si no existe
     await cajaService.inicializarCategoriaRetiro();
-    
+
     // 2. Obtener subcategoría de retiro
     const subcategoriaRetiro = await subcategoriaRepository.findOne({
       where: { nombre: 'Retiro' },
-      relations: ['categoria']
+      relations: ['categoria'],
     });
 
     if (!subcategoriaRetiro) {
@@ -48,14 +58,16 @@ async function runRetiroEfectivo() {
         .getMany();
 
       if (!sesionesConEfectivo.length) {
-        console.log(`   ✅ ${vendedor.name} no tiene efectivo en ninguna sesión`);
+        console.log(
+          `   ✅ ${vendedor.name} no tiene efectivo en ninguna sesión`,
+        );
         continue;
       }
 
       for (const sesion of sesionesConEfectivo) {
         const efectivoDisponible = Number(sesion.totalEfectivo);
         const estado = sesion.fechaCierre ? 'cerrada' : 'abierta';
-        
+
         console.log(`   💰 Sesión ${estado}: $${efectivoDisponible}`);
 
         // 5. Crear movimiento de retiro
@@ -67,7 +79,7 @@ async function runRetiroEfectivo() {
           vendedor: vendedor,
           subcategoria: subcategoriaRetiro,
           fecha: new Date(),
-          sesionCaja: sesion
+          sesionCaja: sesion,
         });
 
         await cajaRepository.save(retiro);
@@ -78,7 +90,9 @@ async function runRetiroEfectivo() {
 
         await sesionRepository.save(sesion);
 
-        console.log(`   ✅ Retiro de $${efectivoDisponible} realizado en sesión ${estado}`);
+        console.log(
+          `   ✅ Retiro de $${efectivoDisponible} realizado en sesión ${estado}`,
+        );
       }
     }
 

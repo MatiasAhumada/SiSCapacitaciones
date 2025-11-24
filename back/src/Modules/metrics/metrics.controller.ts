@@ -24,7 +24,12 @@ export class MetricsController {
   ) {
     const ids = vendedorIds ? vendedorIds.split(',') : undefined;
     const monthsList = months ? months.split(',') : undefined;
-    return this.metricsService.getEnrollmentsByMonth(ids, monthsList, year, cursoId);
+    return this.metricsService.getEnrollmentsByMonth(
+      ids,
+      monthsList,
+      year,
+      cursoId,
+    );
   }
 
   @Get('payment-methods')

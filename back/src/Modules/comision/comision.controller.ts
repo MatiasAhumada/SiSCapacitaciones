@@ -44,7 +44,8 @@ export class ComisionController {
     @Param('comisionId') comisionId: string,
     @Res() res: Response,
   ) {
-    const pdfBuffer = await this.comisionService.generarPdfAsistencia(comisionId);
+    const pdfBuffer =
+      await this.comisionService.generarPdfAsistencia(comisionId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'attachment; filename=asistencia.pdf',
@@ -62,7 +63,14 @@ export class ComisionController {
     @Query('all') all?: string,
     @Query('status') status?: string,
   ) {
-    return this.comisionService.findAll(Number(page), Number(limit), name, day, all === 'true', status);
+    return this.comisionService.findAll(
+      Number(page),
+      Number(limit),
+      name,
+      day,
+      all === 'true',
+      status,
+    );
   }
   @Get('/aluCom/:idAluCom')
   findAluCom(
@@ -86,7 +94,15 @@ export class ComisionController {
     @Query('all') all?: string,
     @Query('status') status?: string,
   ) {
-    return this.comisionService.findBySucursal(id, Number(page), Number(limit), name, day, all === 'true', status);
+    return this.comisionService.findBySucursal(
+      id,
+      Number(page),
+      Number(limit),
+      name,
+      day,
+      all === 'true',
+      status,
+    );
   }
   @Get(':id')
   findOne(

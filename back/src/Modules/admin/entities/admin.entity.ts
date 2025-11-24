@@ -17,6 +17,5 @@ export class Admins {
   @OneToMany(() => Sucursal, (sucursal) => sucursal.admin)
   sucursales: Sucursal[];
   @OneToMany(() => SesionCaja, (sesionCaja) => sesionCaja.admin)
-sesionesCaja: SesionCaja[];
-
+  sesionesCaja: SesionCaja[];
 }

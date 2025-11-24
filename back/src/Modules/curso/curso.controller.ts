@@ -21,8 +21,6 @@ export class CursoController {
     return this.cursoService.create(createCursoDto);
   }
 
-
-
   @Get()
   findAll(
     @Query('page') page?: number,
@@ -30,7 +28,12 @@ export class CursoController {
     @Query('area') area?: string,
     @Query('all') all?: string,
   ) {
-    return this.cursoService.findAll(Number(page), Number(limit), area, all === 'true');
+    return this.cursoService.findAll(
+      Number(page),
+      Number(limit),
+      area,
+      all === 'true',
+    );
   }
 
   @Get(':id')

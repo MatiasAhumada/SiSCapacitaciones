@@ -88,13 +88,20 @@ export class ComisionService {
     return this.comisionRepository.save(nuevaComision);
   }
 
-  async findAll(page = 1, limit = 10, name?: string, day?: string, all?: boolean, status?: string) {
+  async findAll(
+    page = 1,
+    limit = 10,
+    name?: string,
+    day?: string,
+    all?: boolean,
+    status?: string,
+  ) {
     const whereConditions: any = {};
-    
+
     if (name) {
       whereConditions.name = ILike(`%${name}%`);
     }
-    
+
     if (day) {
       whereConditions.day = day;
     }
@@ -181,7 +188,9 @@ export class ComisionService {
     });
 
     // Obtener pagos filtrados por comisión si se especifica
-    const whereConditions: any = { alumnoComision: { alumno: { id: alumnoComision.alumno.id } } };
+    const whereConditions: any = {
+      alumnoComision: { alumno: { id: alumnoComision.alumno.id } },
+    };
     if (comisionId) {
       whereConditions.alumnoComision = { id: comisionId };
     }
@@ -360,13 +369,21 @@ export class ComisionService {
     }
   }
 
-  async findBySucursal(sucursalId: string, page = 1, limit = 10, name?: string, day?: string, all?: boolean, status?: string) {
+  async findBySucursal(
+    sucursalId: string,
+    page = 1,
+    limit = 10,
+    name?: string,
+    day?: string,
+    all?: boolean,
+    status?: string,
+  ) {
     const whereConditions: any = { sucursal: { id: sucursalId } };
-    
+
     if (name) {
       whereConditions.name = ILike(`%${name}%`);
     }
-    
+
     if (day) {
       whereConditions.day = day;
     }
@@ -429,7 +446,9 @@ export class ComisionService {
     return this.alumnoComisionRepository.save(alumnoComision);
   }
 
-  async cambiarStatusComision(change: ChangeStatusComisionDto): Promise<Comision> {
+  async cambiarStatusComision(
+    change: ChangeStatusComisionDto,
+  ): Promise<Comision> {
     const { status, comisionId } = change;
     const comision = await this.comisionRepository.findOne({
       where: { id: comisionId },
@@ -454,7 +473,7 @@ export class ComisionService {
       this.asistenciaRepository.create({
         alumnoComision: { id: alumnoComision.id },
         presente: data.alumnosComisionIds.includes(alumnoComision.id),
-        fecha:data.fecha,
+        fecha: data.fecha,
       }),
     );
     await this.asistenciaRepository.save(asistencias);

@@ -9,11 +9,17 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 
 async function runLimpiarVendedoresSinCajas() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  
-  const vendedorRepository = app.get<Repository<Vendedor>>(getRepositoryToken(Vendedor));
-  const sesionRepository = app.get<Repository<SesionCaja>>(getRepositoryToken(SesionCaja));
+
+  const vendedorRepository = app.get<Repository<Vendedor>>(
+    getRepositoryToken(Vendedor),
+  );
+  const sesionRepository = app.get<Repository<SesionCaja>>(
+    getRepositoryToken(SesionCaja),
+  );
   const cajaRepository = app.get<Repository<Caja>>(getRepositoryToken(Caja));
-  const inscripcionRepository = app.get<Repository<Inscripcion>>(getRepositoryToken(Inscripcion));
+  const inscripcionRepository = app.get<Repository<Inscripcion>>(
+    getRepositoryToken(Inscripcion),
+  );
 
   try {
     console.log('🔍 Buscando vendedores sin cajas o sesiones...');
@@ -24,26 +30,32 @@ async function runLimpiarVendedoresSinCajas() {
     for (const vendedor of vendedores) {
       // Verificar si tiene sesiones
       const sesiones = await sesionRepository.count({
-        where: { vendedor: { id: vendedor.id } }
+        where: { vendedor: { id: vendedor.id } },
       });
 
       // Verificar si tiene movimientos de caja
       const movimientos = await cajaRepository.count({
-        where: { vendedor: { id: vendedor.id } }
+        where: { vendedor: { id: vendedor.id } },
       });
 
       // Verificar si tiene inscripciones
       const inscripciones = await inscripcionRepository.count({
-        where: { vendedor: { id: vendedor.id } }
+        where: { vendedor: { id: vendedor.id } },
       });
 
       if (sesiones === 0 && inscripciones === 0) {
         vendedoresParaEliminar.push(vendedor);
-        console.log(`❌ ${vendedor.name} (${vendedor.email}) - Sin sesiones ni inscripciones (Movimientos: ${movimientos})`);
+        console.log(
+          `❌ ${vendedor.name} (${vendedor.email}) - Sin sesiones ni inscripciones (Movimientos: ${movimientos})`,
+        );
       } else if (sesiones === 0 && inscripciones > 0) {
-        console.log(`⚠️ ${vendedor.name} - Sin sesiones pero con ${inscripciones} inscripciones (NO SE ELIMINA)`);
+        console.log(
+          `⚠️ ${vendedor.name} - Sin sesiones pero con ${inscripciones} inscripciones (NO SE ELIMINA)`,
+        );
       } else {
-        console.log(`✅ ${vendedor.name} - Sesiones: ${sesiones}, Movimientos: ${movimientos}, Inscripciones: ${inscripciones}`);
+        console.log(
+          `✅ ${vendedor.name} - Sesiones: ${sesiones}, Movimientos: ${movimientos}, Inscripciones: ${inscripciones}`,
+        );
       }
     }
 
@@ -52,8 +64,10 @@ async function runLimpiarVendedoresSinCajas() {
       return;
     }
 
-    console.log(`\n⚠️  Se encontraron ${vendedoresParaEliminar.length} vendedores sin actividad:`);
-    vendedoresParaEliminar.forEach(v => {
+    console.log(
+      `\n⚠️  Se encontraron ${vendedoresParaEliminar.length} vendedores sin actividad:`,
+    );
+    vendedoresParaEliminar.forEach((v) => {
       console.log(`   - ${v.name} (${v.email})`);
     });
 
@@ -62,13 +76,15 @@ async function runLimpiarVendedoresSinCajas() {
       // Eliminar todas las cajas donde aparezca el vendedor
       await cajaRepository.delete({ vendedor: { id: vendedor.id } });
       await cajaRepository.delete({ vendedorPagos: { id: vendedor.id } });
-      
+
       // Luego eliminar el vendedor
       await vendedorRepository.delete(vendedor.id);
       console.log(`🗑️  Eliminado: ${vendedor.name}`);
     }
 
-    console.log(`✅ Proceso completado. ${vendedoresParaEliminar.length} vendedores eliminados.`);
+    console.log(
+      `✅ Proceso completado. ${vendedoresParaEliminar.length} vendedores eliminados.`,
+    );
   } catch (error) {
     console.error('❌ Error ejecutando limpieza:', error);
   } finally {

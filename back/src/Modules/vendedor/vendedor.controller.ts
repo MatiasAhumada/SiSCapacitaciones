@@ -34,7 +34,11 @@ export class VendedorController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
   ) {
-    return this.vendedorService.getVendedoresBySucursal(sucursalId, +page, +limit);
+    return this.vendedorService.getVendedoresBySucursal(
+      sucursalId,
+      +page,
+      +limit,
+    );
   }
 
   @Get(':id/inscripciones/excel')
@@ -44,10 +48,20 @@ export class VendedorController {
     @Query('fechaDesde') fechaDesde?: string,
     @Query('fechaHasta') fechaHasta?: string,
   ) {
-    const buffer = await this.vendedorService.generateInscripcionesExcel(id, fechaDesde, fechaHasta);
-    
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename=inscripciones-vendedor-${id}.xlsx`);
+    const buffer = await this.vendedorService.generateInscripcionesExcel(
+      id,
+      fechaDesde,
+      fechaHasta,
+    );
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=inscripciones-vendedor-${id}.xlsx`,
+    );
     res.send(buffer);
   }
 

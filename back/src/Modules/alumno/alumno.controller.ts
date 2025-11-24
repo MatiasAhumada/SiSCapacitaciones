@@ -43,7 +43,13 @@ export class AlumnoController {
     @Query('cantidadComisiones') cantidadComisiones?: string,
     @Query('cantidadCertificados') cantidadCertificados?: string,
   ) {
-    const filtros = { nombre, dni, tel, cantidadComisiones, cantidadCertificados };
+    const filtros = {
+      nombre,
+      dni,
+      tel,
+      cantidadComisiones,
+      cantidadCertificados,
+    };
     return this.alumnoService.getAlumnosBySucursal(
       sucursalId,
       {

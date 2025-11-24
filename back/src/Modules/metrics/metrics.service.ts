@@ -1,8 +1,8 @@
 // src/modules/metrics/metrics.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
-import { Caja, MetodoPago } from '../caja/entities/caja.entity';
+import { Repository } from 'typeorm';
+import { Caja } from '../caja/entities/caja.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 
 @Injectable()
@@ -14,7 +14,10 @@ export class MetricsService {
     private readonly inscripcionRepository: Repository<Inscripcion>,
   ) {}
 
-  async getSalesByMonth(year?: string, vendedorIds?: string[]): Promise<{ name: string; sales: number; month?: string }[]> {
+  async getSalesByMonth(
+    year?: string,
+    vendedorIds?: string[],
+  ): Promise<{ name: string; sales: number; month?: string }[]> {
     const query = this.cajaRepository
       .createQueryBuilder('caja')
       .leftJoin('caja.sesionCaja', 'sesionCaja')
@@ -28,7 +31,8 @@ export class MetricsService {
     query.andWhere("TO_CHAR(caja.fecha, 'YYYY') = :year", { year: targetYear });
 
     if (vendedorIds && vendedorIds.length > 0) {
-      query.addSelect('vendedor.name', 'vendedorName')
+      query
+        .addSelect('vendedor.name', 'vendedorName')
         .andWhere('vendedor.id IN (:...vendedorIds)', { vendedorIds })
         .groupBy('month')
         .addGroupBy('vendedor.name');
@@ -38,7 +42,7 @@ export class MetricsService {
 
     const rawData = await query.orderBy('month', 'ASC').getRawMany();
 
-    const formattedData = rawData.map(item => ({
+    const formattedData = rawData.map((item) => ({
       name: item.vendedorName || item.month,
       month: item.month,
       sales: parseFloat(item.totalSales),
@@ -55,10 +59,17 @@ export class MetricsService {
       .orderBy('year', 'DESC')
       .getRawMany();
 
-    return rawData.map(item => item.year);
+    return rawData.map((item) => item.year);
   }
 
-  async getEnrollmentsByMonth(vendedorIds?: string[], months?: string[], year?: string, cursoId?: string): Promise<{ name: string; inscripciones: number; week?: string; month?: string }[]> {
+  async getEnrollmentsByMonth(
+    vendedorIds?: string[],
+    months?: string[],
+    year?: string,
+    cursoId?: string,
+  ): Promise<
+    { name: string; inscripciones: number; week?: string; month?: string }[]
+  > {
     const query = this.inscripcionRepository
       .createQueryBuilder('inscripcion')
       .leftJoin('inscripcion.vendedor', 'vendedor')
@@ -70,14 +81,22 @@ export class MetricsService {
 
     if (months && months.length > 0) {
       // Agrupar por semana cuando se filtran meses
-      query.select("TO_CHAR(inscripcion.fechaRegistro, 'YYYY-MM') AS month")
-        .addSelect("'Semana ' || EXTRACT(WEEK FROM inscripcion.fechaRegistro) - EXTRACT(WEEK FROM DATE_TRUNC('month', inscripcion.fechaRegistro)) + 1 AS week")
+      query
+        .select("TO_CHAR(inscripcion.fechaRegistro, 'YYYY-MM') AS month")
+        .addSelect(
+          "'Semana ' || EXTRACT(WEEK FROM inscripcion.fechaRegistro) - EXTRACT(WEEK FROM DATE_TRUNC('month', inscripcion.fechaRegistro)) + 1 AS week",
+        )
         .addSelect('COUNT(*)', 'totalInscripciones')
-        .where("TO_CHAR(inscripcion.fechaRegistro, 'MM') IN (:...months)", { months })
-        .andWhere("TO_CHAR(inscripcion.fechaRegistro, 'YYYY') = :year", { year: targetYear });
+        .where("TO_CHAR(inscripcion.fechaRegistro, 'MM') IN (:...months)", {
+          months,
+        })
+        .andWhere("TO_CHAR(inscripcion.fechaRegistro, 'YYYY') = :year", {
+          year: targetYear,
+        });
 
       if (vendedorIds && vendedorIds.length > 0) {
-        query.addSelect('vendedor.name', 'vendedorName')
+        query
+          .addSelect('vendedor.name', 'vendedorName')
           .andWhere('vendedor.id IN (:...vendedorIds)', { vendedorIds })
           .groupBy('month')
           .addGroupBy('week')
@@ -87,12 +106,16 @@ export class MetricsService {
       }
     } else {
       // Agrupar por mes cuando no hay filtro de meses
-      query.select("TO_CHAR(inscripcion.fechaRegistro, 'YYYY-MM') AS month")
+      query
+        .select("TO_CHAR(inscripcion.fechaRegistro, 'YYYY-MM') AS month")
         .addSelect('COUNT(*)', 'totalInscripciones')
-        .where("TO_CHAR(inscripcion.fechaRegistro, 'YYYY') = :year", { year: targetYear });
+        .where("TO_CHAR(inscripcion.fechaRegistro, 'YYYY') = :year", {
+          year: targetYear,
+        });
 
       if (vendedorIds && vendedorIds.length > 0) {
-        query.addSelect('vendedor.name', 'vendedorName')
+        query
+          .addSelect('vendedor.name', 'vendedorName')
           .andWhere('vendedor.id IN (:...vendedorIds)', { vendedorIds })
           .groupBy('month')
           .addGroupBy('vendedor.name');
@@ -107,7 +130,7 @@ export class MetricsService {
 
     const rawData = await query.orderBy('month', 'ASC').getRawMany();
 
-    const formattedData = rawData.map(item => ({
+    const formattedData = rawData.map((item) => ({
       name: item.vendedorName || 'Total',
       month: item.month,
       week: item.week,
@@ -117,7 +140,10 @@ export class MetricsService {
     return formattedData;
   }
 
-  async getPaymentMethodsDistribution(month?: string, vendedorIds?: string[]): Promise<{ name: string; value: number }[]> {
+  async getPaymentMethodsDistribution(
+    month?: string,
+    vendedorIds?: string[],
+  ): Promise<{ name: string; value: number }[]> {
     const query = this.cajaRepository
       .createQueryBuilder('caja')
       .leftJoin('caja.sesionCaja', 'sesionCaja')
@@ -136,7 +162,7 @@ export class MetricsService {
 
     const rawData = await query.groupBy('metodo').getRawMany();
 
-    const formattedData = rawData.map(item => ({
+    const formattedData = rawData.map((item) => ({
       name: item.metodo,
       value: parseFloat(item.totalMonto),
     }));
@@ -145,7 +171,9 @@ export class MetricsService {
   }
 
   // --- NUEVAS MÉTRICAS BASADAS EN LA SESIÓN DE CAJA ---
-  async getSalesBySeller(month?: string): Promise<{ name: string; sales: number }[]> {
+  async getSalesBySeller(
+    month?: string,
+  ): Promise<{ name: string; sales: number }[]> {
     const query = this.cajaRepository
       .createQueryBuilder('caja')
       .leftJoin('caja.sesionCaja', 'sesionCaja')
@@ -162,12 +190,12 @@ export class MetricsService {
       .groupBy('vendedor.name')
       .orderBy('"totalSales"', 'DESC')
       .getRawMany();
-  
-    const formattedData = rawData.map(item => ({
+
+    const formattedData = rawData.map((item) => ({
       name: item.vendedorName,
       sales: parseFloat(item.totalSales),
     }));
-  
+
     return formattedData;
   }
 

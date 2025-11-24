@@ -18,7 +18,6 @@ import { AuthModule } from './auth/auth.module';
 import { CajaModule } from './caja/caja.module';
 import { CertificadoModule } from './certificado/certificado.module';
 import { ComprobanteModule } from './comprobante/comprobante.module';
-import { SeederModule } from '@modules/Seeds/seeders.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { MailModule } from './mail/mail.module';
 import { PdfModule } from './pdf/pdf.module';

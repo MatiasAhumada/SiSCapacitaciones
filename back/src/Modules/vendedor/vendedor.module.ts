@@ -8,7 +8,10 @@ import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { ExcelModule } from '../excel/excel.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Vendedor, Sucursal, Inscripcion]), ExcelModule],
+  imports: [
+    TypeOrmModule.forFeature([Vendedor, Sucursal, Inscripcion]),
+    ExcelModule,
+  ],
   controllers: [VendedorController],
   providers: [VendedorService],
 })

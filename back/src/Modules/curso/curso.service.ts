@@ -20,7 +20,7 @@ export class CursoService {
 
   async findAll(page = 1, limit = 10, area?: string, all = false) {
     const whereConditions: any = {};
-    
+
     if (area) {
       whereConditions.area = area;
     }
@@ -50,8 +50,6 @@ export class CursoService {
       currentPage: page,
     };
   }
-
-
 
   async findOne(id: string) {
     return this.cursoRepository.findOne({

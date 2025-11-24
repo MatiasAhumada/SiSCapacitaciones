@@ -33,12 +33,16 @@ export class ProfesorService {
 
   async findAll() {
     return this.profesorRepository.find({
-      relations:['asistencias'],
+      relations: ['asistencias'],
     });
   }
-  async getProfesoresBySucursal(id: string, page: number = 1, limit: number = 10) {
+  async getProfesoresBySucursal(
+    id: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const [profesores, total] = await this.profesorRepository.findAndCount({
       where: { sucursal: { id } },
       relations: ['comisiones'],
@@ -53,7 +57,7 @@ export class ProfesorService {
       cantidadComisiones: prof.comisiones?.length || 0,
       comisiones: prof.comisiones || [],
     }));
-    
+
     return {
       data,
       totalItems: total,

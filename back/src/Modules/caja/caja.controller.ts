@@ -107,7 +107,7 @@ export class CajaController {
   async getTotalesVendedores() {
     return this.cajaService.getTotalesPorVendedor();
   }
-  
+
   @Get('/resumen/:fecha')
   getResumenPorDia(@Param('fecha') fecha: string) {
     return this.cajaService.getResumenPorDia(fecha);
@@ -124,7 +124,13 @@ export class CajaController {
     @Query('fecha') fecha?: string,
     @Query('conFiltros') conFiltros?: string,
   ) {
-    return this.cajaService.obtenerSesionPorFecha(id, Number(page), Number(limit), fecha, conFiltros === 'true');
+    return this.cajaService.obtenerSesionPorFecha(
+      id,
+      Number(page),
+      Number(limit),
+      fecha,
+      conFiltros === 'true',
+    );
   }
 
   @Get('/export-excel/:sesionId')
@@ -237,12 +243,12 @@ export class CajaController {
   @Get(':id/comprobante-pdf')
   async generarComprobantePDF(@Param('id') id: string, @Res() res: Response) {
     const buffer = await this.cajaService.generarComprobantePDF(id);
-    
+
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="comprobante-${id.substring(0, 8)}-${new Date().toISOString().split('T')[0]}.pdf"`,
     });
-    
+
     res.send(buffer);
   }
 }

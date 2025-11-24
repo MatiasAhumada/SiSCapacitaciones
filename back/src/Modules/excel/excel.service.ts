@@ -50,25 +50,47 @@ export class ExcelService {
     // Título principal
     const titleRow = worksheet.addRow(['REPORTE DE CAJA']);
     titleRow.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
-    titleRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+    titleRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF4472C4' },
+    };
     titleRow.alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.mergeCells('A1:K1');
     titleRow.height = 30;
 
     // Información del vendedor
-    const vendedorRow = worksheet.addRow(['Vendedor:', sesion.vendedor?.name || '-']);
+    const vendedorRow = worksheet.addRow([
+      'Vendedor:',
+      sesion.vendedor?.name || '-',
+    ]);
     vendedorRow.font = { bold: true };
-    vendedorRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
-    
-    const fechaRow = worksheet.addRow(['Fecha de descarga:', formatPostgresDate(new Date())]);
-    fechaRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
-    
+    vendedorRow.getCell(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD9E1F2' },
+    };
+
+    const fechaRow = worksheet.addRow([
+      'Fecha de descarga:',
+      formatPostgresDate(new Date()),
+    ]);
+    fechaRow.getCell(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD9E1F2' },
+    };
+
     worksheet.addRow([]);
 
     // Sección de totales
     const totalesTitle = worksheet.addRow(['TOTALES DE LA SESIÓN']);
     totalesTitle.font = { size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
-    totalesTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF70AD47' } };
+    totalesTitle.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF70AD47' },
+    };
     totalesTitle.alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.mergeCells('A5:K5');
     totalesTitle.height = 25;
@@ -88,7 +110,11 @@ export class ExcelService {
     totales.forEach((total) => {
       const row = worksheet.addRow(total);
       row.getCell(1).font = { bold: true };
-      row.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+      row.getCell(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE2EFDA' },
+      };
       row.getCell(2).numFmt = '$#,##0.00';
       row.getCell(2).alignment = { horizontal: 'right' };
     });
@@ -111,7 +137,11 @@ export class ExcelService {
     ];
     const headerRow = worksheet.addRow(headers);
     headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF4472C4' },
+    };
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
     headerRow.height = 20;
 
@@ -133,7 +163,11 @@ export class ExcelService {
 
       // Formato alternado de filas
       if (index % 2 === 0) {
-        row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+        row.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFF2F2F2' },
+        };
       }
 
       // Formato de monto

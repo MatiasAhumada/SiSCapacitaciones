@@ -17,10 +17,9 @@ export class SeederService implements OnModuleInit {
     await this.seedCajasEspeciales();
   }
 
-
   async seedCajasEspeciales() {
     this.logger.log('🚀 Iniciando creación de cajas perpetuas...');
-    
+
     const adminsInfo = [
       {
         id: '4ab59277-5a15-4841-acce-851b0f6dbe11', // Javier
@@ -48,7 +47,9 @@ export class SeederService implements OnModuleInit {
       });
 
       if (sesionExistente) {
-        this.logger.log(`ℹ️ Sesión perpetua ya existe para ${adminInfo.nombre}.`);
+        this.logger.log(
+          `ℹ️ Sesión perpetua ya existe para ${adminInfo.nombre}.`,
+        );
         continue;
       }
 
@@ -73,26 +74,25 @@ export class SeederService implements OnModuleInit {
     await this.migrarMovimientosDigitales();
   }
 
-
-
   async recalcularTotalesProduccion() {
     this.logger.log('🔄 Iniciando recálculo de totales para producción...');
-    
+
     const dataSource = this.sesionRepository.manager.connection;
-    
+
     // 1. Reparar movimientos de apertura y cierre huérfanos
     await this.repararAperturaCierreHuerfanos();
-    
+
     // 2. Recalcular totales de todas las sesiones
     const sesiones = await this.sesionRepository.find({
-      relations: ['vendedor', 'admin']
+      relations: ['vendedor', 'admin'],
     });
 
     let sesionesActualizadas = 0;
 
     for (const sesion of sesiones) {
       // Calcular totales reales desde los movimientos
-      const totalesReales = await dataSource.query(`
+      const totalesReales = await dataSource.query(
+        `
         SELECT 
           COALESCE(SUM(CASE WHEN tipo = 'Ingreso' THEN monto ELSE 0 END), 0) as total_ingresos,
           COALESCE(SUM(CASE WHEN tipo = 'Egreso' THEN monto ELSE 0 END), 0) as total_egresos,
@@ -109,29 +109,47 @@ export class SeederService implements OnModuleInit {
           COALESCE(SUM(CASE WHEN tipo = 'Apertura' THEN monto ELSE 0 END), 0) as monto_apertura
         FROM cajas 
         WHERE "sesionCajaId" = $1
-      `, [sesion.id]);
+      `,
+        [sesion.id],
+      );
 
       const totales = totalesReales[0];
-      
+
       // Calcular totales finales incluyendo apertura
-      const totalEfectivo = Number(totales.monto_apertura) + Number(totales.ingresos_egresos_efectivo);
+      const totalEfectivo =
+        Number(totales.monto_apertura) +
+        Number(totales.ingresos_egresos_efectivo);
       const totalCredito = Number(totales.ingresos_egresos_credito);
-      const totalDigitalJavier = Number(totales.ingresos_egresos_digital_javier);
-      const totalDigitalTobias = Number(totales.ingresos_egresos_digital_tobias);
+      const totalDigitalJavier = Number(
+        totales.ingresos_egresos_digital_javier,
+      );
+      const totalDigitalTobias = Number(
+        totales.ingresos_egresos_digital_tobias,
+      );
       const totalFerro = Number(totales.ingresos_egresos_ferro);
 
-      
-      const usuario = sesion.vendedor?.name || sesion.admin?.name || 'Desconocido';
-      
+      const usuario =
+        sesion.vendedor?.name || sesion.admin?.name || 'Desconocido';
+
       // Calcular monto de cierre
-      const montoCierre = Number(totales.monto_apertura) + Number(totales.total_ingresos) - Number(totales.total_egresos);
-      
-      this.logger.log(`🔧 Actualizando sesión ${sesion.id} - Usuario: ${usuario}`);
-      this.logger.log(`   Totales: I:${totales.total_ingresos} E:${totales.total_egresos} Ef:${totalEfectivo} Cr:${totalCredito} DJ:${totalDigitalJavier} DT:${totalDigitalTobias} F:${totalFerro}`);
-      this.logger.log(`   Apertura: ${totales.monto_apertura} | Cierre: ${montoCierre}`);
+      const montoCierre =
+        Number(totales.monto_apertura) +
+        Number(totales.total_ingresos) -
+        Number(totales.total_egresos);
+
+      this.logger.log(
+        `🔧 Actualizando sesión ${sesion.id} - Usuario: ${usuario}`,
+      );
+      this.logger.log(
+        `   Totales: I:${totales.total_ingresos} E:${totales.total_egresos} Ef:${totalEfectivo} Cr:${totalCredito} DJ:${totalDigitalJavier} DT:${totalDigitalTobias} F:${totalFerro}`,
+      );
+      this.logger.log(
+        `   Apertura: ${totales.monto_apertura} | Cierre: ${montoCierre}`,
+      );
 
       // Actualizar la sesión
-      await dataSource.query(`
+      await dataSource.query(
+        `
         UPDATE sesiones_caja 
         SET 
           "montoApertura" = $1,
@@ -147,30 +165,36 @@ export class SeederService implements OnModuleInit {
             ELSE "montoCierre"
           END
         WHERE id = $10
-      `, [
-        totales.monto_apertura,
-        totales.total_ingresos,
-        totales.total_egresos, 
-        totalEfectivo,
-        totalCredito,
-        totalDigitalJavier,
-        totalDigitalTobias,
-        totalFerro,
-        montoCierre,
-        sesion.id
-      ]);
+      `,
+        [
+          totales.monto_apertura,
+          totales.total_ingresos,
+          totales.total_egresos,
+          totalEfectivo,
+          totalCredito,
+          totalDigitalJavier,
+          totalDigitalTobias,
+          totalFerro,
+          montoCierre,
+          sesion.id,
+        ],
+      );
 
       sesionesActualizadas++;
     }
 
-    this.logger.log(`✅ Recálculo completado. ${sesionesActualizadas} sesiones actualizadas.`);
+    this.logger.log(
+      `✅ Recálculo completado. ${sesionesActualizadas} sesiones actualizadas.`,
+    );
   }
 
   async repararAperturaCierreHuerfanos() {
-    this.logger.log('🔧 Reparando movimientos de apertura y cierre huérfanos...');
-    
+    this.logger.log(
+      '🔧 Reparando movimientos de apertura y cierre huérfanos...',
+    );
+
     const dataSource = this.sesionRepository.manager.connection;
-    
+
     // Buscar movimientos de apertura y cierre sin sesión
     const movimientosHuerfanos = await dataSource.query(`
       SELECT c.*, v.name as vendedor_name
@@ -180,12 +204,13 @@ export class SeederService implements OnModuleInit {
       AND c.tipo IN ('Apertura', 'Cierre')
       ORDER BY c.fecha
     `);
-    
+
     let movimientosReparados = 0;
-    
+
     for (const movimiento of movimientosHuerfanos) {
       // Buscar sesión apropiada por usuario y fecha
-      const sesionApropiada = await dataSource.query(`
+      const sesionApropiada = await dataSource.query(
+        `
         SELECT s.id, s."fechaApertura", s."fechaCierre"
         FROM sesiones_caja s
         WHERE (
@@ -196,33 +221,42 @@ export class SeederService implements OnModuleInit {
         AND (s."fechaCierre" IS NULL OR s."fechaCierre" >= $2)
         ORDER BY ABS(EXTRACT(EPOCH FROM (s."fechaApertura" - $2)))
         LIMIT 1
-      `, [movimiento.vendedorId, movimiento.fecha]);
-      
+      `,
+        [movimiento.vendedorId, movimiento.fecha],
+      );
+
       if (sesionApropiada.length > 0) {
         const sesion = sesionApropiada[0];
-        
-        await dataSource.query(`
+
+        await dataSource.query(
+          `
           UPDATE cajas SET "sesionCajaId" = $1 WHERE id = $2
-        `, [sesion.id, movimiento.id]);
-        
-        this.logger.log(`📎 Movimiento ${movimiento.tipo} asociado a sesión ${sesion.id}`);
+        `,
+          [sesion.id, movimiento.id],
+        );
+
+        this.logger.log(
+          `📎 Movimiento ${movimiento.tipo} asociado a sesión ${sesion.id}`,
+        );
         movimientosReparados++;
       }
     }
-    
-    this.logger.log(`✅ ${movimientosReparados} movimientos de apertura/cierre reparados.`);
+
+    this.logger.log(
+      `✅ ${movimientosReparados} movimientos de apertura/cierre reparados.`,
+    );
   }
 
   async migrarMovimientosDigitales() {
     const dataSource = this.sesionRepository.manager.connection;
-    
+
     const sesionJavier = await this.sesionRepository.findOne({
       where: {
         admin: { id: '4ab59277-5a15-4841-acce-851b0f6dbe11' },
         fechaCierre: IsNull(),
       },
     });
-    
+
     const sesionTobias = await this.sesionRepository.findOne({
       where: {
         admin: { id: 'f709ac35-d270-4941-83de-d45031d6c33e' },
@@ -237,7 +271,10 @@ export class SeederService implements OnModuleInit {
     `);
 
     for (const mov of movimientosJavier) {
-      await dataSource.query(`UPDATE cajas SET "sesionCajaId" = $1 WHERE id = $2`, [sesionJavier.id, mov.id]);
+      await dataSource.query(
+        `UPDATE cajas SET "sesionCajaId" = $1 WHERE id = $2`,
+        [sesionJavier.id, mov.id],
+      );
     }
 
     const movimientosTobias = await dataSource.query(`
@@ -245,7 +282,10 @@ export class SeederService implements OnModuleInit {
     `);
 
     for (const mov of movimientosTobias) {
-      await dataSource.query(`UPDATE cajas SET "sesionCajaId" = $1 WHERE id = $2`, [sesionTobias.id, mov.id]);
+      await dataSource.query(
+        `UPDATE cajas SET "sesionCajaId" = $1 WHERE id = $2`,
+        [sesionTobias.id, mov.id],
+      );
     }
   }
 }

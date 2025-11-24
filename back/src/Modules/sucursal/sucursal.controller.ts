@@ -15,7 +15,6 @@ export class SucursalController {
     return this.sucursalService.getSucursales();
   }
 
-
   @Post()
   createSuc(@Body() createSucursalDto: CreateSucursalDto) {
     return this.sucursalService.createSuc(createSucursalDto);

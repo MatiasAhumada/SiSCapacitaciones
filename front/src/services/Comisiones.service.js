@@ -1,7 +1,7 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const getComisiones = async (page = 1, limit = 10, name = '', day = '', all = false) => {
+export const getComisiones = async (page = 1, limit = 10, name = '', day = '', all = false, status = '') => {
   try {
     const params = { page, limit };
     if (name && name !== '') {
@@ -12,6 +12,9 @@ export const getComisiones = async (page = 1, limit = 10, name = '', day = '', a
     }
     if (all) {
       params.all = 'true';
+    }
+    if (status !== '') {
+      params.status = status;
     }
     const response = await axios.get(`${API_URL}/comision`, { params });
     return response.data;
@@ -59,7 +62,8 @@ export const getComisionBySucursal = async (
   limit = 10,
   name = '',
   day = '',
-  all = false
+  all = false,
+  status = ''
 ) => {
   try {
     const params = { page, limit };
@@ -71,6 +75,9 @@ export const getComisionBySucursal = async (
     }
     if (all) {
       params.all = 'true';
+    }
+    if (status !== '') {
+      params.status = status;
     }
     const response = await axios.get(`${API_URL}/comision/suc/${id}`, { params });
     return response.data;
@@ -130,6 +137,15 @@ export const transferirAlumno = async (alumnoComisionId, nuevaComisionId) => {
       alumnoComisionId,
       nuevaComisionId,
     });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const editStatusComision = async (change) => {
+  try {
+    const response = await axios.put(`${API_URL}/comision/status`, change);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

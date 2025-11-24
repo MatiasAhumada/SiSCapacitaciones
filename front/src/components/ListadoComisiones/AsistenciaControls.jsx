@@ -8,9 +8,9 @@ const AsistenciaControls = ({ asistencia, onAsistenciaChange, showAsistencia }) 
       <select
         value={asistencia.estadoProfesor}
         onChange={(e) => onAsistenciaChange({ estadoProfesor: e.target.value })}
-        className={`px-4 py-3 border border-gray-300 rounded-lg shadow-sm 
-          focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-          transition-all duration-200 w-full 
+        className={`px-4 py-3 border border-gray-300 rounded shadow-sm 
+          focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:scale-[1.02]
+          transition-all duration-300 w-full hover:shadow-md cursor-pointer
           ${asistencia.estadoProfesor === '' ? 'text-gray-400' : 'text-gray-900'}`}
       >
         <option value="" className="text-gray-400">
@@ -33,9 +33,9 @@ const AsistenciaControls = ({ asistencia, onAsistenciaChange, showAsistencia }) 
           placeholder="Descripción"
           value={asistencia.descripcion}
           onChange={(e) => onAsistenciaChange({ descripcion: e.target.value })}
-          className="px-4 py-3 border border-gray-300 rounded-lg shadow-sm 
-            focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-            transition-all duration-200 w-full"
+          className="px-4 py-3 border border-gray-300 rounded shadow-sm 
+            focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:scale-[1.02]
+            transition-all duration-300 w-full hover:shadow-md animate-fadeIn"
         />
       )}
     </div>

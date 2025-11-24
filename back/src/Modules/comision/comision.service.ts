@@ -15,6 +15,7 @@ import { AsistenciaProfesor } from './entities/asistencia-profesor.entity';
 import { TransferAlumnoDto } from './dto/transfer-alumno.dto';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { PdfService } from '../pdf/pdf.service';
+import { ChangeStatusComisionDto } from './dto/changeStatus-comision.dto';
 
 @Injectable()
 export class ComisionService {
@@ -84,7 +85,7 @@ export class ComisionService {
     return this.comisionRepository.save(nuevaComision);
   }
 
-  async findAll(page = 1, limit = 10, name?: string, day?: string, all?: boolean) {
+  async findAll(page = 1, limit = 10, name?: string, day?: string, all?: boolean, status?: string) {
     const whereConditions: any = {};
     
     if (name) {
@@ -93,6 +94,10 @@ export class ComisionService {
     
     if (day) {
       whereConditions.day = day;
+    }
+
+    if (status !== undefined && status !== '') {
+      whereConditions.status = status === 'true';
     }
 
     const comisiones = await this.comisionRepository.find({
@@ -309,7 +314,7 @@ export class ComisionService {
     }
   }
 
-  async findBySucursal(sucursalId: string, page = 1, limit = 10, name?: string, day?: string, all?: boolean) {
+  async findBySucursal(sucursalId: string, page = 1, limit = 10, name?: string, day?: string, all?: boolean, status?: string) {
     const whereConditions: any = { sucursal: { id: sucursalId } };
     
     if (name) {
@@ -318,6 +323,10 @@ export class ComisionService {
     
     if (day) {
       whereConditions.day = day;
+    }
+
+    if (status !== undefined && status !== '') {
+      whereConditions.status = status === 'true';
     }
 
     const comisiones = await this.comisionRepository.find({
@@ -372,6 +381,20 @@ export class ComisionService {
     alumnoComision.state = estado;
 
     return this.alumnoComisionRepository.save(alumnoComision);
+  }
+
+  async cambiarStatusComision(change: ChangeStatusComisionDto): Promise<Comision> {
+    const { status, comisionId } = change;
+    const comision = await this.comisionRepository.findOne({
+      where: { id: comisionId },
+    });
+
+    if (!comision) {
+      throw new NotFoundException('Comisión no encontrada');
+    }
+
+    comision.status = status;
+    return this.comisionRepository.save(comision);
   }
 
   async registrarAsistencia(data: CreateAsistenciaDto) {

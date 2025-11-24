@@ -241,16 +241,16 @@ const ListadoComisiones = () => {
 
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
         <div className="flex flex-col gap-3 w-full lg:w-80">
-          <div className="relative">
-            <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <div className="relative group">
+            <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
             <input
               type="text"
               placeholder="Filtrar por DNI"
               value={dniFiltro}
               onChange={handleFiltrarDni}
-              className="pl-11 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm 
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                transition-all duration-200 w-full"
+              className="pl-11 pr-4 py-3 border border-gray-300 rounded shadow-sm 
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:scale-[1.02]
+                transition-all duration-300 w-full hover:shadow-md"
             />
           </div>
           <AsistenciaControls
@@ -260,53 +260,53 @@ const ListadoComisiones = () => {
           />
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button
             onClick={generatePDF}
-            className="px-5 py-3 text-white font-medium rounded bg-red-600 hover:bg-red-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+            className="px-5 py-3 text-white font-medium rounded bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2 group"
           >
-            <i className="fa-solid fa-file-pdf"></i>
+            <i className="fa-solid fa-file-pdf group-hover:rotate-12 transition-transform duration-300"></i>
             Exportar PDF
           </button>
 
           {onAsistenciaClicked ? (
             <button
               onClick={onGuardar}
-              className="px-5 py-3 text-white font-medium rounded bg-green-600 hover:bg-green-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+              className="px-5 py-3 text-white font-medium rounded bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2 group"
             >
-              <i className="fa-solid fa-save"></i>
+              <i className="fa-solid fa-save group-hover:rotate-12 transition-transform duration-300"></i>
               Guardar
             </button>
           ) : (
             <button
               onClick={onAsist}
-              className="px-5 py-3 text-white font-medium rounded bg-blue-600 hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+              className="px-5 py-3 text-white font-medium rounded bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2 group"
             >
-              <i className="fa-solid fa-clipboard-check"></i>
+              <i className="fa-solid fa-clipboard-check group-hover:rotate-12 transition-transform duration-300"></i>
               Asistencia
             </button>
           )}
         </div>
       </div>
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="w-full table-auto text-sm">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 font-semibold border-b-2 border-gray-200">
+            <thead className="bg-gradient-to-r from-indigo-50 via-blue-50 to-indigo-50 text-gray-700 font-semibold border-b-2 border-indigo-200">
               <tr>
-                <th className="py-4 px-6 text-left">Acciones</th>
-                <th className="py-4 px-6 text-left">Nombre</th>
-                <th className="py-4 px-6 text-left">DNI</th>
-                <th className="py-4 px-6 text-left">Teléfono</th>
-                <th className="py-4 px-6 text-center">Estado</th>
+                <th className="py-5 px-6 text-left">Acciones</th>
+                <th className="py-5 px-6 text-left">Nombre</th>
+                <th className="py-5 px-6 text-left">DNI</th>
+                <th className="py-5 px-6 text-left">Teléfono</th>
+                <th className="py-5 px-6 text-center">Estado</th>
                 {allDates.map((date) => (
-                  <th key={date} className="py-4 px-6 text-center">
+                  <th key={date} className="py-5 px-6 text-center font-bold text-indigo-700">
                     {date}
                   </th>
                 ))}
                 {onAsistenciaClicked && (
-                  <th className="py-4 px-6 text-center">
+                  <th className="py-5 px-6 text-center">
                     <input
-                      className="py-2 px-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="py-2 px-3 text-gray-700 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:scale-105 transition-all duration-200 shadow-sm hover:shadow-md"
                       type="date"
                       onChange={(e) => handleAsistenciaChange({ fecha: e.target.value })}
                     />
@@ -314,7 +314,7 @@ const ListadoComisiones = () => {
                 )}
               </tr>
             </thead>
-            <tbody className="text-gray-600 divide-y divide-gray-200">
+            <tbody className="text-gray-600 divide-y divide-gray-100">
               {alumnosComision?.map((item) => (
                 <AlumnoRow
                   key={item.id}
@@ -334,7 +334,7 @@ const ListadoComisiones = () => {
           </table>
         </div>
       </div>
-      <div className="mt-6">
+      <div className="mt-8">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

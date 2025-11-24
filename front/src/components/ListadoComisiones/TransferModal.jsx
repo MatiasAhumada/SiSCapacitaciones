@@ -21,8 +21,8 @@ const TransferModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full transform transition-all duration-300 animate-slideUp">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bgColor flex items-center justify-center">
@@ -32,7 +32,7 @@ const TransferModal = ({
           </div>
           <button
             onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+            className="text-gray-400 hover:text-gray-600 transition-all duration-300 p-2 hover:rotate-90 hover:scale-110"
           >
             <i className="fa-solid fa-times text-2xl"></i>
           </button>
@@ -68,15 +68,15 @@ const TransferModal = ({
         <div className="flex gap-4">
           <button
             onClick={onCancel}
-            className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded transition-all duration-200 principal"
+            className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded transition-all duration-300 principal hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 px-6 py-3 btnAz text-white font-semibold rounded transition-all duration-200 shadow-lg hover:shadow-xl principal"
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded transition-all duration-300 shadow-lg hover:shadow-xl principal hover:scale-105 active:scale-95 group"
           >
-            <i className="fa-solid fa-check mr-2"></i>
+            <i className="fa-solid fa-check mr-2 group-hover:scale-110 transition-transform"></i>
             Transferir
           </button>
         </div>

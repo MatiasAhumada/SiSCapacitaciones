@@ -16,6 +16,7 @@ import { ChangeStateDto } from './dto/changeState.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { CreateAsistenciaDto } from './dto/create-assistencia.dto';
 import { TransferAlumnoDto } from './dto/transfer-alumno.dto';
+import { ChangeStatusComisionDto } from './dto/changeStatus-comision.dto';
 
 @Controller('comision')
 export class ComisionController {
@@ -59,8 +60,9 @@ export class ComisionController {
     @Query('name') name?: string,
     @Query('day') day?: string,
     @Query('all') all?: string,
+    @Query('status') status?: string,
   ) {
-    return this.comisionService.findAll(Number(page), Number(limit), name, day, all === 'true');
+    return this.comisionService.findAll(Number(page), Number(limit), name, day, all === 'true', status);
   }
   @Get('/aluCom/:idAluCom')
   findAluCom(@Param('idAluCom') id: string) {
@@ -79,8 +81,9 @@ export class ComisionController {
     @Query('name') name?: string,
     @Query('day') day?: string,
     @Query('all') all?: string,
+    @Query('status') status?: string,
   ) {
-    return this.comisionService.findBySucursal(id, Number(page), Number(limit), name, day, all === 'true');
+    return this.comisionService.findBySucursal(id, Number(page), Number(limit), name, day, all === 'true', status);
   }
   @Get(':id')
   findOne(
@@ -95,6 +98,10 @@ export class ComisionController {
   cambiarEstado(@Body() change: ChangeStateDto) {
     console.log(change);
     return this.comisionService.cambiarEstadoAlumnoComision(change);
+  }
+  @Put('/status')
+  cambiarStatusComision(@Body() change: ChangeStatusComisionDto) {
+    return this.comisionService.cambiarStatusComision(change);
   }
   @Put('/transferir')
   transferirAlumno(@Body() transferData: TransferAlumnoDto) {

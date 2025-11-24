@@ -100,62 +100,63 @@ const CreateComision = () => {
   });
 
   return (
-    <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
-      <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
+    <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-6 md:p-8 bg-white rounded-2xl shadow-2xl border border-gray-100">
+      <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-6">
         <div>
           <img src={logo} alt="Logo" width="50" />
         </div>
-
-        <h2 className="my-auto principal">Nueva Comision</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 principal">Nueva Comisión</h2>
       </div>
 
-      <form className="flex flex-col" onSubmit={handleSubmit}>
-        <div className="pb-2">
-          <label htmlFor="email" className="block mb-2 text-sm principal">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-signature text-blue-600 mr-2"></i>
             Nombre
           </label>
-          <div className="relative text-gray-400">
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="Programacion 1"
-            />
-          </div>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="Programación 1"
+            required
+          />
         </div>
-        <div className="pb-2">
-          <label htmlFor="apellido" className="block mb-2 text-sm principal text-[#111827]">
-            Dia de Dictado
+        <div>
+          <label htmlFor="day" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-calendar-days text-blue-600 mr-2"></i>
+            Día de Dictado
           </label>
-          <div className="relative text-gray-400">
-            <select
-              name="day"
-              value={formData.day || ''}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-            >
-              <option value="">Seleccionar</option>
-              {dias.map((dia, idx) => (
-                <option key={idx} value={dia.value}>
-                  {dia.value}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            name="day"
+            value={formData.day || ''}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md cursor-pointer"
+            required
+          >
+            <option value="">Seleccionar día</option>
+            {dias.map((dia, idx) => (
+              <option key={idx} value={dia.value}>
+                {dia.value}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="pb-2">
-          <label htmlFor="apellido" className="block mb-2 text-sm principal text-[#111827]">
+        <div>
+          <label className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-clock text-blue-600 mr-2"></i>
             Horario
           </label>
-          <div className="flex items-center w-full space-x-2">
+          <div className="flex items-center gap-3">
             <select
               name="start"
               value={formData.hour.start || ''}
               onChange={handleChange}
-              className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
+              className="flex-1 px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md cursor-pointer"
+              required
             >
               <option value="">Inicio</option>
               {horarios.map((horario, index) => (
@@ -164,12 +165,13 @@ const CreateComision = () => {
                 </option>
               ))}
             </select>
-            <span className="font-bold text-lg">-</span>
+            <span className="font-bold text-xl text-gray-400">→</span>
             <select
               name="end"
               value={formData.hour.end || ''}
               onChange={handleChange}
-              className="w-full bg-gray-50 text-gray-600 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 p-2.5"
+              className="flex-1 px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md cursor-pointer"
+              required
             >
               <option value="">Fin</option>
               {horarios.map((horario, index) => (
@@ -180,17 +182,20 @@ const CreateComision = () => {
             </select>
           </div>
         </div>
-        <div className="pb-2">
-          <label className="block mb-2 text-sm principal">Profesor</label>
+        <div>
+          <label htmlFor="profesorId" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-chalkboard-user text-blue-600 mr-2"></i>
+            Profesor
+          </label>
           <select
-            type="text"
             name="profesorId"
             id="profesorId"
             value={formData.profesorId}
             onChange={handleChange}
-            className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md cursor-pointer"
+            required
           >
-            <option value="">Seleccionar Profesor</option>
+            <option value="">Seleccionar profesor</option>
             {Array.isArray(profes) &&
               profes.map((profe) => (
                 <option key={profe.id} value={profe.id}>
@@ -200,8 +205,11 @@ const CreateComision = () => {
           </select>
         </div>
 
-        <div className="pb-2">
-          <label className="block mb-2 text-sm principal">Curso</label>
+        <div>
+          <label className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-book text-blue-600 mr-2"></i>
+            Curso
+          </label>
           <div className="relative curso-dropdown">
             <input
               type="text"
@@ -216,10 +224,11 @@ const CreateComision = () => {
               }}
               onFocus={() => setShowCursos(true)}
               placeholder="Buscar curso..."
-              className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
+              className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+              required
             />
             {showCursos && (
-              <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                 {filteredCursos.map((curso) => (
                   <div
                     key={curso.id}
@@ -228,16 +237,16 @@ const CreateComision = () => {
                       setSearchCurso(curso.name);
                       setShowCursos(false);
                     }}
-                    className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0"
+                    className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-200"
                   >
-                    <div className="font-medium text-gray-900">{curso.name}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-semibold text-gray-900">{curso.name}</div>
+                    <div className="text-sm text-gray-600 mt-1">
                       {curso.area} • {curso.duration}h • ${curso.price}
                     </div>
                   </div>
                 ))}
                 {filteredCursos.length === 0 && (
-                  <div className="p-3 text-gray-500 text-center">No se encontraron cursos</div>
+                  <div className="p-4 text-gray-500 text-center text-sm">No se encontraron cursos</div>
                 )}
               </div>
             )}
@@ -246,27 +255,37 @@ const CreateComision = () => {
 
         <button
           type="submit"
-          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
+          disabled={pause}
+          className="w-full mt-2 px-6 py-3 text-white font-semibold btnAz rounded shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 group"
         >
           {pause ? (
-            <svg
-              fill="white"
-              className="w-6 h-6 mx-auto"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                <animateTransform
-                  attributeName="transform"
-                  type="rotate"
-                  dur="0.75s"
-                  values="0 12 12;360 12 12"
-                  repeatCount="indefinite"
-                />
-              </path>
-            </svg>
+            <>
+              <svg
+                className="animate-spin h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span>Creando...</span>
+            </>
           ) : (
-            'Crear Comision'
+            <>
+              <i className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+              <span>Crear Comisión</span>
+            </>
           )}
         </button>
       </form>

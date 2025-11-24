@@ -24,7 +24,7 @@ const ComisionSelector = ({
 
   const filteredComisiones = comisiones.filter((c) => {
     const comisionText = `${c.name} - ${c.curso?.name} (${c.day} ${c.hour?.start}-${c.hour?.end})`;
-    return comisionText.toLowerCase().includes(searchValue.toLowerCase());
+    return comisionText.toLowerCase().includes(searchValue.toLowerCase()) && c.status !== false;
   });
 
   return (
@@ -46,7 +46,12 @@ const ComisionSelector = ({
               onClick={() => onComisionSelect(comision)}
               className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 text-sm text-gray-700 hover:text-blue-700 transition-colors"
             >
-              <div className="font-medium">{comision.name}</div>
+              <div className="flex items-center justify-between">
+                <div className="font-medium">{comision.name}</div>
+                <span className={`text-xs px-2 py-0.5 rounded ${comision.status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {comision.status ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
               <div className="text-xs text-gray-500">
                 {comision.curso?.name} • {comision.day} {comision.hour?.start}-{comision.hour?.end}
               </div>

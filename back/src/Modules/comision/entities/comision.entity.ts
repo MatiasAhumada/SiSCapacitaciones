@@ -31,6 +31,9 @@ export class Comision {
     end: string;
   };
 
+  @Column({ default: true })
+  status: boolean;
+
   @ManyToOne(() => Curso, (curso) => curso.comisiones, { onDelete: 'SET NULL' })
   curso: Curso;
 

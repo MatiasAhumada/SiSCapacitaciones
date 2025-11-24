@@ -31,7 +31,15 @@ export class AdminService {
     if (!admin) {
       return null;
     }
-    Object.assign(admin, updateAdminDto);
+    
+    const { password, ...updateData } = updateAdminDto;
+    Object.assign(admin, updateData);
+    
+    if (password) {
+      const bcrypt = require('bcrypt');
+      admin.password = await bcrypt.hash(password, 10);
+    }
+    
     await this.admRepository.save(admin);
     return admin;
   }

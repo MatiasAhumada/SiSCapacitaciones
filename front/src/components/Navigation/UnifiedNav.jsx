@@ -22,6 +22,7 @@ import { useApp } from '../../context/AppContext';
 import { useState, useEffect } from 'react';
 import { ModalEditarGenerico } from '../ModalEditar/ModalEditarGenerico';
 import { putVendedor } from '../../services/Vendedores.service';
+import { putAdmin } from '../../services/Admin.service';
 import { aperturaCaja, cerrarCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES } from '../../constants/messages';
@@ -173,13 +174,21 @@ const UnifiedNav = () => {
   };
 
   const handleEditProfile = () => {
-    setEditData({
-      name: user?.name || '',
-      email: user?.email || '',
-      tel: user?.tel || '',
-      password: '',
-      img: user?.img || '',
-    });
+    if (isAdmin) {
+      setEditData({
+        name: user?.name || '',
+        password: '',
+        img: user?.img || '',
+      });
+    } else {
+      setEditData({
+        name: user?.name || '',
+        email: user?.email || '',
+        tel: user?.tel || '',
+        password: '',
+        img: user?.img || '',
+      });
+    }
     setShowEditModal(true);
   };
 
@@ -189,7 +198,18 @@ const UnifiedNav = () => {
 
   const handleEditSave = async () => {
     try {
-      await putVendedor(user.id, editData);
+      let updatedUser;
+      if (isAdmin) {
+        updatedUser = await putAdmin(user.id, editData);
+      } else {
+        updatedUser = await putVendedor(user.id, editData);
+      }
+      
+      // Actualizar usuario en localStorage
+      const currentUser = JSON.parse(localStorage.getItem('auth_user'));
+      const newUser = { ...currentUser, ...updatedUser };
+      localStorage.setItem('auth_user', JSON.stringify(newUser));
+      
       clientSuccessHandler(SUCCESS_MESSAGES.VENDEDOR_ACTUALIZADO);
       setShowEditModal(false);
       window.location.reload();
@@ -198,13 +218,19 @@ const UnifiedNav = () => {
     }
   };
 
-  const editFields = [
-    { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
-    { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
-    { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
-    { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
-  ];
+  const editFields = isAdmin
+    ? [
+        { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
+        { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
+        { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
+      ]
+    : [
+        { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
+        { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
+        { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
+        { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
+        { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
+      ];
 
   const DropdownMenu = ({ config, isMobile = false }) => (
     <Menu as="div" className="relative">
@@ -324,7 +350,7 @@ const UnifiedNav = () => {
               <MenuButton className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-full border border-white/20 hover:bg-white/20 transition-all duration-200">
                 {user?.img ? (
                   <img
-                    src={user.img}
+                    src={user?.img}
                     alt={user.name}
                     className="w-8 h-8 rounded-full object-cover"
                   />

@@ -880,59 +880,69 @@ export class CajaService {
     return sesionAbierta;
   }
 
-  async obtenerSesionPorFecha(userId: string, page = 1, limit = 10) {
+  async obtenerSesionPorFecha(userId: string, page = 1, limit = 10, fecha?: string, conFiltros = false) {
     if (!userId) {
       throw new NotFoundException('ID de usuario no enviado');
     }
 
-    // 1. Buscar sesión abierta sin importar la fecha (vendedor o admin)
-    const sesionAbierta = await this.sesionRepository.findOne({
-      where: [
-        { vendedor: { id: userId }, fechaCierre: IsNull() },
-        { admin: { id: userId }, fechaCierre: IsNull() }
-      ],
-      order: { fechaApertura: 'ASC' },
-    });
-
     let sesiones: SesionCaja[] = [];
 
-    if (sesionAbierta) {
-      // si hay una sesión abierta, usar esa
-      sesiones = [sesionAbierta];
-    } else {
-      // 2. Buscar sesiones del día (vendedor o admin)
-      const fecha = new Date();
-      const inicioDelDia = new Date(fecha);
-      inicioDelDia.setHours(0, 0, 0, 0);
-      const finDelDia = new Date(fecha);
-      finDelDia.setHours(23, 59, 59, 999);
+    if (conFiltros) {
+      // Admin con filtros: buscar todas las sesiones del vendedor
+      let whereCondition: any = [
+        { vendedor: { id: userId } },
+        { admin: { id: userId } }
+      ];
 
-      sesiones = await this.sesionRepository.find({
-        where: [
+      // Si hay filtro de fecha, buscar sesiones de ese día específico
+      if (fecha) {
+        const inicio = new Date(`${fecha}T00:00:00`);
+        const fin = new Date(`${fecha}T23:59:59.999`);
+
+        whereCondition = [
           {
             vendedor: { id: userId },
-            fechaApertura: Between(inicioDelDia, finDelDia),
+            fechaApertura: Between(inicio, fin),
           },
           {
             admin: { id: userId },
-            fechaApertura: Between(inicioDelDia, finDelDia),
+            fechaApertura: Between(inicio, fin),
           }
-        ],
-        order: { fechaApertura: 'ASC' },
+        ];
+      }
+
+      sesiones = await this.sesionRepository.find({
+        where: whereCondition,
+        order: { fechaApertura: 'DESC' },
       });
 
       if (!sesiones.length) {
+        return [];
+      }
+    } else {
+      // Vendedor sin filtros: buscar solo sesión abierta
+      const sesionAbierta = await this.sesionRepository.findOne({
+        where: [
+          { vendedor: { id: userId }, fechaCierre: IsNull() },
+          { admin: { id: userId }, fechaCierre: IsNull() }
+        ],
+        order: { fechaApertura: 'DESC' },
+      });
+
+      if (!sesionAbierta) {
         throw new NotFoundException(
-          'No se encontraron sesiones abiertas ni sesiones del día.',
+          'No hay sesión de caja abierta.',
         );
       }
+
+      sesiones = [sesionAbierta];
     }
 
     const sesionesConMovimientos = await Promise.all(
       sesiones.map(async (sesion) => {
         const [movimientos, total] = await this.cajaRepository.findAndCount({
           where: { sesionCaja: { id: sesion.id } },
-          relations: ['alumnoComision.alumno'],
+          relations: ['alumnoComision.alumno', 'vendedor', 'subcategoria.categoria'],
           select: {
             alumnoComision: {
               id: true,
@@ -940,6 +950,18 @@ export class CajaService {
                 id: true,
                 name: true,
                 dni: true,
+              },
+            },
+            vendedor: {
+              id: true,
+              name: true,
+            },
+            subcategoria: {
+              id: true,
+              nombre: true,
+              categoria: {
+                id: true,
+                nombre: true,
               },
             },
           },

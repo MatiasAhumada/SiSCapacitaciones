@@ -27,7 +27,7 @@ import CreateCaja from './components/CreateCaja/CreateCaja';
 import CajaEgreso from './components/CajaEgreso/CajaEgreso';
 import CajaTransferencia from './components/CajaTransferencia/CajaTransferencia';
 
-import DashCajas from './components/DashCajas/DashCajas';
+
 import ListadoCajas from './components/ListadoCajas/ListadoCajas';
 import Certificados from './components/Certificados/Certificados';
 import Inscribir from './components/Inscribir/Inscribir';
@@ -188,7 +188,7 @@ function App() {
               element={
                 <RequireAuth>
                   <ProtectedLayout>
-                    <DashCajas />
+                    <DashCaja />
                   </ProtectedLayout>
                 </RequireAuth>
               }

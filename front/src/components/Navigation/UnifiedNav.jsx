@@ -19,12 +19,75 @@ import simplificado from '../../assets/simplificado_a_color.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
+import { useState, useEffect } from 'react';
+import { aperturaCaja, cerrarCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
+import { SUCCESS_MESSAGES } from '../../constants/messages';
 
 const UnifiedNav = () => {
   const { logout, user } = useAuth();
   const { sucursales, sucursalSeleccionada, cambiarSucursal } = useApp();
   const navigate = useNavigate();
   const isAdmin = user?.isAdmin;
+  const [sesionCaja, setSesionCaja] = useState(null);
+  const [loadingCaja, setLoadingCaja] = useState(false);
+
+  useEffect(() => {
+    const cargarSesionCaja = async () => {
+      if (!user?.id) return;
+      try {
+        const data = await GetCajaByVendedor(user.id, 1, 1);
+        const ultimaSesion = data.length > 0 ? data[0] : null;
+        setSesionCaja(ultimaSesion);
+      } catch (error) {
+        // Silencioso
+      }
+    };
+    cargarSesionCaja();
+  }, [user?.id]);
+
+  const handleAperturaCaja = async () => {
+    setLoadingCaja(true);
+    try {
+      await aperturaCaja(user.id);
+      clientSuccessHandler(SUCCESS_MESSAGES.CAJA_ABIERTA);
+      const data = await GetCajaByVendedor(user.id, 1, 1);
+      setSesionCaja(data.length > 0 ? data[0] : null);
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message);
+    } finally {
+      setLoadingCaja(false);
+    }
+  };
+
+  const handleCerrarCaja = async () => {
+    setLoadingCaja(true);
+    try {
+      await cerrarCaja(user.id);
+      clientSuccessHandler(SUCCESS_MESSAGES.CAJA_CERRADA);
+      setSesionCaja(null);
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message);
+    } finally {
+      setLoadingCaja(false);
+    }
+  };
+
+  const handleDescargarExcel = async () => {
+    if (!sesionCaja?.id) return;
+    try {
+      const blob = await descargarExcelCaja(sesionCaja.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `caja-${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      clientSuccessHandler(SUCCESS_MESSAGES.EXCEL_DESCARGADO);
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message);
+    }
+  };
 
   const navigationConfig = isAdmin
     ? {
@@ -81,6 +144,13 @@ const UnifiedNav = () => {
             { name: 'Egreso', path: '/vendedor/egreso' },
             { name: 'Transferencia', path: '/vendedor/transferencia' },
             { name: 'Listado Cajas', path: '/vendedor/listado-cajas' },
+            { name: 'divider' },
+            ...(sesionCaja?.fechaCierre ? [
+              { name: 'Abrir Caja', action: handleAperturaCaja, loading: loadingCaja }
+            ] : [
+              { name: 'Cerrar Caja', action: handleCerrarCaja, loading: loadingCaja }
+            ]),
+            { name: 'Descargar Excel', action: handleDescargarExcel, disabled: !sesionCaja?.id },
           ],
         },
         alumnos: {
@@ -111,21 +181,34 @@ const UnifiedNav = () => {
         className={`absolute ${isMobile ? 'left-0 right-0' : 'right-0'} z-20 mt-3 w-56 bg-white rounded-3xl shadow-2xl ring-1 ring-gray-200 focus:outline-none backdrop-blur-sm`}
       >
         <div className="p-3">
-          {config.items.map((item, index) => (
-            <MenuItem key={item.name}>
-              {({ active }) => (
-                <button
-                  onClick={() => handleNavigation(item.path)}
-                  className={`${active ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md' : 'text-gray-700 hover:bg-gray-50'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-full transition-all duration-150 ${index === 0 ? 'mt-0' : 'mt-1'}`}
-                >
-                  <div
-                    className={`w-2 h-2 rounded-full mr-3 ${active ? 'bg-blue-500' : 'bg-gray-300'} transition-colors duration-150`}
-                  ></div>
-                  {item.name}
-                </button>
-              )}
-            </MenuItem>
-          ))}
+          {config.items.map((item, index) => {
+            if (item.name === 'divider') {
+              return <div key={`divider-${index}`} className="border-t border-gray-200 my-2"></div>;
+            }
+            return (
+              <MenuItem key={item.name}>
+                {({ active }) => (
+                  <button
+                    onClick={() => item.action ? item.action() : handleNavigation(item.path)}
+                    disabled={item.disabled || item.loading}
+                    className={`${active ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md' : 'text-gray-700 hover:bg-gray-50'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-full transition-all duration-150 ${index === 0 ? 'mt-0' : 'mt-1'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {item.loading ? (
+                      <svg className="animate-spin h-4 w-4 mr-3" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    ) : (
+                      <div
+                        className={`w-2 h-2 rounded-full mr-3 ${active ? 'bg-blue-500' : 'bg-gray-300'} transition-colors duration-150`}
+                      ></div>
+                    )}
+                    {item.name}
+                  </button>
+                )}
+              </MenuItem>
+            );
+          })}
         </div>
       </MenuItems>
     </Menu>

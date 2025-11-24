@@ -121,8 +121,10 @@ export class CajaController {
     @Param('vendedorId') id: string,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
+    @Query('fecha') fecha?: string,
+    @Query('conFiltros') conFiltros?: string,
   ) {
-    return this.cajaService.obtenerSesionPorFecha(id, Number(page), Number(limit));
+    return this.cajaService.obtenerSesionPorFecha(id, Number(page), Number(limit), fecha, conFiltros === 'true');
   }
 
   @Get('/export-excel/:sesionId')

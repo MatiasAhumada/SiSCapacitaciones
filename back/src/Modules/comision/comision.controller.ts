@@ -62,6 +62,7 @@ export class ComisionController {
     @Query('day') day?: string,
     @Query('all') all?: string,
     @Query('status') status?: string,
+    @Query('sucursalId') sucursalId?: string,
   ) {
     return this.comisionService.findAll(
       Number(page),
@@ -70,6 +71,7 @@ export class ComisionController {
       day,
       all === 'true',
       status,
+      sucursalId,
     );
   }
   @Get('/aluCom/:idAluCom')

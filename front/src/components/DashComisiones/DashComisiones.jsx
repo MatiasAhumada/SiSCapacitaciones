@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { getCursos } from '../../services/Cursos.service';
+import { getSucursales } from '../../services/Sucursales.service';
 import Pagination from '../Pagination/Pagination';
 import { getProfes } from '../../services/Profesores.service';
 import {
@@ -31,11 +32,13 @@ const DashComisiones = () => {
   });
   const [cursos, setCursos] = useState([]);
   const [profesores, setProfesores] = useState([]);
+  const [sucursales, setSucursales] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchName, setSearchName] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedSucursal, setSelectedSucursal] = useState('');
   const [loading, setLoading] = useState(true);
   const [, setPause] = useState({});
 
@@ -62,16 +65,16 @@ const DashComisiones = () => {
     }
   };
 
-  const cargarComisiones = async (page = 1, name = '', day = '', status = '') => {
+  const cargarComisiones = async (page = 1, name = '', day = '', status = '', sucursalId = '') => {
     setLoading(true);
     try {
       let data;
       if (user?.isadmin) {
-        const sucursalId = getSucursalActiva()?.id;
-        if (!sucursalId) return;
-        data = await getComisionBySucursal(sucursalId, page, 10, name, day, false, status);
+        const activeSucursalId = getSucursalActiva()?.id;
+        if (!activeSucursalId) return;
+        data = await getComisionBySucursal(activeSucursalId, page, 10, name, day, false, status);
       } else {
-        data = await getComisiones(page, 10, name, day, false, status);
+        data = await getComisiones(page, 10, name, day, false, status, sucursalId);
       }
       setTableItems(data.data || []);
       setTotalPages(data.totalPages || 1);
@@ -88,9 +91,14 @@ const DashComisiones = () => {
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const [cursosData, profesoresData] = await Promise.all([getCursos(), getProfes()]);
+        const [cursosData, profesoresData, sucursalesData] = await Promise.all([
+          getCursos(),
+          getProfes(),
+          getSucursales()
+        ]);
         setCursos(cursosData.data || cursosData);
         setProfesores(profesoresData);
+        setSucursales(sucursalesData || []);
       } catch (error) {
         clientErrorHandler(
           error?.response?.data?.message || error?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS
@@ -98,9 +106,9 @@ const DashComisiones = () => {
       }
     };
     cargarDatos();
-    cargarComisiones(currentPage, searchName, selectedDay, selectedStatus);
+    cargarComisiones(currentPage, searchName, selectedDay, selectedStatus, selectedSucursal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchName, selectedDay, selectedStatus]);
+  }, [currentPage, searchName, selectedDay, selectedStatus, selectedSucursal]);
 
   const handleEdit = (comision) => {
     setEditing(comision.id);
@@ -223,6 +231,23 @@ const DashComisiones = () => {
               <option value="true">Activas</option>
               <option value="false">Inactivas</option>
             </select>
+            {!user?.isadmin && (
+              <select
+                value={selectedSucursal}
+                onChange={(e) => {
+                  setSelectedSucursal(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="sm:w-auto px-3 py-2 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md text-sm cursor-pointer"
+              >
+                <option value="">Todas las sucursales</option>
+                {sucursales.map((sucursal) => (
+                  <option key={sucursal.id} value={sucursal.id}>
+                    {sucursal.name}
+                  </option>
+                ))}
+              </select>
+            )}
             {user?.isadmin && (
               <button
                 onClick={() => navigate('/admin/comisiones/crear')}

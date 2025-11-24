@@ -1,7 +1,7 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const getComisiones = async (page = 1, limit = 10, name = '', day = '', all = false, status = '') => {
+export const getComisiones = async (page = 1, limit = 10, name = '', day = '', all = false, status = '', sucursalId = '') => {
   try {
     const params = { page, limit };
     if (name && name !== '') {
@@ -15,6 +15,9 @@ export const getComisiones = async (page = 1, limit = 10, name = '', day = '', a
     }
     if (status !== '') {
       params.status = status;
+    }
+    if (sucursalId !== '') {
+      params.sucursalId = sucursalId;
     }
     const response = await axios.get(`${API_URL}/comision`, { params });
     return response.data;

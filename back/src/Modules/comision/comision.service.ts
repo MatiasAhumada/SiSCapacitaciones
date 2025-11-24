@@ -95,6 +95,7 @@ export class ComisionService {
     day?: string,
     all?: boolean,
     status?: string,
+    sucursalId?: string,
   ) {
     const whereConditions: any = {};
 
@@ -108,6 +109,10 @@ export class ComisionService {
 
     if (status !== undefined && status !== '') {
       whereConditions.status = status === 'true';
+    }
+
+    if (sucursalId) {
+      whereConditions.sucursal = { id: sucursalId };
     }
 
     const comisiones = await this.comisionRepository.find({

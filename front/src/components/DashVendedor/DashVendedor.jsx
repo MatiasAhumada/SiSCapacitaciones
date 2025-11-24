@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { getVendSucID, descargarInscripcionesExcel } from '../../services/Vendedores.service';
+import { getVendSucID, descargarInscripcionesExcel, putVendedor } from '../../services/Vendedores.service';
+import { ModalEditarGenerico } from '../ModalEditar/ModalEditarGenerico';
 import Pagination from '../Pagination/Pagination';
 import { Spinner } from '../Spinner/Spinner';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
@@ -15,6 +16,9 @@ const DashVendedor = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [editingId, setEditingId] = useState(null);
 
   const click = (idVend) => {
     navigate(`/admin/vendedores/info/${idVend}`);
@@ -37,6 +41,41 @@ const DashVendedor = () => {
       setDownloadingId(null);
     }
   };
+
+  const handleEditClick = (vendedor) => {
+    setEditData({
+      name: vendedor.name,
+      email: vendedor.email,
+      tel: vendedor.tel,
+    });
+    setEditingId(vendedor.id);
+    setShowEditModal(true);
+  };
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSave = async () => {
+    try {
+      await putVendedor(editingId, editData);
+      clientSuccessHandler(SUCCESS_MESSAGES.VENDEDOR_ACTUALIZADO);
+      const sucursalId = getSucursalActiva()?.id;
+      if (sucursalId) {
+        const data = await getVendSucID(sucursalId, currentPage, 10);
+        setTableItems(data.data || []);
+      }
+      setShowEditModal(false);
+    } catch (error) {
+      clientErrorHandler(error.response?.data?.message || error.message);
+    }
+  };
+
+  const editFields = [
+    { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
+    { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
+  ];
 
   useEffect(() => {
     const sucursalId = getSucursalActiva()?.id;
@@ -180,6 +219,14 @@ const DashVendedor = () => {
                           </button>
                           <button
                             type="button"
+                            onClick={() => handleEditClick(item)}
+                            className="group relative p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                            title="Editar vendedor"
+                          >
+                            <i className="fa-solid fa-pen"></i>
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => handleDownloadExcel(item.id)}
                             disabled={downloadingId === item.id}
                             className="group relative p-2.5 bg-green-600 hover:bg-green-700 text-white rounded transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
@@ -211,6 +258,17 @@ const DashVendedor = () => {
           </div>
         )}
       </div>
+
+      {showEditModal && (
+        <ModalEditarGenerico
+          title="Editar Vendedor"
+          formData={editData}
+          fields={editFields}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleEditSave}
+          onChange={handleEditChange}
+        />
+      )}
     </div>
   );
 };

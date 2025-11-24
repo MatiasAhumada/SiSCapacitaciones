@@ -1,13 +1,44 @@
 import React, { useState } from 'react';
 import { Spinner } from '../Spinner/Spinner';
+import { ModalEditarGenerico } from '../ModalEditar/ModalEditarGenerico';
 
-const ProfesorCard = ({ profesor, onDelete, isDeleting }) => {
+const ProfesorCard = ({ profesor, onDelete, onEdit, isDeleting }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({});
 
   const handleToggle = (e) => {
     e.stopPropagation();
     setIsExpanded(prev => !prev);
   };
+
+  const handleEditClick = () => {
+    setEditData({
+      name: profesor.name,
+      apellido: profesor.apellido,
+      tel: profesor.tel,
+      email: profesor.email || '',
+      direccion: profesor.direccion || '',
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSave = async () => {
+    await onEdit(profesor.id, editData);
+    setShowEditModal(false);
+  };
+
+  const editFields = [
+    { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
+    { name: 'apellido', label: 'Apellido', type: 'text', placeholder: 'Apellido' },
+    { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
+    { name: 'direccion', label: 'Dirección', type: 'text', placeholder: 'Dirección' },
+  ];
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 hover:border-indigo-200">
@@ -34,6 +65,13 @@ const ProfesorCard = ({ profesor, onDelete, isDeleting }) => {
             title="Ver comisiones activas"
           >
             <i className={`fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+          </button>
+          <button
+            onClick={handleEditClick}
+            className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
+            title="Editar profesor"
+          >
+            <i className="fa-solid fa-pen"></i>
           </button>
           <button
             onClick={(e) => {
@@ -75,6 +113,17 @@ const ProfesorCard = ({ profesor, onDelete, isDeleting }) => {
             <p className="text-gray-500 italic text-sm">No tiene comisiones activas asignadas</p>
           )}
         </div>
+      )}
+
+      {showEditModal && (
+        <ModalEditarGenerico
+          title="Editar Profesor"
+          formData={editData}
+          fields={editFields}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleEditSave}
+          onChange={handleEditChange}
+        />
       )}
     </div>
   );

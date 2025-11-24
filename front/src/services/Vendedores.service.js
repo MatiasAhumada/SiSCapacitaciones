@@ -62,6 +62,15 @@ export const updateVend = async (id, vendedor) => {
   }
 };
 
+export const putVendedor = async (id, vendedor) => {
+  try {
+    const response = await axios.patch(`${API_URL}/vendedor/${id}`, vendedor);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const descargarInscripcionesExcel = async (id, fechaDesde, fechaHasta) => {
   try {
     const params = new URLSearchParams();

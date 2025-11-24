@@ -47,3 +47,12 @@ export const deleteProfesId = async (id) => {
     throw error.response?.data || error;
   }
 };
+
+export const putProfesor = async (id, profesor) => {
+  try {
+    const response = await axios.put(`${API_URL}/profesor/edit/${id}`, profesor);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

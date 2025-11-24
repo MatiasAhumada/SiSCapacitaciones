@@ -18,6 +18,7 @@ export const SUCCESS_MESSAGES = {
   CURSO_CREADO: 'Curso creado correctamente',
   CURSO_ELIMINADO: 'Curso eliminado correctamente',
   PROFESOR_CREADO: 'Profesor creado correctamente',
+  PROFESOR_ACTUALIZADO: 'Profesor actualizado correctamente',
   PROFESOR_ELIMINADO: 'Profesor eliminado correctamente',
   VENDEDOR_CREADO: 'Vendedor creado correctamente',
   VENDEDOR_ACTUALIZADO: 'Vendedor actualizado correctamente',

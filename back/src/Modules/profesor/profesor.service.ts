@@ -56,6 +56,9 @@ export class ProfesorService {
         id: prof.id,
         name: prof.name,
         apellido: prof.apellido,
+        tel: prof.tel,
+        email: prof.email,
+        direccion: prof.direccion,
         cantidadComisiones: comisionesActivas.length,
         comisiones: comisionesActivas,
       };

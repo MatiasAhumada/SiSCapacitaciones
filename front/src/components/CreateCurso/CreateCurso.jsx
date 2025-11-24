@@ -45,59 +45,62 @@ const CreateCurso = () => {
   };
 
   return (
-    <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-8 md:p-10 2xl:p-12 3xl:p-14 bg-[#ffffff] rounded-2xl shadow-xl">
-      <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-4">
+    <div className="flex flex-col w-full md:w-1/2 xl:w-2/5 2xl:w-2/5 3xl:w-1/3 mx-auto p-6 md:p-8 bg-white rounded-2xl shadow-2xl border border-gray-100">
+      <div className="flex flex-col justify-center mx-auto items-center gap-3 pb-6">
         <div>
           <img src={logo} alt="Logo" width="50" />
         </div>
-
-        <h2 className="my-auto principal">Creacion de curso</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 principal">Nuevo Curso</h2>
       </div>
 
-      <form className="flex flex-col" onSubmit={handleSubmit}>
-        <div className="pb-2">
-          <label htmlFor="email" className="block mb-2 text-sm principal">
-            Nombre
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-book text-blue-600 mr-2"></i>
+            Nombre del Curso
           </label>
-          <div className="relative text-gray-400">
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="Nombre del curso"
-              autoComplete="off"
-            />
-          </div>
-        </div>
-        <div className="pb-2">
-          <label htmlFor="apellido" className="block mb-2 text-sm principal text-[#111827]">
-            Duracion en Meses
-          </label>
-          <div className="relative text-gray-400">
-            <input
-              type="number"
-              name="duration"
-              id="duration"
-              value={formData.duration}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              placeholder="10"
-              autoComplete="off"
-            />
-          </div>
-        </div>
-        <div className="pb-2">
-          <label className="block mb-2 text-sm principal">Área</label>
-          <select
+          <input
             type="text"
+            name="name"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="Ej: Programación Web"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="duration" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-calendar text-blue-600 mr-2"></i>
+            Duración (Meses)
+          </label>
+          <input
+            type="number"
+            name="duration"
+            id="duration"
+            value={formData.duration}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="Ej: 6"
+            min="1"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="area" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-layer-group text-blue-600 mr-2"></i>
+            Área
+          </label>
+          <select
             name="area"
             id="area"
             value={formData.area}
             onChange={handleChange}
-            className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md cursor-pointer"
+            required
           >
             <option value="">Seleccionar área</option>
             {areas.map((area) => (
@@ -108,15 +111,18 @@ const CreateCurso = () => {
           </select>
         </div>
 
-        <div className="pb-2">
-          <label className="block mb-2 text-sm principal">Tipo</label>
+        <div>
+          <label htmlFor="tipo" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-graduation-cap text-blue-600 mr-2"></i>
+            Tipo de Curso
+          </label>
           <select
-            type="text"
             name="tipo"
             id="tipo"
             value={formData.tipo}
             onChange={handleChange}
-            className="mb-2 bg-gray-50 text-gray-600 border border-gray-300 rounded-lg p-2.5 w-full"
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md cursor-pointer"
+            required
           >
             <option value="">Seleccionar tipo</option>
             {tipos.map((tipo, idx) => (
@@ -127,45 +133,58 @@ const CreateCurso = () => {
           </select>
         </div>
 
-        <div className="pb-6">
-          <label htmlFor="curso" className="block mb-2 text-sm text-[#111827] principal">
+        <div>
+          <label htmlFor="price" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+            <i className="fa-solid fa-dollar-sign text-blue-600 mr-2"></i>
             Precio
           </label>
-          <div className="relative text-gray-400">
-            <input
-              type="text"
-              name="price"
-              id="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
-              autoComplete="off"
-            />
-          </div>
+          <input
+            type="number"
+            name="price"
+            id="price"
+            value={formData.price}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-gray-50 text-gray-700 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-300 hover:shadow-md"
+            placeholder="Ej: 15000"
+            min="0"
+            step="0.01"
+            required
+          />
         </div>
+
         <button
           type="submit"
-          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
+          disabled={pause}
+          className="w-full mt-2 px-6 py-3 text-white font-semibold btnAz rounded shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 group"
         >
           {pause ? (
-            <svg
-              fill="white"
-              className="w-6 h-6 mx-auto"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z">
-                <animateTransform
-                  attributeName="transform"
-                  type="rotate"
-                  dur="0.75s"
-                  values="0 12 12;360 12 12"
-                  repeatCount="indefinite"
-                />
-              </path>
-            </svg>
+            <>
+              <svg
+                className="animate-spin h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span>Creando...</span>
+            </>
           ) : (
-            'Crear Curso'
+            <>
+              <i className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+              <span>Crear Curso</span>
+            </>
           )}
         </button>
       </form>

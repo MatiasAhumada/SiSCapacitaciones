@@ -16,6 +16,7 @@ import { TransferAlumnoDto } from './dto/transfer-alumno.dto';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { PdfService } from '../pdf/pdf.service';
 import { ChangeStatusComisionDto } from './dto/changeStatus-comision.dto';
+import { Caja } from '../caja/entities/caja.entity';
 
 @Injectable()
 export class ComisionService {
@@ -36,6 +37,8 @@ export class ComisionService {
     private readonly asistenciaProfesorRepository: Repository<AsistenciaProfesor>,
     @InjectRepository(Inscripcion)
     private readonly inscripcionRepository: Repository<Inscripcion>,
+    @InjectRepository(Caja)
+    private readonly cajaRepository: Repository<Caja>,
     private readonly pdfService: PdfService,
   ) {}
   private cleanHour(hour: any): { start: string; end: string } {
@@ -137,11 +140,34 @@ export class ComisionService {
     };
   }
 
-  async findOneAluCom(id: string) {
-    return this.alumnoComisionRepository.findOne({
+  async findOneAluCom(id: string, comisionId?: string) {
+    const alumnoComision = await this.alumnoComisionRepository.findOne({
       where: { id },
-      relations: ['comision', 'alumno', 'pagos.comprobante', 'pagos', 'pagos.vendedor'],
+      relations: ['alumno'],
       select: {
+        alumno: {
+          id: true,
+          dni: true,
+          name: true,
+          tel: true,
+          email: true,
+          age: true,
+          address: true,
+        },
+      },
+    });
+
+    if (!alumnoComision) {
+      throw new NotFoundException('Alumno-Comisión no encontrado');
+    }
+
+    // Obtener todas las comisiones del alumno
+    const comisiones = await this.alumnoComisionRepository.find({
+      where: { alumno: { id: alumnoComision.alumno.id } },
+      relations: ['comision'],
+      select: {
+        id: true,
+        state: true,
         comision: {
           id: true,
           name: true,
@@ -151,32 +177,52 @@ export class ComisionService {
             end: true,
           },
         },
-        alumno: {
+      },
+    });
+
+    // Obtener pagos filtrados por comisión si se especifica
+    const whereConditions: any = { alumnoComision: { alumno: { id: alumnoComision.alumno.id } } };
+    if (comisionId) {
+      whereConditions.alumnoComision = { id: comisionId };
+    }
+
+    const pagos = await this.cajaRepository.find({
+      where: whereConditions,
+      relations: ['comprobante', 'vendedor', 'alumnoComision.comision'],
+      select: {
+        id: true,
+        monto: true,
+        metodoPago: true,
+        fecha: true,
+        cuota: true,
+        mesCuota: true,
+        descripcion: true,
+        vendedor: {
           id: true,
-          dni: true,
           name: true,
-          tel: true,
         },
-        pagos: {
+        alumnoComision: {
           id: true,
-          monto: true,
-          metodoPago: true,
-          fecha: true,
-          cuota: true,
-          mesCuota: true,
-          vendedor: {
+          comision: {
             id: true,
             name: true,
           },
-          comprobante: {
-            numeroComprobante: true,
-            tipoComprobante: true,
-            formaPago: true,
-            monto: true,
-          },
+        },
+        comprobante: {
+          numeroComprobante: true,
+          tipoComprobante: true,
+          formaPago: true,
+          monto: true,
         },
       },
+      order: { fecha: 'DESC' },
     });
+
+    return {
+      ...alumnoComision,
+      comisiones,
+      pagos,
+    };
   }
   async getComisionesBySucursal(id: string) {
     return this.comisionRepository.find({

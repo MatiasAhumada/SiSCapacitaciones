@@ -65,8 +65,11 @@ export class ComisionController {
     return this.comisionService.findAll(Number(page), Number(limit), name, day, all === 'true', status);
   }
   @Get('/aluCom/:idAluCom')
-  findAluCom(@Param('idAluCom') id: string) {
-    return this.comisionService.findOneAluCom(id);
+  findAluCom(
+    @Param('idAluCom') id: string,
+    @Query('comisionId') comisionId?: string,
+  ) {
+    return this.comisionService.findOneAluCom(id, comisionId);
   }
   @Get('sucursal/:id')
   getComisionesBySucursal(@Param('id') sucursalId: string) {

@@ -47,9 +47,13 @@ export const deleteComision = async (id) => {
   }
 };
 
-export const getAluComID = async (id) => {
+export const getAluComID = async (id, comisionId = '') => {
   try {
-    const response = await axios.get(`${API_URL}/comision/aluCom/${id}`);
+    const params = {};
+    if (comisionId) {
+      params.comisionId = comisionId;
+    }
+    const response = await axios.get(`${API_URL}/comision/aluCom/${id}`, { params });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

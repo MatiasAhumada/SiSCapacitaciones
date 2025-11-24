@@ -17,6 +17,7 @@ const DashAlumno = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
   const [vendedores, setVendedores] = useState([]);
+  const [selectedComision, setSelectedComision] = useState('');
 
   const handleEditPago = (pago) => {
     setFormData({
@@ -91,7 +92,7 @@ const DashAlumno = () => {
 
       try {
         const [alumnoData, vendedoresData] = await Promise.all([
-          getAluComID(alumnoId),
+          getAluComID(alumnoId, selectedComision),
           getVendedores(),
         ]);
         setAlumno(alumnoData);
@@ -104,7 +105,7 @@ const DashAlumno = () => {
     };
 
     cargarDatos();
-  }, [alumnoId]);
+  }, [alumnoId, selectedComision]);
 
   if (loading) {
     return (
@@ -151,46 +152,46 @@ const DashAlumno = () => {
             </div>
             <div>
               <span className="font-medium text-gray-600">Email:</span>
-              <span className="ml-2">{alumno.email}</span>
+              <span className="ml-2">{alumno.alumno?.email || '-'}</span>
             </div>
             <div>
               <span className="font-medium text-gray-600">Edad:</span>
-              <span className="ml-2">{alumno.age}</span>
+              <span className="ml-2">{alumno.alumno?.age || '-'}</span>
             </div>
             <div>
               <span className="font-medium text-gray-600">Dirección:</span>
-              <span className="ml-2">{alumno.address}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Localidad:</span>
-              <span className="ml-2">{alumno.locality}</span>
+              <span className="ml-2">{alumno.alumno?.address || '-'}</span>
             </div>
           </div>
         </div>
 
-        {/* Comisión */}
+        {/* Comisiones */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h4 className="text-lg font-semibold mb-4 principal">Comisión</h4>
-          {alumno.comision ? (
-            <div className="p-3 bg-gray-50 rounded border">
-              <div className="font-medium">{alumno.comision.name}</div>
-              <div className="text-sm text-gray-600">Día: {alumno.comision.day}</div>
-              <div className="text-sm text-gray-600">
-                Horario: {alumno.comision.hour?.start}-{alumno.comision.hour?.end}
-              </div>
-              <div className="text-sm">
-                Estado:
-                <span
-                  className={`ml-1 px-2 py-1 rounded text-xs ${
-                    alumno.state ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {alumno.state ? 'Activo' : 'Inactivo'}
-                </span>
-              </div>
+          <h4 className="text-lg font-semibold mb-4 principal">Comisiones</h4>
+          {alumno.comisiones && alumno.comisiones.length > 0 ? (
+            <div className="space-y-3">
+              {alumno.comisiones.map((comision) => (
+                <div key={comision.id} className="p-3 bg-gray-50 rounded border">
+                  <div className="font-medium">{comision.comision.name}</div>
+                  <div className="text-sm text-gray-600">Día: {comision.comision.day}</div>
+                  <div className="text-sm text-gray-600">
+                    Horario: {comision.comision.hour?.start}-{comision.comision.hour?.end}
+                  </div>
+                  <div className="text-sm">
+                    Estado:
+                    <span
+                      className={`ml-1 px-2 py-1 rounded text-xs ${
+                        comision.state ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {comision.state ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
-            <p className="text-gray-600">No tiene comisión asignada</p>
+            <p className="text-gray-600">No tiene comisiones asignadas</p>
           )}
         </div>
       </div>
@@ -198,7 +199,21 @@ const DashAlumno = () => {
       {/* Pagos */}
       {alumno.pagos && alumno.pagos.length > 0 && (
         <div className="mt-8">
-          <h4 className="text-xl font-bold mb-6 principal">Historial de Pagos</h4>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h4 className="text-xl font-bold principal">Historial de Pagos</h4>
+            <select
+              value={selectedComision}
+              onChange={(e) => setSelectedComision(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md text-sm cursor-pointer"
+            >
+              <option value="">Todas las comisiones</option>
+              {alumno.comisiones?.map((comision) => (
+                <option key={comision.id} value={comision.id}>
+                  {comision.comision.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Vista Desktop */}
           <div className="hidden md:block bg-white rounded-lg shadow-lg overflow-hidden">
@@ -214,6 +229,9 @@ const DashAlumno = () => {
                     </th>
                     <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
                       Método
+                    </th>
+                    <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Comisión
                     </th>
                     <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
                       Cuota
@@ -253,6 +271,7 @@ const DashAlumno = () => {
                           {pago.metodoPago}
                         </span>
                       </td>
+                      <td className="px-6 py-4 text-gray-900">{pago.alumnoComision?.comision?.name || '-'}</td>
                       <td className="px-6 py-4 text-gray-900">{pago.cuota}</td>
                       <td className="px-6 py-4 text-gray-900">{pago.mesCuota}</td>
                       <td className="px-6 py-4">
@@ -338,10 +357,14 @@ const DashAlumno = () => {
                     </span>
                   </div>
                   <div>
+                    <span className="text-gray-600">Comisión:</span>
+                    <span className="ml-2 font-medium">{pago.alumnoComision?.comision?.name || '-'}</span>
+                  </div>
+                  <div>
                     <span className="text-gray-600">Cuota:</span>
                     <span className="ml-2 font-medium">{pago.cuota}</span>
                   </div>
-                  <div className="col-span-2">
+                  <div>
                     <span className="text-gray-600">Mes:</span>
                     <span className="ml-2 font-medium">{pago.mesCuota}</span>
                   </div>

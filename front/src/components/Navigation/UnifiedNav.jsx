@@ -150,7 +150,7 @@ const UnifiedNav = () => {
             { name: 'Transferencia', path: '/vendedor/transferencia' },
             { name: 'Listado Cajas', path: '/vendedor/listado-cajas' },
             { name: 'divider' },
-            ...(sesionCaja?.fechaCierre ? [
+            ...(!sesionCaja || sesionCaja?.fechaCierre ? [
               { name: 'Abrir Caja', action: handleAperturaCaja, loading: loadingCaja }
             ] : [
               { name: 'Cerrar Caja', action: handleCerrarCaja, loading: loadingCaja }

@@ -17,6 +17,7 @@ const DashAlumnos = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isFiltered, setIsFiltered] = useState(false);
+  const [filtrosActivos, setFiltrosActivos] = useState({});
 
   const click = (item) => {
     const idAlu = item.idAluCom[0];
@@ -36,7 +37,7 @@ const DashAlumnos = () => {
         delete newPause[id];
         return newPause;
       });
-      peticionAlumnos(currentPage);
+      peticionAlumnos(currentPage, itemsPerPage, filtrosActivos);
     });
   };
 
@@ -58,7 +59,7 @@ const DashAlumnos = () => {
   useEffect(() => {
     const sucursalId = getSucursalActiva()?.id;
     if (sucursalId) {
-      peticionAlumnos(currentPage);
+      peticionAlumnos(currentPage, itemsPerPage, filtrosActivos);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, getSucursalActiva()?.id]);
@@ -67,16 +68,10 @@ const DashAlumnos = () => {
     setPaused(true);
     try {
       const hayFiltros = Object.values(filtros).some((v) => v !== '');
-      if (!hayFiltros) {
-        setItemsPerPage(10);
-        setCurrentPage(1);
-        await peticionAlumnos(1, 10);
-        setIsFiltered(false);
-        return;
-      }
+      setFiltrosActivos(hayFiltros ? filtros : {});
       setCurrentPage(1);
-      await peticionAlumnos(1, itemsPerPage, filtros);
-      setIsFiltered(true);
+      await peticionAlumnos(1, itemsPerPage, hayFiltros ? filtros : {});
+      setIsFiltered(hayFiltros);
     } catch (error) {
       clientErrorHandler(
         error.response?.data?.message || error.message || ERROR_MESSAGES.ERROR_CARGAR_ALUMNOS
@@ -141,13 +136,11 @@ const DashAlumnos = () => {
           </tbody>
         </table>
       </div>
-      {!isFiltered && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-        />
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
 };

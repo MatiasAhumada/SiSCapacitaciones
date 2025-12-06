@@ -112,11 +112,11 @@ export class AlumnoService {
   ): Promise<PaginatedAlumnos> {
     const { page = 1, limit = 10 } = pagination || {};
 
-    // Construir condiciones de filtro
     const whereConditions: any = { sucursal: { id } };
 
     if (filtros?.nombre) {
-      whereConditions.name = Like(`%${filtros.nombre}%`);
+      const nombreNormalizado = filtros.nombre.trim().toLowerCase();
+      whereConditions.name = Like(`%${nombreNormalizado}%`);
     }
     if (filtros?.dni) {
       whereConditions.dni = Like(`%${filtros.dni}%`);
@@ -125,20 +125,14 @@ export class AlumnoService {
       whereConditions.tel = Like(`%${filtros.tel}%`);
     }
 
-    // Contar total de alumnos con filtros
-    const totalItems = await this.alumnoRepository.count({
-      where: whereConditions,
-    });
-
-    const alumnos = await this.alumnoRepository.find({
+    // Obtener todos los alumnos con relaciones para filtrar por cantidades
+    const allAlumnos = await this.alumnoRepository.find({
       where: whereConditions,
       relations: ['alumnoComisiones', 'certificados'],
       select: ['id', 'name', 'dni', 'tel'],
-      skip: (page - 1) * limit,
-      take: limit,
     });
 
-    let data = alumnos.map((alumno) => ({
+    let filteredData = allAlumnos.map((alumno) => ({
       id: alumno.id,
       name: alumno.name,
       dni: alumno.dni,
@@ -148,31 +142,30 @@ export class AlumnoService {
       cantidadCertificados: alumno.certificados?.length || 0,
     }));
 
-    // Filtrar por cantidad de comisiones y certificados si se especifica
+    // Filtrar por cantidad de comisiones y certificados
     if (filtros?.cantidadComisiones) {
-      data = data.filter(
+      filteredData = filteredData.filter(
         (alumno) =>
           alumno.cantidadComisiones === parseInt(filtros.cantidadComisiones),
       );
     }
     if (filtros?.cantidadCertificados) {
-      data = data.filter(
+      filteredData = filteredData.filter(
         (alumno) =>
           alumno.cantidadCertificados ===
           parseInt(filtros.cantidadCertificados),
       );
     }
 
-    // Si hay filtros aplicados, usar el total filtrado, sino el total original
-    const finalTotalItems =
-      filtros?.cantidadComisiones || filtros?.cantidadCertificados
-        ? data.length
-        : totalItems;
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const startIndex = (page - 1) * limit;
+    const data = filteredData.slice(startIndex, startIndex + limit);
 
     return {
       data,
-      totalItems: finalTotalItems,
-      totalPages: Math.ceil(finalTotalItems / limit),
+      totalItems,
+      totalPages,
       currentPage: page,
     };
   }

@@ -3,6 +3,8 @@ import { AlumnoComision } from 'src/Modules/comision/entities/alumnocomision.ent
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
@@ -19,8 +21,16 @@ export class Alumno {
   @Column()
   dni: string;
 
-  @Column()
+  @Column({ transformer: { to: (value) => value?.toLowerCase(), from: (value) => value } })
   name: string;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  normalizeName() {
+    if (this.name) {
+      this.name = this.name.trim().toLowerCase();
+    }
+  }
 
   @Column({ nullable: true, type: 'timestamp' })
   fNac?: Date;

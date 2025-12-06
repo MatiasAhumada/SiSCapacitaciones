@@ -40,6 +40,7 @@ const ListadoComisiones = () => {
   });
   const [dniFiltro, setDniFiltro] = useState('');
   const [fechaFiltro, setFechaFiltro] = useState('');
+  const [estadoFiltro, setEstadoFiltro] = useState('');
   const [allDates, setAllDates] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -59,9 +60,9 @@ const ListadoComisiones = () => {
     navigate(redirectionPath);
   };
 
-  const fetchAlumnos = async (page = 1, dni = '', fecha = '') => {
+  const fetchAlumnos = async (page = 1, dni = '', fecha = '', estado = '') => {
     try {
-      const data = await getComisionId(comisionId, page, itemsPerPage, dni, fecha);
+      const data = await getComisionId(comisionId, page, itemsPerPage, dni, fecha, estado);
       setAlumnosComision(data.data);
       setComisionDate(data.comision || {});
       setTotalPages(data.totalPages || 1);
@@ -87,7 +88,7 @@ const ListadoComisiones = () => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      fetchAlumnos(currentPage, dniFiltro, fechaFiltro);
+      fetchAlumnos(currentPage, dniFiltro, fechaFiltro, estadoFiltro);
     }, 300);
 
     return () => clearTimeout(timeoutId);
@@ -95,9 +96,9 @@ const ListadoComisiones = () => {
   }, [dniFiltro]);
 
   useEffect(() => {
-    fetchAlumnos(currentPage, dniFiltro, fechaFiltro);
+    fetchAlumnos(currentPage, dniFiltro, fechaFiltro, estadoFiltro);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, comisionId, reload, fechaFiltro]);
+  }, [currentPage, comisionId, reload, fechaFiltro, estadoFiltro]);
 
   const formatFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
@@ -278,6 +279,23 @@ const ListadoComisiones = () => {
                   </option>
                 );
               })}
+            </select>
+          </div>
+          <div className="relative">
+            <i className="fa-solid fa-filter absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <select
+              value={estadoFiltro}
+              onChange={(e) => {
+                setEstadoFiltro(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-11 pr-4 py-3 border border-gray-300 rounded shadow-sm 
+                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:scale-[1.02]
+                transition-all duration-300 w-full hover:shadow-md cursor-pointer"
+            >
+              <option value="">Todos los estados</option>
+              <option value="true">Activos</option>
+              <option value="false">Inactivos</option>
             </select>
           </div>
           <AsistenciaControls

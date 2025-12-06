@@ -244,7 +244,7 @@ export class ComisionService {
       select: ['id', 'name'],
     });
   }
-  async findOne(id: string, page = 1, limit = 10, dni?: string, fecha?: string) {
+  async findOne(id: string, page = 1, limit = 10, dni?: string, fecha?: string, estado?: string) {
     // Traer datos generales de la comisión
     const comision = await this.comisionRepository.findOne({
       where: { id },
@@ -270,6 +270,9 @@ export class ComisionService {
     const whereAlumno: any = { comision: { id } };
     if (dni) {
       whereAlumno.alumno = { dni: Like(`%${dni}%`) };
+    }
+    if (estado !== undefined && estado !== '') {
+      whereAlumno.state = estado === 'true';
     }
 
     // Si se proporciona fecha, filtrar solo alumnos ausentes en esa fecha

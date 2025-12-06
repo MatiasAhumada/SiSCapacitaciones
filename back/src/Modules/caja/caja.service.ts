@@ -81,48 +81,60 @@ export class CajaService {
       );
     }
 
-    if (tipo === TipoMovimiento.INGRESO) {
-      const alumnoComision = await this.alumnoComisionRepository.findOne({
-        where: { id: alumnoComisionId },
-        relations: ['alumno', 'comision'],
-      });
-
-      if (!alumnoComision) {
-        throw new NotFoundException('Alumno no encontrado');
+    if (tipo === TipoMovimiento.INGRESO || tipo === TipoMovimiento.COBRO_VARIOS || tipo === TipoMovimiento.CERTIFICACION_EXAMEN) {
+      // Para INGRESO siempre se requiere alumno
+      if (tipo === TipoMovimiento.INGRESO && !alumnoComisionId) {
+        throw new BadRequestException('El cobro de cuota requiere un alumno');
       }
-      if (!comprobante) {
-        throw new NotFoundException('Comprobante no encontrado');
-      }
-      const ultimoComprobante = await this.comprobanteRepository.findOne({
-        where: { numeroComprobante: Like(`X ${comprobante.numeroSucursal}-%`) }, // Filtrar por número de sucursal
-        order: { numeroComprobante: 'DESC' }, // Ordenar para obtener el último
-      });
+      
+      // Para COBRO_VARIOS y CERTIFICACION_EXAMEN el alumno es opcional
+      let alumnoComision: AlumnoComision | undefined = undefined;
+      if (alumnoComisionId) {
+        const foundAlumno = await this.alumnoComisionRepository.findOne({
+          where: { id: alumnoComisionId },
+          relations: ['alumno', 'comision'],
+        });
 
-      let numeroLargo = 0;
-      if (ultimoComprobante) {
-        const partes = ultimoComprobante.numeroComprobante.split('-');
-        if (partes.length > 1) {
-          numeroLargo = parseInt(partes[1], 10);
+        if (!foundAlumno) {
+          throw new NotFoundException('Alumno no encontrado');
         }
+        alumnoComision = foundAlumno;
       }
-      numeroLargo += 1;
-      const numeroLargoFormateado = numeroLargo.toString().padStart(8, '0');
-      const numeroComprobante = `X ${comprobante.numeroSucursal}-${numeroLargoFormateado}`;
+      let newComprobante: Comprobante | undefined = undefined;
+      
+      // Solo generar comprobante si hay alumno y datos de comprobante
+      if (alumnoComision && comprobante) {
+        const ultimoComprobante = await this.comprobanteRepository.findOne({
+          where: { numeroComprobante: Like(`X ${comprobante.numeroSucursal}-%`) },
+          order: { numeroComprobante: 'DESC' },
+        });
 
-      const newComprobante = new Comprobante();
-      newComprobante.apellidoNombre = alumnoComision.alumno.name; // Nombre del alumno
-      newComprobante.dni = alumnoComision.alumno.dni; // DNI del alumno
-      newComprobante.domicilioComercial = alumnoComision.alumno.address ?? '-'; // Domicilio del alumno
-      newComprobante.iva = '-'; // Ajusta esto según sea necesario
-      newComprobante.fecha = restoCaja.fecha; // Fecha actual
-      newComprobante.formaPago = comprobante.formaPago; // Forma de pago recibida en el DTO
-      newComprobante.observacion = `${comprobante.observacion} - Comisión: ${alumnoComision.comision?.name || 'N/A'}`; // Observación
-      newComprobante.monto = restoCaja.monto; // Monto de la caja
-      newComprobante.tipoComprobante = comprobante.tipoComprobante; // Tipo de comprobante
-      newComprobante.numero = comprobante.numero; // Número de comprobante
-      newComprobante.numeroComprobante = numeroComprobante; // Número del comprobante
+        let numeroLargo = 0;
+        if (ultimoComprobante) {
+          const partes = ultimoComprobante.numeroComprobante.split('-');
+          if (partes.length > 1) {
+            numeroLargo = parseInt(partes[1], 10);
+          }
+        }
+        numeroLargo += 1;
+        const numeroLargoFormateado = numeroLargo.toString().padStart(8, '0');
+        const numeroComprobante = `X ${comprobante.numeroSucursal}-${numeroLargoFormateado}`;
 
-      await this.comprobanteRepository.save(newComprobante);
+        newComprobante = new Comprobante();
+        newComprobante.apellidoNombre = alumnoComision.alumno.name;
+        newComprobante.dni = alumnoComision.alumno.dni;
+        newComprobante.domicilioComercial = alumnoComision.alumno.address ?? '-';
+        newComprobante.iva = '-';
+        newComprobante.fecha = restoCaja.fecha;
+        newComprobante.formaPago = comprobante.formaPago;
+        newComprobante.observacion = `${comprobante.observacion} - Comisión: ${alumnoComision.comision?.name || 'N/A'}`;
+        newComprobante.monto = restoCaja.monto;
+        newComprobante.tipoComprobante = comprobante.tipoComprobante;
+        newComprobante.numero = comprobante.numero;
+        newComprobante.numeroComprobante = numeroComprobante;
+
+        await this.comprobanteRepository.save(newComprobante);
+      }
 
       const newCaja = new Caja();
       newCaja.tipo = tipo;
@@ -130,8 +142,8 @@ export class CajaService {
       newCaja.monto = restoCaja.monto;
       newCaja.descripcion = restoCaja.descripcion;
       newCaja.fecha = restoCaja.fecha;
-      newCaja.cuota = restoCaja.cuota;
-      newCaja.mesCuota = restoCaja.mesCuota;
+      newCaja.cuota = restoCaja.cuota || undefined;
+      newCaja.mesCuota = restoCaja.mesCuota || undefined;
       newCaja.vendedor = vendedor;
       newCaja.comprobante = newComprobante;
       newCaja.alumnoComision = alumnoComision;
@@ -151,8 +163,8 @@ export class CajaService {
         await this.duplicarEnCajaPerpetua(cajaGuardada, restoCaja.metodoPago);
       }
 
-      // Enviar email con comprobante si el alumno tiene email
-      if (alumnoComision.alumno.email) {
+      // Enviar email con comprobante si el alumno tiene email y hay comprobante
+      if (alumnoComision && alumnoComision.alumno.email && newComprobante) {
         try {
           const pdfBuffer =
             await this.pdfService.generarComprobantePDF(cajaGuardada);
@@ -168,6 +180,9 @@ export class CajaService {
 
       return cajaGuardada;
     }
+    
+    // Si no se retornó nada, lanzar error
+    throw new BadRequestException('Tipo de movimiento no soportado en este endpoint');
   }
 
   async findAll(

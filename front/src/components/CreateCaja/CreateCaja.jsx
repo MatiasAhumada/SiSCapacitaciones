@@ -151,6 +151,8 @@ const CreateCaja = () => {
           tipo: tipo.value,
           vendedorId: user?.id,
           comprobante: cargaComprobante,
+          cuota: formData.cuota || undefined,
+          mesCuota: formData.mesCuota || undefined,
         };
         response = await postCaja(nuevoFormData);
       } else {

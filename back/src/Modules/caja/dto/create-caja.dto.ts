@@ -44,7 +44,7 @@ export class CreateCajaDto {
 
   @IsOptional()
   @IsNumber()
-  cuota: number;
+  cuota?: number;
 
   @IsOptional()
   @ValidateNested()

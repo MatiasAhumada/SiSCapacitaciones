@@ -205,6 +205,7 @@ export class ComisionService {
       relations: ['comprobante', 'vendedor', 'alumnoComision.comision'],
       select: {
         id: true,
+        tipo: true,
         monto: true,
         metodoPago: true,
         fecha: true,

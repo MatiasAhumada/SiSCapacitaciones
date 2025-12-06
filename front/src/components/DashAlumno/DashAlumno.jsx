@@ -225,6 +225,9 @@ const DashAlumno = () => {
                       Fecha
                     </th>
                     <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                      Tipo
+                    </th>
+                    <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
                       Monto
                     </th>
                     <th className="py-4 px-6 text-left font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
@@ -254,6 +257,9 @@ const DashAlumno = () => {
                     >
                       <td className="px-6 py-4 text-gray-900">
                         {new Date(pago.fecha).toLocaleDateString('es-ES')}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-700">{pago.tipo}</span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="font-semibold text-green-600">${pago.monto}</span>
@@ -319,6 +325,7 @@ const DashAlumno = () => {
                     <div className="text-sm text-gray-600">
                       {new Date(pago.fecha).toLocaleDateString('es-ES')}
                     </div>
+                    <div className="text-xs text-gray-500 mt-1">{pago.tipo}</div>
                   </div>
                   <div className="flex gap-2">
                     <button

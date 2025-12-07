@@ -28,6 +28,7 @@ jobs:
             cd ../front
             npm install
             npm run build
+            sudo mkdir -p /var/www/siscapacitaciones
             sudo rm -rf /var/www/siscapacitaciones/*
             sudo cp -r dist/* /var/www/siscapacitaciones/
             sudo chown -R www-data:www-data /var/www/siscapacitaciones

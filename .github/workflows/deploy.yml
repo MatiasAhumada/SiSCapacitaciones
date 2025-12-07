@@ -1,0 +1,33 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            cd /root/SiSCapacitaciones
+            git pull
+            cd back
+            npm install --production
+            npm run build
+            pm2 restart siscapacitaciones-api
+            cd ../front
+            npm install
+            npm run build
+            sudo rm -rf /var/www/siscapacitaciones/*
+            sudo cp -r dist/* /var/www/siscapacitaciones/
+            sudo chown -R www-data:www-data /var/www/siscapacitaciones

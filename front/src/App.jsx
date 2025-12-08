@@ -3,6 +3,9 @@ import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import RequireAuth from './context/RequireAuth';
 import ProtectedLayout from './layouts/ProtectedLayout';
+import { useState, useEffect } from 'react';
+import AppLockModal from './components/AppLockModal/AppLockModal';
+import { getAppLockStatus } from './services/AppLock.service';
 
 // Views
 import Login from './Views/Login';
@@ -34,6 +37,29 @@ import Inscribir from './components/Inscribir/Inscribir';
 import InfoIndexVend from './components/InfoIndexVend/InfoIndexVend';
 import DashAlumno from './components/DashAlumno/DashAlumno';
 function App() {
+  const [appLocked, setAppLocked] = useState(false);
+  const [lockMessage, setLockMessage] = useState('');
+
+  useEffect(() => {
+    const checkLockStatus = async () => {
+      try {
+        const data = await getAppLockStatus();
+        setAppLocked(data.locked);
+        setLockMessage(data.message);
+      } catch (error) {
+        console.error('Error checking lock status:', error);
+      }
+    };
+
+    checkLockStatus();
+    const interval = setInterval(checkLockStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (appLocked) {
+    return <AppLockModal message={lockMessage} />;
+  }
+
   return (
     <AuthProvider>
       <AppProvider>

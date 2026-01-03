@@ -44,3 +44,23 @@ export const descargarPDFInscripcion = async (inscripcionId) => {
     throw error.response?.data || error;
   }
 };
+
+export const getInscripcionById = async (inscripcionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/inscripcion/${inscripcionId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const firmarContrato = async (inscripcionId, firmaBase64) => {
+  try {
+    const response = await axios.post(`${API_URL}/inscripcion/${inscripcionId}/firmar`, {
+      firmaBase64,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

@@ -31,6 +31,7 @@ export const SUCCESS_MESSAGES = {
   EXCEL_DESCARGADO: 'Excel descargado correctamente',
   LOGIN_EXITOSO: 'Inicio de sesión exitoso',
   BIENVENIDO: 'Bienvenido!',
+  CONTRATO_FIRMADO: 'Contrato firmado exitosamente',
 };
 
 export const ERROR_MESSAGES = {
@@ -59,4 +60,7 @@ export const ERROR_MESSAGES = {
   ALUMNO_NO_ENCONTRADO: 'Alumno no encontrado',
   NUMERO_CERTIFICADO_REQUERIDO: 'Ingrese un número',
   ERROR_GENERAR_EXCEL: 'Error al generar Excel',
+  CONTRATO_YA_FIRMADO: 'Este contrato ya ha sido firmado',
+  FIRMA_REQUERIDA: 'Por favor, realiza tu firma antes de enviar',
+  ERROR_FIRMAR_CONTRATO: 'Error al firmar el contrato',
 };

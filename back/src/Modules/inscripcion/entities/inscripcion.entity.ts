@@ -14,6 +14,15 @@ export class Inscripcion {
   @Column()
   fechaRegistro: Date;
 
+  @Column({ type: 'text', nullable: true })
+  firmaBase64: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  fechaFirma: Date;
+
+  @Column({ default: false })
+  firmado: boolean;
+
   @ManyToOne(() => Vendedor, (vendedor) => vendedor.inscripciones)
   vendedor: Vendedor;
 

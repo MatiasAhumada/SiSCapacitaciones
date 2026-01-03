@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { Inscripcion } from './entities/inscripcion.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { PdfService } from '../pdf/pdf.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class InscripcionService {
@@ -27,6 +28,7 @@ export class InscripcionService {
     @InjectRepository(AlumnoComision)
     private readonly alumnoComisionRepository: Repository<AlumnoComision>,
     private readonly pdfService: PdfService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(createInscripcionDto: CreateInscripcionDto) {
@@ -78,8 +80,23 @@ export class InscripcionService {
       alumno,
       comision,
       sucursal,
+      firmado: false,
     });
     const insc = await this.inscripcionRepository.save(inscripcion);
+    
+    // Enviar email solicitando firma
+    if (alumno.email) {
+      try {
+        await this.mailService.sendContractSignRequest(
+          alumno.email,
+          alumno.name,
+          insc.id,
+        );
+      } catch (error) {
+        console.error('Error enviando email de solicitud de firma:', error);
+      }
+    }
+    
     return await this.findOne(insc.id);
   }
 
@@ -229,7 +246,7 @@ export class InscripcionService {
   async generarPDF(id: string): Promise<Buffer> {
     const inscripcion = await this.inscripcionRepository.findOne({
       where: { id },
-      relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
+      relations: ['vendedor', 'alumno', 'comision', 'comision.hour', 'sucursal'],
     });
 
     if (!inscripcion) {
@@ -237,5 +254,42 @@ export class InscripcionService {
     }
 
     return this.pdfService.generarInscripcionPDF(inscripcion);
+  }
+
+  async firmarContrato(id: string, firmaBase64: string) {
+    const inscripcion = await this.inscripcionRepository.findOne({
+      where: { id },
+      relations: ['alumno', 'vendedor', 'comision', 'comision.hour', 'sucursal'],
+    });
+
+    if (!inscripcion) {
+      throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
+    }
+
+    if (inscripcion.firmado) {
+      throw new Error('Este contrato ya ha sido firmado');
+    }
+
+    inscripcion.firmaBase64 = firmaBase64;
+    inscripcion.fechaFirma = new Date();
+    inscripcion.firmado = true;
+
+    await this.inscripcionRepository.save(inscripcion);
+
+    // Generar PDF con firma y enviar por email
+    if (inscripcion.alumno.email) {
+      try {
+        const pdfBuffer = await this.pdfService.generarInscripcionPDF(inscripcion);
+        await this.mailService.sendSignedContract(
+          inscripcion.alumno.email,
+          inscripcion.alumno.name,
+          pdfBuffer,
+        );
+      } catch (error) {
+        console.error('Error enviando contrato firmado:', error);
+      }
+    }
+
+    return inscripcion;
   }
 }

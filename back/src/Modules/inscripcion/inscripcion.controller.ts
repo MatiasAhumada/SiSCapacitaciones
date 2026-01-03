@@ -13,6 +13,11 @@ export class InscripcionController {
     return this.inscripcionService.create(createInscripcionDto);
   }
 
+  @Post(':id/firmar')
+  firmarContrato(@Param('id') id: string, @Body('firmaBase64') firmaBase64: string) {
+    return this.inscripcionService.firmarContrato(id, firmaBase64);
+  }
+
   @Get()
   findAll(
     @Query('page') page: string = '1',

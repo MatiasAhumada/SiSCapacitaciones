@@ -37,6 +37,7 @@ import Inscribir from './components/Inscribir/Inscribir';
 import InfoIndexVend from './components/InfoIndexVend/InfoIndexVend';
 import DashAlumno from './components/DashAlumno/DashAlumno';
 import DashInscripciones from './components/DashInscripciones/DashInscripciones';
+import FirmarContrato from './components/FirmarContrato/FirmarContrato';
 function App() {
   const [appLocked, setAppLocked] = useState(false);
   const [lockMessage, setLockMessage] = useState('');
@@ -68,6 +69,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/firmar-contrato/:id" element={<FirmarContrato />} />
 
             {/* Admin Routes */}
             <Route

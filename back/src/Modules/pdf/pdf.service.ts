@@ -475,15 +475,33 @@ export class PdfService {
 
     y += 115;
 
-    // Sección: Firma (sin fondo)
+    // Sección: Firma
     doc.setDrawColor(71, 85, 105);
     doc.setLineWidth(0.8);
-    doc.line(pageWidth - margin - 70, y + 15, pageWidth - margin - 12, y + 15);
+    
+    if (inscripcion.firmaBase64 && inscripcion.firmado) {
+      // Insertar imagen de firma
+      doc.addImage(inscripcion.firmaBase64, 'PNG', pageWidth - margin - 70, y + 5, 58, 15);
+      
+      // Fecha de firma
+      doc.setTextColor(51, 65, 85);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text(
+        `Firmado el: ${new Date(inscripcion.fechaFirma).toLocaleDateString('es-AR')}`,
+        pageWidth - margin - 41,
+        y + 23,
+        { align: 'center' }
+      );
+    } else {
+      // Línea para firma manual
+      doc.line(pageWidth - margin - 70, y + 15, pageWidth - margin - 12, y + 15);
+    }
 
     doc.setTextColor(51, 65, 85);
     doc.setFontSize(9);
     doc.setFont('courier', 'bold');
-    doc.text('FIRMA DEL ALUMNO', pageWidth - margin - 41, y + 21, {
+    doc.text('FIRMA DEL ALUMNO', pageWidth - margin - 41, y + 28, {
       align: 'center',
     });
 

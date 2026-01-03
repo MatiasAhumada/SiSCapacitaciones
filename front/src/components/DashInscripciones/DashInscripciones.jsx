@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getAllInscripciones, getInscripcionesByVendedor } from '../../services/Inscripciones.service';
+import { getAllInscripciones, getInscripcionesByVendedor, descargarPDFInscripcion } from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import { clientErrorHandler } from '../../utils/notificationHandler';
 import { Spinner } from '../Spinner/Spinner';
@@ -63,8 +63,18 @@ const DashInscripciones = () => {
     }
   }, [user?.id, currentPage, isAdmin, selectedVendedor, selectedFecha]);
 
-  const handlePrint = (inscripcion) => {
-    console.log('Imprimir inscripción:', inscripcion);
+  const handlePrint = async (inscripcion) => {
+    try {
+      const blob = await descargarPDFInscripcion(inscripcion.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `inscripcion-${inscripcion.alumno?.name || inscripcion.id}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message);
+    }
   };
 
   const handleClearFilters = () => {

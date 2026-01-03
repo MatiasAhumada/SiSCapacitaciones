@@ -274,4 +274,90 @@ export class PdfService {
       throw new Error(`Error al generar comprobante: ${error.message}`);
     }
   }
+
+  async generarInscripcionPDF(inscripcion: any): Promise<Buffer> {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('FICHA DE INSCRIPCIÓN', pageWidth / 2, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('SIS CAPACITACIONES', pageWidth / 2, 25, { align: 'center' });
+
+    doc.setFillColor(59, 130, 246);
+    doc.rect(10, 45, pageWidth - 20, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('DATOS DE INSCRIPCIÓN', 12, 51);
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    let y = 60;
+
+    doc.text(`Asesor: ${inscripcion.vendedor?.name || '-'}`, 12, y);
+    doc.text(
+      `Fecha: ${new Date(inscripcion.fechaRegistro).toLocaleDateString('es-AR')}`,
+      120,
+      y,
+    );
+    y += 7;
+    doc.text(`Curso: ${inscripcion.comision?.name || '-'}`, 12, y);
+    y += 7;
+    doc.text(`Sede: ${inscripcion.sucursal?.name || '-'}`, 12, y);
+
+    y += 10;
+    doc.setFillColor(59, 130, 246);
+    doc.rect(10, y, pageWidth - 20, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INFORMACIÓN PERSONAL', 12, y + 6);
+
+    y += 15;
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      `Nombre y Apellido: ${inscripcion.alumno?.name || '-'}`,
+      12,
+      y,
+    );
+    y += 7;
+    doc.text(`DNI: ${inscripcion.alumno?.dni || '-'}`, 12, y);
+    doc.text(
+      `Fecha de Nac.: ${inscripcion.alumno?.fechaNacimiento ? new Date(inscripcion.alumno.fechaNacimiento).toLocaleDateString('es-AR') : '-'}`,
+      120,
+      y,
+    );
+    y += 7;
+    doc.text(`Teléfono: ${inscripcion.alumno?.tel || '-'}`, 12, y);
+    y += 7;
+    doc.text(`E-Mail: ${inscripcion.alumno?.email || '-'}`, 12, y);
+    y += 7;
+    doc.text(`Dirección: ${inscripcion.alumno?.address || '-'}`, 12, y);
+    y += 7;
+    doc.text(`Localidad: ${inscripcion.alumno?.localidad || '-'}`, 12, y);
+    doc.text(`Provincia: ${inscripcion.alumno?.provincia || '-'}`, 120, y);
+    y += 7;
+    doc.text(`Nacionalidad: ${inscripcion.alumno?.nacionalidad || '-'}`, 12, y);
+
+    const logoPath = path.join(process.cwd(), 'assets', 'completo.png');
+    if (fs.existsSync(logoPath)) {
+      const logoBytes = fs.readFileSync(logoPath);
+      const logoImage = doc.addImage(logoBytes, 'PNG', 12, pageHeight - 40, 50, 25);
+    }
+
+    doc.setDrawColor(0, 0, 0);
+    doc.line(pageWidth - 70, pageHeight - 20, pageWidth - 10, pageHeight - 20);
+    doc.setFontSize(8);
+    doc.text('FIRMA ALUMNO', pageWidth - 40, pageHeight - 15, { align: 'center' });
+
+    return Buffer.from(doc.output('arraybuffer'));
+  }
 }

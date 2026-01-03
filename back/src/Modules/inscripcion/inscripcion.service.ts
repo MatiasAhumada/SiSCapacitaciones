@@ -9,6 +9,7 @@ import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { Repository } from 'typeorm';
 import { Inscripcion } from './entities/inscripcion.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
+import { PdfService } from '../pdf/pdf.service';
 
 @Injectable()
 export class InscripcionService {
@@ -25,6 +26,7 @@ export class InscripcionService {
     private readonly inscripcionRepository: Repository<Inscripcion>,
     @InjectRepository(AlumnoComision)
     private readonly alumnoComisionRepository: Repository<AlumnoComision>,
+    private readonly pdfService: PdfService,
   ) {}
 
   async create(createInscripcionDto: CreateInscripcionDto) {
@@ -222,5 +224,18 @@ export class InscripcionService {
       throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
     }
     return `Inscripción con ID ${id} eliminada`;
+  }
+
+  async generarPDF(id: string): Promise<Buffer> {
+    const inscripcion = await this.inscripcionRepository.findOne({
+      where: { id },
+      relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
+    });
+
+    if (!inscripcion) {
+      throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
+    }
+
+    return this.pdfService.generarInscripcionPDF(inscripcion);
   }
 }

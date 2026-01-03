@@ -33,3 +33,14 @@ export const getInscripcionesByVendedor = async (vendedorId, page = 1, limit = 1
     throw error.response?.data || error;
   }
 };
+
+export const descargarPDFInscripcion = async (inscripcionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/inscripcion/${inscripcionId}/pdf`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

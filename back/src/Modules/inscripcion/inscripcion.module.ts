@@ -8,6 +8,7 @@ import { Alumno } from '../alumno/entities/alumno.entity';
 import { Comision } from '../comision/entities/comision.entity';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
+import { PdfModule } from '../pdf/pdf.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
       Sucursal,
       AlumnoComision,
     ]),
+    PdfModule,
   ],
   controllers: [InscripcionController],
   providers: [InscripcionService],

@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from '@nestjs/common';
 import { InscripcionService } from './inscripcion.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { UpdateInscripcionDto } from './dto/update-inscripcion.dto';
+import { Response } from 'express';
 
 @Controller('inscripcion')
 export class InscripcionController {
@@ -38,6 +39,16 @@ export class InscripcionController {
       parseInt(page),
       parseInt(limit),
     );
+  }
+
+  @Get(':id/pdf')
+  async descargarPDF(@Param('id') id: string, @Res() res: Response) {
+    const pdf = await this.inscripcionService.generarPDF(id);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=inscripcion-${id}.pdf`,
+    });
+    res.send(pdf);
   }
 
   @Get(':id')

@@ -36,6 +36,7 @@ import Certificados from './components/Certificados/Certificados';
 import Inscribir from './components/Inscribir/Inscribir';
 import InfoIndexVend from './components/InfoIndexVend/InfoIndexVend';
 import DashAlumno from './components/DashAlumno/DashAlumno';
+import DashInscripciones from './components/DashInscripciones/DashInscripciones';
 function App() {
   const [appLocked, setAppLocked] = useState(false);
   const [lockMessage, setLockMessage] = useState('');
@@ -278,6 +279,16 @@ function App() {
                 <RequireAuth>
                   <ProtectedLayout>
                     <InfoIndexVend />
+                  </ProtectedLayout>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/vendedor/inscripciones"
+              element={
+                <RequireAuth>
+                  <ProtectedLayout>
+                    <DashInscripciones />
                   </ProtectedLayout>
                 </RequireAuth>
               }

@@ -135,7 +135,7 @@ const UnifiedNav = () => {
           name: 'Académico',
           icon: AcademicCapIcon,
           items: [
-            { name: 'Inscribir', path: '/vendedor/inscribir' },
+            { name: 'Inscripciones', path: '/vendedor/inscripciones' },
             { name: 'Cursos', path: '/vendedor/cursos' },
             { name: 'Comisiones', path: '/vendedor/comisiones' },
           ],

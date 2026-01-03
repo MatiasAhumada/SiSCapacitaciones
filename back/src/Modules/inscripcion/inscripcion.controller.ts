@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { InscripcionService } from './inscripcion.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { UpdateInscripcionDto } from './dto/update-inscripcion.dto';
@@ -23,6 +15,19 @@ export class InscripcionController {
   @Get()
   findAll() {
     return this.inscripcionService.findAll();
+  }
+
+  @Get('vendedor/:vendedorId')
+  findByVendedor(
+    @Param('vendedorId') vendedorId: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.inscripcionService.findByVendedor(
+      vendedorId,
+      parseInt(page),
+      parseInt(limit),
+    );
   }
 
   @Get(':id')

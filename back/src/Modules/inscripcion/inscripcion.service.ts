@@ -105,6 +105,47 @@ export class InscripcionService {
     });
   }
 
+  async findByVendedor(vendedorId: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    
+    const [data, total] = await this.inscripcionRepository.findAndCount({
+      where: { vendedor: { id: vendedorId } },
+      relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
+      select: {
+        vendedor: {
+          id: true,
+          name: true,
+        },
+        alumno: {
+          id: true,
+          name: true,
+          dni: true,
+        },
+        comision: {
+          id: true,
+          name: true,
+        },
+        sucursal: {
+          id: true,
+          name: true,
+        },
+      },
+      order: {
+        fechaRegistro: 'DESC',
+      },
+      skip,
+      take: limit,
+    });
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
   async findOne(id: string) {
     return this.inscripcionRepository.findOne({
       where: { id },

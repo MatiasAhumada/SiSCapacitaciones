@@ -10,6 +10,19 @@ export const postInscripcion = async (inscripcion) => {
   }
 };
 
+export const getAllInscripciones = async (page = 1, limit = 10, vendedorId = '', fecha = '') => {
+  try {
+    const params = { page, limit };
+    if (vendedorId) params.vendedorId = vendedorId;
+    if (fecha) params.fecha = fecha;
+    
+    const response = await axios.get(`${API_URL}/inscripcion`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getInscripcionesByVendedor = async (vendedorId, page = 1, limit = 10) => {
   try {
     const response = await axios.get(`${API_URL}/inscripcion/vendedor/${vendedorId}`, {

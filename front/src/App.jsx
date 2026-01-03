@@ -271,6 +271,16 @@ function App() {
                 </RequireAuth>
               }
             />
+            <Route
+              path="/admin/inscripciones"
+              element={
+                <RequireAuth>
+                  <ProtectedLayout>
+                    <DashInscripciones />
+                  </ProtectedLayout>
+                </RequireAuth>
+              }
+            />
 
             {/* Vendedor Routes */}
             <Route

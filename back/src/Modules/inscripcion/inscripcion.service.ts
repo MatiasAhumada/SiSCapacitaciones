@@ -81,28 +81,69 @@ export class InscripcionService {
     return await this.findOne(insc.id);
   }
 
-  async findAll() {
-    return this.inscripcionRepository.find({
-      relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
-      select: {
-        vendedor: {
-          id: true,
-          name: true,
-        },
-        alumno: {
-          id: true,
-          name: true,
-        },
-        comision: {
-          id: true,
-          name: true,
-        },
-        sucursal: {
-          id: true,
-          name: true,
-        },
-      },
-    });
+  async findAll(page: number = 1, limit: number = 10, vendedorId?: string, fecha?: string) {
+    const skip = (page - 1) * limit;
+    
+    const queryBuilder = this.inscripcionRepository
+      .createQueryBuilder('inscripcion')
+      .leftJoinAndSelect('inscripcion.vendedor', 'vendedor')
+      .leftJoinAndSelect('inscripcion.alumno', 'alumno')
+      .leftJoinAndSelect('inscripcion.comision', 'comision')
+      .leftJoinAndSelect('inscripcion.sucursal', 'sucursal')
+      .select([
+        'inscripcion',
+        'vendedor.id',
+        'vendedor.name',
+        'alumno.id',
+        'alumno.name',
+        'alumno.dni',
+        'comision.id',
+        'comision.name',
+        'sucursal.id',
+        'sucursal.name',
+      ])
+      .orderBy('inscripcion.fechaRegistro', 'DESC');
+
+    if (vendedorId) {
+      queryBuilder.andWhere('vendedor.id = :vendedorId', { vendedorId });
+    }
+
+    if (fecha) {
+      queryBuilder.andWhere('DATE(inscripcion.fechaRegistro) = :fecha', { fecha });
+    }
+
+    const [data, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    const statsQuery = this.inscripcionRepository
+      .createQueryBuilder('inscripcion')
+      .select('vendedor.id', 'vendedorId')
+      .addSelect('vendedor.name', 'vendedorName')
+      .addSelect('COUNT(inscripcion.id)', 'count')
+      .leftJoin('inscripcion.vendedor', 'vendedor')
+      .groupBy('vendedor.id')
+      .addGroupBy('vendedor.name');
+
+    if (vendedorId) {
+      statsQuery.where('vendedor.id = :vendedorId', { vendedorId });
+    }
+
+    const statsByVendedor = await statsQuery.getRawMany();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      statsByVendedor: statsByVendedor.map((stat) => ({
+        id: stat.vendedorId,
+        name: stat.vendedorName,
+        count: parseInt(stat.count),
+      })),
+    };
   }
 
   async findByVendedor(vendedorId: string, page: number = 1, limit: number = 10) {

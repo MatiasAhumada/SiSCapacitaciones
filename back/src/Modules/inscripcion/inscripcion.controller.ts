@@ -13,8 +13,18 @@ export class InscripcionController {
   }
 
   @Get()
-  findAll() {
-    return this.inscripcionService.findAll();
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('vendedorId') vendedorId?: string,
+    @Query('fecha') fecha?: string,
+  ) {
+    return this.inscripcionService.findAll(
+      parseInt(page),
+      parseInt(limit),
+      vendedorId,
+      fecha,
+    );
   }
 
   @Get('vendedor/:vendedorId')

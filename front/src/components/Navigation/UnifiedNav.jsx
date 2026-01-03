@@ -116,6 +116,7 @@ const UnifiedNav = () => {
             { name: 'Crear Curso', path: '/admin/cursos/crear' },
             { name: 'Comisiones', path: '/admin/comisiones' },
             { name: 'Crear Comisión', path: '/admin/comisiones/crear' },
+            { name: 'Inscripciones', path: '/admin/inscripciones' },
             { name: 'Certificados', path: '/admin/certificados' },
           ],
         },

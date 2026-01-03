@@ -279,84 +279,230 @@ export class PdfService {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
+    const margin = 12;
+    const contentWidth = pageWidth - margin * 2;
 
-    doc.setFillColor(37, 99, 235);
-    doc.rect(0, 0, pageWidth, 40, 'F');
+    // Header con degradado
+    doc.setFillColor(30, 58, 138);
+    doc.rect(0, 0, pageWidth, 50, 'F');
 
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text('FICHA DE INSCRIPCIÓN', pageWidth / 2, 15, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text('SIS CAPACITACIONES', pageWidth / 2, 25, { align: 'center' });
+    doc.setFontSize(32);
+    doc.setFont('times', 'bold');
+    doc.text('FICHA DE INSCRIPCIÓN', pageWidth / 2, 22, { align: 'center' });
 
-    doc.setFillColor(59, 130, 246);
-    doc.rect(10, 45, pageWidth - 20, 8, 'F');
+    doc.setFontSize(13);
+    doc.setFont('courier', 'bold');
+    doc.text('SIS CAPACITACIONES', pageWidth / 2, 33, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'italic');
+    doc.text(
+      `Fecha de emisión: ${new Date(inscripcion.fechaRegistro).toLocaleDateString('es-AR')}`,
+      pageWidth / 2,
+      42,
+      { align: 'center' },
+    );
+
+    let y = 55;
+
+    // Sección: Datos de Inscripción
+    doc.setFillColor(30, 58, 138);
+    doc.roundedRect(margin, y, contentWidth, 14, 3, 3, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('DATOS DE INSCRIPCIÓN', 12, 51);
+    doc.setFontSize(14);
+    doc.setFont('times', 'bold');
+    doc.text('DATOS DE INSCRIPCION', margin + 6, y + 9);
 
-    doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    let y = 60;
+    y += 20;
+    doc.setFillColor(241, 245, 249);
+    doc.roundedRect(margin, y, contentWidth, 48, 3, 3, 'F');
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, y, contentWidth, 48, 3, 3, 'S');
 
-    doc.text(`Asesor: ${inscripcion.vendedor?.name || '-'}`, 12, y);
-    doc.text(
-      `Fecha: ${new Date(inscripcion.fechaRegistro).toLocaleDateString('es-AR')}`,
-      120,
-      y,
-    );
-    y += 7;
-    doc.text(`Curso: ${inscripcion.comision?.name || '-'}`, 12, y);
-    y += 7;
-    doc.text(`Sede: ${inscripcion.sucursal?.name || '-'}`, 12, y);
+    const fontSize = 11;
 
-    y += 10;
-    doc.setFillColor(59, 130, 246);
-    doc.rect(10, y, pageWidth - 20, 8, 'F');
+    doc.setTextColor(51, 65, 85);
+    doc.setFontSize(fontSize);
+    doc.setFont('courier', 'bold');
+    doc.text('ASESOR:', margin + 10, y + 12);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(15, 23, 42);
+    doc.text(inscripcion.vendedor?.name || '-', margin + 35, y + 12);
+
+    doc.setTextColor(51, 65, 85);
+    doc.setFont('courier', 'bold');
+    doc.text('SEDE:', pageWidth / 2 + 15, y + 12);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(15, 23, 42);
+    doc.text(inscripcion.sucursal?.name || '-', pageWidth / 2 + 35, y + 12);
+
+    doc.setTextColor(51, 65, 85);
+    doc.setFont('courier', 'bold');
+    doc.text('CURSO:', margin + 10, y + 24);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(15, 23, 42);
+    const cursoText = inscripcion.comision?.name || '-';
+    doc.text(cursoText, margin + 35, y + 24, { maxWidth: contentWidth - 50 });
+
+    doc.setTextColor(51, 65, 85);
+    doc.setFont('courier', 'bold');
+    doc.text('HORARIO:', margin + 10, y + 36);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(15, 23, 42);
+    const horario = inscripcion.comision?.hour
+      ? `${inscripcion.comision.day} - ${inscripcion.comision.hour.start} a ${inscripcion.comision.hour.end}`
+      : '-';
+    doc.text(horario, margin + 35, y + 36);
+
+    y += 55;
+
+    // Sección: Información Personal
+    doc.setFillColor(30, 58, 138);
+    doc.roundedRect(margin, y, contentWidth, 14, 3, 3, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INFORMACIÓN PERSONAL', 12, y + 6);
+    doc.setFontSize(14);
+    doc.setFont('times', 'bold');
+    doc.text('INFORMACION PERSONAL', margin + 6, y + 9);
 
-    y += 15;
-    doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'normal');
-    doc.text(
-      `Nombre y Apellido: ${inscripcion.alumno?.name || '-'}`,
-      12,
-      y,
-    );
-    y += 7;
-    doc.text(`DNI: ${inscripcion.alumno?.dni || '-'}`, 12, y);
-    doc.text(
-      `Fecha de Nac.: ${inscripcion.alumno?.fechaNacimiento ? new Date(inscripcion.alumno.fechaNacimiento).toLocaleDateString('es-AR') : '-'}`,
-      120,
-      y,
-    );
-    y += 7;
-    doc.text(`Teléfono: ${inscripcion.alumno?.tel || '-'}`, 12, y);
-    y += 7;
-    doc.text(`E-Mail: ${inscripcion.alumno?.email || '-'}`, 12, y);
-    y += 7;
-    doc.text(`Dirección: ${inscripcion.alumno?.address || '-'}`, 12, y);
-    y += 7;
-    doc.text(`Localidad: ${inscripcion.alumno?.localidad || '-'}`, 12, y);
-    doc.text(`Provincia: ${inscripcion.alumno?.provincia || '-'}`, 120, y);
-    y += 7;
-    doc.text(`Nacionalidad: ${inscripcion.alumno?.nacionalidad || '-'}`, 12, y);
+    y += 20;
+    doc.setFillColor(241, 245, 249);
+    doc.roundedRect(margin, y, contentWidth, 115, 3, 3, 'F');
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, y, contentWidth, 115, 3, 3, 'S');
 
+    const drawField = (
+      label: string,
+      value: string,
+      xPos: number,
+      yPos: number,
+      width?: number,
+    ) => {
+      doc.setTextColor(51, 65, 85);
+      doc.setFontSize(fontSize);
+      doc.setFont('courier', 'bold');
+      doc.text(label, xPos, yPos);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(15, 23, 42);
+      doc.text(value, xPos, yPos + 8, { maxWidth: width || 85 });
+    };
+
+    drawField(
+      'NOMBRE Y APELLIDO',
+      inscripcion.alumno?.name || '-',
+      margin + 10,
+      y + 10,
+      80,
+    );
+
+    drawField(
+      'FECHA DE NACIMIENTO',
+      inscripcion.alumno?.fNac
+        ? new Date(inscripcion.alumno.fNac).toLocaleDateString('es-AR')
+        : '-',
+      pageWidth / 2 + 8,
+      y + 10,
+    );
+
+    drawField('DNI', inscripcion.alumno?.dni || '-', margin + 10, y + 28);
+
+    drawField(
+      'EDAD',
+      inscripcion.alumno?.age?.toString() || '-',
+      pageWidth / 2 + 8,
+      y + 28,
+    );
+
+    drawField(
+      'EMAIL',
+      inscripcion.alumno?.email || '-',
+      margin + 10,
+      y + 46,
+      80,
+    );
+
+    drawField(
+      'TELEFONO',
+      inscripcion.alumno?.tel || '-',
+      pageWidth / 2 + 8,
+      y + 46,
+    );
+
+    drawField(
+      'DIRECCION',
+      inscripcion.alumno?.address || '-',
+      margin + 10,
+      y + 64,
+      80,
+    );
+
+    drawField(
+      'GENERO',
+      inscripcion.alumno?.gender || '-',
+      pageWidth / 2 + 8,
+      y + 64,
+    );
+
+    drawField(
+      'LOCALIDAD',
+      inscripcion.alumno?.locality || '-',
+      margin + 10,
+      y + 82,
+    );
+
+    drawField(
+      'PROVINCIA',
+      inscripcion.alumno?.province || '-',
+      pageWidth / 2 + 8,
+      y + 82,
+    );
+
+    drawField(
+      'NACIONALIDAD',
+      inscripcion.alumno?.nationality || '-',
+      margin + 10,
+      y + 100,
+    );
+
+    drawField(
+      'OCUPACION',
+      inscripcion.alumno?.ocupation || '-',
+      pageWidth / 2 + 8,
+      y + 100,
+    );
+
+    y += 115;
+
+    // Sección: Firma (sin fondo)
+    doc.setDrawColor(71, 85, 105);
+    doc.setLineWidth(0.8);
+    doc.line(pageWidth - margin - 70, y + 15, pageWidth - margin - 12, y + 15);
+
+    doc.setTextColor(51, 65, 85);
+    doc.setFontSize(9);
+    doc.setFont('courier', 'bold');
+    doc.text('FIRMA DEL ALUMNO', pageWidth - margin - 41, y + 21, {
+      align: 'center',
+    });
+
+    // Footer (sin fondo)
     const logoPath = path.join(process.cwd(), 'assets', 'completo.png');
     if (fs.existsSync(logoPath)) {
       const logoBytes = fs.readFileSync(logoPath);
-      const logoImage = doc.addImage(logoBytes, 'PNG', 12, pageHeight - 40, 50, 25);
+      doc.addImage(logoBytes, 'PNG', margin + 3, pageHeight - 30, 70, 20);
     }
 
-    doc.setDrawColor(0, 0, 0);
-    doc.line(pageWidth - 70, pageHeight - 20, pageWidth - 10, pageHeight - 20);
-    doc.setFontSize(8);
-    doc.text('FIRMA ALUMNO', pageWidth - 40, pageHeight - 15, { align: 'center' });
+    doc.setTextColor(71, 85, 105);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'italic');
+    doc.text(
+      '© 2025 SIS Capacitaciones - Desarrollado por Matias Ahumada | Tel: +54 9 381 3528-658',
+      pageWidth / 2,
+      pageHeight - 3,
+      { align: 'center' },
+    );
 
     return Buffer.from(doc.output('arraybuffer'));
   }

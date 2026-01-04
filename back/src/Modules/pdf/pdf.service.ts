@@ -478,11 +478,18 @@ export class PdfService {
     // Sección: Firma
     doc.setDrawColor(71, 85, 105);
     doc.setLineWidth(0.8);
-    
+
     if (inscripcion.firmaBase64 && inscripcion.firmado) {
       // Insertar imagen de firma
-      doc.addImage(inscripcion.firmaBase64, 'PNG', pageWidth - margin - 70, y , 58, 15);
-      
+      doc.addImage(
+        inscripcion.firmaBase64,
+        'PNG',
+        pageWidth - margin - 70,
+        y,
+        58,
+        15,
+      );
+
       // Fecha de firma
       doc.setTextColor(51, 65, 85);
       doc.setFontSize(8);
@@ -491,11 +498,16 @@ export class PdfService {
         `Firmado el: ${new Date(inscripcion.fechaFirma).toLocaleDateString('es-AR')}`,
         pageWidth - margin - 41,
         y + 15,
-        { align: 'center' }
+        { align: 'center' },
       );
     } else {
       // Línea para firma manual
-      doc.line(pageWidth - margin - 70, y + 15, pageWidth - margin - 12, y + 15);
+      doc.line(
+        pageWidth - margin - 70,
+        y + 15,
+        pageWidth - margin - 12,
+        y + 15,
+      );
     }
 
     doc.setTextColor(51, 65, 85);
@@ -522,6 +534,187 @@ export class PdfService {
       { align: 'center' },
     );
 
+    // Agregar segunda hoja
+    doc.addPage();
+    this.agregarSegundaHojaContrato(doc, inscripcion);
+
     return Buffer.from(doc.output('arraybuffer'));
+  }
+
+  agregarSegundaHojaContrato(doc: jsPDF, inscripcion: any): void {
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 12;
+
+    // Header
+    doc.setFillColor(30, 58, 138);
+    doc.rect(0, 0, pageWidth, 35, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont('courier', 'bold');
+    doc.text('SIS CAPACITACIONES', pageWidth / 2, 15, { align: 'center' });
+
+    doc.setFontSize(20);
+    doc.setFont('times', 'bold');
+    doc.text('IMPORTANTE - NORMATIVA', pageWidth / 2, 27, { align: 'center' });
+
+    // Términos y condiciones
+    const terminos = [
+      'Cupo mínimo 12 alumnos. En caso de no completarse el cupo la fecha de inicio de clases se postergará hasta el próximo mes. De no completarse el cupo en tres meses consecutivos, se realizará la devolución, según lo establecido en el ítem 3.',
+      'Las cuotas se abonarán por adelantado hasta el 15 de cada mes. Posterior a esa fecha tendrán un recargo de $4000 (pesos cuatro mil). El valor de cuota está sujeto a modificación con previo aviso por medio de los grupos de WhatsApp informativos y con un mínimo de 10 días antes de su vencimiento.',
+      {
+        titulo: 'No se realizarán devoluciones bajo ningún concepto.',
+        subitems: [
+          'En caso de que el alumno no pueda cursar en el horario y día elegido o disponible por la institución, pierde el importe abonado.',
+          'En caso de corresponder devolución, sólo por causa de entera responsabilidad de la institución la misma se realizará mediante la liberación de nota de crédito correspondiente.',
+        ],
+      },
+      'El pago de las cuotas no incluye materiales, derecho de examen ni certificación (excepto promociones vigentes).',
+      'Todos los materiales e insumos a utilizar en esta capacitación son de costo del estudiante y en ningún caso queda comprendido dentro del monto de la matrícula y/o arancel de esta capacitación.',
+      'Programas de capacitaciones sujetos a modificaciones sin previo aviso.',
+      'Promociones no acumulativas y con vigencia únicamente si el alumno está cursando y con las cuotas abonadas al día.',
+      'Las señas o cuotas abonadas no pueden ser transferidas a terceros, sólo se realizarán devoluciones en caso de corresponder según lo establecido en el ítem 3.',
+      'El alumno que adeude 2 cuotas consecutivas o alternadas no podrá asistir a clases hasta saldar lo adeudado. Si el alumno deja de asistir al curso y mantiene una deuda con la institución, esa deuda debe ser abonada en su totalidad con los recargos e intereses punitorios pertinentes.',
+      'La institución se reserva poder cambiar o unificar horarios de los cursos, como así también finalizarlos con anticipación, en el caso que los asistentes y abonados no superen los 10 alumnos en la comisión y grupo, o por fuerza mayor y casos o eventos especiales, propios o ajenos.',
+      'La promoción de certificación y derecho de examen, gratis es válida solo con todas las cuotas pagadas completas hasta el 10 de cada mes, vencido ese plazo se pierde la promoción y debe abonarse derecho de examen y certificación sin excepción, correspondiendo $12.000 de derecho de examen y $18.000 de certificación.',
+      'El instituto se reserva el derecho de admisión y permanencia.',
+      'Las clases de días feriados, asuetos y días no laborales no se recuperan.',
+      'El instituto no se responsabiliza por pérdidas de elementos personales dentro de la institución.',
+      'Para realización de prácticas, en caso de corresponder, los alumnos serán evaluados antes de acceder a las mismas, y sólo los aprobados estarán en condiciones de realizarlas. El alumno debe abonar el seguro correspondiente para salir fuera de la institución, como así también debe estar al día con las cuotas vigentes.',
+      'Requisitos para la certificación: cuotas abonadas, asistencia 80%, evaluación final aprobada con el 60%.',
+      'La certificación tiene una demora máxima de 90 días hábiles desde el momento de finalización efectiva del curso y pago del arancel de certificación si correspondiese.',
+    ];
+
+    const footerY = pageHeight - 35;
+    let yPos = 45;
+    doc.setFontSize(10);
+    doc.setFont('times', 'bold');
+    doc.setTextColor(15, 23, 42);
+
+    let itemNumber = 1;
+    terminos.forEach((termino) => {
+      if (typeof termino === 'string') {
+        const lines = doc.splitTextToSize(
+          `${itemNumber}. ${termino}`,
+          pageWidth - margin * 2 - 4,
+        );
+        lines.forEach((line) => {
+          if (yPos > footerY - 10) return;
+          doc.text(line, margin + 2, yPos);
+          yPos += 4.5;
+        });
+        yPos += 1.5;
+        itemNumber++;
+      } else {
+        const lines = doc.splitTextToSize(
+          `${itemNumber}. ${termino.titulo}`,
+          pageWidth - margin * 2 - 4,
+        );
+        lines.forEach((line) => {
+          if (yPos > footerY - 10) return;
+          doc.text(line, margin + 2, yPos);
+          yPos += 4.5;
+        });
+        yPos += 1.5;
+        termino.subitems.forEach((subitem, subIndex) => {
+          const subLines = doc.splitTextToSize(
+            `   ${itemNumber}.${subIndex + 1}. ${subitem}`,
+            pageWidth - margin * 2 - 4,
+          );
+          subLines.forEach((line) => {
+            if (yPos > footerY - 10) return;
+            doc.text(line, margin + 2, yPos);
+            yPos += 4.5;
+          });
+          yPos += 1.5;
+        });
+        itemNumber++;
+      }
+    });
+
+    // Espacio para términos y condiciones
+
+    // Footer con firmas
+    const firmaWidth = 45;
+
+    // Texto de aceptación en negrita
+    doc.setFontSize(10);
+    doc.setFont('times', 'bold');
+    doc.setTextColor(15, 23, 42);
+    doc.text(
+      'Entiendo y acepto los términos, condiciones y firmo en conformidad.',
+      margin + 2,
+      footerY - 25,
+    );
+
+    // Logo
+    const logoPath = path.join(process.cwd(), 'assets', 'completo.png');
+    if (fs.existsSync(logoPath)) {
+      const logoBytes = fs.readFileSync(logoPath);
+      doc.addImage(logoBytes, 'PNG', margin, footerY, 50, 15);
+    }
+
+    // Sección de firmas
+    const col1X = margin + 80;
+    const col2X = col1X + firmaWidth + 10;
+
+    doc.setDrawColor(71, 85, 105);
+    doc.setLineWidth(0.5);
+
+    // Firma Alumno
+    if (inscripcion.firmaBase64 && inscripcion.firmado) {
+      doc.addImage(inscripcion.firmaBase64, 'PNG', col1X, footerY - 18, 45, 10);
+      doc.setTextColor(51, 65, 85);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.text(
+        `Firmado el: ${new Date(inscripcion.fechaFirma).toLocaleDateString('es-AR')}`,
+        col1X + firmaWidth / 2,
+        footerY - 5,
+        { align: 'center' },
+      );
+    } else {
+      doc.line(col1X, footerY - 5, col1X + firmaWidth, footerY - 5);
+    }
+    doc.setTextColor(51, 65, 85);
+    doc.setFontSize(7);
+    doc.setFont('courier', 'bold');
+    doc.text('FIRMA ALUMNO', col1X + firmaWidth / 2, footerY - 1, {
+      align: 'center',
+    });
+
+    doc.line(col1X, footerY + 5, col1X + firmaWidth, footerY + 5);
+    doc.text('ACLARACIÓN', col1X + firmaWidth / 2, footerY + 9, {
+      align: 'center',
+    });
+
+    doc.line(col1X, footerY + 15, col1X + firmaWidth, footerY + 15);
+    doc.text('DNI', col1X + firmaWidth / 2, footerY + 19, { align: 'center' });
+
+    // Firma Tutor
+    doc.line(col2X, footerY - 5, col2X + firmaWidth, footerY - 5);
+    doc.text('FIRMA TUTOR', col2X + firmaWidth / 2, footerY - 1, {
+      align: 'center',
+    });
+
+    doc.line(col2X, footerY + 5, col2X + firmaWidth, footerY + 5);
+    doc.text('ACLARACIÓN', col2X + firmaWidth / 2, footerY + 9, {
+      align: 'center',
+    });
+
+    doc.line(col2X, footerY + 15, col2X + firmaWidth, footerY + 15);
+    doc.text('DNI', col2X + firmaWidth / 2, footerY + 19, { align: 'center' });
+
+    // Copyright
+    doc.setTextColor(71, 85, 105);
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'italic');
+    doc.text(
+      '© 2025 SIS Capacitaciones - Desarrollado por Matias Ahumada | Tel: +54 9 381 3528-658',
+      pageWidth / 2,
+      pageHeight - 3,
+      { align: 'center' },
+    );
   }
 }

@@ -54,12 +54,18 @@ export class CertificadoService {
   }
 
   async findOneByNumber(numero: string) {
-    return this.certificadoRepository.findOne({
+    const certificado = await this.certificadoRepository.findOne({
       where: { numero: numero },
       select: {
         link: true,
       },
     });
+
+    if (!certificado) {
+      throw new NotFoundException('Certificado no encontrado');
+    }
+
+    return certificado;
   }
 
   async update(id: string, updateCertificadoDto: UpdateCertificadoDto) {

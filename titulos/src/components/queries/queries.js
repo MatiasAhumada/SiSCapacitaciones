@@ -25,5 +25,6 @@ export const getCertId=async (numero)=>{
     return response.data
   } catch (error) {
     console.error("Error al obtener el certificado", error.response?.data)
+    throw error
   }
 }

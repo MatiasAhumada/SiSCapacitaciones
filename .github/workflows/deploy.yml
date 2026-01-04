@@ -36,10 +36,21 @@ jobs:
             npm install --production
             npm run build
             pm2 restart siscapacitaciones-api
+            
             cd ../front
+            rm -rf node_modules package-lock.json
             npm install
             npm run build
             sudo mkdir -p /var/www/siscapacitaciones
             sudo rm -rf /var/www/siscapacitaciones/*
             sudo cp -r dist/* /var/www/siscapacitaciones/
             sudo chown -R www-data:www-data /var/www/siscapacitaciones
+            
+            cd ../titulos
+            rm -rf node_modules package-lock.json
+            npm install
+            npm run build
+            sudo mkdir -p /var/www/titulos
+            sudo rm -rf /var/www/titulos/*
+            sudo cp -r dist/* /var/www/titulos/
+            sudo chown -R www-data:www-data /var/www/titulos

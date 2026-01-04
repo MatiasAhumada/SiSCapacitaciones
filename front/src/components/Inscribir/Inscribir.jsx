@@ -27,6 +27,8 @@ const Inscribir = () => {
   });
   const [comisionSearch, setComisionSearch] = useState('');
   const [showComisiones, setShowComisiones] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkFirma, setLinkFirma] = useState('');
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -94,7 +96,7 @@ const Inscribir = () => {
         });
       }
 
-      await postInscripcion({
+      const inscripcion = await postInscripcion({
         alumnoId: formData.dni,
         comisionId: formData.comisionId,
         vendedorId: formData.vendedorId,
@@ -104,6 +106,12 @@ const Inscribir = () => {
       });
 
       clientSuccessHandler(SUCCESS_MESSAGES.INSCRIPCION_REALIZADA);
+      
+      // Mostrar modal con link de firma
+      const link = `${window.location.origin}/firmar-contrato/${inscripcion.id}`;
+      setLinkFirma(link);
+      setShowLinkModal(true);
+      
       setFormData({
         dni: '',
         nombre: '',
@@ -119,6 +127,16 @@ const Inscribir = () => {
     } finally {
       setPause(false);
     }
+  };
+
+  const copiarLink = () => {
+    navigator.clipboard.writeText(linkFirma);
+    clientSuccessHandler('Link copiado al portapapeles');
+  };
+
+  const cerrarModal = () => {
+    setShowLinkModal(false);
+    setLinkFirma('');
   };
 
   return (
@@ -142,7 +160,7 @@ const Inscribir = () => {
               id="dni"
               value={formData.dni}
               onChange={handleChange}
-              className="flex-1 bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg p-2.5"
+              className="flex-1 bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded p-2.5"
               placeholder="Ingrese DNI"
               required
             />
@@ -166,7 +184,7 @@ const Inscribir = () => {
             id="nombre"
             value={formData.nombre}
             onChange={handleChange}
-            className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg p-2.5"
+            className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded p-2.5"
             placeholder="Nombre del alumno"
             required
           />
@@ -181,7 +199,7 @@ const Inscribir = () => {
             id="vendedorId"
             value={formData.vendedorId}
             onChange={handleChange}
-            className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded-lg p-2.5"
+            className="w-full bg-gray-50 text-gray-600 border border-gray-300 sm:text-sm rounded p-2.5"
             required
           >
             <option value="">Seleccione un vendedor</option>
@@ -222,7 +240,7 @@ const Inscribir = () => {
 
         <button
           type="submit"
-          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-6"
+          className="w-full btnAz focus:ring-4 focus:outline-hidden focus:ring-primary-300 font-medium rounded text-sm px-5 py-2.5 text-center mb-6"
           disabled={pause}
         >
           {pause ? (
@@ -247,6 +265,34 @@ const Inscribir = () => {
           )}
         </button>
       </form>
+
+      {showLinkModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4 principal">Link de Firma de Contrato</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Comparte este link con el alumno para que pueda firmar su contrato:
+            </p>
+            <div className="bg-gray-100 p-3 rounded mb-4 break-all text-sm">
+              {linkFirma}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={copiarLink}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded px-4 py-2"
+              >
+                Copiar Link
+              </button>
+              <button
+                onClick={cerrarModal}
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded px-4 py-2"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

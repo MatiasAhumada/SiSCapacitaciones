@@ -54,8 +54,7 @@ const db_config = {
     SesionCaja,
     AsistenciaProfesor,
   ],
-  migrationsRun: true,
-  // entities: [Abono,Admins,Alumno,Comision,Curso,Inscripcion,Profesor,Servicio,Sucursal,Vendedor],
+  migrationsRun: false,
   migrations: ['dist/migrations/*.{js,ts}'],
 };
 

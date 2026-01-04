@@ -20,7 +20,18 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             cd SiSCapacitaciones/
-            git pull
+            
+            # Configurar git para resolver conflictos automáticamente
+            git config pull.rebase false
+            git config merge.ours.driver true
+            
+            # Hacer stash de cambios locales si existen
+            git stash
+            
+            # Actualizar desde dev con estrategia theirs para package-lock
+            git fetch origin dev
+            git reset --hard origin/dev
+            
             cd back
             npm install --production
             npm run build

@@ -36,7 +36,7 @@ export class MailService {
     });
   }
 
-  async sendContractSignRequest(to: string, alumnoName: string, inscripcionId: string) {
+  async sendContractSignRequest(to: string, alumnoName: string, inscripcionId: string, pdfBuffer: Buffer) {
     const signUrl = `${process.env.FRONTEND_URL}/firmar-contrato/${inscripcionId}`;
     await this.transporter.sendMail({
       from: process.env.SMTP_FROM,
@@ -45,11 +45,18 @@ export class MailService {
       html: `
         <h2>Hola ${alumnoName},</h2>
         <p>Tu inscripción ha sido registrada exitosamente.</p>
-        <p>Para completar el proceso, por favor lee y firma tu contrato de inscripción haciendo clic en el siguiente enlace:</p>
+        <p>Adjuntamos tu contrato de inscripción para que puedas leerlo con detenimiento.</p>
+        <p>Una vez que lo hayas leído, por favor firma tu contrato haciendo clic en el siguiente enlace:</p>
         <a href="${signUrl}" style="display: inline-block; padding: 10px 20px; background-color: #1e3a8a; color: white; text-decoration: none; border-radius: 5px;">Firmar Contrato</a>
         <p>Este enlace es único y personal.</p>
         <p>Gracias por confiar en SiSCapacitaciones.</p>
       `,
+      attachments: [
+        {
+          filename: 'contrato-inscripcion.pdf',
+          content: pdfBuffer,
+        },
+      ],
     });
   }
 

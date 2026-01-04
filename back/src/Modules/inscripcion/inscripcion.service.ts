@@ -84,13 +84,19 @@ export class InscripcionService {
     });
     const insc = await this.inscripcionRepository.save(inscripcion);
     
-    // Enviar email solicitando firma
+    // Enviar email solicitando firma con PDF adjunto
     if (alumno.email) {
       try {
+        const inscripcionCompleta = await this.inscripcionRepository.findOne({
+          where: { id: insc.id },
+          relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
+        });
+        const pdfBuffer = await this.pdfService.generarInscripcionPDF(inscripcionCompleta);
         await this.mailService.sendContractSignRequest(
           alumno.email,
           alumno.name,
           insc.id,
+          pdfBuffer,
         );
       } catch (error) {
         console.error('Error enviando email de solicitud de firma:', error);
@@ -246,7 +252,7 @@ export class InscripcionService {
   async generarPDF(id: string): Promise<Buffer> {
     const inscripcion = await this.inscripcionRepository.findOne({
       where: { id },
-      relations: ['vendedor', 'alumno', 'comision', 'comision.hour', 'sucursal'],
+      relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
     });
 
     if (!inscripcion) {
@@ -259,7 +265,7 @@ export class InscripcionService {
   async firmarContrato(id: string, firmaBase64: string) {
     const inscripcion = await this.inscripcionRepository.findOne({
       where: { id },
-      relations: ['alumno', 'vendedor', 'comision', 'comision.hour', 'sucursal'],
+      relations: ['alumno', 'vendedor', 'comision', 'sucursal'],
     });
 
     if (!inscripcion) {

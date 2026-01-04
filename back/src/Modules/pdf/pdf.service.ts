@@ -481,7 +481,7 @@ export class PdfService {
     
     if (inscripcion.firmaBase64 && inscripcion.firmado) {
       // Insertar imagen de firma
-      doc.addImage(inscripcion.firmaBase64, 'PNG', pageWidth - margin - 70, y + 5, 58, 15);
+      doc.addImage(inscripcion.firmaBase64, 'PNG', pageWidth - margin - 70, y , 58, 15);
       
       // Fecha de firma
       doc.setTextColor(51, 65, 85);
@@ -490,7 +490,7 @@ export class PdfService {
       doc.text(
         `Firmado el: ${new Date(inscripcion.fechaFirma).toLocaleDateString('es-AR')}`,
         pageWidth - margin - 41,
-        y + 23,
+        y + 15,
         { align: 'center' }
       );
     } else {
@@ -501,7 +501,7 @@ export class PdfService {
     doc.setTextColor(51, 65, 85);
     doc.setFontSize(9);
     doc.setFont('courier', 'bold');
-    doc.text('FIRMA DEL ALUMNO', pageWidth - margin - 41, y + 28, {
+    doc.text('FIRMA DEL ALUMNO', pageWidth - margin - 41, y + 20, {
       align: 'center',
     });
 

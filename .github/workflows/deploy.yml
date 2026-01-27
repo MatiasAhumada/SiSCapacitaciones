@@ -35,7 +35,8 @@ jobs:
             cd back
             npm install --production
             npm run build
-            pm2 restart siscapacitaciones-api
+            pm2 describe siscapacitaciones-api > /dev/null 2>&1 && pm2 restart siscapacitaciones-api || pm2 start dist/main.js --name siscapacitaciones-api
+            pm2 save
             
             cd ../front
             rm -f package-lock.json

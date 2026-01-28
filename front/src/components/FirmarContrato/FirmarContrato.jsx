@@ -3,10 +3,7 @@ import { useParams } from 'react-router-dom';
 import SignatureCanvas from 'react-signature-canvas';
 import logo from '../../assets/simplificado_a_color.png';
 import { getInscripcionById, firmarContrato } from '../../services/Inscripciones.service';
-import {
-  clientErrorHandler,
-  clientSuccessHandler,
-} from '../../utils/notificationHandler';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const FirmarContrato = () => {
@@ -21,19 +18,17 @@ const FirmarContrato = () => {
     const cargarInscripcion = async () => {
       try {
         const data = await getInscripcionById(id);
-        
+
         if (data.firmado) {
           clientErrorHandler(ERROR_MESSAGES.CONTRATO_YA_FIRMADO);
           setFirmadoExitosamente(true);
           setLoading(false);
           return;
         }
-        
+
         setInscripcion(data);
       } catch (error) {
-        clientErrorHandler(
-          error?.response?.data?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS
-        );
+        clientErrorHandler(error?.response?.data?.message || ERROR_MESSAGES.ERROR_CARGAR_DATOS);
       } finally {
         setLoading(false);
       }
@@ -59,9 +54,7 @@ const FirmarContrato = () => {
       clientSuccessHandler(SUCCESS_MESSAGES.CONTRATO_FIRMADO);
       setFirmadoExitosamente(true);
     } catch (error) {
-      clientErrorHandler(
-        error?.response?.data?.message || ERROR_MESSAGES.ERROR_FIRMAR_CONTRATO
-      );
+      clientErrorHandler(error?.response?.data?.message || ERROR_MESSAGES.ERROR_FIRMAR_CONTRATO);
     } finally {
       setSubmitting(false);
     }
@@ -99,11 +92,25 @@ const FirmarContrato = () => {
             <h2 className="text-2xl font-bold text-gray-800">Contrato Firmado</h2>
           </div>
           <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-            <svg className="w-16 h-16 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-16 h-16 mx-auto mb-4 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
-            <p className="text-lg font-semibold text-green-800 mb-2">¡Gracias por firmar tu contrato!</p>
-            <p className="text-gray-600">Recibirás una copia del contrato firmado en tu correo electrónico.</p>
+            <p className="text-lg font-semibold text-green-800 mb-2">
+              ¡Gracias por firmar tu contrato!
+            </p>
+            <p className="text-gray-600">
+              Recibirás una copia del contrato firmado en tu correo electrónico.
+            </p>
           </div>
         </div>
       </div>
@@ -121,9 +128,16 @@ const FirmarContrato = () => {
         {inscripcion && (
           <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <h3 className="font-bold text-lg mb-2">Datos de la Inscripción</h3>
-            <p><strong>Alumno:</strong> {inscripcion.alumno?.name}</p>
-            <p><strong>Curso:</strong> {inscripcion.comision?.name}</p>
-            <p><strong>Fecha de Registro:</strong> {new Date(inscripcion.fechaRegistro).toLocaleDateString('es-AR')}</p>
+            <p>
+              <strong>Alumno:</strong> {inscripcion.alumno?.name}
+            </p>
+            <p>
+              <strong>Curso:</strong> {inscripcion.comision?.name}
+            </p>
+            <p>
+              <strong>Fecha de Registro:</strong>{' '}
+              {new Date(inscripcion.fechaRegistro).toLocaleDateString('es-AR')}
+            </p>
           </div>
         )}
 

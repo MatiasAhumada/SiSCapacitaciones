@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { editMovCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
+import {
+  editMovCaja,
+  GetCajaByVendedor,
+  descargarExcelCaja,
+  descargarComprobanteEgreso,
+} from '../../services/Cajas.service';
 import { getAlu } from '../../services/Alumnos.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
@@ -49,7 +54,13 @@ const DashCaja = () => {
     try {
       const vendedorId = user.isAdmin && filtroVendedor ? filtroVendedor : user.id;
       const hayFiltrosAdmin = user.isAdmin && (filtroVendedor || filtroFecha);
-      const data = await GetCajaByVendedor(vendedorId, currentPage, 10, filtroFecha, hayFiltrosAdmin);
+      const data = await GetCajaByVendedor(
+        vendedorId,
+        currentPage,
+        10,
+        filtroFecha,
+        hayFiltrosAdmin
+      );
       const ultimaSesion = data.length > 0 ? data[0] : null;
       setSesionCaja(ultimaSesion);
       if (ultimaSesion) {
@@ -121,6 +132,24 @@ const DashCaja = () => {
       clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_DESCARGAR_COMPROBANTE);
     } finally {
       setPause((prev) => ({ ...prev, [pago.id]: false }));
+    }
+  };
+
+  const handlePrintEgreso = async (egreso) => {
+    setPause((prev) => ({ ...prev, [egreso.id]: true }));
+    try {
+      const blob = await descargarComprobanteEgreso(egreso.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `egreso-${egreso.id.substring(0, 8)}-${new Date().toISOString().split('T')[0]}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      clientSuccessHandler(SUCCESS_MESSAGES.COMPROBANTE_EGRESO_DESCARGADO);
+    } catch (error) {
+      clientErrorHandler(ERROR_MESSAGES.ERROR_DESCARGAR_COMPROBANTE_EGRESO);
+    } finally {
+      setPause((prev) => ({ ...prev, [egreso.id]: false }));
     }
   };
 
@@ -224,7 +253,9 @@ const DashCaja = () => {
               <div className="p-2 bg-indigo-100 rounded-lg">
                 <i className="fa-solid fa-list text-indigo-600"></i>
               </div>
-              <h2 className="text-lg md:text-xl font-semibold text-gray-700">Movimientos del Día</h2>
+              <h2 className="text-lg md:text-xl font-semibold text-gray-700">
+                Movimientos del Día
+              </h2>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -233,14 +264,26 @@ const DashCaja = () => {
                 <tr>
                   <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm">Fecha</th>
                   <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm">Alumno</th>
-                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden sm:table-cell">DNI</th>
-                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden md:table-cell">Vendedor</th>
+                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden sm:table-cell">
+                    DNI
+                  </th>
+                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden md:table-cell">
+                    Vendedor
+                  </th>
                   <th className="py-3 md:py-4 px-3 md:px-6 text-center text-xs md:text-sm">Tipo</th>
-                  <th className="py-3 md:py-4 px-3 md:px-6 text-center text-xs md:text-sm hidden lg:table-cell">Método</th>
-                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden xl:table-cell">Descripción</th>
+                  <th className="py-3 md:py-4 px-3 md:px-6 text-center text-xs md:text-sm hidden lg:table-cell">
+                    Método
+                  </th>
+                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden xl:table-cell">
+                    Descripción
+                  </th>
                   <th className="py-3 md:py-4 px-3 md:px-6 text-right text-xs md:text-sm">Monto</th>
-                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden xl:table-cell">Categoría</th>
-                  <th className="py-3 md:py-4 px-3 md:px-6 text-center text-xs md:text-sm">Acciones</th>
+                  <th className="py-3 md:py-4 px-3 md:px-6 text-left text-xs md:text-sm hidden xl:table-cell">
+                    Categoría
+                  </th>
+                  <th className="py-3 md:py-4 px-3 md:px-6 text-center text-xs md:text-sm">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -252,7 +295,9 @@ const DashCaja = () => {
                           <i className="fa-solid fa-inbox text-5xl text-gray-400"></i>
                         </div>
                         <p className="text-gray-500 font-medium">No hay movimientos disponibles</p>
-                        <p className="text-gray-400 text-sm mt-1">Los movimientos aparecerán aquí</p>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Los movimientos aparecerán aquí
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -329,7 +374,10 @@ const DashCaja = () => {
                               title="Descargar comprobante"
                             >
                               {pause[item.id] ? (
-                                <svg className="w-3 h-3 md:w-4 md:h-4 animate-spin" viewBox="0 0 24 24">
+                                <svg
+                                  className="w-3 h-3 md:w-4 md:h-4 animate-spin"
+                                  viewBox="0 0 24 24"
+                                >
                                   <circle
                                     className="opacity-25"
                                     cx="12"
@@ -346,6 +394,36 @@ const DashCaja = () => {
                                 </svg>
                               ) : (
                                 <i className="fa-solid fa-print text-xs md:text-sm"></i>
+                              )}
+                            </button>
+                          )}
+                          {item.tipo === 'Egreso' && (
+                            <button
+                              onClick={() => handlePrintEgreso(item)}
+                              className="p-1.5 md:p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
+                              title="Descargar comprobante de egreso"
+                            >
+                              {pause[item.id] ? (
+                                <svg
+                                  className="w-3 h-3 md:w-4 md:h-4 animate-spin"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  ></path>
+                                </svg>
+                              ) : (
+                                <i className="fa-solid fa-file-pdf text-xs md:text-sm"></i>
                               )}
                             </button>
                           )}

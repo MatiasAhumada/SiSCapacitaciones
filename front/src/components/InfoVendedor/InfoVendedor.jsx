@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { deleteVend, getVendID, descargarInscripcionesExcel } from '../../services/Vendedores.service';
+import {
+  deleteVend,
+  getVendID,
+  descargarInscripcionesExcel,
+} from '../../services/Vendedores.service';
 import Button from '../Common/Button';
 import { Spinner } from '../Spinner/Spinner';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
@@ -246,8 +250,12 @@ const InfoVendedor = () => {
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                           <i className="fa-solid fa-inbox text-gray-400 text-2xl"></i>
                         </div>
-                        <p className="text-gray-500 font-medium">No hay inscripciones para mostrar</p>
-                        <p className="text-gray-400 text-sm mt-1">Intenta ajustar los filtros de fecha</p>
+                        <p className="text-gray-500 font-medium">
+                          No hay inscripciones para mostrar
+                        </p>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Intenta ajustar los filtros de fecha
+                        </p>
                       </div>
                     </td>
                   </tr>

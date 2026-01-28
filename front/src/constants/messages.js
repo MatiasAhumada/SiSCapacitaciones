@@ -32,6 +32,7 @@ export const SUCCESS_MESSAGES = {
   LOGIN_EXITOSO: 'Inicio de sesión exitoso',
   BIENVENIDO: 'Bienvenido!',
   CONTRATO_FIRMADO: 'Contrato firmado exitosamente',
+  COMPROBANTE_EGRESO_DESCARGADO: 'Comprobante de egreso descargado correctamente',
 };
 
 export const ERROR_MESSAGES = {
@@ -63,4 +64,5 @@ export const ERROR_MESSAGES = {
   CONTRATO_YA_FIRMADO: 'Este contrato ya ha sido firmado',
   FIRMA_REQUERIDA: 'Por favor, realiza tu firma antes de enviar',
   ERROR_FIRMAR_CONTRATO: 'Error al firmar el contrato',
+  ERROR_DESCARGAR_COMPROBANTE_EGRESO: 'Error al descargar comprobante de egreso',
 };

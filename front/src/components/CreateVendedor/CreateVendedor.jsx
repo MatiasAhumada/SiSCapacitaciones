@@ -63,12 +63,17 @@ const CreateVendedor = () => {
         <div>
           <img src={logo} alt="Logo" width="50" />
         </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 principal">Nuevo Vendedor</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 principal">
+          Nuevo Vendedor
+        </h2>
       </div>
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-user text-blue-600 mr-2"></i>
             Nombre
           </label>
@@ -85,7 +90,10 @@ const CreateVendedor = () => {
           />
         </div>
         <div>
-          <label htmlFor="email" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="email"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-envelope text-blue-600 mr-2"></i>
             Email
           </label>
@@ -119,7 +127,10 @@ const CreateVendedor = () => {
           />
         </div>
         <div>
-          <label htmlFor="sucursal" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="sucursal"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-building text-blue-600 mr-2"></i>
             Sucursal
           </label>
@@ -140,7 +151,10 @@ const CreateVendedor = () => {
           </select>
         </div>
         <div>
-          <label htmlFor="password" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="password"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-lock text-blue-600 mr-2"></i>
             Contraseña
           </label>
@@ -179,11 +193,7 @@ const CreateVendedor = () => {
         >
           {loading ? (
             <>
-              <svg
-                className="animate-spin h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
+              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
                 <circle
                   className="opacity-25"
                   cx="12"

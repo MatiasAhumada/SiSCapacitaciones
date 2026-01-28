@@ -23,7 +23,12 @@ import { useState, useEffect } from 'react';
 import { ModalEditarGenerico } from '../ModalEditar/ModalEditarGenerico';
 import { putVendedor } from '../../services/Vendedores.service';
 import { putAdmin } from '../../services/Admin.service';
-import { aperturaCaja, cerrarCaja, GetCajaByVendedor, descargarExcelCaja } from '../../services/Cajas.service';
+import {
+  aperturaCaja,
+  cerrarCaja,
+  GetCajaByVendedor,
+  descargarExcelCaja,
+} from '../../services/Cajas.service';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES } from '../../constants/messages';
 
@@ -151,11 +156,9 @@ const UnifiedNav = () => {
             { name: 'Transferencia', path: '/vendedor/transferencia' },
             { name: 'Listado Cajas', path: '/vendedor/listado-cajas' },
             { name: 'divider' },
-            ...(!sesionCaja || sesionCaja?.fechaCierre ? [
-              { name: 'Abrir Caja', action: handleAperturaCaja, loading: loadingCaja }
-            ] : [
-              { name: 'Cerrar Caja', action: handleCerrarCaja, loading: loadingCaja }
-            ]),
+            ...(!sesionCaja || sesionCaja?.fechaCierre
+              ? [{ name: 'Abrir Caja', action: handleAperturaCaja, loading: loadingCaja }]
+              : [{ name: 'Cerrar Caja', action: handleCerrarCaja, loading: loadingCaja }]),
             { name: 'Descargar Excel', action: handleDescargarExcel, disabled: !sesionCaja?.id },
           ],
         },
@@ -205,12 +208,12 @@ const UnifiedNav = () => {
       } else {
         updatedUser = await putVendedor(user.id, editData);
       }
-      
+
       // Actualizar usuario en localStorage
       const currentUser = JSON.parse(localStorage.getItem('auth_user'));
       const newUser = { ...currentUser, ...updatedUser };
       localStorage.setItem('auth_user', JSON.stringify(newUser));
-      
+
       clientSuccessHandler(SUCCESS_MESSAGES.VENDEDOR_ACTUALIZADO);
       setShowEditModal(false);
       window.location.reload();
@@ -222,14 +225,24 @@ const UnifiedNav = () => {
   const editFields = isAdmin
     ? [
         { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
-        { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
+        {
+          name: 'password',
+          label: 'Nueva Contraseña (opcional)',
+          type: 'password',
+          placeholder: 'Dejar vacío para no cambiar',
+        },
         { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
       ]
     : [
         { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
         { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
         { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
-        { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
+        {
+          name: 'password',
+          label: 'Nueva Contraseña (opcional)',
+          type: 'password',
+          placeholder: 'Dejar vacío para no cambiar',
+        },
         { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
       ];
 
@@ -254,14 +267,25 @@ const UnifiedNav = () => {
               <MenuItem key={item.name}>
                 {({ active }) => (
                   <button
-                    onClick={() => item.action ? item.action() : handleNavigation(item.path)}
+                    onClick={() => (item.action ? item.action() : handleNavigation(item.path))}
                     disabled={item.disabled || item.loading}
                     className={`${active ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md' : 'text-gray-700 hover:bg-gray-50'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-full transition-all duration-150 ${index === 0 ? 'mt-0' : 'mt-1'} disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {item.loading ? (
                       <svg className="animate-spin h-4 w-4 mr-3" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                     ) : (
                       <div

@@ -1,7 +1,13 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const GetCajaByVendedor = async (vendedorId, page = 1, limit = 10, fecha = '', conFiltros = false) => {
+export const GetCajaByVendedor = async (
+  vendedorId,
+  page = 1,
+  limit = 10,
+  fecha = '',
+  conFiltros = false
+) => {
   try {
     const params = { page, limit };
     if (fecha) params.fecha = fecha;
@@ -210,6 +216,17 @@ export const getMockVendedores = async () => {
 export const postIngresoSimple = async (data) => {
   try {
     const response = await axios.post(`${API_URL}/caja/ingreso-simple`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const descargarComprobanteEgreso = async (movimientoId) => {
+  try {
+    const response = await axios.get(`${API_URL}/caja/${movimientoId}/comprobante-egreso-pdf`, {
+      responseType: 'blob',
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

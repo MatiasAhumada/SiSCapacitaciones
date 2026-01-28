@@ -94,7 +94,7 @@ const DashComisiones = () => {
         const [cursosData, profesoresData, sucursalesData] = await Promise.all([
           getCursos(),
           getProfes(),
-          getSucursales()
+          getSucursales(),
         ]);
         setCursos(cursosData.data || cursosData);
         setProfesores(profesoresData);
@@ -267,10 +267,18 @@ const DashComisiones = () => {
               <tr>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Nombre</th>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Día</th>
-                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden lg:table-cell">Hora</th>
-                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden xl:table-cell">Curso</th>
-                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden xl:table-cell">Profesor</th>
-                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden sm:table-cell">Alumnos</th>
+                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden lg:table-cell">
+                  Hora
+                </th>
+                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden xl:table-cell">
+                  Curso
+                </th>
+                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden xl:table-cell">
+                  Profesor
+                </th>
+                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden sm:table-cell">
+                  Alumnos
+                </th>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Estado</th>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Acciones</th>
               </tr>
@@ -447,10 +455,14 @@ const DashComisiones = () => {
                           }
                         }}
                         className={`px-2 md:px-4 py-1 md:py-2 text-white text-xs font-semibold rounded shadow-md hover:shadow-lg hover:scale-110 active:scale-95 transition-all duration-300 ${
-                          item.status ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+                          item.status
+                            ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+                            : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
                         }`}
                       >
-                        <span className="hidden md:inline">{item.status ? '✓ Activa' : '✕ Inactiva'}</span>
+                        <span className="hidden md:inline">
+                          {item.status ? '✓ Activa' : '✕ Inactiva'}
+                        </span>
                         <span className="md:hidden">{item.status ? '✓' : '✕'}</span>
                       </button>
                     </td>

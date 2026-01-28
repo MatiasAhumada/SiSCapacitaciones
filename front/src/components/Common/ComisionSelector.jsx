@@ -48,7 +48,9 @@ const ComisionSelector = ({
             >
               <div className="flex items-center justify-between">
                 <div className="font-medium">{comision.name}</div>
-                <span className={`text-xs px-2 py-0.5 rounded ${comision.status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded ${comision.status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                >
                   {comision.status ? 'Activa' : 'Inactiva'}
                 </span>
               </div>

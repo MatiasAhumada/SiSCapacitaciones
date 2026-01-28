@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { getVendSucID, descargarInscripcionesExcel, putVendedor } from '../../services/Vendedores.service';
+import {
+  getVendSucID,
+  descargarInscripcionesExcel,
+  putVendedor,
+} from '../../services/Vendedores.service';
 import { ModalEditarGenerico } from '../ModalEditar/ModalEditarGenerico';
 import Pagination from '../Pagination/Pagination';
 import { Spinner } from '../Spinner/Spinner';
@@ -77,7 +81,12 @@ const DashVendedor = () => {
     { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Nombre' },
     { name: 'email', label: 'Email', type: 'email', placeholder: 'Email' },
     { name: 'tel', label: 'Teléfono', type: 'tel', placeholder: 'Teléfono' },
-    { name: 'password', label: 'Nueva Contraseña (opcional)', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
+    {
+      name: 'password',
+      label: 'Nueva Contraseña (opcional)',
+      type: 'password',
+      placeholder: 'Dejar vacío para no cambiar',
+    },
     { name: 'img', label: 'Imagen de Perfil', type: 'file', placeholder: 'Seleccionar imagen' },
   ];
 
@@ -177,7 +186,9 @@ const DashVendedor = () => {
                           <i className="fa-solid fa-users text-gray-400 text-2xl"></i>
                         </div>
                         <p className="text-gray-500 font-medium">No hay vendedores registrados</p>
-                        <p className="text-gray-400 text-sm mt-1">Agrega vendedores para comenzar</p>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Agrega vendedores para comenzar
+                        </p>
                       </div>
                     </td>
                   </tr>

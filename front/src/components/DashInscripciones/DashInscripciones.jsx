@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getAllInscripciones, getInscripcionesByVendedor, descargarPDFInscripcion } from '../../services/Inscripciones.service';
+import {
+  getAllInscripciones,
+  getInscripcionesByVendedor,
+  descargarPDFInscripcion,
+} from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
 import { clientErrorHandler } from '../../utils/notificationHandler';
 import { Spinner } from '../Spinner/Spinner';
@@ -224,16 +228,21 @@ const DashInscripciones = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {inscripciones.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? "6" : "5"} className="px-6 py-12 text-center">
+                  <td colSpan={isAdmin ? '6' : '5'} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <i className="fa-solid fa-inbox text-gray-300 text-6xl mb-4"></i>
-                      <p className="text-gray-500 text-lg font-medium">No hay inscripciones registradas</p>
+                      <p className="text-gray-500 text-lg font-medium">
+                        No hay inscripciones registradas
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 inscripciones.map((inscripcion) => (
-                  <tr key={inscripcion.id} className="hover:bg-gray-50 transition-colors duration-150">
+                  <tr
+                    key={inscripcion.id}
+                    className="hover:bg-gray-50 transition-colors duration-150"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(inscripcion.fechaRegistro).toLocaleDateString('es-AR')}
                     </td>
@@ -243,7 +252,9 @@ const DashInscripciones = () => {
                       </td>
                     )}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{inscripcion.alumno?.name}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {inscripcion.alumno?.name}
+                      </div>
                       <div className="text-sm text-gray-500">DNI: {inscripcion.alumno?.dni}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -271,7 +282,11 @@ const DashInscripciones = () => {
 
       {totalPages > 1 && (
         <div className="mt-6">
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
     </div>

@@ -277,7 +277,9 @@ const DashAlumno = () => {
                           {pago.metodoPago}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-gray-900">{pago.alumnoComision?.comision?.name || '-'}</td>
+                      <td className="px-6 py-4 text-gray-900">
+                        {pago.alumnoComision?.comision?.name || '-'}
+                      </td>
                       <td className="px-6 py-4 text-gray-900">{pago.cuota}</td>
                       <td className="px-6 py-4 text-gray-900">{pago.mesCuota}</td>
                       <td className="px-6 py-4">
@@ -365,7 +367,9 @@ const DashAlumno = () => {
                   </div>
                   <div>
                     <span className="text-gray-600">Comisión:</span>
-                    <span className="ml-2 font-medium">{pago.alumnoComision?.comision?.name || '-'}</span>
+                    <span className="ml-2 font-medium">
+                      {pago.alumnoComision?.comision?.name || '-'}
+                    </span>
                   </div>
                   <div>
                     <span className="text-gray-600">Cuota:</span>

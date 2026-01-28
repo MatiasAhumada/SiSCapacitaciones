@@ -94,7 +94,9 @@ const DashCursos = () => {
               <tr>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Nombre</th>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Área</th>
-                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden sm:table-cell">Duración</th>
+                <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm hidden sm:table-cell">
+                  Duración
+                </th>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Tipo</th>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Precio</th>
                 <th className="py-3 md:py-5 px-3 md:px-6 text-xs md:text-sm">Acciones</th>
@@ -133,7 +135,9 @@ const DashCursos = () => {
               ) : (
                 tableItems.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-200">
-                    <td className="px-3 md:px-6 py-3 md:py-4 font-semibold text-gray-800 text-xs md:text-sm">{item.name}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 font-semibold text-gray-800 text-xs md:text-sm">
+                      {item.name}
+                    </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
                       <span
                         className={`px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm font-semibold rounded shadow-sm ${

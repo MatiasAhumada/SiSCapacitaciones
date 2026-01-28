@@ -67,7 +67,7 @@ const ListadoComisiones = () => {
       setComisionDate(data.comision || {});
       setTotalPages(data.totalPages || 1);
       setCurrentPage(data.currentPage || 1);
-      
+
       // Solo actualizar allDates si no hay filtro de fecha aplicado
       if (!fecha && data.data.length > 0) {
         const dates = Array.from(
@@ -107,8 +107,6 @@ const ListadoComisiones = () => {
     const year = fecha.getUTCFullYear();
     return `${day}-${month}-${year}`;
   };
-
-
 
   const generatePDF = async () => {
     try {
@@ -343,15 +341,16 @@ const ListadoComisiones = () => {
                 <th className="py-5 px-6 text-left">DNI</th>
                 <th className="py-5 px-6 text-left">Teléfono</th>
                 <th className="py-5 px-6 text-center">Estado</th>
-                {!fechaFiltro && allDates.map((date) => {
-                  const [year, month, day] = date.split('-');
-                  const displayDate = `${day}-${month}-${year}`;
-                  return (
-                    <th key={date} className="py-5 px-6 text-center font-bold text-indigo-700">
-                      {displayDate}
-                    </th>
-                  );
-                })}
+                {!fechaFiltro &&
+                  allDates.map((date) => {
+                    const [year, month, day] = date.split('-');
+                    const displayDate = `${day}-${month}-${year}`;
+                    return (
+                      <th key={date} className="py-5 px-6 text-center font-bold text-indigo-700">
+                        {displayDate}
+                      </th>
+                    );
+                  })}
                 {onAsistenciaClicked && (
                   <th className="py-5 px-6 text-center">
                     <input

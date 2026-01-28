@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ArrowDownTrayIcon,
+  DocumentTextIcon,
+} from '@heroicons/react/24/outline';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useAuth } from '../../context/AuthContext';
 import {
   descargarExcelAdmin,
   descargarExcelCaja,
   GetByVendedorMock,
+  descargarComprobanteEgreso,
 } from '../../services/Cajas.service';
 import { Spinner } from '../Spinner/Spinner';
 import Pagination from '../Pagination/Pagination';
@@ -19,6 +25,7 @@ const ListadoCajas = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
+  const [loadingComprobanteId, setLoadingComprobanteId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isSelectedVendedor, setIsSelectedVendedor] = useState(false);
@@ -131,6 +138,25 @@ const ListadoCajas = () => {
       clientErrorHandler(errorMessage);
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  const handleDownloadComprobanteEgreso = async (movimientoId) => {
+    setLoadingComprobanteId(movimientoId);
+    try {
+      const blob = await descargarComprobanteEgreso(movimientoId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `egreso-${movimientoId.substring(0, 8)}-${new Date().toISOString().split('T')[0]}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      clientSuccessHandler(SUCCESS_MESSAGES.COMPROBANTE_EGRESO_DESCARGADO);
+    } catch (error) {
+      clientErrorHandler(ERROR_MESSAGES.ERROR_DESCARGAR_COMPROBANTE_EGRESO);
+    } finally {
+      setLoadingComprobanteId(null);
     }
   };
 
@@ -314,24 +340,41 @@ const ListadoCajas = () => {
                                         : 'bg-red-50 text-red-800'
                                     }`}
                                   >
-                                    <div>
+                                    <div className="flex-1">
                                       <p className="font-semibold capitalize">
                                         {movimiento.tipo} - {movimiento.metodo_pago}
                                       </p>
                                       <p className="text-xs text-gray-600">{movimiento.fecha}</p>
                                       <p className="text-xs text-gray-600">{movimiento.vendedor}</p>
                                     </div>
-                                    <span
-                                      className={`font-bold text-lg ${
-                                        movimiento.tipo === 'Ingreso' ||
-                                        movimiento.tipo === 'Apertura'
-                                          ? 'text-emerald-700'
-                                          : 'text-red-700'
-                                      }`}
-                                    >
-                                      {movimiento.tipo === 'Egreso' ? '- ' : '+ '}$
-                                      {movimiento.monto}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className={`font-bold text-lg ${
+                                          movimiento.tipo === 'Ingreso' ||
+                                          movimiento.tipo === 'Apertura'
+                                            ? 'text-emerald-700'
+                                            : 'text-red-700'
+                                        }`}
+                                      >
+                                        {movimiento.tipo === 'Egreso' ? '- ' : '+ '}$
+                                        {movimiento.monto}
+                                      </span>
+                                      {movimiento.tipo === 'Egreso' && (
+                                        <button
+                                          onClick={() =>
+                                            handleDownloadComprobanteEgreso(movimiento.id)
+                                          }
+                                          className="p-1.5 rounded bg-red-100 hover:bg-red-200 transition"
+                                          title="Descargar comprobante de egreso"
+                                        >
+                                          {loadingComprobanteId === movimiento.id ? (
+                                            <Spinner color={'red'} className="w-4 h-4" />
+                                          ) : (
+                                            <DocumentTextIcon className="w-4 h-4 text-red-600" />
+                                          )}
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
                                 ))}
                               </div>

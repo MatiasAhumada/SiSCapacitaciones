@@ -50,12 +50,17 @@ const CreateCurso = () => {
         <div>
           <img src={logo} alt="Logo" width="50" />
         </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 principal">Nuevo Curso</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 principal">
+          Nuevo Curso
+        </h2>
       </div>
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="name"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-book text-blue-600 mr-2"></i>
             Nombre del Curso
           </label>
@@ -72,7 +77,10 @@ const CreateCurso = () => {
         </div>
 
         <div>
-          <label htmlFor="duration" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="duration"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-calendar text-blue-600 mr-2"></i>
             Duración (Meses)
           </label>
@@ -90,7 +98,10 @@ const CreateCurso = () => {
         </div>
 
         <div>
-          <label htmlFor="area" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="area"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-layer-group text-blue-600 mr-2"></i>
             Área
           </label>
@@ -112,7 +123,10 @@ const CreateCurso = () => {
         </div>
 
         <div>
-          <label htmlFor="tipo" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="tipo"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-graduation-cap text-blue-600 mr-2"></i>
             Tipo de Curso
           </label>
@@ -134,7 +148,10 @@ const CreateCurso = () => {
         </div>
 
         <div>
-          <label htmlFor="price" className="block mb-2 text-sm font-semibold text-gray-700 principal">
+          <label
+            htmlFor="price"
+            className="block mb-2 text-sm font-semibold text-gray-700 principal"
+          >
             <i className="fa-solid fa-dollar-sign text-blue-600 mr-2"></i>
             Precio
           </label>
@@ -159,11 +176,7 @@ const CreateCurso = () => {
         >
           {pause ? (
             <>
-              <svg
-                className="animate-spin h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
+              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
                 <circle
                   className="opacity-25"
                   cx="12"

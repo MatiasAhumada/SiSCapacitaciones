@@ -2,14 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Spinner } from '../Spinner/Spinner.jsx';
 
-export const ModalEditarGenerico = ({
-  title,
-  formData,
-  fields,
-  onClose,
-  onSave,
-  onChange,
-}) => {
+export const ModalEditarGenerico = ({ title, formData, fields, onClose, onSave, onChange }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showPassword, setShowPassword] = useState({});
@@ -67,7 +60,7 @@ export const ModalEditarGenerico = ({
             />
             <button
               type="button"
-              onClick={() => setShowPassword(prev => ({ ...prev, [name]: !prev[name] }))}
+              onClick={() => setShowPassword((prev) => ({ ...prev, [name]: !prev[name] }))}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
             >
               <i className={`fa-solid ${showPassword[name] ? 'fa-eye-slash' : 'fa-eye'}`}></i>
@@ -183,7 +176,16 @@ ModalEditarGenerico.propTypes = {
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(['text', 'email', 'tel', 'number', 'password', 'select', 'textarea', 'file']).isRequired,
+      type: PropTypes.oneOf([
+        'text',
+        'email',
+        'tel',
+        'number',
+        'password',
+        'select',
+        'textarea',
+        'file',
+      ]).isRequired,
       disabled: PropTypes.bool,
       options: PropTypes.arrayOf(
         PropTypes.shape({

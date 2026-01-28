@@ -106,12 +106,12 @@ const Inscribir = () => {
       });
 
       clientSuccessHandler(SUCCESS_MESSAGES.INSCRIPCION_REALIZADA);
-      
+
       // Mostrar modal con link de firma
       const link = `${window.location.origin}/firmar-contrato/${inscripcion.id}`;
       setLinkFirma(link);
       setShowLinkModal(true);
-      
+
       setFormData({
         dni: '',
         nombre: '',
@@ -273,9 +273,7 @@ const Inscribir = () => {
             <p className="text-sm text-gray-600 mb-4">
               Comparte este link con el alumno para que pueda firmar su contrato:
             </p>
-            <div className="bg-gray-100 p-3 rounded mb-4 break-all text-sm">
-              {linkFirma}
-            </div>
+            <div className="bg-gray-100 p-3 rounded mb-4 break-all text-sm">{linkFirma}</div>
             <div className="flex gap-3">
               <button
                 onClick={copiarLink}

@@ -1,7 +1,15 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
-export const getComisiones = async (page = 1, limit = 10, name = '', day = '', all = false, status = '', sucursalId = '') => {
+export const getComisiones = async (
+  page = 1,
+  limit = 10,
+  name = '',
+  day = '',
+  all = false,
+  status = '',
+  sucursalId = ''
+) => {
   try {
     const params = { page, limit };
     if (name && name !== '') {
@@ -26,7 +34,14 @@ export const getComisiones = async (page = 1, limit = 10, name = '', day = '', a
   }
 };
 
-export const getComisionId = async (id, page = 1, limit = 10, dni = '', fecha = '', estado = '') => {
+export const getComisionId = async (
+  id,
+  page = 1,
+  limit = 10,
+  dni = '',
+  fecha = '',
+  estado = ''
+) => {
   try {
     const params = { page, limit };
     if (dni) {

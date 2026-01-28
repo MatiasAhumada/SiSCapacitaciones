@@ -15,7 +15,9 @@ const AlumnoRow = ({
   hideDates = false,
 }) => {
   return (
-    <tr className={`${getRowBgColor(item)} hover:shadow-lg hover:scale-[1.01] transition-all duration-300`}>
+    <tr
+      className={`${getRowBgColor(item)} hover:shadow-lg hover:scale-[1.01] transition-all duration-300`}
+    >
       <td className="px-6 py-4">
         <div className="flex gap-2">
           <button
@@ -23,7 +25,11 @@ const AlumnoRow = ({
             className="px-3 py-2 text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 rounded transition-all duration-300 shadow-md hover:shadow-lg hover:scale-110 active:scale-95 group"
             title="Ver detalles"
           >
-            {pause[item.id] ? <Spinner color="white" /> : <i className="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>}
+            {pause[item.id] ? (
+              <Spinner color="white" />
+            ) : (
+              <i className="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
+            )}
           </button>
           <button
             onClick={() => onTransfer(item)}
@@ -48,18 +54,21 @@ const AlumnoRow = ({
           {pause[item.id] ? <Spinner color="white" /> : item.state ? '✓ Activo' : '✕ Inactivo'}
         </button>
       </td>
-      {!hideDates && allDates.map((date) => {
-        const asistencia = item.asistencias.find((a) => a.fecha.split('T')[0] === date);
-        return (
-          <td key={date} className="px-6 py-4 text-center text-xl">
-            <span className={`inline-block transition-transform duration-300 hover:scale-125 ${
-              asistencia?.presente ? 'hover:rotate-12' : 'hover:rotate-[-12deg]'
-            }`}>
-              {asistencia ? (asistencia.presente ? '✔️' : '❌') : '❌'}
-            </span>
-          </td>
-        );
-      })}
+      {!hideDates &&
+        allDates.map((date) => {
+          const asistencia = item.asistencias.find((a) => a.fecha.split('T')[0] === date);
+          return (
+            <td key={date} className="px-6 py-4 text-center text-xl">
+              <span
+                className={`inline-block transition-transform duration-300 hover:scale-125 ${
+                  asistencia?.presente ? 'hover:rotate-12' : 'hover:rotate-[-12deg]'
+                }`}
+              >
+                {asistencia ? (asistencia.presente ? '✔️' : '❌') : '❌'}
+              </span>
+            </td>
+          );
+        })}
       {showAsistencia && (
         <td className="text-center py-2">
           <input

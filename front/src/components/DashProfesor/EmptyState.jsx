@@ -10,8 +10,8 @@ const EmptyState = ({ hasSearchTerm }) => {
         {hasSearchTerm ? 'No se encontraron profesores' : 'No hay profesores registrados'}
       </h3>
       <p className="text-gray-500">
-        {hasSearchTerm 
-          ? 'Intenta con otro término de búsqueda' 
+        {hasSearchTerm
+          ? 'Intenta con otro término de búsqueda'
           : 'Comienza agregando profesores a esta sucursal'}
       </p>
     </div>

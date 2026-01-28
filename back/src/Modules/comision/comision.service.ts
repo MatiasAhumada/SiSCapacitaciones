@@ -245,7 +245,14 @@ export class ComisionService {
       select: ['id', 'name'],
     });
   }
-  async findOne(id: string, page = 1, limit = 10, dni?: string, fecha?: string, estado?: string) {
+  async findOne(
+    id: string,
+    page = 1,
+    limit = 10,
+    dni?: string,
+    fecha?: string,
+    estado?: string,
+  ) {
     // Traer datos generales de la comisión
     const comision = await this.comisionRepository.findOne({
       where: { id },
@@ -291,8 +298,8 @@ export class ComisionService {
         relations: ['alumnoComision'],
       });
 
-      alumnosIds = asistencias.map(a => a.alumnoComision.id);
-      
+      alumnosIds = asistencias.map((a) => a.alumnoComision.id);
+
       if (alumnosIds.length === 0) {
         return {
           comision,

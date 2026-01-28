@@ -51,7 +51,8 @@ export class ProfesorService {
     });
 
     const data = profesores.map((prof) => {
-      const comisionesActivas = prof.comisiones?.filter(c => c.status === true) || [];
+      const comisionesActivas =
+        prof.comisiones?.filter((c) => c.status === true) || [];
       return {
         id: prof.id,
         name: prof.name,

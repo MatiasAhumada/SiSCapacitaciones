@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { InscripcionService } from './inscripcion.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { UpdateInscripcionDto } from './dto/update-inscripcion.dto';
@@ -14,7 +24,10 @@ export class InscripcionController {
   }
 
   @Post(':id/firmar')
-  firmarContrato(@Param('id') id: string, @Body('firmaBase64') firmaBase64: string) {
+  firmarContrato(
+    @Param('id') id: string,
+    @Body('firmaBase64') firmaBase64: string,
+  ) {
     return this.inscripcionService.firmarContrato(id, firmaBase64);
   }
 

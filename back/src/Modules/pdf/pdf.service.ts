@@ -717,4 +717,152 @@ export class PdfService {
       { align: 'center' },
     );
   }
+
+  async generarComprobanteEgresoPDF(egreso: any): Promise<Buffer> {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
+
+    // Header
+    doc.setFillColor(220, 38, 38);
+    doc.rect(0, 0, pageWidth, 45, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('COMPROBANTE DE EGRESO', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('SIS CAPACITACIONES - Documento Interno', pageWidth / 2, 32, {
+      align: 'center',
+    });
+
+    let y = 55;
+
+    // Información del egreso
+    doc.setFillColor(254, 226, 226);
+    doc.roundedRect(margin, y, pageWidth - margin * 2, 70, 3, 3, 'F');
+    doc.setDrawColor(220, 38, 38);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(margin, y, pageWidth - margin * 2, 70, 3, 3, 'S');
+
+    doc.setTextColor(127, 29, 29);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+
+    doc.text('N° COMPROBANTE:', margin + 5, y + 10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(egreso.id.substring(0, 8).toUpperCase(), margin + 55, y + 10);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('FECHA:', margin + 5, y + 20);
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      new Date(egreso.fecha).toLocaleDateString('es-AR'),
+      margin + 25,
+      y + 20,
+    );
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('MÉTODO DE PAGO:', margin + 5, y + 30);
+    doc.setFont('helvetica', 'normal');
+    doc.text(egreso.metodoPago, margin + 50, y + 30);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('CATEGORÍA:', margin + 5, y + 40);
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      egreso.subcategoria?.categoria?.nombre || '-',
+      margin + 35,
+      y + 40,
+    );
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('SUBCATEGORÍA:', margin + 5, y + 50);
+    doc.setFont('helvetica', 'normal');
+    doc.text(egreso.subcategoria?.nombre || '-', margin + 45, y + 50);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('MONTO:', margin + 5, y + 60);
+    doc.setFontSize(14);
+    doc.setTextColor(220, 38, 38);
+    doc.text(`$${egreso.monto}`, margin + 25, y + 60);
+
+    y += 80;
+
+    // Descripción
+    doc.setFillColor(249, 250, 251);
+    doc.roundedRect(margin, y, pageWidth - margin * 2, 40, 3, 3, 'F');
+    doc.setDrawColor(209, 213, 219);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, y, pageWidth - margin * 2, 40, 3, 3, 'S');
+
+    doc.setTextColor(31, 41, 55);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('DESCRIPCIÓN:', margin + 5, y + 10);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(55, 65, 81);
+    const descripcionLines = doc.splitTextToSize(
+      egreso.descripcion || 'Sin descripción',
+      pageWidth - margin * 2 - 10,
+    );
+    doc.text(descripcionLines, margin + 5, y + 20);
+
+    y += 50;
+
+    // Información adicional
+    if (egreso.profesor) {
+      doc.setTextColor(31, 41, 55);
+      doc.setFont('helvetica', 'bold');
+      doc.text('PROFESOR:', margin + 5, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(
+        `${egreso.profesor.name} ${egreso.profesor.apellido}`,
+        margin + 35,
+        y,
+      );
+      y += 10;
+    }
+
+    if (egreso.vendedorPagos) {
+      doc.setTextColor(31, 41, 55);
+      doc.setFont('helvetica', 'bold');
+      doc.text('VENDEDOR:', margin + 5, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(egreso.vendedorPagos.name, margin + 35, y);
+      y += 10;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('REGISTRADO POR:', margin + 5, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(egreso.vendedor?.name || '-', margin + 50, y);
+
+    // Footer
+    const footerY = doc.internal.pageSize.height - 20;
+    doc.setDrawColor(220, 38, 38);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY, pageWidth - margin, footerY);
+
+    doc.setTextColor(107, 114, 128);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.text(
+      '© 2025 SIS Capacitaciones - Documento de uso interno',
+      pageWidth / 2,
+      footerY + 5,
+      { align: 'center' },
+    );
+    doc.text(
+      'Desarrollado por Matias Ahumada | Tel: +54 9 381 3528-658',
+      pageWidth / 2,
+      footerY + 10,
+      { align: 'center' },
+    );
+
+    return Buffer.from(doc.output('arraybuffer'));
+  }
 }

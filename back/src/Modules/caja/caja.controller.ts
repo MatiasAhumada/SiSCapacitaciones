@@ -251,4 +251,19 @@ export class CajaController {
 
     res.send(buffer);
   }
+
+  @Get(':id/comprobante-egreso-pdf')
+  async generarComprobanteEgresoPDF(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const buffer = await this.cajaService.generarComprobanteEgresoPDF(id);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="egreso-${id.substring(0, 8)}-${new Date().toISOString().split('T')[0]}.pdf"`,
+    });
+
+    res.send(buffer);
+  }
 }

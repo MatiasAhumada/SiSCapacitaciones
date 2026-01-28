@@ -184,11 +184,13 @@ export class VendedorService {
 
     // Obtener comisiones únicas del vendedor
     const comisionesUnicas = Array.from(
-      new Set(inscripcionesFiltradas.map(insc => insc.comision.id))
-    ).map(id => {
-      const insc = inscripcionesFiltradas.find(i => i.comision.id === id);
-      return { id, name: insc?.comision?.name || '' };
-    }).filter(c => c.name);
+      new Set(inscripcionesFiltradas.map((insc) => insc.comision.id)),
+    )
+      .map((id) => {
+        const insc = inscripcionesFiltradas.find((i) => i.comision.id === id);
+        return { id, name: insc?.comision?.name || '' };
+      })
+      .filter((c) => c.name);
 
     return {
       id: vend.id,

@@ -1,4 +1,10 @@
-import { IsString, IsBoolean, IsArray, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsArray,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
 import { Inscripcion } from 'src/Modules/inscripcion/entities/inscripcion.entity';
 import { Sucursal } from 'src/Modules/sucursal/entities/sucursal.entity';
 

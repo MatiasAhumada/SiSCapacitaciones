@@ -83,7 +83,7 @@ export class InscripcionService {
       firmado: false,
     });
     const insc = await this.inscripcionRepository.save(inscripcion);
-    
+
     // Enviar email solicitando firma con PDF adjunto
     if (alumno.email) {
       try {
@@ -91,7 +91,8 @@ export class InscripcionService {
           where: { id: insc.id },
           relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
         });
-        const pdfBuffer = await this.pdfService.generarInscripcionPDF(inscripcionCompleta);
+        const pdfBuffer =
+          await this.pdfService.generarInscripcionPDF(inscripcionCompleta);
         await this.mailService.sendContractSignRequest(
           alumno.email,
           alumno.name,
@@ -102,13 +103,18 @@ export class InscripcionService {
         console.error('Error enviando email de solicitud de firma:', error);
       }
     }
-    
+
     return await this.findOne(insc.id);
   }
 
-  async findAll(page: number = 1, limit: number = 10, vendedorId?: string, fecha?: string) {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    vendedorId?: string,
+    fecha?: string,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const queryBuilder = this.inscripcionRepository
       .createQueryBuilder('inscripcion')
       .leftJoinAndSelect('inscripcion.vendedor', 'vendedor')
@@ -134,7 +140,9 @@ export class InscripcionService {
     }
 
     if (fecha) {
-      queryBuilder.andWhere('DATE(inscripcion.fechaRegistro) = :fecha', { fecha });
+      queryBuilder.andWhere('DATE(inscripcion.fechaRegistro) = :fecha', {
+        fecha,
+      });
     }
 
     const [data, total] = await queryBuilder
@@ -171,9 +179,13 @@ export class InscripcionService {
     };
   }
 
-  async findByVendedor(vendedorId: string, page: number = 1, limit: number = 10) {
+  async findByVendedor(
+    vendedorId: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const [data, total] = await this.inscripcionRepository.findAndCount({
       where: { vendedor: { id: vendedorId } },
       relations: ['vendedor', 'alumno', 'comision', 'sucursal'],
@@ -285,7 +297,8 @@ export class InscripcionService {
     // Generar PDF con firma y enviar por email
     if (inscripcion.alumno.email) {
       try {
-        const pdfBuffer = await this.pdfService.generarInscripcionPDF(inscripcion);
+        const pdfBuffer =
+          await this.pdfService.generarInscripcionPDF(inscripcion);
         await this.mailService.sendSignedContract(
           inscripcion.alumno.email,
           inscripcion.alumno.name,

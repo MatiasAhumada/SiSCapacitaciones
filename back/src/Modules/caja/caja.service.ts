@@ -81,12 +81,16 @@ export class CajaService {
       );
     }
 
-    if (tipo === TipoMovimiento.INGRESO || tipo === TipoMovimiento.COBRO_VARIOS || tipo === TipoMovimiento.CERTIFICACION_EXAMEN) {
+    if (
+      tipo === TipoMovimiento.INGRESO ||
+      tipo === TipoMovimiento.COBRO_VARIOS ||
+      tipo === TipoMovimiento.CERTIFICACION_EXAMEN
+    ) {
       // Para INGRESO siempre se requiere alumno
       if (tipo === TipoMovimiento.INGRESO && !alumnoComisionId) {
         throw new BadRequestException('El cobro de cuota requiere un alumno');
       }
-      
+
       // Para COBRO_VARIOS y CERTIFICACION_EXAMEN el alumno es opcional
       let alumnoComision: AlumnoComision | undefined = undefined;
       if (alumnoComisionId) {
@@ -101,11 +105,13 @@ export class CajaService {
         alumnoComision = foundAlumno;
       }
       let newComprobante: Comprobante | undefined = undefined;
-      
+
       // Solo generar comprobante si hay alumno y datos de comprobante
       if (alumnoComision && comprobante) {
         const ultimoComprobante = await this.comprobanteRepository.findOne({
-          where: { numeroComprobante: Like(`X ${comprobante.numeroSucursal}-%`) },
+          where: {
+            numeroComprobante: Like(`X ${comprobante.numeroSucursal}-%`),
+          },
           order: { numeroComprobante: 'DESC' },
         });
 
@@ -123,7 +129,8 @@ export class CajaService {
         newComprobante = new Comprobante();
         newComprobante.apellidoNombre = alumnoComision.alumno.name;
         newComprobante.dni = alumnoComision.alumno.dni;
-        newComprobante.domicilioComercial = alumnoComision.alumno.address ?? '-';
+        newComprobante.domicilioComercial =
+          alumnoComision.alumno.address ?? '-';
         newComprobante.iva = '-';
         newComprobante.fecha = restoCaja.fecha;
         newComprobante.formaPago = comprobante.formaPago;
@@ -180,9 +187,11 @@ export class CajaService {
 
       return cajaGuardada;
     }
-    
+
     // Si no se retornó nada, lanzar error
-    throw new BadRequestException('Tipo de movimiento no soportado en este endpoint');
+    throw new BadRequestException(
+      'Tipo de movimiento no soportado en este endpoint',
+    );
   }
 
   async findAll(
@@ -1305,6 +1314,28 @@ export class CajaService {
     }
 
     return this.pdfService.generarComprobantePDF(movimiento);
+  }
+
+  async generarComprobanteEgresoPDF(movimientoId: string): Promise<Buffer> {
+    const movimiento = await this.cajaRepository.findOne({
+      where: { id: movimientoId },
+      relations: [
+        'vendedor',
+        'profesor',
+        'vendedorPagos',
+        'subcategoria.categoria',
+      ],
+    });
+
+    if (!movimiento) {
+      throw new NotFoundException('Movimiento no encontrado');
+    }
+
+    if (movimiento.tipo !== TipoMovimiento.EGRESO) {
+      throw new BadRequestException('El movimiento no es un egreso');
+    }
+
+    return this.pdfService.generarComprobanteEgresoPDF(movimiento);
   }
 
   private async actualizarConMovimiento(

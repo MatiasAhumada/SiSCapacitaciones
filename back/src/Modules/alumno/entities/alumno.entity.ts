@@ -21,7 +21,12 @@ export class Alumno {
   @Column()
   dni: string;
 
-  @Column({ transformer: { to: (value) => value?.toLowerCase(), from: (value) => value } })
+  @Column({
+    transformer: {
+      to: (value) => value?.toLowerCase(),
+      from: (value) => value,
+    },
+  })
   name: string;
 
   @BeforeInsert()

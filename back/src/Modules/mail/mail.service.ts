@@ -36,7 +36,12 @@ export class MailService {
     });
   }
 
-  async sendContractSignRequest(to: string, alumnoName: string, inscripcionId: string, pdfBuffer: Buffer) {
+  async sendContractSignRequest(
+    to: string,
+    alumnoName: string,
+    inscripcionId: string,
+    pdfBuffer: Buffer,
+  ) {
     const signUrl = `${process.env.FRONTEND_URL}/firmar-contrato/${inscripcionId}`;
     await this.transporter.sendMail({
       from: process.env.SMTP_FROM,

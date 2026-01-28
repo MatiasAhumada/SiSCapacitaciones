@@ -37,6 +37,9 @@ Teléfono: +54 9 381 352-8658`,
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     customSiteTitle: 'API SiSCapacitaciones',
+    swaggerOptions: {
+      url: '/backend/api/swagger-json',
+    },
   });
 
   await app.listen(4040);

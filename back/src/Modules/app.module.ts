@@ -21,6 +21,7 @@ import { ComprobanteModule } from './comprobante/comprobante.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { MailModule } from './mail/mail.module';
 import { PdfModule } from './pdf/pdf.module';
+import { ImagesModule } from './images/images.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -51,6 +52,7 @@ import { PdfModule } from './pdf/pdf.module';
     MetricsModule,
     MailModule,
     PdfModule,
+    ImagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

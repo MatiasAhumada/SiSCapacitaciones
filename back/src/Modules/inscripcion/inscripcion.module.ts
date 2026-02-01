@@ -10,6 +10,7 @@ import { Sucursal } from '../sucursal/entities/sucursal.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { PdfModule } from '../pdf/pdf.module';
 import { MailModule } from '../mail/mail.module';
+import { ImagesModule } from '../images/images.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MailModule } from '../mail/mail.module';
     ]),
     PdfModule,
     MailModule,
+    ImagesModule,
   ],
   controllers: [InscripcionController],
   providers: [InscripcionService],

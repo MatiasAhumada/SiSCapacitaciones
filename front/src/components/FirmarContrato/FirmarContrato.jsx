@@ -49,7 +49,7 @@ const FirmarContrato = () => {
 
     setSubmitting(true);
     try {
-      const firmaBase64 = sigCanvas.current.toDataURL();
+      const firmaBase64 = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png', 0.5);
       await firmarContrato(id, firmaBase64);
       clientSuccessHandler(SUCCESS_MESSAGES.CONTRATO_FIRMADO);
       setFirmadoExitosamente(true);
@@ -147,7 +147,9 @@ const FirmarContrato = () => {
             <SignatureCanvas
               ref={sigCanvas}
               canvasProps={{
-                className: 'w-full h-64 bg-white',
+                width: 600,
+                height: 200,
+                className: 'w-full h-auto bg-white',
               }}
               backgroundColor="white"
             />

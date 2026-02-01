@@ -15,7 +15,7 @@ export class Inscripcion {
   fechaRegistro: Date;
 
   @Column({ type: 'text', nullable: true })
-  firmaBase64: string;
+  firmaUrl: string;
 
   @Column({ type: 'timestamp', nullable: true })
   fechaFirma: Date;

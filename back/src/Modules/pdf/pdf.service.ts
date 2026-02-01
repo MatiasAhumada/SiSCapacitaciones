@@ -4,9 +4,26 @@ import autoTable from 'jspdf-autotable';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as https from 'https';
+import * as http from 'http';
 
 @Injectable()
 export class PdfService {
+  private async downloadImage(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const protocol = url.startsWith('https') ? https : http;
+      protocol.get(url, (response) => {
+        const chunks: Buffer[] = [];
+        response.on('data', (chunk) => chunks.push(chunk));
+        response.on('end', () => {
+          const buffer = Buffer.concat(chunks);
+          const base64 = `data:image/png;base64,${buffer.toString('base64')}`;
+          resolve(base64);
+        });
+        response.on('error', reject);
+      });
+    });
+  }
   generarPdfAsistencia(comision: any, alumnos: any[]): Buffer {
     const doc = new jsPDF({ orientation: 'landscape' });
 
@@ -276,6 +293,15 @@ export class PdfService {
   }
 
   async generarInscripcionPDF(inscripcion: any): Promise<Buffer> {
+    let firmaBase64: string | null = null;
+    if (inscripcion.firmaUrl && inscripcion.firmado) {
+      try {
+        firmaBase64 = await this.downloadImage(inscripcion.firmaUrl);
+      } catch (error) {
+        console.error('Error descargando firma:', error);
+      }
+    }
+
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
@@ -479,18 +505,9 @@ export class PdfService {
     doc.setDrawColor(71, 85, 105);
     doc.setLineWidth(0.8);
 
-    if (inscripcion.firmaBase64 && inscripcion.firmado) {
-      // Insertar imagen de firma
-      doc.addImage(
-        inscripcion.firmaBase64,
-        'PNG',
-        pageWidth - margin - 70,
-        y,
-        58,
-        15,
-      );
+    if (firmaBase64 && inscripcion.firmado) {
+      doc.addImage(firmaBase64, 'PNG', pageWidth - margin - 70, y, 58, 15);
 
-      // Fecha de firma
       doc.setTextColor(51, 65, 85);
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
@@ -501,7 +518,6 @@ export class PdfService {
         { align: 'center' },
       );
     } else {
-      // Línea para firma manual
       doc.line(
         pageWidth - margin - 70,
         y + 15,
@@ -536,12 +552,16 @@ export class PdfService {
 
     // Agregar segunda hoja
     doc.addPage();
-    this.agregarSegundaHojaContrato(doc, inscripcion);
+    await this.agregarSegundaHojaContrato(doc, inscripcion, firmaBase64);
 
     return Buffer.from(doc.output('arraybuffer'));
   }
 
-  agregarSegundaHojaContrato(doc: jsPDF, inscripcion: any): void {
+  async agregarSegundaHojaContrato(
+    doc: jsPDF,
+    inscripcion: any,
+    firmaBase64: string | null,
+  ): Promise<void> {
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     const margin = 12;
@@ -663,8 +683,8 @@ export class PdfService {
     doc.setLineWidth(0.5);
 
     // Firma Alumno
-    if (inscripcion.firmaBase64 && inscripcion.firmado) {
-      doc.addImage(inscripcion.firmaBase64, 'PNG', col1X, footerY - 18, 45, 10);
+    if (firmaBase64 && inscripcion.firmado) {
+      doc.addImage(firmaBase64, 'PNG', col1X, footerY - 18, 45, 10);
       doc.setTextColor(51, 65, 85);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');

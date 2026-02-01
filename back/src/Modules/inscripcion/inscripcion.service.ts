@@ -11,6 +11,7 @@ import { Inscripcion } from './entities/inscripcion.entity';
 import { AlumnoComision } from '../comision/entities/alumnocomision.entity';
 import { PdfService } from '../pdf/pdf.service';
 import { MailService } from '../mail/mail.service';
+import { ImagesService } from '../images/images.service';
 
 @Injectable()
 export class InscripcionService {
@@ -29,6 +30,7 @@ export class InscripcionService {
     private readonly alumnoComisionRepository: Repository<AlumnoComision>,
     private readonly pdfService: PdfService,
     private readonly mailService: MailService,
+    private readonly imagesService: ImagesService,
   ) {}
 
   async create(createInscripcionDto: CreateInscripcionDto) {
@@ -288,13 +290,30 @@ export class InscripcionService {
       throw new Error('Este contrato ya ha sido firmado');
     }
 
-    inscripcion.firmaBase64 = firmaBase64;
+    const base64Data = firmaBase64.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    const file: Express.Multer.File = {
+      buffer,
+      originalname: `firma-${id}.png`,
+      mimetype: 'image/png',
+      fieldname: 'image',
+      encoding: '7bit',
+      size: buffer.length,
+      stream: null as any,
+      destination: '',
+      filename: '',
+      path: '',
+    };
+
+    const firmaUrl = await this.imagesService.uploadImage(file);
+
+    inscripcion.firmaUrl = firmaUrl;
     inscripcion.fechaFirma = new Date();
     inscripcion.firmado = true;
 
     await this.inscripcionRepository.save(inscripcion);
 
-    // Generar PDF con firma y enviar por email
     if (inscripcion.alumno.email) {
       try {
         const pdfBuffer =

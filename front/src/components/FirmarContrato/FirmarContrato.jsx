@@ -49,7 +49,7 @@ const FirmarContrato = () => {
 
     setSubmitting(true);
     try {
-      const firmaBase64 = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png', 0.5);
+      const firmaBase64 = sigCanvas.current.toDataURL('image/png');
       await firmarContrato(id, firmaBase64);
       clientSuccessHandler(SUCCESS_MESSAGES.CONTRATO_FIRMADO);
       setFirmadoExitosamente(true);

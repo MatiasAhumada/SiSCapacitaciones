@@ -64,3 +64,12 @@ export const firmarContrato = async (inscripcionId, firmaBase64) => {
     throw error.response?.data || error;
   }
 };
+
+export const deleteInscripcion = async (inscripcionId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/inscripcion/${inscripcionId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

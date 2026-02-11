@@ -256,11 +256,24 @@ export class InscripcionService {
   }
 
   async remove(id: string) {
-    const deleted = await this.inscripcionRepository.delete(id);
-    if (deleted.affected === 0) {
+    const inscripcion = await this.inscripcionRepository.findOne({
+      where: { id },
+    });
+
+    if (!inscripcion) {
       throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
     }
-    return `Inscripción con ID ${id} eliminada`;
+
+    if (inscripcion.firmaUrl) {
+      try {
+        await this.imagesService.deleteImage(inscripcion.firmaUrl);
+      } catch (error) {
+        console.error('Error eliminando imagen de firma:', error);
+      }
+    }
+
+    await this.inscripcionRepository.delete(id);
+    return { message: 'Inscripción eliminada correctamente' };
   }
 
   async generarPDF(id: string): Promise<Buffer> {

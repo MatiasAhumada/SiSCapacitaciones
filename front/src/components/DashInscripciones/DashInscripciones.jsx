@@ -5,9 +5,10 @@ import {
   getAllInscripciones,
   getInscripcionesByVendedor,
   descargarPDFInscripcion,
+  deleteInscripcion,
 } from '../../services/Inscripciones.service';
 import { getVendedores } from '../../services/Vendedores.service';
-import { clientErrorHandler } from '../../utils/notificationHandler';
+import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { Spinner } from '../Spinner/Spinner';
 import Pagination from '../Pagination/Pagination';
 
@@ -23,6 +24,8 @@ const DashInscripciones = () => {
   const [vendedores, setVendedores] = useState([]);
   const [selectedVendedor, setSelectedVendedor] = useState('');
   const [selectedFecha, setSelectedFecha] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [inscripcionToDelete, setInscripcionToDelete] = useState(null);
   const isAdmin = user?.isAdmin;
 
   useEffect(() => {
@@ -85,6 +88,49 @@ const DashInscripciones = () => {
     setSelectedVendedor('');
     setSelectedFecha('');
     setCurrentPage(1);
+  };
+
+  const handleDeleteClick = (inscripcion) => {
+    setInscripcionToDelete(inscripcion);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteInscripcion(inscripcionToDelete.id);
+      clientSuccessHandler('Inscripción eliminada correctamente');
+      setShowDeleteModal(false);
+      setInscripcionToDelete(null);
+      const cargarInscripciones = async () => {
+        setLoading(true);
+        try {
+          let response;
+          if (isAdmin) {
+            response = await getAllInscripciones(currentPage, 10, selectedVendedor, selectedFecha);
+            if (response.statsByVendedor) {
+              setStatsByVendedor(response.statsByVendedor);
+            }
+          } else {
+            response = await getInscripcionesByVendedor(user.id, currentPage, 10);
+          }
+          setInscripciones(response.data);
+          setTotal(response.total);
+          setTotalPages(response.totalPages);
+        } catch (error) {
+          clientErrorHandler(error?.response?.data?.message || error?.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      cargarInscripciones();
+    } catch (error) {
+      clientErrorHandler(error?.response?.data?.message || error?.message);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setInscripcionToDelete(null);
   };
 
   if (loading) {
@@ -264,13 +310,24 @@ const DashInscripciones = () => {
                       {inscripcion.sucursal?.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <button
-                        onClick={() => handlePrint(inscripcion)}
-                        className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 rounded text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                        title="Imprimir"
-                      >
-                        <i className="fa-solid fa-print"></i>
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handlePrint(inscripcion)}
+                          className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 rounded text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                          title="Imprimir"
+                        >
+                          <i className="fa-solid fa-print"></i>
+                        </button>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteClick(inscripcion)}
+                            className="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                            title="Eliminar"
+                          >
+                            <i className="fa-solid fa-trash"></i>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -287,6 +344,41 @@ const DashInscripciones = () => {
             totalPages={totalPages}
             onPageChange={setCurrentPage}
           />
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <i className="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Confirmar Eliminación</h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              ¿Estás seguro de eliminar la inscripción de{' '}
+              <strong>{inscripcionToDelete?.alumno?.name}</strong>?
+              <br />
+              <span className="text-sm text-gray-500 mt-2 block">
+                Los pagos del alumno se mantendrán intactos.
+              </span>
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium px-4 py-2.5 transition-colors duration-200 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2.5 transition-colors duration-200 rounded"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

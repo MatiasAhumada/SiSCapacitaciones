@@ -17,10 +17,10 @@ const AppLockModal = ({ message }) => {
               Información de Pago
             </p>
             <p className="text-sm text-blue-800 mb-1">
-              <strong>Alias:</strong> mahumada9732.nx.ars
+              <strong>Alias:</strong> ahu.nx
             </p>
             <p className="text-sm text-blue-800">
-              <strong>Vencimiento:</strong> Día 7 de cada mes
+              <strong>Vencimiento:</strong> Día 8 de cada mes
             </p>
           </div>
         </div>

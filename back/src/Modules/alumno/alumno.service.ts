@@ -234,6 +234,8 @@ export class AlumnoService {
         'alumnoComisiones',
         'alumnoComisiones.pagos',
         'alumnoComisiones.comision',
+        'inscripciones',
+        'inscripciones.comision',
       ],
       select: {
         sucursal: {
@@ -253,6 +255,12 @@ export class AlumnoService {
           },
           comision: {
             name: true,
+          },
+        },
+        inscripciones: {
+          fechaRegistro: true,
+          comision: {
+            id: true,
           },
         },
       },

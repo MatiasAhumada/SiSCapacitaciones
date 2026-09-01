@@ -60,7 +60,6 @@ export const ERROR_MESSAGES = {
   ERROR_INSCRIBIR: 'Error al inscribir',
   ALUMNO_NO_ENCONTRADO: 'Alumno no encontrado',
   NUMERO_CERTIFICADO_REQUERIDO: 'Ingrese un número',
-  ERROR_GENERAR_EXCEL: 'Error al generar Excel',
   CONTRATO_YA_FIRMADO: 'Este contrato ya ha sido firmado',
   FIRMA_REQUERIDA: 'Por favor, realiza tu firma antes de enviar',
   ERROR_FIRMAR_CONTRATO: 'Error al firmar el contrato',

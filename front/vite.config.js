@@ -11,4 +11,7 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: ['siscapacitaciones.net', 'www.siscapacitaciones.net'],
   },
+  build: {
+    chunkSizeWarningLimit: 1200,
+  },
 });

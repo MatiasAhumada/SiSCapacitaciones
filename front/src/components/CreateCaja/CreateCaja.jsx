@@ -394,7 +394,7 @@ const CreateCaja = () => {
                   className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
                 >
                   <option value="">Seleccione un mes</option>
-                  <option value="Mes Inicial">Mes Inicial</option>
+                  <option value="Mes Inicial">Mes inicial</option>
                   <option value="Enero">Enero</option>
                   <option value="Febrero">Febrero</option>
                   <option value="Marzo">Marzo</option>

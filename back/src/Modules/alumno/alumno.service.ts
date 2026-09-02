@@ -8,7 +8,7 @@ import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Alumno } from './entities/alumno.entity';
-import { Repository, Like } from 'typeorm';
+import { ILike, Like, Raw, Repository } from 'typeorm';
 import { Sucursal } from '../sucursal/entities/sucursal.entity';
 interface PaginationOptions {
   page?: number;
@@ -116,13 +116,17 @@ export class AlumnoService {
 
     if (filtros?.nombre) {
       const nombreNormalizado = filtros.nombre.trim().toLowerCase();
-      whereConditions.name = Like(`%${nombreNormalizado}%`);
+      whereConditions.name = ILike(`%${nombreNormalizado}%`);
     }
     if (filtros?.dni) {
       whereConditions.dni = Like(`%${filtros.dni}%`);
     }
     if (filtros?.tel) {
-      whereConditions.tel = Like(`%${filtros.tel}%`);
+      const telefono = String(filtros.tel).trim();
+      whereConditions.tel = Raw(
+        (alias) => `CAST(${alias} AS TEXT) LIKE :telefono`,
+        { telefono: `%${telefono}%` },
+      );
     }
 
     // Obtener todos los alumnos con relaciones para filtrar por cantidades

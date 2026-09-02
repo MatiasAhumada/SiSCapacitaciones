@@ -52,3 +52,77 @@ describe('ComisionService.remove', () => {
     );
   });
 });
+
+describe('ComisionService.findOneAluCom', () => {
+  afterEach(() => jest.useRealTimers());
+
+  it('devuelve el estado de deuda calculado por cada comisión', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-15T12:00:00'));
+    const alumnoComisionRepository = {
+      findOne: jest
+        .fn()
+        .mockResolvedValue({ id: 'ac-1', alumno: { id: 'alumno-1' } }),
+      find: jest.fn().mockResolvedValue([
+        {
+          id: 'ac-1',
+          state: true,
+          comision: { id: 'com-1', name: 'Comisión 1' },
+          pagos: [
+            {
+              id: 'pago-1',
+              tipo: 'Ingreso',
+              fecha: new Date('2026-08-10T12:00:00'),
+            },
+          ],
+        },
+      ]),
+    };
+    const cajaRepository = { find: jest.fn().mockResolvedValue([]) };
+    const service = new ComisionService(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      alumnoComisionRepository as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      cajaRepository as any,
+      {} as any,
+    );
+
+    const result = await service.findOneAluCom('ac-1');
+
+    expect(result.comisiones[0].debe).toBe(true);
+  });
+
+  it('filtra los pagos por la comisión seleccionada', async () => {
+    const alumnoComisionRepository = {
+      findOne: jest
+        .fn()
+        .mockResolvedValue({ id: 'ac-1', alumno: { id: 'alumno-1' } }),
+      find: jest.fn().mockResolvedValue([]),
+    };
+    const cajaRepository = { find: jest.fn().mockResolvedValue([]) };
+    const service = new ComisionService(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      alumnoComisionRepository as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      cajaRepository as any,
+      {} as any,
+    );
+
+    await service.findOneAluCom('ac-1', 'com-2');
+
+    expect(cajaRepository.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { alumnoComision: { comision: { id: 'com-2' } } },
+      }),
+    );
+  });
+});

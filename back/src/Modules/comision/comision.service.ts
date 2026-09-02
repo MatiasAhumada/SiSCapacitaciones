@@ -20,7 +20,7 @@ import { TransferAlumnoDto } from './dto/transfer-alumno.dto';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { PdfService } from '../pdf/pdf.service';
 import { ChangeStatusComisionDto } from './dto/changeStatus-comision.dto';
-import { Caja } from '../caja/entities/caja.entity';
+import { Caja, TipoMovimiento } from '../caja/entities/caja.entity';
 
 @Injectable()
 export class ComisionService {
@@ -45,6 +45,36 @@ export class ComisionService {
     private readonly cajaRepository: Repository<Caja>,
     private readonly pdfService: PdfService,
   ) {}
+
+  private tieneDeuda(pagos: Caja[] = []) {
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
+    const mesAnterior = mesActual === 0 ? 11 : mesActual - 1;
+    const anioMesAnterior = mesActual === 0 ? anioActual - 1 : anioActual;
+
+    const pagoMesAnterior = pagos.some((pago) => {
+      if (pago.tipo !== TipoMovimiento.INGRESO || !pago.fecha) return false;
+      const fechaPago = new Date(pago.fecha);
+      return (
+        fechaPago.getMonth() === mesAnterior &&
+        fechaPago.getFullYear() === anioMesAnterior
+      );
+    });
+
+    const pagoMesActual = pagos.some((pago) => {
+      if (pago.tipo !== TipoMovimiento.INGRESO || !pago.fecha) return false;
+      const fechaPago = new Date(pago.fecha);
+      return (
+        fechaPago.getMonth() === mesActual &&
+        fechaPago.getFullYear() === anioActual
+      );
+    });
+
+    if (!pagoMesAnterior) return true;
+    if (hoy.getDate() <= 10) return false;
+    return !pagoMesActual;
+  }
   private cleanHour(hour: any): { start: string; end: string } {
     if (hour && hour.start && hour.end) {
       return {
@@ -180,7 +210,7 @@ export class ComisionService {
     // Obtener todas las comisiones del alumno
     const comisiones = await this.alumnoComisionRepository.find({
       where: { alumno: { id: alumnoComision.alumno.id } },
-      relations: ['comision'],
+      relations: ['comision', 'pagos'],
       select: {
         id: true,
         state: true,
@@ -193,15 +223,25 @@ export class ComisionService {
             end: true,
           },
         },
+        pagos: {
+          id: true,
+          tipo: true,
+          fecha: true,
+        },
       },
     });
+
+    const comisionesConDeuda = comisiones.map((comision) => ({
+      ...comision,
+      debe: this.tieneDeuda(comision.pagos),
+    }));
 
     // Obtener pagos filtrados por comisión si se especifica
     const whereConditions: any = {
       alumnoComision: { alumno: { id: alumnoComision.alumno.id } },
     };
     if (comisionId) {
-      whereConditions.alumnoComision = { id: comisionId };
+      whereConditions.alumnoComision = { comision: { id: comisionId } };
     }
 
     const pagos = await this.cajaRepository.find({
@@ -239,7 +279,7 @@ export class ComisionService {
 
     return {
       ...alumnoComision,
-      comisiones,
+      comisiones: comisionesConDeuda,
       pagos,
     };
   }

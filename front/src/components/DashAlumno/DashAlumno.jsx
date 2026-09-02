@@ -172,7 +172,21 @@ const DashAlumno = () => {
             <div className="space-y-3">
               {alumno.comisiones.map((comision) => (
                 <div key={comision.id} className="p-3 bg-gray-50 rounded border">
-                  <div className="font-medium">{comision.comision.name}</div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="font-medium">{comision.comision.name}</div>
+                    <span
+                      role="status"
+                      aria-label={comision.debe ? 'Debe' : 'Sin deuda'}
+                      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${
+                        comision.debe
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}
+                    >
+                      <span aria-hidden="true">{comision.debe ? '●' : '✓'}</span>
+                      {comision.debe ? 'debe' : 'sin deuda'}
+                    </span>
+                  </div>
                   <div className="text-sm text-gray-600">Día: {comision.comision.day}</div>
                   <div className="text-sm text-gray-600">
                     Horario: {comision.comision.hour?.start}-{comision.comision.hour?.end}

@@ -27,7 +27,6 @@ const CreateCaja = () => {
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [pause, setPause] = useState(false);
   const [alumnoComisiones, setAlumnocomisiones] = useState([]);
-  const [mesInicial, setMesInicial] = useState('');
   const [alu, setAlu] = useState([]);
   const [fecha, setFecha] = useState(new Date());
   const [tipoIngreso, setTipoIngreso] = useState('Ingreso');
@@ -55,24 +54,6 @@ const CreateCaja = () => {
       numero: '',
     },
   });
-
-  const getMesInicial = (alumnoComisionId, inscripciones) => {
-    const inscripcion = inscripciones
-      ?.filter((item) => item.comision?.id === alumnoComisionId)
-      ?.sort((firstItem, secondItem) => {
-        return new Date(firstItem.fechaRegistro) - new Date(secondItem.fechaRegistro);
-      })[0];
-
-    if (!inscripcion?.fechaRegistro) {
-      return '';
-    }
-
-    const mes = new Date(inscripcion.fechaRegistro).toLocaleDateString('es-AR', {
-      month: 'long',
-    });
-
-    return mes.charAt(0).toUpperCase() + mes.slice(1);
-  };
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -110,19 +91,6 @@ const CreateCaja = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === 'alumnoComisionId') {
-      const comisionSeleccionada = alumnoComisiones.find((item) => item.id === value);
-      const mesInicial = getMesInicial(
-        comisionSeleccionada?.comision?.id,
-        comisionSeleccionada?.inscripciones,
-      );
-
-      setMesInicial(mesInicial);
-      setFormData((prev) => ({ ...prev, [name]: value, mesCuota: mesInicial }));
-      return;
-    }
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -234,12 +202,7 @@ const CreateCaja = () => {
             ...prev,
             alumnoComisionId: data.id,
           }));
-          const comisionesConMesInicial = data.alumnoComisiones.map((alumnoComision) => ({
-            ...alumnoComision,
-            inscripciones: data.inscripciones,
-          }));
-
-          setAlumnocomisiones(comisionesConMesInicial);
+          setAlumnocomisiones(data.alumnoComisiones);
           setAlumnoSeleccionado({
             apellidoNombre: data.name,
             dni: data.dni,
@@ -431,11 +394,7 @@ const CreateCaja = () => {
                   className="pl-12 mb-2 bg-gray-50 text-gray-600 border focus:border-transparent border-gray-300 sm:text-sm rounded-lg ring-3 ring-transparent focus:ring-1 focus:outline-hidden focus:ring-gray-400 block w-full p-2.5 rounded-l-lg py-3 px-4"
                 >
                   <option value="">Seleccione un mes</option>
-                  {mesInicial && (
-                    <option value={mesInicial}>
-                      Mes Inicial ({mesInicial})
-                    </option>
-                  )}
+                  <option value="Mes Inicial">Mes Inicial</option>
                   <option value="Enero">Enero</option>
                   <option value="Febrero">Febrero</option>
                   <option value="Marzo">Marzo</option>

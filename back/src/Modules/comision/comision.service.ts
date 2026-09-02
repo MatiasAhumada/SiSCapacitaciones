@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateComisionDto } from './dto/create-comision.dto';
 import { UpdateComisionDto } from './dto/update-comision.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -538,31 +542,147 @@ export class ComisionService {
   }
 
   async registrarAsistencia(data: CreateAsistenciaDto) {
-    // Obtener todos los alumnos de la comisión
+    const comision = await this.comisionRepository.findOne({
+      where: { id: data.comisionId },
+    });
+    if (!comision) {
+      throw new NotFoundException('Comisión no encontrada');
+    }
+
+    const profesor = await this.profesorRepository.findOne({
+      where: { id: data.profesorId },
+    });
+    if (!profesor) {
+      throw new NotFoundException('Profesor no encontrado');
+    }
+
+    const fecha = new Date(data.fecha);
+    if (Number.isNaN(fecha.getTime())) {
+      throw new BadRequestException('La fecha de asistencia no es válida');
+    }
+
+    const fechaInicio = new Date(fecha);
+    fechaInicio.setUTCHours(0, 0, 0, 0);
+    const fechaFin = new Date(fechaInicio);
+    fechaFin.setUTCDate(fechaFin.getUTCDate() + 1);
+    const alumnosPresentes = new Set(data.alumnosComisionIds || []);
+
     const todosAlumnos = await this.alumnoComisionRepository.find({
       where: { comision: { id: data.comisionId } },
     });
 
-    // Registrar asistencias: presentes y ausentes
-    const asistencias = todosAlumnos.map((alumnoComision) =>
-      this.asistenciaRepository.create({
+    const asistenciasExistentes = await this.asistenciaRepository.find({
+      where: {
+        alumnoComision: { comision: { id: data.comisionId } },
+        fecha: Between(fechaInicio, fechaFin),
+      },
+      relations: ['alumnoComision'],
+    });
+    const existentesPorAlumno = new Map<string, Asistencia[]>();
+    asistenciasExistentes.forEach((asistencia) => {
+      const alumnoId = asistencia.alumnoComision?.id;
+      if (!alumnoId) return;
+      const registros = existentesPorAlumno.get(alumnoId) || [];
+      registros.push(asistencia);
+      existentesPorAlumno.set(alumnoId, registros);
+    });
+
+    const asistencias = todosAlumnos.flatMap((alumnoComision) => {
+      const presente = alumnosPresentes.has(alumnoComision.id);
+      const existentes = existentesPorAlumno.get(alumnoComision.id);
+      if (existentes?.length) {
+        return existentes.map((asistencia) => {
+          asistencia.presente = presente;
+          return asistencia;
+        });
+      }
+      return this.asistenciaRepository.create({
         alumnoComision: { id: alumnoComision.id },
-        presente: data.alumnosComisionIds.includes(alumnoComision.id),
-        fecha: data.fecha,
-      }),
-    );
+        presente,
+        fecha,
+      });
+    });
     await this.asistenciaRepository.save(asistencias);
 
-    // Registrar asistencia del profesor
-    const asistenciaProfesor = this.asistenciaProfesorRepository.create({
-      profesor: { id: data.profesorId },
-      comision: { id: data.comisionId },
-      estado: data.estadoProfesor,
-      descripcion: data.descripcion,
-    });
+    const asistenciaProfesorExistente =
+      await this.asistenciaProfesorRepository.findOne({
+        where: {
+          comision: { id: data.comisionId },
+          fecha: Between(fechaInicio, fechaFin),
+        },
+      });
+    const asistenciaProfesor =
+      asistenciaProfesorExistente ||
+      this.asistenciaProfesorRepository.create({
+        profesor,
+        comision,
+        estado: data.estadoProfesor,
+        descripcion: data.descripcion,
+        fecha,
+      });
+    if (asistenciaProfesorExistente) {
+      asistenciaProfesorExistente.profesor = profesor;
+      asistenciaProfesorExistente.estado = data.estadoProfesor;
+      asistenciaProfesorExistente.descripcion = data.descripcion ?? '';
+      asistenciaProfesorExistente.fecha = fecha;
+    }
     await this.asistenciaProfesorRepository.save(asistenciaProfesor);
 
     return { message: 'Asistencias registradas correctamente' };
+  }
+
+  async obtenerMetricasAsistencia(comisionId: string) {
+    const totalAlumnos = await this.alumnoComisionRepository.count({
+      where: { comision: { id: comisionId } },
+    });
+    const asistencias = await this.asistenciaRepository.find({
+      where: { alumnoComision: { comision: { id: comisionId } } },
+      relations: ['alumnoComision'],
+      order: { fecha: 'ASC' },
+    });
+
+    const registrosUnicos = new Map<string, Asistencia>();
+    asistencias.forEach((asistencia) => {
+      const alumnoId = asistencia.alumnoComision?.id;
+      if (!alumnoId || !asistencia.fecha) return;
+      const fecha = asistencia.fecha.toISOString().slice(0, 10);
+      registrosUnicos.set(`${alumnoId}:${fecha}`, asistencia);
+    });
+
+    const porFecha = new Map<
+      string,
+      { fecha: string; presentes: number; ausentes: number }
+    >();
+    let presentes = 0;
+    registrosUnicos.forEach((asistencia) => {
+      const fecha = asistencia.fecha.toISOString().slice(0, 10);
+      const resumen = porFecha.get(fecha) || {
+        fecha,
+        presentes: 0,
+        ausentes: 0,
+      };
+      if (asistencia.presente) {
+        presentes += 1;
+        resumen.presentes += 1;
+      } else {
+        resumen.ausentes += 1;
+      }
+      porFecha.set(fecha, resumen);
+    });
+
+    const totalRegistros = registrosUnicos.size;
+    const ausentes = totalRegistros - presentes;
+    return {
+      totalAlumnos,
+      clasesRegistradas: porFecha.size,
+      totalRegistros,
+      presentes,
+      ausentes,
+      porcentajeAsistencia: totalRegistros
+        ? Math.round((presentes / totalRegistros) * 100)
+        : 0,
+      porFecha: Array.from(porFecha.values()),
+    };
   }
 
   async obtenerAsistenciasPorComision(

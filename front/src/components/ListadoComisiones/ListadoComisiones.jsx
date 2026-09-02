@@ -5,6 +5,7 @@ import {
   editStateComision,
   getComisionId,
   postAsistenciaComision,
+  getMetricasAsistencia,
   transferirAlumno,
   getComisiones,
 } from '../../services/Comisiones.service';
@@ -27,7 +28,7 @@ const ListadoComisiones = () => {
   const navigate = useNavigate();
   const [onAsistenciaClicked, setOnAsistenciaClicked] = useState(false);
   const [alumnosComision, setAlumnosComision] = useState([]);
-  const [comisionDate, setComisionDate] = useState([]);
+  const [comisionDate, setComisionDate] = useState({});
   const [pause, setPause] = useState({});
   const [reload, setReload] = useState(false);
   const [asistencia, setAsistencia] = useState({
@@ -48,6 +49,7 @@ const ListadoComisiones = () => {
   const [selectedAlumno, setSelectedAlumno] = useState(null);
   const [comisionesDisponibles, setComisionesDisponibles] = useState([]);
   const [nuevaComisionId, setNuevaComisionId] = useState('');
+  const [metricasAsistencia, setMetricasAsistencia] = useState(null);
 
   const itemsPerPage = 10;
 
@@ -78,6 +80,13 @@ const ListadoComisiones = () => {
           )
         ).sort((a, b) => new Date(a) - new Date(b));
         setAllDates(dates);
+      }
+
+      try {
+        const metricas = await getMetricasAsistencia(comisionId);
+        setMetricasAsistencia(metricas);
+      } catch {
+        setMetricasAsistencia(null);
       }
     } catch (error) {
       clientErrorHandler(
@@ -179,21 +188,26 @@ const ListadoComisiones = () => {
   const onAsist = (e) => {
     e.preventDefault();
     setAsistencia({
-      ...asistencia,
+      alumnosComisionIds: [],
       profesorId: comisionDate.profesor?.id,
       comisionId: comisionDate.id,
+      estadoProfesor: '',
+      descripcion: '',
+      fecha: new Date().toISOString().slice(0, 10),
     });
     setOnAsistenciaClicked(true);
   };
 
   const handleAsistenciaChange = (updates) => {
-    setAsistencia({ ...asistencia, ...updates });
+    setAsistencia((prev) => ({ ...prev, ...updates }));
   };
 
   const handleAsistenciaCheck = (alumnoId) => {
-    setAsistencia({
-      ...asistencia,
-      alumnosComisionIds: [...asistencia.alumnosComisionIds, alumnoId],
+    setAsistencia((prev) => {
+      const alumnosComisionIds = prev.alumnosComisionIds.includes(alumnoId)
+        ? prev.alumnosComisionIds.filter((id) => id !== alumnoId)
+        : [...prev.alumnosComisionIds, alumnoId];
+      return { ...prev, alumnosComisionIds };
     });
   };
 
@@ -240,6 +254,34 @@ const ListadoComisiones = () => {
   return (
     <div className="max-w-screen-2xl mx-auto px-4 md:px-8 py-6">
       <ComisionHeader comision={comisionDate} />
+
+      {metricasAsistencia && (
+        <section
+          aria-label="Métricas de asistencia"
+          className="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4"
+        >
+          <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Asistencia</p>
+            <p className="mt-1 text-2xl font-bold text-blue-950">{metricasAsistencia.porcentajeAsistencia}%</p>
+            <p className="text-xs text-blue-700">promedio registrado</p>
+          </div>
+          <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Presentes</p>
+            <p className="mt-1 text-2xl font-bold text-emerald-950">{metricasAsistencia.presentes}</p>
+            <p className="text-xs text-emerald-700">registros válidos</p>
+          </div>
+          <div className="rounded-xl border border-rose-100 bg-rose-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">Ausentes</p>
+            <p className="mt-1 text-2xl font-bold text-rose-950">{metricasAsistencia.ausentes}</p>
+            <p className="text-xs text-rose-700">registros válidos</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Clases</p>
+            <p className="mt-1 text-2xl font-bold text-slate-950">{metricasAsistencia.clasesRegistradas}</p>
+            <p className="text-xs text-slate-600">con asistencia cargada</p>
+          </div>
+        </section>
+      )}
 
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
         <div className="flex flex-col gap-3 w-full lg:w-80">
@@ -374,6 +416,7 @@ const ListadoComisiones = () => {
                   onTransfer={handleTransferClick}
                   onStateChange={clickEdit}
                   onAsistenciaCheck={handleAsistenciaCheck}
+                  asistenciaSeleccionada={asistencia.alumnosComisionIds.includes(item.id)}
                   pause={pause}
                   showAsistencia={onAsistenciaClicked}
                   hideDates={!!fechaFiltro}

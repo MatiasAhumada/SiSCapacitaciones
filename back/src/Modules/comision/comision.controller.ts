@@ -34,6 +34,11 @@ export class ComisionController {
   ) {
     return this.comisionService.registrarAsistencia(data);
   }
+  @Get('asistencia/:comisionId/metricas')
+  obtenerMetricasAsistencia(@Param('comisionId') comisionId: string) {
+    return this.comisionService.obtenerMetricasAsistencia(comisionId);
+  }
+
   @Get('asistencia/:comisionId')
   obtenerAsistenciasPorComision(@Param('comisionId') comisionId: string) {
     return this.comisionService.obtenerAsistenciasPorComision(comisionId);

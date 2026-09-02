@@ -10,6 +10,7 @@ const AlumnoRow = ({
   onTransfer,
   onStateChange,
   onAsistenciaCheck,
+  asistenciaSeleccionada,
   pause,
   showAsistencia,
   hideDates = false,
@@ -76,6 +77,8 @@ const AlumnoRow = ({
             style={{ accentColor: '#2563eb' }}
             onChange={() => onAsistenciaCheck(item.id)}
             type="checkbox"
+            checked={asistenciaSeleccionada}
+            aria-label={`Marcar asistencia de ${item.alumno.name}`}
           />
         </td>
       )}
@@ -92,6 +95,7 @@ AlumnoRow.propTypes = {
   onTransfer: PropTypes.func.isRequired,
   onStateChange: PropTypes.func.isRequired,
   onAsistenciaCheck: PropTypes.func.isRequired,
+  asistenciaSeleccionada: PropTypes.bool.isRequired,
   pause: PropTypes.object.isRequired,
   showAsistencia: PropTypes.bool.isRequired,
   hideDates: PropTypes.bool,

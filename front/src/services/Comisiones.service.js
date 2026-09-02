@@ -159,6 +159,15 @@ export const postAsistenciaComision = async (asistenciaComision) => {
   }
 };
 
+export const getMetricasAsistencia = async (comisionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/comision/asistencia/${comisionId}/metricas`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const transferirAlumno = async (alumnoComisionId, nuevaComisionId) => {
   try {
     const response = await axios.put(`${API_URL}/comision/transferir`, {

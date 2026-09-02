@@ -24,11 +24,21 @@ export class MetricsService {
       .leftJoin('sesionCaja.vendedor', 'vendedor')
       .select("TO_CHAR(caja.fecha, 'YYYY-MM') AS month")
       .addSelect('SUM(caja.monto)', 'totalSales')
-      .where('caja.tipo = :tipo', { tipo: 'Ingreso' });
+      .where('caja.tipo = :tipo', { tipo: 'Ingreso' })
+      // Los movimientos copiados a cajas perpetuas no tienen vendedor y no
+      // deben volver a sumarse en la métrica global.
+      .andWhere('caja.vendedor IS NOT NULL');
 
     const currentYear = new Date().getFullYear().toString();
     const targetYear = year || currentYear;
-    query.andWhere("TO_CHAR(caja.fecha, 'YYYY') = :year", { year: targetYear });
+    const nextYear = (Number(targetYear) + 1).toString();
+    query
+      .andWhere('caja.fecha >= :startDate', {
+        startDate: `${targetYear}-01-01`,
+      })
+      .andWhere('caja.fecha < :endDate', {
+        endDate: `${nextYear}-01-01`,
+      });
 
     if (vendedorIds && vendedorIds.length > 0) {
       query

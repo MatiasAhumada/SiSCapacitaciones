@@ -40,15 +40,23 @@ const DashComisiones = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedSucursal, setSelectedSucursal] = useState('');
   const [loading, setLoading] = useState(true);
+  const [comisionToDelete, setComisionToDelete] = useState(null);
   const [, setPause] = useState({});
 
-  const clickDelete = async (id) => {
-    const comisionId = id;
+  const clickDelete = (comision) => {
+    setComisionToDelete(comision);
+  };
+
+  const confirmDelete = async () => {
+    if (!comisionToDelete) return;
+
+    const comisionId = comisionToDelete.id;
 
     setPause((prev) => ({ ...prev, [comisionId]: true }));
     try {
-      await deleteComision(id);
+      await deleteComision(comisionId);
       clientSuccessHandler(SUCCESS_MESSAGES.COMISION_ELIMINADA);
+      setComisionToDelete(null);
       setPause((prev) => {
         const newPause = { ...prev };
         delete newPause[comisionId];
@@ -501,7 +509,7 @@ const DashComisiones = () => {
                             </button>
                           )}
                           <button
-                            onClick={() => clickDelete(item.id)}
+                            onClick={() => clickDelete(item)}
                             className="px-2 md:px-3 py-1.5 md:py-2 ms-1 md:ms-2 text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded shadow-md hover:shadow-lg hover:scale-110 active:scale-95 transition-all duration-300 group"
                             title="Eliminar"
                           >
@@ -524,6 +532,53 @@ const DashComisiones = () => {
           onPageChange={(page) => setCurrentPage(page)}
         />
       </div>
+
+      {comisionToDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirmar-eliminacion-comision"
+        >
+          <div className="w-full max-w-lg rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-2xl sm:p-6">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h2 id="confirmar-eliminacion-comision" className="text-lg font-bold text-slate-900">
+                  Eliminar comisión
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Vas a eliminar <strong>{comisionToDelete.name}</strong>.
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+              <p className="font-semibold">Los pagos y las inscripciones se conservarán.</p>
+              <p className="mt-1 text-emerald-800">
+                Se quitará únicamente la relación con esta comisión y sus asistencias asociadas.
+              </p>
+            </div>
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setComisionToDelete(null)}
+                className="min-h-11 rounded-lg border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                className="min-h-11 rounded-lg bg-red-600 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-red-700"
+              >
+                Eliminar comisión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

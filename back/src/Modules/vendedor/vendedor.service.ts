@@ -172,22 +172,31 @@ export class VendedorService {
       return undefined;
     }
 
-    let inscripcionesFiltradas = vend.inscripciones;
+    const inscripcionesConComision = vend.inscripciones.filter(
+      (inscripcion) => inscripcion.comision,
+    );
+    let inscripcionesFiltradas = inscripcionesConComision;
     if (fechaDesde || fechaHasta) {
-      inscripcionesFiltradas = vend.inscripciones.filter((inscripcion) => {
-        const fecha = new Date(inscripcion.fechaRegistro);
-        if (fechaDesde && fecha < new Date(fechaDesde)) return false;
-        if (fechaHasta && fecha > new Date(fechaHasta)) return false;
-        return true;
-      });
+      inscripcionesFiltradas = inscripcionesConComision.filter(
+        (inscripcion) => {
+          const fecha = new Date(inscripcion.fechaRegistro);
+          if (fechaDesde && fecha < new Date(fechaDesde)) return false;
+          if (fechaHasta && fecha > new Date(fechaHasta)) return false;
+          return true;
+        },
+      );
     }
 
     // Obtener comisiones únicas del vendedor
     const comisionesUnicas = Array.from(
-      new Set(inscripcionesFiltradas.map((insc) => insc.comision.id)),
+      new Set(
+        inscripcionesFiltradas
+          .map((insc) => insc.comision?.id)
+          .filter((id): id is string => Boolean(id)),
+      ),
     )
       .map((id) => {
-        const insc = inscripcionesFiltradas.find((i) => i.comision.id === id);
+        const insc = inscripcionesFiltradas.find((i) => i.comision?.id === id);
         return { id, name: insc?.comision?.name || '' };
       })
       .filter((c) => c.name);
@@ -278,15 +287,17 @@ export class VendedorService {
       order: { fechaRegistro: 'DESC' },
     });
 
-    const data = inscripciones.map((insc) => ({
-      fecha: new Date(insc.fechaRegistro).toLocaleDateString('es-ES'),
-      alumno: insc.alumno.name,
-      dni: insc.alumno.dni,
-      telefono: insc.alumno.tel,
-      curso: insc.comision.curso.name,
-      comision: insc.comision.name,
-      vendedor: insc.vendedor.name,
-    }));
+    const data = inscripciones
+      .filter((insc) => insc.comision)
+      .map((insc) => ({
+        fecha: new Date(insc.fechaRegistro).toLocaleDateString('es-ES'),
+        alumno: insc.alumno.name,
+        dni: insc.alumno.dni,
+        telefono: insc.alumno.tel,
+        curso: insc.comision?.curso?.name || '',
+        comision: insc.comision?.name || '',
+        vendedor: insc.vendedor.name,
+      }));
 
     const columns = [
       { header: 'Fecha', key: 'fecha', width: 15 },

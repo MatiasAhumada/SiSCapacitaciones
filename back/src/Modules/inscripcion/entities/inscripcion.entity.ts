@@ -30,9 +30,10 @@ export class Inscripcion {
   alumno: Alumno;
 
   @ManyToOne(() => Comision, (comision) => comision.inscripciones, {
-    onDelete: 'CASCADE',
+    nullable: true,
+    onDelete: 'SET NULL',
   })
-  comision: Comision;
+  comision: Comision | null;
 
   @ManyToOne(() => Sucursal, (sucursal) => sucursal.inscripciones)
   sucursal: Sucursal;

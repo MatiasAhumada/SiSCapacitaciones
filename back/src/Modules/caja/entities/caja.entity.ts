@@ -79,9 +79,9 @@ export class Caja {
 
   @ManyToOne(() => AlumnoComision, (ac) => ac.pagos, {
     nullable: true,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
-  alumnoComision?: AlumnoComision;
+  alumnoComision?: AlumnoComision | null;
 
   @OneToOne(() => Comprobante, (comprobante) => comprobante.caja, {
     cascade: true,

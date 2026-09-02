@@ -406,12 +406,42 @@ export class ComisionService {
   }
 
   async remove(id: string) {
-    const borrado = this.comisionRepository.delete(id);
-    if ((await borrado).affected == 1) {
+    return this.comisionRepository.manager.transaction(async (manager) => {
+      const comision = await manager.findOne(Comision, { where: { id } });
+
+      if (!comision) {
+        throw new NotFoundException(`Comisión con ID ${id} no encontrada`);
+      }
+
+      // Desvincular pagos antes de eliminar las relaciones alumno-comisión.
+      // Esto protege los comprobantes y movimientos aun con una restricción de
+      // cascada histórica en alumno_comision.
+      const pagos = await manager.find(Caja, {
+        where: { alumnoComision: { comision: { id } } },
+        relations: ['alumnoComision.comision'],
+      });
+      if (pagos.length > 0) {
+        pagos.forEach((pago) => {
+          pago.alumnoComision = null;
+        });
+        await manager.save(Caja, pagos);
+      }
+
+      // Las inscripciones son historial del alumno y no deben desaparecer con
+      // la comisión. La migración cambia la FK a SET NULL como segunda defensa.
+      const inscripciones = await manager.find(Inscripcion, {
+        where: { comision: { id } },
+      });
+      if (inscripciones.length > 0) {
+        inscripciones.forEach((inscripcion) => {
+          inscripcion.comision = null;
+        });
+        await manager.save(Inscripcion, inscripciones);
+      }
+
+      await manager.delete(Comision, id);
       return { message: 'Borrado exitoso' };
-    } else {
-      return { message: 'Error en el borrado no se hizo' };
-    }
+    });
   }
 
   async findBySucursal(

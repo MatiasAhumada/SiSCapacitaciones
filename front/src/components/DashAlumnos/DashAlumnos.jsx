@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { deleteAlumnoId, getAluSucID } from '../../services/Alumnos.service';
 import FilterAlus from '../FilterAlus/FilterAlus';
 import { Spinner } from '../Spinner/Spinner';
@@ -10,6 +11,8 @@ import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
 
 const DashAlumnos = () => {
   const { getSucursalActiva } = useApp();
+  const { user } = useAuth();
+  const isAdmin = user?.isAdmin;
   const navigate = useNavigate();
   const [tableItems, setTableItems] = useState([]);
   const [pause, setPause] = useState({});
@@ -25,7 +28,7 @@ const DashAlumnos = () => {
       clientErrorHandler('No hay comisiones asignadas');
       return;
     }
-    navigate(`/admin/alumno/${idAlu}`);
+    navigate(`${isAdmin ? '/admin' : '/vendedor'}/alumno/${idAlu}`);
   };
 
   const clickDelete = async (id) => {
@@ -124,12 +127,14 @@ const DashAlumnos = () => {
                   >
                     <i className="fa-solid fa-plus"></i>
                   </button>
-                  <button
-                    onClick={() => clickDelete(item.id)}
-                    className="px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
-                  >
-                    {pause[item.id] ? <Spinner color="white" /> : <i className="fa-solid fa-x"></i>}
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => clickDelete(item.id)}
+                      className="px-4 py-2 ms-3 text-white principal bg-red-500 hover:bg-red-600 md:text-sm rounded"
+                    >
+                      {pause[item.id] ? <Spinner color="white" /> : <i className="fa-solid fa-x"></i>}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

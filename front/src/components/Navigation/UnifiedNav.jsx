@@ -167,7 +167,10 @@ const UnifiedNav = () => {
         alumnos: {
           name: 'Alumnos',
           icon: UsersIcon,
-          items: [{ name: 'Crear Alumno', path: '/vendedor/alumnos/crear' }],
+          items: [
+            { name: 'Alumnos', path: '/vendedor/alumnos' },
+            { name: 'Crear Alumno', path: '/vendedor/alumnos/crear' },
+          ],
         },
       };
 

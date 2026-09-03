@@ -427,6 +427,16 @@ function App() {
               }
             />
             <Route
+              path="/vendedor/alumnos"
+              element={
+                <RequireAuth>
+                  <ProtectedLayout>
+                    <DashAlumnos />
+                  </ProtectedLayout>
+                </RequireAuth>
+              }
+            />
+            <Route
               path="/vendedor/alumnos/crear"
               element={
                 <RequireAuth>

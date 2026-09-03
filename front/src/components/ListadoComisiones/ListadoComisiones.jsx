@@ -109,6 +109,23 @@ const ListadoComisiones = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, comisionId, reload, fechaFiltro, estadoFiltro]);
 
+  useEffect(() => {
+    const refrescarAlVolver = () => {
+      if (document.visibilityState === 'visible') {
+        fetchAlumnos(currentPage, dniFiltro, fechaFiltro, estadoFiltro);
+      }
+    };
+
+    window.addEventListener('focus', refrescarAlVolver);
+    document.addEventListener('visibilitychange', refrescarAlVolver);
+
+    return () => {
+      window.removeEventListener('focus', refrescarAlVolver);
+      document.removeEventListener('visibilitychange', refrescarAlVolver);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, comisionId, dniFiltro, fechaFiltro, estadoFiltro]);
+
   const formatFecha = (fechaISO) => {
     const fecha = new Date(fechaISO);
     const day = String(fecha.getUTCDate()).padStart(2, '0');
@@ -155,28 +172,13 @@ const ListadoComisiones = () => {
   };
 
   const getRowBgColor = (alumno) => {
-    const now = new Date();
-    const day = now.getDate();
-    const mesActual = now.getMonth();
-    const yearActual = now.getFullYear();
-    const mesAnterior = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-    const yearMesAnterior = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+    const colores = {
+      green: 'bg-green-200',
+      yellow: 'bg-yellow-200',
+      red: 'bg-red-200',
+    };
 
-    const pagoMesAnterior = alumno.pagos.some((pago) => {
-      const fechaPago = new Date(pago.fecha);
-      return fechaPago.getMonth() === mesAnterior && fechaPago.getFullYear() === yearMesAnterior;
-    });
-
-    const pagoMesActual = alumno.pagos.some((pago) => {
-      const fechaPago = new Date(pago.fecha);
-      return fechaPago.getMonth() === mesActual && fechaPago.getFullYear() === yearActual;
-    });
-
-    if (!pagoMesAnterior) return 'bg-red-200';
-    if (day <= 10) return 'bg-green-200';
-    if (day <= 15 && !pagoMesActual) return 'bg-yellow-200';
-    if (day > 15 && !pagoMesActual) return 'bg-red-200';
-    return 'bg-green-200';
+    return colores[alumno.semaforo] || 'bg-gray-100';
   };
 
   const handleFiltrarDni = (e) => {

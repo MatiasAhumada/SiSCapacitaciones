@@ -46,7 +46,7 @@ export class ComisionService {
     private readonly pdfService: PdfService,
   ) {}
 
-  private tieneDeuda(pagos: Caja[] = []) {
+  private calcularSemaforo(pagos: Caja[] = []) {
     const hoy = new Date();
     const mesActual = hoy.getMonth();
     const anioActual = hoy.getFullYear();
@@ -71,9 +71,14 @@ export class ComisionService {
       );
     });
 
-    if (!pagoMesAnterior) return true;
-    if (hoy.getDate() <= 10) return false;
-    return !pagoMesActual;
+    if (!pagoMesAnterior) return 'red';
+    if (hoy.getDate() <= 10) return 'green';
+    if (!pagoMesActual) return hoy.getDate() <= 15 ? 'yellow' : 'red';
+    return 'green';
+  }
+
+  private tieneDeuda(pagos: Caja[] = []) {
+    return this.calcularSemaforo(pagos) !== 'green';
   }
   private cleanHour(hour: any): { start: string; end: string } {
     if (hour && hour.start && hour.end) {
@@ -383,6 +388,7 @@ export class ComisionService {
         },
         pagos: {
           id: true,
+          tipo: true,
           fecha: true,
           cuota: true,
           mesCuota: true,
@@ -392,9 +398,14 @@ export class ComisionService {
       },
     });
 
+    const alumnosConSemaforo = alumnosComision.map((alumnoComision) => ({
+      ...alumnoComision,
+      semaforo: this.calcularSemaforo(alumnoComision.pagos),
+    }));
+
     return {
       comision,
-      data: alumnosComision,
+      data: alumnosConSemaforo,
       totalPages: Math.ceil(totalAlumnos / limit),
       currentPage: page,
     };

@@ -12,6 +12,8 @@ import {
   fetchAvailableYears,
   fetchAvailableSellers,
   fetchAvailableCourses,
+  fetchStudentDemographics,
+  fetchAvailableGenders,
 } from '../../services/Metrics.service';
 
 const DashboardMetrics = () => {
@@ -32,6 +34,18 @@ const DashboardMetrics = () => {
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedPaymentSellers, setSelectedPaymentSellers] = useState([]);
   const [selectedSellerMonth, setSelectedSellerMonth] = useState('');
+  const [demographicData, setDemographicData] = useState({ totalAlumnos: 0 });
+  const [availableGenders, setAvailableGenders] = useState([]);
+  const [selectedAgeRange, setSelectedAgeRange] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
+
+  const ageRanges = [
+    { value: '0-17', label: '0 a 17 años' },
+    { value: '18-25', label: '18 a 25 años' },
+    { value: '26-35', label: '26 a 35 años' },
+    { value: '36-50', label: '36 a 50 años' },
+    { value: '51+', label: '51 años o más' },
+  ];
 
   const months = [
     { value: '01', label: 'Enero' },
@@ -61,15 +75,20 @@ const DashboardMetrics = () => {
       const courses = await fetchAvailableCourses();
       setAvailableCourses(courses);
     };
+    const loadGenders = async () => {
+      const genders = await fetchAvailableGenders();
+      setAvailableGenders(genders);
+    };
     loadYears();
     loadSellers();
     loadCourses();
+    loadGenders();
   }, []);
 
   useEffect(() => {
     const getMetrics = async () => {
       try {
-        const [sales, enrollments, payment, salesBySeller] = await Promise.all([
+        const [sales, enrollments, payment, salesBySeller, demographics] = await Promise.all([
           fetchSalesByMonth(selectedYear, selectedSalesSellers),
           fetchEnrollmentsByMonth(
             selectedEnrollmentSellers,
@@ -79,11 +98,13 @@ const DashboardMetrics = () => {
           ),
           fetchPaymentMethods(selectedPaymentMonth, selectedPaymentSellers),
           fetchSalesBySeller(selectedSellers, selectedSellerMonth),
+          fetchStudentDemographics(selectedAgeRange, selectedGender),
         ]);
         setSalesData(sales);
         setEnrollmentData(enrollments);
         setPaymentData(payment);
         setSalesBySellerData(salesBySeller);
+        setDemographicData(demographics);
       } catch (error) {
         console.error('Error fetching metrics data:', error);
       }
@@ -100,6 +121,8 @@ const DashboardMetrics = () => {
     selectedCourse,
     selectedPaymentSellers,
     selectedSellerMonth,
+    selectedAgeRange,
+    selectedGender,
   ]);
 
   return (
@@ -110,6 +133,63 @@ const DashboardMetrics = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6">
+        {/* Perfil de alumnos */}
+        <div className="bg-slate-950 text-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-emerald-400 rounded-lg flex items-center justify-center mr-2">
+                <i className="fa-solid fa-user-group text-slate-950 text-sm"></i>
+              </div>
+              <h3 className="text-sm font-semibold">Perfil de alumnos</h3>
+            </div>
+            <FilterButton
+              color="green"
+              activeFiltersCount={[selectedAgeRange, selectedGender].filter(Boolean).length}
+              dropdownId="demographic-filters"
+            >
+              <div className="sticky top-0 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-3 font-semibold text-sm rounded-t-xl">
+                Filtros demográficos
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Edad</label>
+                  <select
+                    value={selectedAgeRange}
+                    onChange={(e) => setSelectedAgeRange(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Todas las edades</option>
+                    {ageRanges.map((range) => (
+                      <option key={range.value} value={range.value}>
+                        {range.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Género</label>
+                  <select
+                    value={selectedGender}
+                    onChange={(e) => setSelectedGender(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Todos los géneros</option>
+                    {availableGenders.map((gender) => (
+                      <option key={gender} value={gender}>
+                        {gender}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </FilterButton>
+          </div>
+          <p className="text-4xl font-bold tracking-tight">{demographicData.totalAlumnos}</p>
+          <p className="mt-2 text-sm text-slate-300">
+            alumnos {selectedAgeRange || selectedGender ? 'según filtros' : 'registrados'}
+          </p>
+        </div>
+
         {/* Cobranzas por Mes */}
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">

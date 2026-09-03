@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Caja } from '../caja/entities/caja.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
 
 @Injectable()
 export class MetricsService {
@@ -12,6 +13,8 @@ export class MetricsService {
     private readonly cajaRepository: Repository<Caja>,
     @InjectRepository(Inscripcion)
     private readonly inscripcionRepository: Repository<Inscripcion>,
+    @InjectRepository(Alumno)
+    private readonly alumnoRepository: Repository<Alumno>,
   ) {}
 
   async getSalesByMonth(
@@ -238,5 +241,54 @@ export class MetricsService {
       .getRawMany();
 
     return rawData;
+  }
+
+  async getStudentDemographics(ageRange?: string, gender?: string) {
+    const query = this.alumnoRepository
+      .createQueryBuilder('alumno')
+      .select('COUNT(alumno.id)', 'totalAlumnos');
+
+    if (gender) {
+      query.andWhere('LOWER(alumno.gender) = LOWER(:gender)', { gender });
+    }
+
+    const ageRanges: Record<string, [number, number | null]> = {
+      '0-17': [0, 17],
+      '18-25': [18, 25],
+      '26-35': [26, 35],
+      '36-50': [36, 50],
+      '51+': [51, null],
+    };
+    const range = ageRange ? ageRanges[ageRange] : undefined;
+    if (range) {
+      if (range[1] === null) {
+        query.andWhere('alumno.age >= :ageMin', { ageMin: range[0] });
+      } else {
+        query.andWhere('alumno.age BETWEEN :ageMin AND :ageMax', {
+          ageMin: range[0],
+          ageMax: range[1],
+        });
+      }
+    }
+
+    const result = await query.getRawOne();
+    return {
+      totalAlumnos: Number(result?.totalAlumnos || 0),
+      ageRange: ageRange || '',
+      gender: gender || '',
+    };
+  }
+
+  async getAvailableGenders(): Promise<string[]> {
+    const rawData = await this.alumnoRepository
+      .createQueryBuilder('alumno')
+      .select('DISTINCT alumno.gender', 'gender')
+      .where(
+        "alumno.gender IS NOT NULL AND alumno.gender <> '' AND alumno.gender <> '-' ",
+      )
+      .orderBy('alumno.gender', 'ASC')
+      .getRawMany();
+
+    return rawData.map((item) => item.gender);
   }
 }

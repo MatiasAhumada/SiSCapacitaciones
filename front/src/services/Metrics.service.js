@@ -88,3 +88,26 @@ export const fetchAvailableCourses = async () => {
     return [];
   }
 };
+
+export const fetchStudentDemographics = async (ageRange, gender) => {
+  try {
+    const params = {};
+    if (ageRange) params.ageRange = ageRange;
+    if (gender) params.gender = gender;
+    const response = await api.get('/metrics/student-demographics', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Fallo en la llamada a las métricas demográficas:', error);
+    return { totalAlumnos: 0, ageRange: ageRange || '', gender: gender || '' };
+  }
+};
+
+export const fetchAvailableGenders = async () => {
+  try {
+    const response = await api.get('/metrics/available-genders');
+    return response.data;
+  } catch (error) {
+    console.error('Fallo en la llamada a los géneros disponibles:', error);
+    return [];
+  }
+};

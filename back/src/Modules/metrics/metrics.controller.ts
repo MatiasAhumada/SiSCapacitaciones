@@ -60,4 +60,17 @@ export class MetricsController {
   getAvailableCourses() {
     return this.metricsService.getAvailableCourses();
   }
+
+  @Get('student-demographics')
+  getStudentDemographics(
+    @Query('ageRange') ageRange?: string,
+    @Query('gender') gender?: string,
+  ) {
+    return this.metricsService.getStudentDemographics(ageRange, gender);
+  }
+
+  @Get('available-genders')
+  getAvailableGenders() {
+    return this.metricsService.getAvailableGenders();
+  }
 }

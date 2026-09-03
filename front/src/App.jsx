@@ -25,6 +25,7 @@ import CreateCurso from './components/CreateCurso/CreateCurso';
 import DashComisiones from './components/DashComisiones/DashComisiones';
 import CreateComision from './components/CreateComision/CreateComision';
 import ListadoComisiones from './components/ListadoComisiones/ListadoComisiones';
+import DashDeudores from './components/DashDeudores/DashDeudores';
 import DashCaja from './components/DashCaja/DashCaja';
 import CreateCaja from './components/CreateCaja/CreateCaja';
 import CajaEgreso from './components/CajaEgreso/CajaEgreso';
@@ -212,6 +213,16 @@ function App() {
               }
             />
             <Route
+              path="/admin/deudores"
+              element={
+                <RequireAuth>
+                  <ProtectedLayout>
+                    <DashDeudores />
+                  </ProtectedLayout>
+                </RequireAuth>
+              }
+            />
+            <Route
               path="/admin/cajas"
               element={
                 <RequireAuth>
@@ -391,6 +402,16 @@ function App() {
                 <RequireAuth>
                   <ProtectedLayout>
                     <ListadoComisiones />
+                  </ProtectedLayout>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/vendedor/deudores"
+              element={
+                <RequireAuth>
+                  <ProtectedLayout>
+                    <DashDeudores />
                   </ProtectedLayout>
                 </RequireAuth>
               }

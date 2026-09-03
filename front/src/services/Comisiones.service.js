@@ -62,6 +62,18 @@ export const getComisionId = async (
   }
 };
 
+export const getDeudores = async (sucursalId = '', dni = '') => {
+  try {
+    const params = {};
+    if (sucursalId) params.sucursalId = sucursalId;
+    if (dni) params.dni = dni;
+    const response = await axios.get(`${API_URL}/comision/deudores`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const deleteComision = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/comision/${id}`);

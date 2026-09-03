@@ -411,6 +411,38 @@ export class ComisionService {
     };
   }
 
+  async findDeudores(sucursalId?: string, dni?: string) {
+    const where: any = { state: true };
+    if (sucursalId) where.comision = { sucursal: { id: sucursalId } };
+    if (dni) where.alumno = { dni: Like(`%${dni}%`) };
+
+    const relaciones = await this.alumnoComisionRepository.find({
+      where,
+      relations: ['alumno', 'comision', 'pagos'],
+      select: {
+        id: true,
+        alumno: { id: true, name: true, dni: true, tel: true },
+        comision: {
+          id: true,
+          name: true,
+          day: true,
+          hour: { start: true, end: true },
+        },
+        pagos: { id: true, tipo: true, fecha: true },
+      },
+    });
+
+    return relaciones
+      .map((relacion) => ({
+        id: relacion.id,
+        alumno: relacion.alumno,
+        comision: relacion.comision,
+        semaforo: this.calcularSemaforo(relacion.pagos),
+      }))
+      .filter((relacion) => relacion.semaforo !== 'green')
+      .sort((a, b) => a.alumno.name.localeCompare(b.alumno.name));
+  }
+
   async update(id: string, updateComisionDto: UpdateComisionDto) {
     const { cursoId, profesorId, sucursalId, ...updateData } =
       updateComisionDto;

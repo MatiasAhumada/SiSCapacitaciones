@@ -120,6 +120,7 @@ const UnifiedNav = () => {
             { name: 'Cursos', path: '/admin/cursos' },
             { name: 'Crear Curso', path: '/admin/cursos/crear' },
             { name: 'Comisiones', path: '/admin/comisiones' },
+            { name: 'Deudores', path: '/admin/deudores' },
             { name: 'Crear Comisión', path: '/admin/comisiones/crear' },
             { name: 'Inscripciones', path: '/admin/inscripciones' },
             { name: 'Certificados', path: '/admin/certificados' },
@@ -144,6 +145,7 @@ const UnifiedNav = () => {
             { name: 'Inscripciones', path: '/vendedor/inscripciones' },
             { name: 'Cursos', path: '/vendedor/cursos' },
             { name: 'Comisiones', path: '/vendedor/comisiones' },
+            { name: 'Deudores', path: '/vendedor/deudores' },
           ],
         },
         cajas: {

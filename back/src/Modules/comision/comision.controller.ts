@@ -111,6 +111,14 @@ export class ComisionController {
       status,
     );
   }
+  @Get('deudores')
+  findDeudores(
+    @Query('sucursalId') sucursalId?: string,
+    @Query('dni') dni?: string,
+  ) {
+    return this.comisionService.findDeudores(sucursalId, dni);
+  }
+
   @Get(':id')
   findOne(
     @Param('id') id: string,

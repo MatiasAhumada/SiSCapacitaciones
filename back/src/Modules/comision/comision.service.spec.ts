@@ -126,3 +126,58 @@ describe('ComisionService.findOneAluCom', () => {
     );
   });
 });
+
+describe('ComisionService.findDeudores', () => {
+  afterEach(() => jest.useRealTimers());
+
+  it('lista solo relaciones activas con semáforo pendiente', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-20T12:00:00'));
+    const alumnoComisionRepository = {
+      find: jest.fn().mockResolvedValue([
+        {
+          id: 'ac-deudor',
+          state: true,
+          alumno: { id: 'a-1', name: 'Ana', dni: '111' },
+          comision: { id: 'c-1', name: 'Comisión A' },
+          pagos: [{ tipo: 'Ingreso', fecha: new Date('2026-08-10T12:00:00') }],
+        },
+        {
+          id: 'ac-al-dia',
+          state: true,
+          alumno: { id: 'a-2', name: 'Bruno', dni: '222' },
+          comision: { id: 'c-2', name: 'Comisión B' },
+          pagos: [
+            { tipo: 'Ingreso', fecha: new Date('2026-08-10T12:00:00') },
+            { tipo: 'Ingreso', fecha: new Date('2026-09-10T12:00:00') },
+          ],
+        },
+      ]),
+    };
+    const service = new ComisionService(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      alumnoComisionRepository as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const result = await service.findDeudores('sucursal-1', '11');
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ id: 'ac-deudor', semaforo: 'red' });
+    expect(alumnoComisionRepository.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          state: true,
+          comision: { sucursal: { id: 'sucursal-1' } },
+          alumno: { dni: expect.anything() },
+        },
+      }),
+    );
+  });
+});

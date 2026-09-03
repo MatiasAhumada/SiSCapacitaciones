@@ -59,16 +59,22 @@ export class PdfService {
 
     const headers = ['Alumno', 'DNI', 'Teléfono', ...fechas];
 
-    const rows = alumnos.map((item) => {
-      const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
-      fechas.forEach((fecha) => {
-        const asistencia = item.asistencias.find(
-          (a) => new Date(a.fecha).toLocaleDateString() === fecha,
-        );
-        row.push(asistencia ? (asistencia.presente ? 'P' : 'A') : 'A');
+    const rows = [...alumnos]
+      .sort((a, b) =>
+        a.alumno.name.localeCompare(b.alumno.name, 'es', {
+          sensitivity: 'base',
+        }),
+      )
+      .map((item) => {
+        const row = [item.alumno.name, item.alumno.dni, item.alumno.tel];
+        fechas.forEach((fecha) => {
+          const asistencia = item.asistencias.find(
+            (a) => new Date(a.fecha).toLocaleDateString() === fecha,
+          );
+          row.push(asistencia ? (asistencia.presente ? 'P' : 'A') : 'A');
+        });
+        return row;
       });
-      return row;
-    });
 
     autoTable(doc, {
       head: [headers],

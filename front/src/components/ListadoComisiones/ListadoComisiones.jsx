@@ -260,8 +260,18 @@ const ListadoComisiones = () => {
       {metricasAsistencia && (
         <section
           aria-label="Métricas de asistencia"
-          className="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4"
+          className="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-3 lg:grid-cols-6"
         >
+          <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Activos</p>
+            <p className="mt-1 text-2xl font-bold text-emerald-950">{metricasAsistencia.alumnosActivos}</p>
+            <p className="text-xs text-emerald-700">alumnos activos</p>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Inactivos</p>
+            <p className="mt-1 text-2xl font-bold text-slate-950">{metricasAsistencia.alumnosInactivos}</p>
+            <p className="text-xs text-slate-600">alumnos inactivos</p>
+          </div>
           <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Asistencia</p>
             <p className="mt-1 text-2xl font-bold text-blue-950">{metricasAsistencia.porcentajeAsistencia}%</p>

@@ -181,3 +181,36 @@ describe('ComisionService.findDeudores', () => {
     );
   });
 });
+
+describe('ComisionService.obtenerMetricasAsistencia', () => {
+  it('devuelve contadores de alumnos activos e inactivos', async () => {
+    const alumnoComisionRepository = {
+      count: jest
+        .fn()
+        .mockResolvedValueOnce(3)
+        .mockResolvedValueOnce(2)
+        .mockResolvedValueOnce(1),
+    };
+    const asistenciaRepository = { find: jest.fn().mockResolvedValue([]) };
+    const service = new ComisionService(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      alumnoComisionRepository as any,
+      asistenciaRepository as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    await expect(
+      service.obtenerMetricasAsistencia('com-1'),
+    ).resolves.toMatchObject({
+      totalAlumnos: 3,
+      alumnosActivos: 2,
+      alumnosInactivos: 1,
+    });
+  });
+});

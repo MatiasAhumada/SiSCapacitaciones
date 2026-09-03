@@ -370,6 +370,7 @@ export class ComisionService {
     const alumnosComision = await this.alumnoComisionRepository.find({
       where: whereAlumno,
       relations: ['alumno', 'asistencias', 'pagos'],
+      order: { alumno: { name: 'ASC' } },
       skip: (page - 1) * limit,
       take: limit,
       select: {
@@ -718,6 +719,12 @@ export class ComisionService {
     const totalAlumnos = await this.alumnoComisionRepository.count({
       where: { comision: { id: comisionId } },
     });
+    const alumnosActivos = await this.alumnoComisionRepository.count({
+      where: { comision: { id: comisionId }, state: true },
+    });
+    const alumnosInactivos = await this.alumnoComisionRepository.count({
+      where: { comision: { id: comisionId }, state: false },
+    });
     const asistencias = await this.asistenciaRepository.find({
       where: { alumnoComision: { comision: { id: comisionId } } },
       relations: ['alumnoComision'],
@@ -757,6 +764,8 @@ export class ComisionService {
     const ausentes = totalRegistros - presentes;
     return {
       totalAlumnos,
+      alumnosActivos,
+      alumnosInactivos,
       clasesRegistradas: porFecha.size,
       totalRegistros,
       presentes,
@@ -854,6 +863,10 @@ export class ComisionService {
       },
     });
 
-    return this.pdfService.generarPdfAsistencia(comision, alumnosComision);
+    const alumnosOrdenados = [...alumnosComision].sort((a, b) =>
+      a.alumno.name.localeCompare(b.alumno.name, 'es', { sensitivity: 'base' }),
+    );
+
+    return this.pdfService.generarPdfAsistencia(comision, alumnosOrdenados);
   }
 }

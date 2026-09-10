@@ -33,7 +33,7 @@ const FilterButton = ({ color, activeFiltersCount, dropdownId, children }) => {
       </button>
       <div
         id={dropdownId}
-        className="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-10 max-h-96 overflow-y-auto"
+        className="hidden absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-xl shadow-2xl z-10 max-h-96 overflow-y-auto"
       >
         {children}
       </div>

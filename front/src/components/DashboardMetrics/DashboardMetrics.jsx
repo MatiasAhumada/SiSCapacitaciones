@@ -3,7 +3,9 @@ import SalesChart from '../SalesChart/SalesChart';
 import EnrollmentChart from '../EnrollmentChart/EnrollmentChart';
 import MethodPaymentChart from '../MethodPaymentChart/MethodPaymentChart';
 import SalesBySellerChart from '../SalesBySellerChart/SalesBySellerChart';
+import StudentDemographicsChart from '../StudentDemographicsChart/StudentDemographicsChart';
 import FilterButton from './FilterButton';
+import { EMPTY_STUDENT_DEMOGRAPHICS, STUDENT_AGE_RANGES } from '../../constants/studentAgeRanges';
 import {
   fetchSalesByMonth,
   fetchEnrollmentsByMonth,
@@ -34,18 +36,10 @@ const DashboardMetrics = () => {
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedPaymentSellers, setSelectedPaymentSellers] = useState([]);
   const [selectedSellerMonth, setSelectedSellerMonth] = useState('');
-  const [demographicData, setDemographicData] = useState({ totalAlumnos: 0 });
+  const [demographicData, setDemographicData] = useState(EMPTY_STUDENT_DEMOGRAPHICS);
   const [availableGenders, setAvailableGenders] = useState([]);
   const [selectedAgeRange, setSelectedAgeRange] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
-
-  const ageRanges = [
-    { value: '0-17', label: '0 a 17 años' },
-    { value: '18-25', label: '18 a 25 años' },
-    { value: '26-35', label: '26 a 35 años' },
-    { value: '36-50', label: '36 a 50 años' },
-    { value: '51+', label: '51 años o más' },
-  ];
 
   const months = [
     { value: '01', label: 'Enero' },
@@ -61,6 +55,10 @@ const DashboardMetrics = () => {
     { value: '11', label: 'Noviembre' },
     { value: '12', label: 'Diciembre' },
   ];
+
+  const visibleAgeDistribution = demographicData.ageDistribution.filter(
+    (distributionItem) => !selectedAgeRange || distributionItem.range === selectedAgeRange
+  );
 
   useEffect(() => {
     const loadYears = async () => {
@@ -134,13 +132,13 @@ const DashboardMetrics = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6">
         {/* Perfil de alumnos */}
-        <div className="bg-slate-950 text-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-5">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-emerald-400 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-user-group text-slate-950 text-sm"></i>
+              <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-2">
+                <i className="fa-solid fa-user-group text-white text-sm"></i>
               </div>
-              <h3 className="text-sm font-semibold">Perfil de alumnos</h3>
+              <h3 className="text-sm font-semibold text-gray-800">Perfil de alumnos</h3>
             </div>
             <FilterButton
               color="green"
@@ -156,10 +154,10 @@ const DashboardMetrics = () => {
                   <select
                     value={selectedAgeRange}
                     onChange={(e) => setSelectedAgeRange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full bg-white px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="">Todas las edades</option>
-                    {ageRanges.map((range) => (
+                    {STUDENT_AGE_RANGES.map((range) => (
                       <option key={range.value} value={range.value}>
                         {range.label}
                       </option>
@@ -171,7 +169,7 @@ const DashboardMetrics = () => {
                   <select
                     value={selectedGender}
                     onChange={(e) => setSelectedGender(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full bg-white px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="">Todos los géneros</option>
                     {availableGenders.map((gender) => (
@@ -184,10 +182,15 @@ const DashboardMetrics = () => {
               </div>
             </FilterButton>
           </div>
-          <p className="text-4xl font-bold tracking-tight">{demographicData.totalAlumnos}</p>
-          <p className="mt-2 text-sm text-slate-300">
-            alumnos {selectedAgeRange || selectedGender ? 'según filtros' : 'registrados'}
-          </p>
+          <div className="mb-2 flex flex-wrap items-baseline gap-x-2">
+            <p className="text-3xl font-bold tracking-tight text-gray-900">
+              {demographicData.totalAlumnos}
+            </p>
+            <p className="text-sm text-gray-600">
+              alumnos {selectedAgeRange || selectedGender ? 'según filtros' : 'con edad válida'}
+            </p>
+          </div>
+          <StudentDemographicsChart data={visibleAgeDistribution} />
         </div>
 
         {/* Cobranzas por Mes */}

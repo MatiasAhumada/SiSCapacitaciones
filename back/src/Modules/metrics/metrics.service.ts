@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Caja } from '../caja/entities/caja.entity';
 import { Inscripcion } from '../inscripcion/entities/inscripcion.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
+import { STUDENT_AGE_RANGES } from './constants/student-age-ranges.constant';
 
 @Injectable()
 export class MetricsService {
@@ -246,35 +247,64 @@ export class MetricsService {
   async getStudentDemographics(ageRange?: string, gender?: string) {
     const query = this.alumnoRepository
       .createQueryBuilder('alumno')
-      .select('COUNT(alumno.id)', 'totalAlumnos');
+      .select('COUNT(alumno.id) FILTER (WHERE alumno.age >= 0)', 'totalAlumnos')
+      .addSelect('COUNT(alumno.id)', 'allAlumnos');
+
+    for (const ageRangeDefinition of STUDENT_AGE_RANGES) {
+      let ageCondition = `alumno.age >= ${ageRangeDefinition.minimumAge}`;
+
+      if ('maximumAge' in ageRangeDefinition) {
+        ageCondition = `alumno.age BETWEEN ${ageRangeDefinition.minimumAge} AND ${ageRangeDefinition.maximumAge}`;
+      }
+
+      query.addSelect(
+        `COUNT(alumno.id) FILTER (WHERE ${ageCondition})`,
+        ageRangeDefinition.resultAlias,
+      );
+    }
 
     if (gender) {
       query.andWhere('LOWER(alumno.gender) = LOWER(:gender)', { gender });
     }
 
-    const ageRanges: Record<string, [number, number | null]> = {
-      '0-17': [0, 17],
-      '18-25': [18, 25],
-      '26-35': [26, 35],
-      '36-50': [36, 50],
-      '51+': [51, null],
-    };
-    const range = ageRange ? ageRanges[ageRange] : undefined;
-    if (range) {
-      if (range[1] === null) {
-        query.andWhere('alumno.age >= :ageMin', { ageMin: range[0] });
-      } else {
+    const selectedAgeRange = STUDENT_AGE_RANGES.find(
+      (ageRangeDefinition) => ageRangeDefinition.value === ageRange,
+    );
+
+    if (selectedAgeRange) {
+      if ('maximumAge' in selectedAgeRange) {
         query.andWhere('alumno.age BETWEEN :ageMin AND :ageMax', {
-          ageMin: range[0],
-          ageMax: range[1],
+          ageMin: selectedAgeRange.minimumAge,
+          ageMax: selectedAgeRange.maximumAge,
+        });
+      } else {
+        query.andWhere('alumno.age >= :ageMin', {
+          ageMin: selectedAgeRange.minimumAge,
         });
       }
     }
 
-    const result = await query.getRawOne();
+    const rawResult = await query.getRawOne<Record<string, string>>();
+    const result = rawResult || {};
+    const ageDistribution = STUDENT_AGE_RANGES.map((ageRangeDefinition) => ({
+      range: ageRangeDefinition.value,
+      label: ageRangeDefinition.label,
+      total: Number(result[ageRangeDefinition.resultAlias] || 0),
+    }));
+    const classifiedTotal = ageDistribution.reduce(
+      (accumulatedTotal, distributionItem) =>
+        accumulatedTotal + distributionItem.total,
+      0,
+    );
+    const totalAlumnos = Number(result.totalAlumnos || 0);
+    const allAlumnos = Number(result.allAlumnos || 0);
+
     return {
-      totalAlumnos: Number(result?.totalAlumnos || 0),
-      ageRange: ageRange || '',
+      totalAlumnos,
+      classifiedTotal,
+      unclassifiedTotal: allAlumnos - totalAlumnos,
+      ageDistribution,
+      ageRange: selectedAgeRange?.value || '',
       gender: gender || '',
     };
   }

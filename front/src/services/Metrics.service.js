@@ -1,4 +1,5 @@
 import { API_URL } from '../constants/ApiUrl';
+import { EMPTY_STUDENT_DEMOGRAPHICS } from '../constants/studentAgeRanges';
 import axios from 'axios';
 
 const api = axios.create({
@@ -95,10 +96,20 @@ export const fetchStudentDemographics = async (ageRange, gender) => {
     if (ageRange) params.ageRange = ageRange;
     if (gender) params.gender = gender;
     const response = await api.get('/metrics/student-demographics', { params });
-    return response.data;
+    const demographics = response.data || {};
+    return {
+      ...EMPTY_STUDENT_DEMOGRAPHICS,
+      ...demographics,
+      ageDistribution:
+        demographics.ageDistribution || EMPTY_STUDENT_DEMOGRAPHICS.ageDistribution,
+    };
   } catch (error) {
     console.error('Fallo en la llamada a las métricas demográficas:', error);
-    return { totalAlumnos: 0, ageRange: ageRange || '', gender: gender || '' };
+    return {
+      ...EMPTY_STUDENT_DEMOGRAPHICS,
+      ageRange: ageRange || '',
+      gender: gender || '',
+    };
   }
 };
 

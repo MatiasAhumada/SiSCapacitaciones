@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 const RequireAuth = ({ children }) => {
   const { user } = useAuth();
   const location = useLocation();
-  if (!user) {
+  if (!user?.access_token) {
     // No autenticado → redirige a login y guarda la ruta de origen
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

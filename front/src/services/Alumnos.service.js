@@ -1,6 +1,13 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
+const getAuthHeaders = () => {
+  const authUser = JSON.parse(localStorage.getItem('auth_user') || 'null');
+  return authUser?.access_token
+    ? { Authorization: `Bearer ${authUser.access_token}` }
+    : {};
+};
+
 export const getAluSucID = async (id, page = 1, limit = 10, filtros = {}) => {
   try {
     const params = { page, limit };
@@ -11,6 +18,26 @@ export const getAluSucID = async (id, page = 1, limit = 10, filtros = {}) => {
     });
     const response = await axios.get(`${API_URL}/alumno/sucursal/${id}`, {
       params,
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getAluGlobal = async (page = 1, limit = 10, filtros = {}) => {
+  try {
+    const params = { page, limit };
+    Object.keys(filtros).forEach((key) => {
+      if (filtros[key] && filtros[key] !== '') {
+        params[key] = filtros[key];
+      }
+    });
+
+    const response = await axios.get(`${API_URL}/alumno/global`, {
+      params,
+      headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
@@ -20,7 +47,9 @@ export const getAluSucID = async (id, page = 1, limit = 10, filtros = {}) => {
 
 export const getAluID = async (dni) => {
   try {
-    const response = await axios.get(`${API_URL}/alumno/search/${dni}`);
+    const response = await axios.get(`${API_URL}/alumno/search/${dni}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -29,7 +58,10 @@ export const getAluID = async (dni) => {
 
 export const getAluByDNI = async (dni) => {
   try {
-    const response = await axios.get(`${API_URL}/alumno/buscar?dni=${dni}`);
+    const response = await axios.get(
+      `${API_URL}/alumno/buscar?dni=${encodeURIComponent(dni)}`,
+      { headers: getAuthHeaders() }
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -38,7 +70,9 @@ export const getAluByDNI = async (dni) => {
 
 export const getAlu = async () => {
   try {
-    const response = await axios.get(`${API_URL}/alumno`);
+    const response = await axios.get(`${API_URL}/alumno`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

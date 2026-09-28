@@ -110,9 +110,22 @@ export class AlumnoService {
     pagination?: PaginationOptions,
     filtros?: any,
   ): Promise<PaginatedAlumnos> {
-    const { page = 1, limit = 10 } = pagination || {};
+    return this.getAlumnosListado(pagination, filtros, id, false);
+  }
 
-    const whereConditions: any = { sucursal: { id } };
+  async getAlumnosListado(
+    pagination?: PaginationOptions,
+    filtros?: any,
+    sucursalId?: string,
+    clampOutOfRangePage = true,
+  ): Promise<PaginatedAlumnos> {
+    const requestedPage = Number(pagination?.page) || 1;
+    const limit = Math.min(Math.max(Number(pagination?.limit) || 10, 1), 100);
+    const page = Math.max(requestedPage, 1);
+
+    const whereConditions: any = sucursalId
+      ? { sucursal: { id: sucursalId } }
+      : {};
 
     if (filtros?.nombre) {
       const nombreNormalizado = filtros.nombre.trim().toLowerCase();
@@ -146,6 +159,12 @@ export class AlumnoService {
       cantidadCertificados: alumno.certificados?.length || 0,
     }));
 
+    filteredData.sort(
+      (a, b) =>
+        String(a.name || '').localeCompare(String(b.name || ''), 'es') ||
+        String(a.id).localeCompare(String(b.id)),
+    );
+
     // Filtrar por cantidad de comisiones y certificados
     if (filtros?.cantidadComisiones) {
       filteredData = filteredData.filter(
@@ -163,14 +182,19 @@ export class AlumnoService {
 
     const totalItems = filteredData.length;
     const totalPages = Math.ceil(totalItems / limit);
-    const startIndex = (page - 1) * limit;
+    const currentPage = clampOutOfRangePage
+      ? totalPages
+        ? Math.min(page, totalPages)
+        : 1
+      : page;
+    const startIndex = (currentPage - 1) * limit;
     const data = filteredData.slice(startIndex, startIndex + limit);
 
     return {
       data,
       totalItems,
       totalPages,
-      currentPage: page,
+      currentPage,
     };
   }
 

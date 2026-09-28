@@ -7,7 +7,12 @@ import {
   Delete,
   Put,
   Query,
+  Req,
+  UnauthorizedException,
+  ForbiddenException,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AlumnoService } from './alumno.service';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
@@ -29,11 +34,36 @@ export class AlumnoController {
   }
 
   @Get()
-  findAll() {
+  @UseGuards(AuthGuard('jwt'))
+  findAll(@Req() request: { user: { role?: string } }) {
+    this.assertStaffAccess(request.user);
     return this.alumnoService.findAll();
   }
+
+  @Get('global')
+  @UseGuards(AuthGuard('jwt'))
+  getAlumnosGlobales(
+    @Req() request: { user: { role?: string } },
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('nombre') nombre?: string,
+    @Query('dni') dni?: string,
+    @Query('tel') tel?: string,
+    @Query('cantidadComisiones') cantidadComisiones?: string,
+    @Query('cantidadCertificados') cantidadCertificados?: string,
+  ) {
+    this.assertStaffAccess(request.user);
+
+    return this.alumnoService.getAlumnosListado(
+      { page: Number(page), limit: Number(limit) },
+      { nombre, dni, tel, cantidadComisiones, cantidadCertificados },
+    );
+  }
+
   @Get('sucursal/:id')
+  @UseGuards(AuthGuard('jwt'))
   getAlumnosBySucursal(
+    @Req() request: { user: { role?: string } },
     @Param('id') sucursalId: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
@@ -43,6 +73,7 @@ export class AlumnoController {
     @Query('cantidadComisiones') cantidadComisiones?: string,
     @Query('cantidadCertificados') cantidadCertificados?: string,
   ) {
+    this.assertStaffAccess(request.user);
     const filtros = {
       nombre,
       dni,
@@ -73,12 +104,22 @@ export class AlumnoController {
   //   return this.alumnoService.cambiarEstado(id, estadoBooleano);
   // }
   @Get('buscar')
-  async buscarPorDni(@Query('dni') dni: string) {
+  @UseGuards(AuthGuard('jwt'))
+  async buscarPorDni(
+    @Req() request: { user: { role?: string } },
+    @Query('dni') dni: string,
+  ) {
+    this.assertStaffAccess(request.user);
     return this.alumnoService.findByDniBasic(dni);
   }
 
   @Get('search/:dni')
-  findOne(@Param('dni') dni: string) {
+  @UseGuards(AuthGuard('jwt'))
+  findOne(
+    @Req() request: { user: { role?: string } },
+    @Param('dni') dni: string,
+  ) {
+    this.assertStaffAccess(request.user);
     return this.alumnoService.findOne(dni);
   }
 
@@ -92,5 +133,16 @@ export class AlumnoController {
   @Delete('remove/:id')
   remove(@Param('id') id: string) {
     return this.alumnoService.remove(id);
+  }
+
+  private assertStaffAccess(user?: { role?: string }) {
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    if (!['admin', 'vendedor'].includes(user.role || '')) {
+      throw new ForbiddenException(
+        'Acceso exclusivo para administración y ventas',
+      );
+    }
   }
 }

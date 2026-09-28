@@ -36,6 +36,7 @@ export class AuthService {
         return {
           id: admin.id,
           isAdmin: true,
+          role: 'admin',
           name: admin.name,
           img: admin.img,
         };
@@ -53,6 +54,7 @@ export class AuthService {
         return {
           id: vendedor.id,
           isAdmin: false,
+          role: 'vendedor',
           name: vendedor.name,
           img: vendedor.img,
           tel: vendedor.tel,
@@ -68,7 +70,7 @@ export class AuthService {
     });
     if (alumno) {
       if (alumno.dni === password) {
-        return { id: alumno.id };
+        return { id: alumno.id, role: 'alumno' };
       } else {
         throw new BadRequestException('DNI incorrecto');
       }
@@ -81,11 +83,13 @@ export class AuthService {
     const payload = {
       sub: user.id,
       isAdmin: user.isAdmin ?? false,
+      role: user.role,
     };
     return {
       access_token: this.jwtService.sign(payload),
       id: user.id,
       isAdmin: user.isAdmin,
+      role: user.role,
       // sucursalId:user.
     };
   }

@@ -86,11 +86,8 @@ export class AuthService {
       role: user.role,
     };
     return {
+      ...user,
       access_token: this.jwtService.sign(payload),
-      id: user.id,
-      isAdmin: user.isAdmin,
-      role: user.role,
-      // sucursalId:user.
     };
   }
 }

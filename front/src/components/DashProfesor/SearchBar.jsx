@@ -5,7 +5,7 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
     <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <i className="fa-solid fa-search text-gray-400 text-lg"></i>
+          <i aria-hidden="true" className="fa-solid fa-search text-gray-400 text-lg"></i>
         </div>
         <input
           type="text"
@@ -16,10 +16,11 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
         />
         {searchTerm && (
           <button
+            aria-label="Limpiar búsqueda"
             onClick={() => onSearchChange('')}
             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
           >
-            <i className="fa-solid fa-times"></i>
+            <i aria-hidden="true" className="fa-solid fa-times"></i>
           </button>
         )}
       </div>

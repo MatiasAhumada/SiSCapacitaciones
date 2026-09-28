@@ -136,7 +136,7 @@ const DashboardMetrics = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-user-group text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-user-group text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Perfil de alumnos</h3>
             </div>
@@ -198,7 +198,7 @@ const DashboardMetrics = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-chart-line text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-chart-line text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Cobranzas por Mes</h3>
             </div>
@@ -266,7 +266,7 @@ const DashboardMetrics = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-user-plus text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-user-plus text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Inscripciones Nuevas</h3>
             </div>
@@ -387,7 +387,7 @@ const DashboardMetrics = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-credit-card text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-credit-card text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Métodos de Pago</h3>
             </div>
@@ -455,7 +455,7 @@ const DashboardMetrics = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-trophy text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-trophy text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Cobros por Vendedor</h3>
             </div>

@@ -298,7 +298,7 @@ const ListadoComisiones = () => {
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
         <div className="flex flex-col gap-3 w-full lg:w-80">
           <div className="relative group">
-            <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+            <i aria-hidden="true" className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
             <input
               type="text"
               placeholder="Filtrar por DNI"
@@ -310,7 +310,7 @@ const ListadoComisiones = () => {
             />
           </div>
           <div className="relative">
-            <i className="fa-solid fa-calendar absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <i aria-hidden="true" className="fa-solid fa-calendar absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             <select
               value={fechaFiltro}
               onChange={(e) => {
@@ -334,7 +334,7 @@ const ListadoComisiones = () => {
             </select>
           </div>
           <div className="relative">
-            <i className="fa-solid fa-filter absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <i aria-hidden="true" className="fa-solid fa-filter absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             <select
               value={estadoFiltro}
               onChange={(e) => {
@@ -362,7 +362,7 @@ const ListadoComisiones = () => {
             onClick={generatePDF}
             className="px-5 py-3 text-white font-medium rounded bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2 group"
           >
-            <i className="fa-solid fa-file-pdf group-hover:rotate-12 transition-transform duration-300"></i>
+            <i aria-hidden="true" className="fa-solid fa-file-pdf group-hover:rotate-12 transition-transform duration-300"></i>
             Exportar PDF
           </button>
 
@@ -371,7 +371,7 @@ const ListadoComisiones = () => {
               onClick={onGuardar}
               className="px-5 py-3 text-white font-medium rounded bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2 group"
             >
-              <i className="fa-solid fa-save group-hover:rotate-12 transition-transform duration-300"></i>
+              <i aria-hidden="true" className="fa-solid fa-save group-hover:rotate-12 transition-transform duration-300"></i>
               Guardar
             </button>
           ) : (
@@ -379,7 +379,7 @@ const ListadoComisiones = () => {
               onClick={onAsist}
               className="px-5 py-3 text-white font-medium rounded bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2 group"
             >
-              <i className="fa-solid fa-clipboard-check group-hover:rotate-12 transition-transform duration-300"></i>
+              <i aria-hidden="true" className="fa-solid fa-clipboard-check group-hover:rotate-12 transition-transform duration-300"></i>
               Asistencia
             </button>
           )}

@@ -219,7 +219,7 @@ const InfoIndexVend = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-chart-line text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-chart-line text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Mis Cobranzas</h3>
             </div>
@@ -258,7 +258,7 @@ const InfoIndexVend = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-user-plus text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-user-plus text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Mis Inscripciones</h3>
             </div>
@@ -348,7 +348,7 @@ const InfoIndexVend = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-2">
-                <i className="fa-solid fa-credit-card text-white text-sm"></i>
+                <i aria-hidden="true" className="fa-solid fa-credit-card text-white text-sm"></i>
               </div>
               <h3 className="text-sm font-semibold text-gray-800">Mis Métodos de Pago</h3>
             </div>

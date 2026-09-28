@@ -105,7 +105,7 @@ const InfoVendedor = () => {
                 <h1 className="text-3xl font-bold text-gray-900 principal">{dataVend.name}</h1>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="inline-flex items-center px-3 py-1 rounded text-sm font-semibold bg-green-100 text-green-800">
-                    <i className="fa-solid fa-graduation-cap mr-2"></i>
+                    <i aria-hidden="true" className="fa-solid fa-graduation-cap mr-2"></i>
                     {dataVend.totalInscripciones} inscripciones
                   </span>
                 </div>
@@ -124,7 +124,7 @@ const InfoVendedor = () => {
                 </>
               ) : (
                 <>
-                  <i className="fa-solid fa-trash"></i>
+                  <i aria-hidden="true" className="fa-solid fa-trash"></i>
                   <span>Eliminar Vendedor</span>
                 </>
               )}
@@ -136,7 +136,7 @@ const InfoVendedor = () => {
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                <i className="fa-solid fa-list"></i>
+                <i aria-hidden="true" className="fa-solid fa-list"></i>
                 Inscripciones Realizadas
               </h2>
               <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
@@ -185,7 +185,7 @@ const InfoVendedor = () => {
                       </>
                     ) : (
                       <>
-                        <i className="fa-solid fa-file-excel"></i>
+                        <i aria-hidden="true" className="fa-solid fa-file-excel"></i>
                         <span>Excel</span>
                       </>
                     )}
@@ -201,31 +201,31 @@ const InfoVendedor = () => {
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-user"></i>
+                      <i aria-hidden="true" className="fa-solid fa-user"></i>
                       Alumno
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-phone"></i>
+                      <i aria-hidden="true" className="fa-solid fa-phone"></i>
                       Teléfono
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-id-card"></i>
+                      <i aria-hidden="true" className="fa-solid fa-id-card"></i>
                       DNI
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-book"></i>
+                      <i aria-hidden="true" className="fa-solid fa-book"></i>
                       Curso
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-users"></i>
+                      <i aria-hidden="true" className="fa-solid fa-users"></i>
                       Comisión
                     </div>
                   </th>
@@ -248,7 +248,7 @@ const InfoVendedor = () => {
                     <td colSpan="5" className="px-6 py-12">
                       <div className="flex flex-col items-center justify-center">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                          <i className="fa-solid fa-inbox text-gray-400 text-2xl"></i>
+                          <i aria-hidden="true" className="fa-solid fa-inbox text-gray-400 text-2xl"></i>
                         </div>
                         <p className="text-gray-500 font-medium">
                           No hay inscripciones para mostrar

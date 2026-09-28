@@ -29,7 +29,7 @@ const AlumnoRow = ({
             {pause[item.id] ? (
               <Spinner color="white" />
             ) : (
-              <i className="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
+              <i aria-hidden="true" className="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
             )}
           </button>
           <button
@@ -37,7 +37,7 @@ const AlumnoRow = ({
             className="px-3 py-2 text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded transition-all duration-300 shadow-md hover:shadow-lg hover:scale-110 active:scale-95 group"
             title="Transferir alumno"
           >
-            <i className="fa-solid fa-exchange-alt group-hover:rotate-180 transition-transform duration-500"></i>
+            <i aria-hidden="true" className="fa-solid fa-exchange-alt group-hover:rotate-180 transition-transform duration-500"></i>
           </button>
         </div>
       </td>

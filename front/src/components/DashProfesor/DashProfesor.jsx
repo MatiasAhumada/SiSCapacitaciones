@@ -116,7 +116,7 @@ const DashProfesor = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <i className="fa-solid fa-chalkboard-user text-white text-xl"></i>
+              <i aria-hidden="true" className="fa-solid fa-chalkboard-user text-white text-xl"></i>
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 principal">Equipo de Profesores</h1>
@@ -130,7 +130,7 @@ const DashProfesor = () => {
         <div className="bg-white rounded-xl shadow-md p-4 mb-6 border border-gray-100">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <i className="fa-solid fa-search text-gray-400 text-lg"></i>
+              <i aria-hidden="true" className="fa-solid fa-search text-gray-400 text-lg"></i>
             </div>
             <input
               type="text"
@@ -141,10 +141,11 @@ const DashProfesor = () => {
             />
             {searchTerm && (
               <button
+                aria-label="Limpiar búsqueda"
                 onClick={() => setSearchTerm('')}
                 className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
               >
-                <i className="fa-solid fa-times"></i>
+                <i aria-hidden="true" className="fa-solid fa-times"></i>
               </button>
             )}
           </div>
@@ -157,31 +158,31 @@ const DashProfesor = () => {
                 <tr className="bg-gradient-to-r from-blue-600 to-blue-700">
                   <th className="py-4 px-6 text-left text-sm font-semibold text-white">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-user"></i>
+                      <i aria-hidden="true" className="fa-solid fa-user"></i>
                       Profesor
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-white">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-envelope"></i>
+                      <i aria-hidden="true" className="fa-solid fa-envelope"></i>
                       Email
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-white">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-phone"></i>
+                      <i aria-hidden="true" className="fa-solid fa-phone"></i>
                       Teléfono
                     </div>
                   </th>
                   <th className="py-4 px-6 text-center text-sm font-semibold text-white">
                     <div className="flex items-center justify-center gap-2">
-                      <i className="fa-solid fa-users"></i>
+                      <i aria-hidden="true" className="fa-solid fa-users"></i>
                       Comisiones
                     </div>
                   </th>
                   <th className="py-4 px-6 text-center text-sm font-semibold text-white">
                     <div className="flex items-center justify-center gap-2">
-                      <i className="fa-solid fa-cog"></i>
+                      <i aria-hidden="true" className="fa-solid fa-cog"></i>
                       Acciones
                     </div>
                   </th>
@@ -204,7 +205,7 @@ const DashProfesor = () => {
                     <td colSpan="5" className="px-6 py-12">
                       <div className="flex flex-col items-center justify-center">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                          <i className="fa-solid fa-user-slash text-gray-400 text-2xl"></i>
+                          <i aria-hidden="true" className="fa-solid fa-user-slash text-gray-400 text-2xl"></i>
                         </div>
                         <p className="text-gray-500 font-medium">No se encontraron profesores</p>
                         <p className="text-gray-400 text-sm mt-1">
@@ -248,9 +249,9 @@ const DashProfesor = () => {
                               }
                               className="inline-flex items-center px-3 py-1 rounded text-sm font-semibold bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
                             >
-                              <i className="fa-solid fa-users mr-2"></i>
+                              <i aria-hidden="true" className="fa-solid fa-users mr-2"></i>
                               {item.cantidadComisiones}
-                              <i
+                              <i aria-hidden="true"
                                 className={`fa-solid ${expandedProfesor === item.id ? 'fa-chevron-up' : 'fa-chevron-down'} ml-2`}
                               ></i>
                             </button>
@@ -260,14 +261,16 @@ const DashProfesor = () => {
                           <div className="flex justify-center gap-2">
                             <button
                               type="button"
+                              aria-label="Editar profesor"
                               onClick={() => handleEditClick(item)}
                               className="group relative p-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                               title="Editar profesor"
                             >
-                              <i className="fa-solid fa-pen"></i>
+                              <i aria-hidden="true" className="fa-solid fa-pen"></i>
                             </button>
                             <button
                               type="button"
+                              aria-label="Eliminar profesor"
                               onClick={(e) => {
                                 e.target.value = item.id;
                                 handleDelete(e);
@@ -279,7 +282,7 @@ const DashProfesor = () => {
                               {pause[item.id] ? (
                                 <Spinner color="white" />
                               ) : (
-                                <i className="fa-solid fa-trash"></i>
+                                <i aria-hidden="true" className="fa-solid fa-trash"></i>
                               )}
                             </button>
                           </div>
@@ -292,7 +295,7 @@ const DashProfesor = () => {
                             className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100"
                           >
                             <div className="flex items-center gap-2 mb-3">
-                              <i className="fa-solid fa-graduation-cap text-blue-600"></i>
+                              <i aria-hidden="true" className="fa-solid fa-graduation-cap text-blue-600"></i>
                               <h4 className="font-semibold text-gray-700">Comisiones activas:</h4>
                             </div>
                             {item.comisiones && item.comisiones.length > 0 ? (
@@ -302,7 +305,7 @@ const DashProfesor = () => {
                                     key={comision.id}
                                     className="inline-flex items-center px-3 py-2 rounded-lg bg-white text-gray-700 text-sm font-medium border border-blue-200 shadow-sm"
                                   >
-                                    <i className="fa-solid fa-circle-check text-green-500 mr-2 text-xs"></i>
+                                    <i aria-hidden="true" className="fa-solid fa-circle-check text-green-500 mr-2 text-xs"></i>
                                     {comision.name}
                                   </span>
                                 ))}

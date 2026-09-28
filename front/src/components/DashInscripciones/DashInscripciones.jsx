@@ -157,7 +157,7 @@ const DashInscripciones = () => {
             onClick={() => navigate('/vendedor/inscribir')}
             className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
-            <i className="fa-solid fa-plus"></i>
+            <i aria-hidden="true" className="fa-solid fa-plus"></i>
             Inscribir
           </button>
         )}
@@ -203,7 +203,7 @@ const DashInscripciones = () => {
                   className="w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded font-medium transition-colors duration-200 flex items-center justify-center"
                   title="Limpiar Filtros"
                 >
-                  <i className="fa-solid fa-times"></i>
+                  <i aria-hidden="true" className="fa-solid fa-times"></i>
                 </button>
               </div>
             )}
@@ -220,7 +220,7 @@ const DashInscripciones = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                  <i className="fa-solid fa-user text-white"></i>
+                  <i aria-hidden="true" className="fa-solid fa-user text-white"></i>
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 truncate">{vendedor.name}</p>
@@ -235,7 +235,7 @@ const DashInscripciones = () => {
       <div className="mb-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-            <i className="fa-solid fa-chart-bar text-white text-xl"></i>
+            <i aria-hidden="true" className="fa-solid fa-chart-bar text-white text-xl"></i>
           </div>
           <div>
             <p className="text-sm text-gray-600">Total de Inscripciones</p>
@@ -276,7 +276,7 @@ const DashInscripciones = () => {
                 <tr>
                   <td colSpan={isAdmin ? '6' : '5'} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
-                      <i className="fa-solid fa-inbox text-gray-300 text-6xl mb-4"></i>
+                      <i aria-hidden="true" className="fa-solid fa-inbox text-gray-300 text-6xl mb-4"></i>
                       <p className="text-gray-500 text-lg font-medium">
                         No hay inscripciones registradas
                       </p>
@@ -316,7 +316,7 @@ const DashInscripciones = () => {
                           className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 rounded text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                           title="Imprimir"
                         >
-                          <i className="fa-solid fa-print"></i>
+                          <i aria-hidden="true" className="fa-solid fa-print"></i>
                         </button>
                         {isAdmin && (
                           <button
@@ -324,7 +324,7 @@ const DashInscripciones = () => {
                             className="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                             title="Eliminar"
                           >
-                            <i className="fa-solid fa-trash"></i>
+                            <i aria-hidden="true" className="fa-solid fa-trash"></i>
                           </button>
                         )}
                       </div>
@@ -352,7 +352,7 @@ const DashInscripciones = () => {
           <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <i className="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
+                <i aria-hidden="true" className="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
               </div>
               <h3 className="text-xl font-bold text-gray-900">Confirmar Eliminación</h3>
             </div>

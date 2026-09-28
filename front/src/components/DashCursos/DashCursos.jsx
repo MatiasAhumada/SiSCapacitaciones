@@ -128,7 +128,7 @@ const DashCursos = () => {
               ) : tableItems.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
-                    <i className="fa-solid fa-inbox text-4xl text-gray-300 mb-2"></i>
+                    <i aria-hidden="true" className="fa-solid fa-inbox text-4xl text-gray-300 mb-2"></i>
                     <p>No hay cursos disponibles</p>
                   </td>
                 </tr>
@@ -161,7 +161,7 @@ const DashCursos = () => {
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap hidden sm:table-cell text-xs md:text-sm">
                       <span className="inline-flex items-center gap-1">
-                        <i className="fa-solid fa-clock text-blue-600"></i>
+                        <i aria-hidden="true" className="fa-solid fa-clock text-blue-600"></i>
                         {item.duration} meses
                       </span>
                     </td>
@@ -207,7 +207,7 @@ const DashCursos = () => {
                             ></path>
                           </svg>
                         ) : (
-                          <i className="fa-solid fa-trash text-xs md:text-sm group-hover:scale-110 transition-transform"></i>
+                          <i aria-hidden="true" className="fa-solid fa-trash text-xs md:text-sm group-hover:scale-110 transition-transform"></i>
                         )}
                       </button>
                     </td>

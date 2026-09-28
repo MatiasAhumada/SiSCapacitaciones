@@ -189,7 +189,7 @@ const DashCaja = () => {
           <div className="bg-gradient-to-r from-purple-50 via-pink-50 to-purple-50 rounded-xl shadow-lg p-4 md:p-6 mb-6 border border-purple-200">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-purple-100 rounded-lg">
-                <i className="fa-solid fa-filter text-purple-600"></i>
+                <i aria-hidden="true" className="fa-solid fa-filter text-purple-600"></i>
               </div>
               <h3 className="text-sm md:text-base font-semibold text-gray-700">Filtros</h3>
             </div>
@@ -238,7 +238,7 @@ const DashCaja = () => {
                 }}
                 className="mt-4 px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-medium rounded-lg transition-all duration-300 text-sm"
               >
-                <i className="fa-solid fa-times mr-2"></i>
+                <i aria-hidden="true" className="fa-solid fa-times mr-2"></i>
                 Limpiar filtros
               </button>
             )}
@@ -251,7 +251,7 @@ const DashCaja = () => {
           <div className="bg-gradient-to-r from-indigo-50 via-blue-50 to-indigo-50 px-4 md:px-6 py-4 md:py-5 border-b-2 border-indigo-200">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-indigo-100 rounded-lg">
-                <i className="fa-solid fa-list text-indigo-600"></i>
+                <i aria-hidden="true" className="fa-solid fa-list text-indigo-600"></i>
               </div>
               <h2 className="text-lg md:text-xl font-semibold text-gray-700">
                 Movimientos del Día
@@ -292,7 +292,7 @@ const DashCaja = () => {
                     <td colSpan="10" className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center">
                         <div className="p-4 bg-gray-100 rounded-full mb-4">
-                          <i className="fa-solid fa-inbox text-5xl text-gray-400"></i>
+                          <i aria-hidden="true" className="fa-solid fa-inbox text-5xl text-gray-400"></i>
                         </div>
                         <p className="text-gray-500 font-medium">No hay movimientos disponibles</p>
                         <p className="text-gray-400 text-sm mt-1">
@@ -365,7 +365,7 @@ const DashCaja = () => {
                             className="p-1.5 md:p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95"
                             title="Editar"
                           >
-                            <i className="fa-solid fa-pen text-xs md:text-sm"></i>
+                            <i aria-hidden="true" className="fa-solid fa-pen text-xs md:text-sm"></i>
                           </button>
                           {item.tipo === 'Ingreso' && (
                             <button
@@ -393,7 +393,7 @@ const DashCaja = () => {
                                   ></path>
                                 </svg>
                               ) : (
-                                <i className="fa-solid fa-print text-xs md:text-sm"></i>
+                                <i aria-hidden="true" className="fa-solid fa-print text-xs md:text-sm"></i>
                               )}
                             </button>
                           )}
@@ -423,7 +423,7 @@ const DashCaja = () => {
                                   ></path>
                                 </svg>
                               ) : (
-                                <i className="fa-solid fa-file-pdf text-xs md:text-sm"></i>
+                                <i aria-hidden="true" className="fa-solid fa-file-pdf text-xs md:text-sm"></i>
                               )}
                             </button>
                           )}

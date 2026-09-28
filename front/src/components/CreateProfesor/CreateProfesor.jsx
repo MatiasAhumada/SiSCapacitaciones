@@ -65,7 +65,7 @@ const CreateProfesor = () => {
             htmlFor="name"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-user text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-user text-blue-600 mr-2"></i>
             Nombre
           </label>
           <input
@@ -85,7 +85,7 @@ const CreateProfesor = () => {
             htmlFor="apellido"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-user-tag text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-user-tag text-blue-600 mr-2"></i>
             Apellido
           </label>
           <input
@@ -102,7 +102,7 @@ const CreateProfesor = () => {
         </div>
         <div>
           <label htmlFor="tel" className="block mb-2 text-sm font-semibold text-gray-700 principal">
-            <i className="fa-solid fa-phone text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-phone text-blue-600 mr-2"></i>
             Teléfono
           </label>
           <input
@@ -122,7 +122,7 @@ const CreateProfesor = () => {
             htmlFor="email"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-envelope text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-envelope text-blue-600 mr-2"></i>
             Email
           </label>
           <input
@@ -142,7 +142,7 @@ const CreateProfesor = () => {
             htmlFor="direccion"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-location-dot text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-location-dot text-blue-600 mr-2"></i>
             Dirección
           </label>
           <input
@@ -162,7 +162,7 @@ const CreateProfesor = () => {
             htmlFor="sucursalId"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-building text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-building text-blue-600 mr-2"></i>
             Sucursal
           </label>
           <select
@@ -208,7 +208,7 @@ const CreateProfesor = () => {
             </>
           ) : (
             <>
-              <i className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+              <i aria-hidden="true" className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
               <span>Registrar Profesor</span>
             </>
           )}

@@ -61,7 +61,7 @@ const CreateCurso = () => {
             htmlFor="name"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-book text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-book text-blue-600 mr-2"></i>
             Nombre del Curso
           </label>
           <input
@@ -81,7 +81,7 @@ const CreateCurso = () => {
             htmlFor="duration"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-calendar text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-calendar text-blue-600 mr-2"></i>
             Duración (Meses)
           </label>
           <input
@@ -102,7 +102,7 @@ const CreateCurso = () => {
             htmlFor="area"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-layer-group text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-layer-group text-blue-600 mr-2"></i>
             Área
           </label>
           <select
@@ -127,7 +127,7 @@ const CreateCurso = () => {
             htmlFor="tipo"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-graduation-cap text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-graduation-cap text-blue-600 mr-2"></i>
             Tipo de Curso
           </label>
           <select
@@ -152,7 +152,7 @@ const CreateCurso = () => {
             htmlFor="price"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-dollar-sign text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-dollar-sign text-blue-600 mr-2"></i>
             Precio
           </label>
           <input
@@ -195,7 +195,7 @@ const CreateCurso = () => {
             </>
           ) : (
             <>
-              <i className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+              <i aria-hidden="true" className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
               <span>Crear Curso</span>
             </>
           )}

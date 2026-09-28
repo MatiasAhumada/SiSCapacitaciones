@@ -120,7 +120,7 @@ const DashVendedor = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <i className="fa-solid fa-users text-white text-xl"></i>
+              <i aria-hidden="true" className="fa-solid fa-users text-white text-xl"></i>
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 principal">Equipo de Vendedores</h1>
@@ -136,31 +136,31 @@ const DashVendedor = () => {
                 <tr className="bg-gradient-to-r from-blue-600 to-blue-700">
                   <th className="py-4 px-6 text-left text-sm font-semibold text-white">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-user"></i>
+                      <i aria-hidden="true" className="fa-solid fa-user"></i>
                       Vendedor
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-white">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-envelope"></i>
+                      <i aria-hidden="true" className="fa-solid fa-envelope"></i>
                       Email
                     </div>
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-white">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-phone"></i>
+                      <i aria-hidden="true" className="fa-solid fa-phone"></i>
                       Teléfono
                     </div>
                   </th>
                   <th className="py-4 px-6 text-center text-sm font-semibold text-white">
                     <div className="flex items-center justify-center gap-2">
-                      <i className="fa-solid fa-chart-line"></i>
+                      <i aria-hidden="true" className="fa-solid fa-chart-line"></i>
                       Inscripciones
                     </div>
                   </th>
                   <th className="py-4 px-6 text-center text-sm font-semibold text-white">
                     <div className="flex items-center justify-center gap-2">
-                      <i className="fa-solid fa-cog"></i>
+                      <i aria-hidden="true" className="fa-solid fa-cog"></i>
                       Acciones
                     </div>
                   </th>
@@ -183,7 +183,7 @@ const DashVendedor = () => {
                     <td colSpan="5" className="px-6 py-12">
                       <div className="flex flex-col items-center justify-center">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                          <i className="fa-solid fa-users text-gray-400 text-2xl"></i>
+                          <i aria-hidden="true" className="fa-solid fa-users text-gray-400 text-2xl"></i>
                         </div>
                         <p className="text-gray-500 font-medium">No hay vendedores registrados</p>
                         <p className="text-gray-400 text-sm mt-1">
@@ -225,7 +225,7 @@ const DashVendedor = () => {
                       <td className="px-6 py-4">
                         <div className="flex justify-center">
                           <span className="inline-flex items-center px-3 py-1 rounded text-sm font-semibold bg-green-100 text-green-800">
-                            <i className="fa-solid fa-graduation-cap mr-2"></i>
+                            <i aria-hidden="true" className="fa-solid fa-graduation-cap mr-2"></i>
                             {item.inscripciones?.length || 0}
                           </span>
                         </div>
@@ -238,7 +238,7 @@ const DashVendedor = () => {
                             className="group relative p-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                             title="Ver detalles"
                           >
-                            <i className="fa-solid fa-eye"></i>
+                            <i aria-hidden="true" className="fa-solid fa-eye"></i>
                           </button>
                           <button
                             type="button"
@@ -246,7 +246,7 @@ const DashVendedor = () => {
                             className="group relative p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                             title="Editar vendedor"
                           >
-                            <i className="fa-solid fa-pen"></i>
+                            <i aria-hidden="true" className="fa-solid fa-pen"></i>
                           </button>
                           <button
                             type="button"
@@ -258,7 +258,7 @@ const DashVendedor = () => {
                             {downloadingId === item.id ? (
                               <Spinner color="white" />
                             ) : (
-                              <i className="fa-solid fa-file-excel"></i>
+                              <i aria-hidden="true" className="fa-solid fa-file-excel"></i>
                             )}
                           </button>
                         </div>

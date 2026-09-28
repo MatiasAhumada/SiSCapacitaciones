@@ -303,21 +303,21 @@ const DashAlumno = () => {
                             className="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
                             title="Editar pago"
                           >
-                            <i className="fa-solid fa-pen text-sm"></i>
+                            <i aria-hidden="true" className="fa-solid fa-pen text-sm"></i>
                           </button>
                           <button
                             onClick={() => handlePrintPago(pago)}
                             className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
                             title="Imprimir comprobante"
                           >
-                            <i className="fa-solid fa-print text-sm"></i>
+                            <i aria-hidden="true" className="fa-solid fa-print text-sm"></i>
                           </button>
                           <button
                             onClick={() => handleDeletePago(pago.id)}
                             className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
                             title="Eliminar pago"
                           >
-                            <i className="fa-solid fa-trash text-sm"></i>
+                            <i aria-hidden="true" className="fa-solid fa-trash text-sm"></i>
                           </button>
                         </div>
                       </td>
@@ -345,22 +345,25 @@ const DashAlumno = () => {
                   </div>
                   <div className="flex gap-2">
                     <button
+                      aria-label="Editar pago"
                       onClick={() => handleEditPago(pago)}
                       className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
                     >
-                      <i className="fa-solid fa-pen text-sm"></i>
+                      <i aria-hidden="true" className="fa-solid fa-pen text-sm"></i>
                     </button>
                     <button
+                      aria-label="Imprimir comprobante"
                       onClick={() => handlePrintPago(pago)}
                       className="p-2 text-green-600 hover:bg-green-100 rounded-full"
                     >
-                      <i className="fa-solid fa-print text-sm"></i>
+                      <i aria-hidden="true" className="fa-solid fa-print text-sm"></i>
                     </button>
                     <button
+                      aria-label="Eliminar pago"
                       onClick={() => handleDeletePago(pago.id)}
                       className="p-2 text-red-600 hover:bg-red-100 rounded-full"
                     >
-                      <i className="fa-solid fa-trash text-sm"></i>
+                      <i aria-hidden="true" className="fa-solid fa-trash text-sm"></i>
                     </button>
                   </div>
                 </div>

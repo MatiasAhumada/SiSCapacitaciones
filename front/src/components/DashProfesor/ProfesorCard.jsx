@@ -54,7 +54,7 @@ const ProfesorCard = ({ profesor, onDelete, onEdit, isDeleting }) => {
             </h3>
             <div className="flex items-center gap-2 mt-1">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
-                <i className="fa-solid fa-users mr-1.5"></i>
+                <i aria-hidden="true" className="fa-solid fa-users mr-1.5"></i>
                 {profesor.cantidadComisiones}{' '}
                 {profesor.cantidadComisiones === 1 ? 'comisión' : 'comisiones'}
               </span>
@@ -68,14 +68,14 @@ const ProfesorCard = ({ profesor, onDelete, onEdit, isDeleting }) => {
             className="p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
             title="Ver comisiones activas"
           >
-            <i className={`fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+            <i aria-hidden="true" className={`fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
           </button>
           <button
             onClick={handleEditClick}
             className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
             title="Editar profesor"
           >
-            <i className="fa-solid fa-pen"></i>
+            <i aria-hidden="true" className="fa-solid fa-pen"></i>
           </button>
           <button
             onClick={(e) => {
@@ -86,7 +86,7 @@ const ProfesorCard = ({ profesor, onDelete, onEdit, isDeleting }) => {
             className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-50"
             title="Eliminar profesor"
           >
-            {isDeleting ? <Spinner color="currentColor" /> : <i className="fa-solid fa-trash"></i>}
+            {isDeleting ? <Spinner color="currentColor" /> : <i aria-hidden="true" className="fa-solid fa-trash"></i>}
           </button>
         </div>
       </div>
@@ -94,7 +94,7 @@ const ProfesorCard = ({ profesor, onDelete, onEdit, isDeleting }) => {
       {isExpanded && (
         <div className="mt-4 pt-4 border-t border-gray-200 animate-fadeIn">
           <div className="flex items-center gap-2 mb-3">
-            <i className="fa-solid fa-graduation-cap text-indigo-600"></i>
+            <i aria-hidden="true" className="fa-solid fa-graduation-cap text-indigo-600"></i>
             <h4 className="font-semibold text-gray-700">Comisiones activas:</h4>
           </div>
           {profesor.comisiones && profesor.comisiones.length > 0 ? (
@@ -104,7 +104,7 @@ const ProfesorCard = ({ profesor, onDelete, onEdit, isDeleting }) => {
                   key={comision.id}
                   className="inline-flex items-center px-3 py-2 rounded-lg bg-gradient-to-r from-indigo-50 to-blue-50 text-gray-700 text-sm font-medium border border-indigo-200 shadow-sm"
                 >
-                  <i className="fa-solid fa-circle-check text-green-500 mr-2 text-xs"></i>
+                  <i aria-hidden="true" className="fa-solid fa-circle-check text-green-500 mr-2 text-xs"></i>
                   {comision.name}
                 </span>
               ))}

@@ -18,7 +18,7 @@ const StatCard = ({ title, value, icon, color = 'blue' }) => {
           </div>
           {icon && (
             <div className="text-white text-4xl opacity-80">
-              <i className={icon}></i>
+              <i aria-hidden="true" className={icon}></i>
             </div>
           )}
         </div>

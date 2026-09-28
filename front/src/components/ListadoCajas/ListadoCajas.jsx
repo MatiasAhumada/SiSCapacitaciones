@@ -313,6 +313,7 @@ const ListadoCajas = () => {
                               {/* Columna de acciones */}
                               <div className="flex justify-center lg:justify-end items-center">
                                 <button
+                                  aria-label="Descargar caja"
                                   onClick={() => handleDownload(caja.id)}
                                   className="p-2 rounded bg-green-100 hover:bg-green-200 text-green-700 transition"
                                 >

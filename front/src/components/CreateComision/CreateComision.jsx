@@ -116,7 +116,7 @@ const CreateComision = () => {
             htmlFor="name"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-signature text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-signature text-blue-600 mr-2"></i>
             Nombre
           </label>
           <input
@@ -132,7 +132,7 @@ const CreateComision = () => {
         </div>
         <div>
           <label htmlFor="day" className="block mb-2 text-sm font-semibold text-gray-700 principal">
-            <i className="fa-solid fa-calendar-days text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-calendar-days text-blue-600 mr-2"></i>
             Día de Dictado
           </label>
           <select
@@ -152,7 +152,7 @@ const CreateComision = () => {
         </div>
         <div>
           <label className="block mb-2 text-sm font-semibold text-gray-700 principal">
-            <i className="fa-solid fa-clock text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-clock text-blue-600 mr-2"></i>
             Horario
           </label>
           <div className="flex items-center gap-3">
@@ -192,7 +192,7 @@ const CreateComision = () => {
             htmlFor="profesorId"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-chalkboard-user text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-chalkboard-user text-blue-600 mr-2"></i>
             Profesor
           </label>
           <select
@@ -215,7 +215,7 @@ const CreateComision = () => {
 
         <div>
           <label className="block mb-2 text-sm font-semibold text-gray-700 principal">
-            <i className="fa-solid fa-book text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-book text-blue-600 mr-2"></i>
             Curso
           </label>
           <div className="relative curso-dropdown">
@@ -289,7 +289,7 @@ const CreateComision = () => {
             </>
           ) : (
             <>
-              <i className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+              <i aria-hidden="true" className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
               <span>Crear Comisión</span>
             </>
           )}

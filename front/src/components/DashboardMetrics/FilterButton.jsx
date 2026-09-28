@@ -21,7 +21,7 @@ const FilterButton = ({ color, activeFiltersCount, dropdownId, children }) => {
         onClick={() => document.getElementById(dropdownId).classList.toggle('hidden')}
         className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${colorClasses[color]} text-white rounded-lg text-sm font-medium transition-all shadow-md`}
       >
-        <i className="fa-solid fa-filter"></i>
+        <i aria-hidden="true" className="fa-solid fa-filter"></i>
         Filtros
         {activeFiltersCount > 0 && (
           <span

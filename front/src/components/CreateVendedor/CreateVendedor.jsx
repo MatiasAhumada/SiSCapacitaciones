@@ -74,7 +74,7 @@ const CreateVendedor = () => {
             htmlFor="name"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-user text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-user text-blue-600 mr-2"></i>
             Nombre
           </label>
           <input
@@ -94,7 +94,7 @@ const CreateVendedor = () => {
             htmlFor="email"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-envelope text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-envelope text-blue-600 mr-2"></i>
             Email
           </label>
           <input
@@ -111,7 +111,7 @@ const CreateVendedor = () => {
         </div>
         <div>
           <label htmlFor="tel" className="block mb-2 text-sm font-semibold text-gray-700 principal">
-            <i className="fa-solid fa-phone text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-phone text-blue-600 mr-2"></i>
             Teléfono
           </label>
           <input
@@ -131,7 +131,7 @@ const CreateVendedor = () => {
             htmlFor="sucursal"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-building text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-building text-blue-600 mr-2"></i>
             Sucursal
           </label>
           <select
@@ -155,7 +155,7 @@ const CreateVendedor = () => {
             htmlFor="password"
             className="block mb-2 text-sm font-semibold text-gray-700 principal"
           >
-            <i className="fa-solid fa-lock text-blue-600 mr-2"></i>
+            <i aria-hidden="true" className="fa-solid fa-lock text-blue-600 mr-2"></i>
             Contraseña
           </label>
           <div className="relative">
@@ -212,7 +212,7 @@ const CreateVendedor = () => {
             </>
           ) : (
             <>
-              <i className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
+              <i aria-hidden="true" className="fa-solid fa-plus group-hover:rotate-90 transition-transform duration-300"></i>
               <span>Registrar Vendedor</span>
             </>
           )}

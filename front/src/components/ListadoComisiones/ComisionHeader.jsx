@@ -8,17 +8,17 @@ const ComisionHeader = ({ comision }) => {
       </h2>
       <div className="flex flex-wrap gap-4 text-gray-700">
         <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-          <i className="fa-solid fa-calendar-days text-blue-600"></i>
+          <i aria-hidden="true" className="fa-solid fa-calendar-days text-blue-600"></i>
           <span className="font-semibold">{comision.day}</span>
         </div>
         <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-          <i className="fa-solid fa-clock text-blue-600"></i>
+          <i aria-hidden="true" className="fa-solid fa-clock text-blue-600"></i>
           <span className="font-semibold">
             {comision.hour?.start} - {comision.hour?.end}
           </span>
         </div>
         <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-          <i className="fa-solid fa-chalkboard-user text-blue-600"></i>
+          <i aria-hidden="true" className="fa-solid fa-chalkboard-user text-blue-600"></i>
           <span className="font-semibold">
             {comision.profesor?.name} {comision.profesor?.apellido}
           </span>

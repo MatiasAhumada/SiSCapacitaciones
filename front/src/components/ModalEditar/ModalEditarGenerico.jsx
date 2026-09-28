@@ -60,10 +60,11 @@ export const ModalEditarGenerico = ({ title, formData, fields, onClose, onSave, 
             />
             <button
               type="button"
+              aria-label={showPassword[name] ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               onClick={() => setShowPassword((prev) => ({ ...prev, [name]: !prev[name] }))}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
             >
-              <i className={`fa-solid ${showPassword[name] ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              <i aria-hidden="true" className={`fa-solid ${showPassword[name] ? 'fa-eye-slash' : 'fa-eye'}`}></i>
             </button>
           </div>
         );

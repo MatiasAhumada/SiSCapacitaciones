@@ -400,7 +400,7 @@ const UnifiedNav = () => {
                         onClick={() => setShowEditModal(true)}
                         className={`${active ? 'bg-blue-50 text-blue-700' : 'text-gray-700'} flex items-center w-full text-left px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150`}
                       >
-                        <i className="fa-solid fa-user-edit mr-3"></i>
+                        <i aria-hidden="true" className="fa-solid fa-user-edit mr-3"></i>
                         Editar Perfil
                       </button>
                     )}
@@ -423,7 +423,10 @@ const UnifiedNav = () => {
 
           {/* Mobile menu button */}
           <div className="lg:hidden">
-            <DisclosureButton className="group inline-flex items-center justify-center w-12 h-12 rounded text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+            <DisclosureButton
+              aria-label="Menú principal"
+              className="group inline-flex items-center justify-center w-12 h-12 rounded text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            >
               <Bars3Icon className="block h-6 w-6 group-data-[open]:hidden group-hover:scale-110 transition-transform duration-200" />
               <XMarkIcon className="hidden h-6 w-6 group-data-[open]:block group-hover:rotate-90 transition-transform duration-200" />
             </DisclosureButton>
@@ -456,7 +459,7 @@ const UnifiedNav = () => {
               onClick={handleEditProfile}
               className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 mb-2"
             >
-              <i className="fa-solid fa-user-edit"></i>
+              <i aria-hidden="true" className="fa-solid fa-user-edit"></i>
               Editar Perfil
             </button>
             <button

@@ -4,12 +4,13 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CreateCajaDto } from './dto/create-caja.dto';
 import { UpdateCajaDto } from './dto/update-caja.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Caja, MetodoPago, TipoMovimiento } from './entities/caja.entity';
-import { Between, IsNull, Like, Not, Repository } from 'typeorm';
+import { Between, EntityManager, IsNull, Like, Not, Repository } from 'typeorm';
 import { Vendedor } from '../vendedor/entities/vendedor.entity';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -290,25 +291,74 @@ export class CajaService {
     return cajaActualizada;
   }
 
-  async remove(id: string) {
-    const caja = await this.cajaRepository.findOne({
-      where: { id },
-      relations: ['sesionCaja'],
+  async remove(id: string, actor: { id: string; role: string }) {
+    if (!actor?.id || !['admin', 'vendedor'].includes(actor.role)) {
+      throw new ForbiddenException('No tenés permisos para eliminar cobros');
+    }
+
+    return this.cajaRepository.manager.transaction(async (manager) => {
+      const caja = await manager.findOne(Caja, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!caja) {
+        throw new NotFoundException(`Movimiento con ID ${id} no encontrado`);
+      }
+
+      const cajaConRelaciones = await manager.findOne(Caja, {
+        where: { id },
+        relations: ['sesionCaja', 'vendedor', 'comprobante'],
+      });
+      Object.assign(caja, cajaConRelaciones);
+
+      if (
+        ![
+          TipoMovimiento.INGRESO,
+          TipoMovimiento.COBRO_VARIOS,
+          TipoMovimiento.CERTIFICACION_EXAMEN,
+        ].includes(caja.tipo)
+      ) {
+        throw new BadRequestException('Solo se pueden eliminar cobros');
+      }
+
+      if (actor.role === 'vendedor' && caja.vendedor?.id !== actor.id) {
+        throw new ForbiddenException('Solo podés eliminar tus propios cobros');
+      }
+
+      if (caja.sesionCaja?.fechaCierre) {
+        throw new BadRequestException(
+          'No se pueden eliminar cobros de una sesión cerrada',
+        );
+      }
+
+      const comprobanteId = caja.comprobante?.id;
+      const sessionIds = new Set<string>();
+      if (caja.sesionCaja?.id) sessionIds.add(caja.sesionCaja.id);
+
+      const copias = await manager.find(Caja, {
+        where: { origenCajaId: caja.id },
+        relations: ['sesionCaja'],
+      });
+      if (copias.some((copia) => copia.sesionCaja?.fechaCierre)) {
+        throw new BadRequestException(
+          'No se puede eliminar este cobro porque su copia pertenece a una sesión cerrada',
+        );
+      }
+      copias.forEach((copia) => {
+        if (copia.sesionCaja?.id) sessionIds.add(copia.sesionCaja.id);
+      });
+
+      if (copias.length) await manager.remove(Caja, copias);
+      await manager.remove(Caja, caja);
+      if (comprobanteId) await manager.delete(Comprobante, comprobanteId);
+
+      for (const sessionId of sessionIds) {
+        await this.recalcularTotalesSesion(sessionId, manager);
+      }
+
+      return { message: 'Cobro eliminado correctamente' };
     });
-
-    if (!caja) {
-      throw new NotFoundException(`Movimiento con ID ${id} no encontrado`);
-    }
-
-    const sesionId = caja.sesionCaja?.id;
-    const resultado = await this.cajaRepository.delete(id);
-
-    // Si tenía sesión asociada, recalcular totales
-    if (sesionId) {
-      await this.recalcularTotalesSesion(sesionId);
-    }
-
-    return resultado;
   }
 
   async findByVendedor(
@@ -1061,6 +1111,7 @@ export class CajaService {
         cuota: movimiento.cuota,
         mesCuota: movimiento.mesCuota,
         sesionCaja: sesionPerpetua,
+        origenCajaId: movimiento.id,
         // No incluir alumnoComision ni vendedor para evitar duplicación
       });
 
@@ -1417,14 +1468,17 @@ export class CajaService {
     return await this.sesionRepository.save(sesion);
   }
 
-  private async recalcularTotalesSesion(sesionId: string): Promise<void> {
-    const sesion = await this.sesionRepository.findOne({
+  private async recalcularTotalesSesion(
+    sesionId: string,
+    manager: EntityManager = this.cajaRepository.manager,
+  ): Promise<void> {
+    const sesion = await manager.findOne(SesionCaja, {
       where: { id: sesionId },
     });
 
     if (!sesion) return;
 
-    const movimientos = await this.cajaRepository.find({
+    const movimientos = await manager.find(Caja, {
       where: { sesionCaja: { id: sesionId } },
     });
 
@@ -1516,6 +1570,6 @@ export class CajaService {
       }
     }
 
-    await this.sesionRepository.save(sesion);
+    await manager.save(SesionCaja, sesion);
   }
 }

@@ -5,6 +5,7 @@ import { Vendedor } from 'src/Modules/vendedor/entities/vendedor.entity';
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToOne,
@@ -108,4 +109,8 @@ export class Caja {
   })
   @JoinColumn()
   sesionCaja?: SesionCaja;
+
+  @Index('IDX_cajas_origenCajaId')
+  @Column({ type: 'uuid', nullable: true })
+  origenCajaId?: string | null;
 }

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   editMovCaja,
   GetCajaByVendedor,
+  deleteMovCaja,
   descargarExcelCaja,
   descargarComprobanteEgreso,
 } from '../../services/Cajas.service';
@@ -14,6 +15,7 @@ import CajaResumen from '../CajaResumen/CajaResumen';
 import Pagination from '../Pagination/Pagination';
 import { clientErrorHandler, clientSuccessHandler } from '../../utils/notificationHandler';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../../constants/messages';
+import Swal from 'sweetalert2';
 
 const DashCaja = () => {
   const { user } = useAuth();
@@ -38,6 +40,7 @@ const DashCaja = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [filtroVendedor, setFiltroVendedor] = useState('');
   const [filtroFecha, setFiltroFecha] = useState('');
+  const deleteLocks = useRef(new Set());
 
   const formatToDisplay = (date) => {
     const d = new Date(date);
@@ -66,6 +69,9 @@ const DashCaja = () => {
       if (ultimaSesion) {
         setTableItems(ultimaSesion.movimientos || []);
         setTotalPages(ultimaSesion.totalPages || 1);
+        if (currentPage > (ultimaSesion.totalPages || 1)) {
+          setCurrentPage(Math.max(1, ultimaSesion.totalPages || 1));
+        }
       } else {
         setTableItems([]);
         setTotalPages(1);
@@ -150,6 +156,34 @@ const DashCaja = () => {
       clientErrorHandler(ERROR_MESSAGES.ERROR_DESCARGAR_COMPROBANTE_EGRESO);
     } finally {
       setPause((prev) => ({ ...prev, [egreso.id]: false }));
+    }
+  };
+
+  const handleDelete = async (mov) => {
+    if (deleteLocks.current.has(mov.id)) return;
+    deleteLocks.current.add(mov.id);
+    try {
+      const result = await Swal.fire({
+        title: '¿Eliminar este cobro?',
+        text: `Se eliminará el cobro de $${new Intl.NumberFormat('es-AR').format(mov.monto)}${mov.alumnoComision?.alumno?.name ? ` de ${mov.alumnoComision.alumno.name}` : ''} y su comprobante asociado, si existe. Esta acción no se puede deshacer.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+      });
+      if (!result.isConfirmed) return;
+
+      setPause((prev) => ({ ...prev, [mov.id]: true }));
+      await deleteMovCaja(mov.id);
+      clientSuccessHandler(SUCCESS_MESSAGES.PAGO_ELIMINADO);
+      await recargarDatos();
+    } catch (error) {
+      clientErrorHandler(error?.message || error?.error || ERROR_MESSAGES.ERROR_ELIMINAR_PAGO);
+    } finally {
+      deleteLocks.current.delete(mov.id);
+      setPause((prev) => ({ ...prev, [mov.id]: false }));
     }
   };
 
@@ -424,6 +458,33 @@ const DashCaja = () => {
                                 </svg>
                               ) : (
                                 <i aria-hidden="true" className="fa-solid fa-file-pdf text-xs md:text-sm"></i>
+                              )}
+                            </button>
+                          )}
+                          {['Ingreso', 'Cobro Varios', 'Certificacion Examen'].includes(
+                            item.tipo
+                          ) && (
+                            <button
+                              onClick={() => handleDelete(item)}
+                              disabled={Boolean(pause[item.id]) || Boolean(sesionCaja?.fechaCierre)}
+                              className="p-1.5 md:p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+                              title={
+                                sesionCaja?.fechaCierre
+                                  ? 'No se pueden eliminar cobros de una sesión cerrada'
+                                  : 'Eliminar cobro y comprobante'
+                              }
+                              aria-label={`Eliminar cobro de $${item.monto}`}
+                            >
+                              {pause[item.id] ? (
+                                <i
+                                  aria-hidden="true"
+                                  className="fa-solid fa-spinner fa-spin text-xs md:text-sm"
+                                ></i>
+                              ) : (
+                                <i
+                                  aria-hidden="true"
+                                  className="fa-solid fa-trash text-xs md:text-sm"
+                                ></i>
                               )}
                             </button>
                           )}

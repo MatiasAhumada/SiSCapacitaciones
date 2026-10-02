@@ -251,7 +251,12 @@ export class ComisionService {
 
     const pagos = await this.cajaRepository.find({
       where: whereConditions,
-      relations: ['comprobante', 'vendedor', 'alumnoComision.comision'],
+      relations: [
+        'comprobante',
+        'vendedor',
+        'alumnoComision.comision',
+        'sesionCaja',
+      ],
       select: {
         id: true,
         tipo: true,
@@ -277,6 +282,10 @@ export class ComisionService {
           tipoComprobante: true,
           formaPago: true,
           monto: true,
+        },
+        sesionCaja: {
+          id: true,
+          fechaCierre: true,
         },
       },
       order: { fecha: 'DESC' },

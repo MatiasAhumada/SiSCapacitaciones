@@ -9,7 +9,10 @@ import {
   Put,
   Query,
   Res,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { CajaService } from './caja.service';
 import { CreateCajaDto } from './dto/create-caja.dto';
@@ -236,8 +239,15 @@ export class CajaController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cajaService.remove(id);
+  @UseGuards(AuthGuard('jwt'))
+  remove(
+    @Param('id') id: string,
+    @Req() request: { user: { name: string; role: string } },
+  ) {
+    return this.cajaService.remove(id, {
+      id: request.user.name,
+      role: request.user.role,
+    });
   }
 
   @Get(':id/comprobante-pdf')

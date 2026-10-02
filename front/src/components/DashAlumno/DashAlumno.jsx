@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getAluComID } from '../../services/Comisiones.service';
 import { descargarComprobantePDF } from '../../services/Comprobantes.service';
@@ -18,6 +18,8 @@ const DashAlumno = () => {
   const [formData, setFormData] = useState({});
   const [vendedores, setVendedores] = useState([]);
   const [selectedComision, setSelectedComision] = useState('');
+  const [deletingPagoId, setDeletingPagoId] = useState(null);
+  const deleteLocks = useRef(new Set());
 
   const handleEditPago = (pago) => {
     setFormData({
@@ -45,27 +47,32 @@ const DashAlumno = () => {
     }
   };
 
-  const handleDeletePago = async (pagoId) => {
-    const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Esta acción no se puede deshacer',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    });
+  const handleDeletePago = async (pago) => {
+    if (deleteLocks.current.has(pago.id)) return;
+    deleteLocks.current.add(pago.id);
+    try {
+      const result = await Swal.fire({
+        title: '¿Eliminar este cobro?',
+        text: `Se eliminará el cobro de $${new Intl.NumberFormat('es-AR').format(pago.monto)} y su comprobante asociado, si existe. Esta acción no se puede deshacer.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+      });
+      if (!result.isConfirmed) return;
 
-    if (result.isConfirmed) {
-      try {
-        await deleteMovCaja(pagoId);
-        clientSuccessHandler(SUCCESS_MESSAGES.PAGO_ELIMINADO);
-        const data = await getAluComID(alumnoId);
-        setAlumno(data);
-      } catch (error) {
-        clientErrorHandler(error.message || ERROR_MESSAGES.ERROR_ELIMINAR_PAGO);
-      }
+      setDeletingPagoId(pago.id);
+      await deleteMovCaja(pago.id);
+      clientSuccessHandler(SUCCESS_MESSAGES.PAGO_ELIMINADO);
+      const data = await getAluComID(alumnoId, selectedComision);
+      setAlumno(data);
+    } catch (error) {
+      clientErrorHandler(error.message || error.error || ERROR_MESSAGES.ERROR_ELIMINAR_PAGO);
+    } finally {
+      deleteLocks.current.delete(pago.id);
+      setDeletingPagoId(null);
     }
   };
 
@@ -313,9 +320,16 @@ const DashAlumno = () => {
                             <i aria-hidden="true" className="fa-solid fa-print text-sm"></i>
                           </button>
                           <button
-                            onClick={() => handleDeletePago(pago.id)}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-                            title="Eliminar pago"
+                            onClick={() => handleDeletePago(pago)}
+                            disabled={
+                              deletingPagoId === pago.id || Boolean(pago.sesionCaja?.fechaCierre)
+                            }
+                            className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                            title={
+                              pago.sesionCaja?.fechaCierre
+                                ? 'No se pueden eliminar cobros de una sesión cerrada'
+                                : 'Eliminar pago'
+                            }
                           >
                             <i aria-hidden="true" className="fa-solid fa-trash text-sm"></i>
                           </button>
@@ -360,8 +374,16 @@ const DashAlumno = () => {
                     </button>
                     <button
                       aria-label="Eliminar pago"
-                      onClick={() => handleDeletePago(pago.id)}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+                      onClick={() => handleDeletePago(pago)}
+                      disabled={
+                        deletingPagoId === pago.id || Boolean(pago.sesionCaja?.fechaCierre)
+                      }
+                      className="p-2 text-red-600 hover:bg-red-100 rounded-full disabled:cursor-not-allowed disabled:opacity-40"
+                      title={
+                        pago.sesionCaja?.fechaCierre
+                          ? 'No se pueden eliminar cobros de una sesión cerrada'
+                          : 'Eliminar pago'
+                      }
                     >
                       <i aria-hidden="true" className="fa-solid fa-trash text-sm"></i>
                     </button>

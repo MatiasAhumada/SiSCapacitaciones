@@ -1,6 +1,11 @@
 import { API_URL } from '../constants/ApiUrl';
 import axios from 'axios';
 
+const getAuthHeaders = () => {
+  const authUser = JSON.parse(localStorage.getItem('auth_user') || 'null');
+  return authUser?.access_token ? { Authorization: `Bearer ${authUser.access_token}` } : {};
+};
+
 export const GetCajaByVendedor = async (
   vendedorId,
   page = 1,
@@ -54,7 +59,9 @@ export const GetByVendedorMock = async (
 
 export const deleteMovCaja = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/caja/${id}`);
+    const response = await axios.delete(`${API_URL}/caja/${id}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

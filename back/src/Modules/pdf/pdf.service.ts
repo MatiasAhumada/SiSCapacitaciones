@@ -151,8 +151,10 @@ export class PdfService {
       const domicilio =
         comprobante?.domicilioComercial || alumno?.address || '';
       const iva = comprobante?.iva || '-';
-      const formaPago = comprobante?.formaPago || pago.metodoPago;
-      const observacion = comprobante?.observacion || '';
+      // Caja is the current source of truth for fields editable from the movement form.
+      // Keep identity and receipt numbering from Comprobante as an issued historical snapshot.
+      const formaPago = pago.metodoPago || comprobante?.formaPago || '';
+      const observacion = this.getObservacionComprobante(pago, comprobante);
       const numeroComprobante = comprobante?.numeroComprobante || '';
       const tipoComprobante = comprobante?.tipoComprobante || '';
       const numero = comprobante?.numero || '';
@@ -296,6 +298,23 @@ export class PdfService {
       console.error('Error generando comprobante PDF:', error);
       throw new Error(`Error al generar comprobante: ${error.message}`);
     }
+  }
+
+  private getObservacionComprobante(pago: any, comprobante: any): string {
+    const observacionHistorica = comprobante?.observacion || '';
+    const notaComision = observacionHistorica
+      .match(/ - Comisión:.*$/)?.[0]
+      .slice(3);
+    const descripcion =
+      pago.descripcion !== undefined && pago.descripcion !== null
+        ? pago.descripcion
+        : observacionHistorica.replace(/ - Comisión:.*$/, '');
+    const partes = [descripcion, notaComision];
+    if (pago.cuota !== undefined && pago.cuota !== null && pago.cuota !== '') {
+      partes.push(`Cuota: ${pago.cuota}`);
+    }
+    if (pago.mesCuota) partes.push(`Mes: ${pago.mesCuota}`);
+    return partes.filter(Boolean).join(' - ');
   }
 
   async generarInscripcionPDF(inscripcion: any): Promise<Buffer> {

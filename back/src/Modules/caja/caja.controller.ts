@@ -257,6 +257,9 @@ export class CajaController {
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="comprobante-${id.substring(0, 8)}-${new Date().toISOString().split('T')[0]}.pdf"`,
+      'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+      Pragma: 'no-cache',
+      Expires: '0',
     });
 
     res.send(buffer);

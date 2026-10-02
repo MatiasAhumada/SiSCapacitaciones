@@ -4,6 +4,7 @@ export const descargarComprobantePDF = async (movimientoId) => {
   try {
     const response = await fetch(`${API_URL}/caja/${movimientoId}/comprobante-pdf`, {
       method: 'GET',
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/pdf',
       },

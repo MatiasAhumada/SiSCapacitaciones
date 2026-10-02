@@ -123,15 +123,20 @@ export const ModalEditar = ({
             >
               <option value="">Seleccione</option>
               <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia</option>
-              <option value="Debito">Débito</option>
               <option value="Credito">Crédito</option>
+              <option value="Digital Tobias">Digital Tobias</option>
               <option value="Digital Javier">Digital javier</option>
+              <option value="Ferro">Ferro</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Descripción del recibo
+            </label>
+            <p className="mb-2 text-xs text-gray-500">
+              La cuota y el mes también aparecen en el comprobante.
+            </p>
             <input
               type="text"
               name="descripcion"

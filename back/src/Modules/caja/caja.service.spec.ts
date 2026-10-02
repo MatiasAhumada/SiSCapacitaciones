@@ -132,3 +132,92 @@ describe('CajaService.remove', () => {
     expect(manager.transaction).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('CajaService.update', () => {
+  const createUpdateService = (caja: Caja | null) => {
+    const sesion = {
+      id: 'sesion-1',
+      montoApertura: 100,
+      totalIngresos: 25,
+      totalEgresos: 0,
+      totalEfectivo: 125,
+      totalCredito: 0,
+      totalDigitalJavier: 0,
+      totalDigitalTobias: 0,
+      totalFerro: 0,
+    } as SesionCaja;
+    const manager = {
+      findOne: jest
+        .fn()
+        .mockImplementation((entity) => (entity === Caja ? caja : sesion)),
+      find: jest.fn().mockResolvedValue([caja]),
+      save: jest.fn().mockImplementation((_entity, value) => value),
+      transaction: jest.fn(),
+    };
+    manager.transaction.mockImplementation((callback) => callback(manager));
+    const service = new CajaService(
+      { manager } as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+    return { service, manager, sesion };
+  };
+
+  it('updates the movement and recalculates its session in one transaction', async () => {
+    const movement = {
+      id: 'cobro-1',
+      tipo: TipoMovimiento.INGRESO,
+      metodoPago: MetodoPago.EFECTIVO,
+      monto: 25,
+      descripcion: 'Descripción anterior',
+      cuota: 1,
+      mesCuota: 'Enero',
+      comprobante: { id: 'comprobante-1', numeroComprobante: 'X 1-00000001' },
+      sesionCaja: { id: 'sesion-1' },
+    } as Caja;
+    const { service, manager } = createUpdateService(movement);
+
+    await service.update('cobro-1', {
+      metodoPago: MetodoPago.CREDITO,
+      monto: 40,
+      descripcion: 'Pago actualizado',
+      cuota: 2,
+      mesCuota: 'Febrero',
+      vendedorId: undefined,
+      alumnoComisionId: undefined,
+    });
+
+    expect(movement).toMatchObject({
+      metodoPago: MetodoPago.CREDITO,
+      monto: 40,
+      descripcion: 'Pago actualizado',
+      cuota: 2,
+      mesCuota: 'Febrero',
+      comprobante: { id: 'comprobante-1', numeroComprobante: 'X 1-00000001' },
+    });
+    expect(manager.transaction).toHaveBeenCalledTimes(1);
+    expect(manager.save).toHaveBeenNthCalledWith(1, Caja, movement);
+    expect(manager.save).toHaveBeenNthCalledWith(
+      2,
+      SesionCaja,
+      expect.anything(),
+    );
+  });
+
+  it('rejects missing movements without saving', async () => {
+    const { service, manager } = createUpdateService(null);
+
+    await expect(
+      service.update('missing', { monto: 40 }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(manager.save).not.toHaveBeenCalled();
+  });
+});

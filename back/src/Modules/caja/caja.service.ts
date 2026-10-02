@@ -250,45 +250,69 @@ export class CajaService {
 
   async update(id: string, updateCajaDto: UpdateCajaDto) {
     const { alumnoComisionId, vendedorId, ...updateData } = updateCajaDto;
+    const editableFields = [
+      'tipo',
+      'metodoPago',
+      'monto',
+      'descripcion',
+      'fecha',
+      'cuota',
+      'mesCuota',
+      'descuento',
+    ] as const;
 
-    const caja = await this.cajaRepository.findOne({
-      where: { id },
-      relations: ['alumnoComision', 'vendedor', 'sesionCaja'],
-    });
-    if (!caja) {
-      throw new NotFoundException(`Caja con ID ${id} no encontrada`);
-    }
-    if (alumnoComisionId) {
-      const alumnoComision = await this.alumnoComisionRepository.findOne({
-        where: { id: alumnoComisionId },
+    return this.cajaRepository.manager.transaction(async (manager) => {
+      const cajaBloqueada = await manager.findOne(Caja, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
       });
-      if (!alumnoComision) {
-        throw new NotFoundException(
-          `AlumnoComision con ID ${alumnoComisionId} no encontrado`,
-        );
+      if (!cajaBloqueada) {
+        throw new NotFoundException(`Caja con ID ${id} no encontrada`);
       }
-      caja.alumnoComision = alumnoComision;
-    }
-    if (vendedorId) {
-      const vendedor = await this.vendedorRepository.findOne({
-        where: { id: vendedorId },
+      const caja = await manager.findOne(Caja, {
+        where: { id },
+        relations: ['alumnoComision', 'vendedor', 'sesionCaja', 'comprobante'],
       });
-      if (!vendedor)
-        throw new NotFoundException(
-          `Vendedor con ID ${vendedorId} no encontrado`,
-        );
-      caja.vendedor = vendedor;
-    }
+      if (!caja) {
+        throw new NotFoundException(`Caja con ID ${id} no encontrada`);
+      }
 
-    Object.assign(caja, updateData);
-    const cajaActualizada = await this.cajaRepository.save(caja);
+      if (alumnoComisionId) {
+        const alumnoComision = await manager.findOne(AlumnoComision, {
+          where: { id: alumnoComisionId },
+        });
+        if (!alumnoComision) {
+          throw new NotFoundException(
+            `AlumnoComision con ID ${alumnoComisionId} no encontrado`,
+          );
+        }
+        caja.alumnoComision = alumnoComision;
+      }
+      if (vendedorId) {
+        const vendedor = await manager.findOne(Vendedor, {
+          where: { id: vendedorId },
+        });
+        if (!vendedor) {
+          throw new NotFoundException(
+            `Vendedor con ID ${vendedorId} no encontrado`,
+          );
+        }
+        caja.vendedor = vendedor;
+      }
 
-    // Si tiene sesión asociada, recalcular totales
-    if (caja.sesionCaja) {
-      await this.recalcularTotalesSesion(caja.sesionCaja.id);
-    }
+      for (const field of editableFields) {
+        if (updateData[field] !== undefined) {
+          (caja as any)[field] = updateData[field];
+        }
+      }
 
-    return cajaActualizada;
+      const cajaActualizada = await manager.save(Caja, caja);
+      if (caja.sesionCaja) {
+        await this.recalcularTotalesSesion(caja.sesionCaja.id, manager);
+      }
+
+      return cajaActualizada;
+    });
   }
 
   async remove(id: string, actor: { id: string; role: string }) {

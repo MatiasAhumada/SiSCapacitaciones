@@ -19,8 +19,10 @@ import { Categoria } from 'src/Modules/caja/entities/categoria.entity';
 import { Subcategoria } from 'src/Modules/caja/entities/subcategoria.entity';
 import { SesionCaja } from 'src/Modules/caja/entities/sesion-caja.entity';
 import { AsistenciaProfesor } from '@modules/Modules/comision/entities/asistencia-profesor.entity';
+import { validateDeploymentEnvironment } from './deployment';
 
-dotenvConfig({ path: '.env' });
+dotenvConfig({ path: process.env.APP_ENV_FILE || '.env' });
+validateDeploymentEnvironment(process.env);
 
 const db_config = {
   type: 'postgres',

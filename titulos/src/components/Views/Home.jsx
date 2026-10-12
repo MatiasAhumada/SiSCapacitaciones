@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 
 const Home = () => {
-  const [user, setUser] = useState(null);
   // useEffect(() => {
   //   const id = localStorage.getItem("user");
   //   getAluID(id).then((data) => {

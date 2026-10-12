@@ -44,7 +44,14 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: npm run lint
+        run: |
+          if [[ "${{ matrix.project }}" == back ]]; then npx eslint "{src,apps,libs}/**/*.ts" --no-fix; fi
+          if [[ "${{ matrix.project }}" == front ]]; then npx eslint "src/**/*.{js,jsx,ts,tsx}" --no-fix; fi
+          if [[ "${{ matrix.project }}" == titulos ]]; then npx eslint . --no-fix; fi
+
+      - name: Test backend
+        if: matrix.project == 'back'
+        run: npm test -- --runInBand
 
       - name: Build
         run: npm run build

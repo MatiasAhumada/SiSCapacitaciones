@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import imagen from "../assets/logo.png";
 import { useState } from "react";
 import Swal from "sweetalert2";
@@ -6,10 +5,9 @@ import { getCertId } from "../queries/queries";
 const Login = () => {
   const [numberCert, setNumberCert] = useState("");
   const [pause, setPause] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { value } = e.target;
     setNumberCert(value);
   };
 
@@ -21,7 +19,7 @@ const Login = () => {
       if (data && data.link) {
         redirectToLink(data.link);
       }
-    } catch (error) {
+    } catch {
       Swal.fire({
         icon: "error",
         title: "Certificado no encontrado",

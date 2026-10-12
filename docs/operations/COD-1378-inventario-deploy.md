@@ -1,45 +1,65 @@
-# COD-1378 — Inventario de despliegue
+# COD-1378 — Corte de deploy desde `dev` y preparación de promoción
 
-Relevamiento de solo lectura realizado el 12/10/2026 para evaluar el aislamiento de staging solicitado por COD-1378. No se cambiaron servicios, configuración ni datos del VPS.
+Actualizado el 12/10/2026 para el alcance revisado del ticket. Este cambio sólo modifica el repositorio y GitHub Actions; no se conectó al VPS, no se ejecutó una migración y no se alteraron servicios, configuración ni datos productivos.
 
-## Repositorio y despliegue
+## Resultado del cambio
 
-- El VPS `srv722748` tiene `/root/SiSCapacitaciones` en `dev`, commit `934121170ab5b99d050e665ddf465ffd4ff0cd09`, igual a `origin/dev` observado localmente.
-- `origin/master` está en `f210c881cbcd0c002a698011fe49f8b212987671` (commit inicial del 13/02/2025) y es ancestro de `origin/dev`. Inicializar `staging` desde el `dev` aprobado evita que empiece desde el commit viejo de `master`; promover a `master` debe hacerse mediante PR revisable, no moviendo ni forzando ramas.
-- El workflow `.github/workflows/deploy.yml` se activa al hacer push a `dev`. Ejecuta `git reset --hard origin/dev`, instala y compila los tres proyectos, corre `npm run migration:run`, reinicia PM2 y publica los builds web. Por lo tanto, push a `dev` es despliegue productivo directo.
-- Al relevamiento no existía workflow ni rama remota `staging`; la rama se inicializa para COD-1378 desde el SHA actual de `origin/dev`. Los despliegues separados de API/frontend y la promoción automatizada siguen fuera del alcance de esta tarea y corresponden a COD-1379/1380/1381, aún en `SIS`.
-- En el checkout del VPS quedan cambios en `back/package-lock.json`, `front/package-lock.json` y `titulos/package-lock.json`; no se tocaron.
+- `.github/workflows/deploy.yml` fue retirado: ya no hay un workflow que despliegue en un push a `dev`.
+- `.github/workflows/ci.yml` valida lint y build de `back`, `front` y `titulos` al abrir o actualizar un PR cuyo destino sea `dev`, `staging` o `master`. No publica artefactos ni se conecta al VPS.
+- La instancia productiva existente debe continuar atendiendo tráfico con los procesos y archivos estáticos actualmente instalados. Desde que entre este cambio, no habrá despliegue automático hasta que se habilite el flujo aprobado en los tickets siguientes; puede existir un intervalo sin actualizaciones automáticas.
+- `titulos/` sigue incluido en la futura promoción productiva. No se habilitará para staging hasta definir y registrar su URL y API de staging.
 
-## Servicios y tráfico
+## Ramas observadas en GitHub
 
-- PM2 mantiene `siscapacitaciones-api` online en `/root/SiSCapacitaciones/back/dist/main.js`; escucha en `*:4040`. No se encontró proceso ni listener en 4043.
-- `siscapacitaciones.net` sirve `front/dist` y enruta `/backend/` al puerto 4040. `certificacionnacional.org` y `www.certificacionnacional.org` sirven `/var/www/titulos` y también enrutan al 4040. No se encontró virtual host de staging.
-- PM2 reporta una revisión `bfd79aee9a0a929aaebc9965cfbbf81a0cc3085a`, distinta del checkout `934121170ab5b99d050e665ddf465ffd4ff0cd09`. Los directorios compilados tienen marcas de tiempo compatibles con el despliegue del 2/10, pero no hay evidencia suficiente para afirmar el SHA exacto ejecutado.
-- El certificado de `siscapacitaciones.net` vence el 10/12/2026. El certificado de `certificacionnacional.org` venció el 15/04/2026: la verificación TLS falla, aunque el sitio responde si se omite la validación del certificado.
+SHA observados al preparar este cambio (12/10/2026):
 
-## Base de datos y respaldos
+| Rama | SHA | Observación |
+| --- | --- | --- |
+| `dev` | `9e92967c640bc3467174d86b7035a1c779db937e` | Merge PR #23 desde `staging`; es la base aprobada de trabajo. |
+| `staging` | `d8fa3c89300785d30e7fa807eb7480d940e7913f` | Ancestro de `dev` al momento del relevamiento. |
+| `master` | `f210c881cbcd0c002a698011fe49f8b212987671` | Commit inicial de 2025 y ancestro de `dev`; no es una versión apta para desplegar. |
 
-- PostgreSQL escucha en todas las interfaces (`0.0.0.0:5432` y `::`). UFW aparece inactivo; no se comprobó firewall del proveedor.
-- Hay bases `cursos`, `cursos_dev` y `root`. Las estadísticas consultadas muestran actividad en `cursos`, mientras `cursos_dev` aparece sin tuplas estimadas. No se inspeccionaron registros de negocio.
-- El usuario confirma que `cursos` es la base de producción y `cursos_dev` la base configurada para staging/pruebas, una copia fiel de producción. Debe tratarse como información sensible hasta definir anonimización, refresco y política de acceso; el recuento estadístico por sí solo no acredita su contenido actual.
-- `back/src/config/configOrm.ts` requiere `DB_*`. El `.env` del backend y el entorno del proceso PM2 no muestran variables `DB_*`/`PG*`; no había conexión activa del API a esas bases al consultar. La base realmente usada por producción y la que alcanzaría la migración del workflow quedan sin verificar. No se ejecutaron migraciones.
-- Existen `/root/postgres-backups/cursos.dump` y `cursos_dev.dump`, de 27/09/2026. No se confirmó política de retención, automatización, integridad ni restaurabilidad.
-- `/root/SiSCapacitaciones/back/.env` tiene permisos `0644` bajo `/root` con permisos `0755`; se confirmó que `www-data` puede leer el archivo. No se leyeron ni registraron valores secretos y no se modificaron permisos.
+Camino de promoción: PR revisable `dev → staging`, validación en el entorno aislado que prepararán COD-1379/COD-1380, y luego PR revisable `staging → master`. No se reescriben ramas, no se usa push forzado y ningún despliegue a producción se habilita antes de que `master` contenga por PR el código y los workflows aprobados. COD-1381/COD-1382 cubren la activación y su validación; este ticket no declara staging ni master desplegados.
 
-## Capacidad observada
+## Matriz de configuración por entorno
 
-El servidor reportó 2 vCPU, 7.8 GiB de RAM (3.8 GiB disponibles), 4 GiB de swap (1.9 GiB usados) y 54 GiB libres en el filesystem principal. No se hizo prueba de carga ni de builds paralelos.
+Los valores de nombres y destinos de abajo son el contrato propuesto para los tickets siguientes. Los valores entre `<...>` son marcadores; nunca deben reemplazarse por secretos en este documento. Los nombres de secretos serán configurados como secrets de GitHub Environment y los valores de runtime residirán en el `.env` de cada proceso, fuera de Git.
 
-## Validación local de COD-1378
+| Parámetro | `staging` | `production` |
+| --- | --- | --- |
+| Rama de despliegue | `staging` | `master` |
+| GitHub Environment | `staging` | `production` |
+| API listen port | `4043` | `4040` (actual `main.ts` lo fija en código; COD-1379 debe permitir configurarlo) |
+| `DB_NAME` | `cursos_dev` | `cursos` |
+| PM2 process | `siscapacitaciones-api-staging` | `siscapacitaciones-api` |
+| Backend checkout/release root | `/opt/siscapacitaciones/staging` | `/root/SiSCapacitaciones` (actual; migrar a releases inmutables antes de promover) |
+| API URL / `VITE_APP_URL` | `https://<staging-api-host>/backend` | `https://siscapacitaciones.net/backend` |
+| Frontend public URL / `FRONTEND_URL` | `https://<staging-frontend-host>` | `https://siscapacitaciones.net` |
+| Frontend static root | `/var/www/siscapacitaciones-staging` | `/var/www/siscapacitaciones` |
+| Títulos public URL / `VITE_APP_URL` | Pendiente; no incluir en deploy staging hasta acordar URL y API | `https://certificacionnacional.org/backend` |
+| Títulos static root | Pendiente | `/var/www/titulos` |
+| SMTP | Credenciales/cuenta de prueba independientes; no usar correo real de clientes | Secretos productivos existentes, fuera de Git |
+| R2 | Bucket y credenciales de staging aislados, sin escribir sobre objetos productivos | Bucket productivo y secretos existentes, fuera de Git |
+| Release/rollback | Releases versionados separados de producción; ruta y retención se cierran en COD-1379/1380 | Releases versionados y puntero de release activo; definir antes de activar deploy |
 
-Se ejecutaron `npm run lint` y `npm run build` para `back`, `front` y `titulos` en un worktree temporal basado en el commit actual, preservando los cambios preexistentes del checkout compartido. Los seis hallazgos de variables/importaciones sin uso en `titulos` se corrigieron en `Home.jsx` y `Login.jsx`; lint y build de los tres proyectos finalizaron correctamente. No se ejecutaron pruebas funcionales de staging porque no hay entorno de staging aislado.
+Nombres esperados para los secrets por GitHub Environment: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `R2_ENDPOINT`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `VITE_APP_URL` y `FRONTEND_URL`. Los nombres pueden repetirse entre Environments porque cada uno entrega valores distintos y con permisos propios. Preferir clave SSH; no mantener `VPS_PASSWORD` como mecanismo de despliegue.
 
-## Estado y pasos para activar despliegues separados
+## Precondiciones y controles para el workflow de despliegue futuro
 
-La rama `staging` parte del `dev` aprobado y `master` se conserva sin cambios. Antes de habilitar workflows de staging/producción hacen falta: resolver hostname y TLS de staging; aislar código, configuración, logs, PM2 y estáticos; asegurar que las migraciones de staging usen `cursos_dev` y las de producción `cursos`; aislar SMTP/R2 y demás efectos externos; acordar si `titulos` requiere staging; definir respaldo/restauración y rollback; corregir permisos del `.env`; y confirmar el commit servido por PM2. El workflow existente sigue desplegando a producción al hacer push a `dev`, por lo que no se cambió en COD-1378.
+El workflow de despliegue, que se implementará en los tickets siguientes, debe seleccionar explícitamente el GitHub Environment según la rama aprobada y comprobar todo lo siguiente antes de compilar o cambiar servicios:
 
-Plan previo a cambiar el disparador de producción: (1) confirmar y registrar el SHA realmente servido, el árbol limpio y la ruta activa; (2) preparar y verificar un respaldo restaurable de `cursos` y las configuraciones efectivas, sin guardar secretos en Git; (3) desplegar primero `staging` en rutas y procesos independientes con `cursos_dev`, y comprobar API, frontend, migraciones y efectos externos; (4) promover por PR revisable a `master`, confirmando que el commit resultante contiene el código aprobado y no el commit inicial de 2025; (5) cambiar el workflow productivo a `master` sólo después de comprobar el SHA y el destino `cursos`; (6) validar salud del API y los sitios tras el deploy. No se ejecutaron estos pasos de activación porque aún faltan dominio/TLS, configuración efectiva de DB y respaldos verificados.
+1. Rechazar ramas/destinos no permitidos y verificar que el SHA a desplegar es el `HEAD` aprobado de `staging` o `master`; registrar rama y SHA en el resumen del job.
+2. Exigir `VPS_HOST`, `VPS_USER` y `VPS_SSH_KEY` no vacíos, conectarse por SSH con host key verificada y fallar con un mensaje que nombre el parámetro faltante, nunca imprimir su valor.
+3. Por SSH, verificar usuario/permisos, espacio disponible, Node/npm, Git, PM2, PostgreSQL alcanzable, Nginx y sus herramientas de validación, directorios/releases y permisos de escritura. Comprobar puerto libre `4043` en staging o servicio/listener esperado en `4040` en producción.
+4. Validar configuración de DB antes de migrar: `DB_HOST`, `DB_PORT`, usuario y contraseña disponibles; confirmar que la base seleccionada sea exactamente `cursos_dev` para staging o `cursos` para producción. Abortar ante cualquier discrepancia. Comprobar un respaldo reciente y restaurable antes de una migración de producción.
+5. Verificar que el hostname configurado resuelve al destino, que el virtual host Nginx apunta a las rutas y API del mismo entorno, y que la configuración pasa `nginx -t`. Confirmar DNS y TLS válidos para el hostname antes de habilitar tráfico.
+6. Verificar secretos/variables de runtime de SMTP, R2, `FRONTEND_URL` y `VITE_APP_URL`. Staging debe usar cuentas/buckets aislados para evitar mensajes y escrituras sobre datos productivos.
+7. Ejecutar health checks de API y de los sitios después de activar el release; ante error, restaurar el release anterior y reiniciar sólo el PM2 del entorno seleccionado. No usar `git reset --hard` en un checkout compartido ni borrar estáticos activos antes de tener listo el nuevo release.
 
-Plan de reversión: conservar intactos el checkout, artefactos y configuración de la versión productiva conocida; ante fallo, volver al artefacto/release anterior y reiniciar el proceso productivo; revertir `master` mediante un commit correctivo revisado, nunca con push forzado; restaurar `cursos` únicamente desde el respaldo validado y sólo si una migración produjo daño que no pueda corregirse con una nueva migración. La ruta actual no usa releases inmutables, por lo que antes del cambio de trigger debe definirse y probarse un mecanismo de rollback que no dependa de reconstruir sobreescribiendo la versión activa.
+Si una precondición no se cumple, el job debe fallar antes de ejecutar migraciones, reiniciar PM2, cambiar symlinks o reemplazar archivos servidos. La configuración observada previamente no acredita que todos estos requisitos estén listos: no se deben inferir credenciales, DNS/TLS, respaldo restaurable ni DB efectiva a partir de este inventario.
 
-El relevamiento del VPS fue de solo lectura: no hubo despliegue, migración, cambio de estado Jira ni acceso a datos de negocio.
+## Estado productivo conocido y límites de la evidencia
+
+El inventario anterior de solo lectura reportó API PM2 `siscapacitaciones-api` en puerto 4040, frontend en `/var/www/siscapacitaciones`, títulos en `/var/www/titulos`, DBs `cursos` y `cursos_dev`, y ambos dominios productivos enrutados a 4040. También dejó constancia de que el SHA servido por PM2, la DB efectiva de producción, la restaurabilidad de respaldos y varios aspectos de DNS/TLS/configuración seguían sin verificar. Este cambio no repite una inspección del VPS y no afirma que esos datos hayan cambiado o continúen iguales.
+
+El deploy productivo anterior ejecutaba `npm run migration:run`, reiniciaba PM2 y reemplazaba los directorios estáticos en cada push a `dev`. Retirarlo evita nuevos cambios automáticos desde `dev`; no detiene ni reinicia la instancia ya ejecutándose. No se hicieron pruebas de staging porque todavía no hay un entorno aislado listo dentro del alcance de este ticket.

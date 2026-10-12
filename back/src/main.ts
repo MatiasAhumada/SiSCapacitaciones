@@ -1,8 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './Modules/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { resolveApiPort } from './config/deployment';
 
 async function bootstrap() {
+  const port = resolveApiPort(process.env);
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: '*',
@@ -42,6 +44,6 @@ Teléfono: +54 9 381 352-8658`,
     },
   });
 
-  await app.listen(4040);
+  await app.listen(port);
 }
 bootstrap();

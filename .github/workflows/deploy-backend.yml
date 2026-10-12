@@ -1,0 +1,231 @@
+name: Deploy backend
+
+on:
+  push:
+    branches:
+      - staging
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref_name == 'master' && 'production' || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: back
+            directory: back
+          - project: front
+            directory: front
+          - project: titulos
+            directory: titulos
+    defaults:
+      run:
+        working-directory: ${{ matrix.directory }}
+    steps:
+      - name: Check out triggering commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.directory }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint without changing the checkout
+        run: |
+          if [[ "${{ matrix.project }}" == back ]]; then npx eslint "{src,apps,libs}/**/*.ts" --no-fix; fi
+          if [[ "${{ matrix.project }}" == front ]]; then npx eslint "src/**/*.{js,jsx,ts,tsx}" --no-fix; fi
+          if [[ "${{ matrix.project }}" == titulos ]]; then npx eslint . --no-fix; fi
+
+      - name: Test backend
+        if: matrix.project == 'back'
+        run: npm test -- --runInBand
+
+      - name: Build project
+        env:
+          VITE_APP_URL: ${{ matrix.project == 'front' && secrets.VITE_APP_URL || '' }}
+        run: |
+          if [[ "${{ matrix.project }}" == front ]]; then
+            if [[ "$GITHUB_REF_NAME" == master ]]; then npm run build:production; else npm run build:staging; fi
+            node scripts/verify-build-api-url.mjs dist
+          else
+            npm run build
+          fi
+
+  deploy:
+    needs: validate
+    if: github.ref_name == 'staging' || github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
+    steps:
+      - name: Check out triggering commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Require staging ancestry before production deploy
+        if: github.ref_name == 'master'
+        run: |
+          git fetch --no-tags origin staging
+          git merge-base --is-ancestor origin/staging "$GITHUB_SHA" || {
+            echo 'Production deploy requires a master commit containing the reviewed staging branch.' >&2
+            exit 1
+          }
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: back/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: back
+        run: npm ci
+
+      - name: Build backend for the triggering commit
+        working-directory: back
+        run: npm run build
+
+      - name: Deploy isolated backend release
+        env:
+          DEPLOY_ENV: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GIT_SHA: ${{ github.sha }}
+          BACKUP_VERIFICATION_ID: ${{ vars.BACKUP_VERIFICATION_ID }}
+          BACKUP_RESTORABLE: ${{ vars.BACKUP_RESTORABLE }}
+          SCHEMA_COMPATIBLE: ${{ vars.SCHEMA_COMPATIBLE }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          SMTP_MODE: ${{ vars.SMTP_MODE }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          SMTP_TEST_RECIPIENT: ${{ secrets.SMTP_TEST_RECIPIENT }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: bash ops/scripts/deploy-backend-release.sh
+
+      - name: Install staging frontend dependencies
+        if: github.ref_name == 'staging'
+        working-directory: front
+        run: npm ci
+
+      - name: Build staging frontend from the same commit
+        if: github.ref_name == 'staging'
+        working-directory: front
+        env:
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+        run: |
+          test -n "$VITE_APP_URL" || { echo 'Configure VITE_APP_URL in GitHub Environment staging.' >&2; exit 1; }
+          npm run build:staging
+          node scripts/verify-build-api-url.mjs dist
+
+      - name: Render staging Nginx configuration
+        if: github.ref_name == 'staging'
+        working-directory: .
+        env:
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+          GIT_SHA: ${{ github.sha }}
+        run: |
+          test -n "$FRONTEND_URL" || { echo 'Configure FRONTEND_URL in GitHub Environment staging.' >&2; exit 1; }
+          node ops/scripts/render-staging-nginx.mjs ops/nginx/siscapacitaciones-staging.conf.template ops/nginx/siscapacitaciones-staging.conf "$FRONTEND_URL" "$VITE_APP_URL" "$GIT_SHA"
+
+      - name: Install password-based SSH client for staging frontend
+        if: github.ref_name == 'staging'
+        working-directory: .
+        run: |
+          if ! command -v sshpass >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install --yes sshpass
+          fi
+
+      - name: Publish staging frontend from the same commit
+        if: github.ref_name == 'staging'
+        working-directory: .
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+          GIT_SHA: ${{ github.sha }}
+        run: bash ops/scripts/deploy-staging-frontend.sh
+
+      - name: Install production frontend dependencies
+        if: github.ref_name == 'master'
+        working-directory: front
+        run: npm ci
+
+      - name: Build production frontend from the same commit
+        if: github.ref_name == 'master'
+        working-directory: front
+        env:
+          VITE_APP_URL: https://siscapacitaciones.net/backend
+        run: npm run build:production
+
+      - name: Install production titles dependencies
+        if: github.ref_name == 'master'
+        working-directory: titulos
+        run: npm ci
+
+      - name: Build production titles from the same commit
+        if: github.ref_name == 'master'
+        working-directory: titulos
+        env:
+          VITE_APP_URL: https://certificacionnacional.org/backend
+        run: npm run build
+
+      - name: Publish production frontend and titles from the same commit
+        if: github.ref_name == 'master'
+        working-directory: .
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GIT_SHA: ${{ github.sha }}
+          FRONTEND_URL: https://siscapacitaciones.net
+          TITULOS_URL: https://certificacionnacional.org
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: bash ops/scripts/deploy-production-static.sh
+
+      - name: Record deployment identity
+        if: success()
+        run: |
+          echo "Environment: ${{ github.ref_name == 'master' && 'production' || 'staging' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Branch: $GITHUB_REF_NAME" >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

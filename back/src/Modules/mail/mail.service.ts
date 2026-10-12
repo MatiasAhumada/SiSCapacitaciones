@@ -6,6 +6,10 @@ export class MailService {
   private transporter;
 
   constructor() {
+    if (this.smtpMode === 'disabled') {
+      return;
+    }
+
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
@@ -17,8 +21,31 @@ export class MailService {
     });
   }
 
+  private get smtpMode(): 'disabled' | 'test' | 'production' {
+    return (
+      (process.env.SMTP_MODE as 'disabled' | 'test' | 'production') ||
+      'production'
+    );
+  }
+
+  private async sendMail(message: nodemailer.SendMailOptions) {
+    if (this.smtpMode === 'disabled') {
+      return;
+    }
+
+    const to =
+      this.smtpMode === 'test' ? process.env.SMTP_TEST_RECIPIENT : message.to;
+    if (!to) {
+      throw new Error(
+        'SMTP_TEST_RECIPIENT is required when SMTP_MODE is test.',
+      );
+    }
+
+    await this.transporter.sendMail({ ...message, to });
+  }
+
   async sendReceiptEmail(to: string, alumnoName: string, pdfBuffer: Buffer) {
-    await this.transporter.sendMail({
+    await this.sendMail({
       from: process.env.SMTP_FROM,
       to,
       subject: 'Comprobante de Pago - SiSCapacitaciones',
@@ -43,7 +70,7 @@ export class MailService {
     pdfBuffer: Buffer,
   ) {
     const signUrl = `${process.env.FRONTEND_URL}/firmar-contrato/${inscripcionId}`;
-    await this.transporter.sendMail({
+    await this.sendMail({
       from: process.env.SMTP_FROM,
       to,
       subject: 'Firma tu Contrato de Inscripción - SiSCapacitaciones',
@@ -66,7 +93,7 @@ export class MailService {
   }
 
   async sendSignedContract(to: string, alumnoName: string, pdfBuffer: Buffer) {
-    await this.transporter.sendMail({
+    await this.sendMail({
       from: process.env.SMTP_FROM,
       to,
       subject: 'Contrato de Inscripción Firmado - SiSCapacitaciones',

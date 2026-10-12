@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\" && vite build",
+    "build:staging": "node scripts/build-environment.mjs staging",
+    "build:production": "node scripts/build-environment.mjs production",
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\""

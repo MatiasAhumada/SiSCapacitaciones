@@ -48,3 +48,11 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Build production frontend configuration
+        if: matrix.project == 'front'
+        env:
+          VITE_APP_URL: https://siscapacitaciones.net/backend
+        run: |
+          npm run build:production
+          node scripts/verify-build-api-url.mjs dist

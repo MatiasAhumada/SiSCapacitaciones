@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 fail() { printf '%s\n' "$1" >&2; exit 1; }
-required=(VPS_HOST VPS_USER VPS_SSH_KEY VPS_KNOWN_HOSTS FRONTEND_URL VITE_APP_URL GIT_SHA)
+required=(VPS_HOST VPS_USER VPS_PASSWORD VPS_KNOWN_HOSTS FRONTEND_URL VITE_APP_URL GIT_SHA)
 for name in "${required[@]}"; do
   [[ -n "${!name:-}" ]] || fail "Missing required staging deployment value: ${name}. Configure it in GitHub Environment staging."
 done
@@ -26,15 +26,19 @@ esac
 ssh_dir="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/cod1380-ssh"
 mkdir -p "$ssh_dir"
 chmod 700 "$ssh_dir"
-printf '%s\n' "$VPS_SSH_KEY" > "$ssh_dir/id_ed25519"
+cleanup() { rm -rf "$ssh_dir"; unset SSHPASS; }
+trap cleanup EXIT
 printf '%s\n' "$VPS_KNOWN_HOSTS" > "$ssh_dir/known_hosts"
-chmod 600 "$ssh_dir/id_ed25519" "$ssh_dir/known_hosts"
-ssh_opts=(-i "$ssh_dir/id_ed25519" -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$ssh_dir/known_hosts")
+chmod 600 "$ssh_dir/known_hosts"
+command -v sshpass >/dev/null || fail 'sshpass is required for password-based SSH deployment.'
+export SSHPASS="$VPS_PASSWORD"
+ssh_opts=(-o BatchMode=no -o PreferredAuthentications=password,keyboard-interactive -o PubkeyAuthentication=no -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$ssh_dir/known_hosts")
+ssh_run() { sshpass -e ssh "${ssh_opts[@]}" "$@"; }
 target="${VPS_USER}@${VPS_HOST}"
 release="/var/www/siscapacitaciones-staging/releases/${GIT_SHA}"
 remote_config="/tmp/siscapacitaciones-staging-${GIT_SHA}.conf"
 
-ssh "${ssh_opts[@]}" "$target" bash -s -- "$release" <<'REMOTE_PREPARE'
+ssh_run "$target" bash -s -- "$release" <<'REMOTE_PREPARE'
 set -Eeuo pipefail
 release="$1"
 [[ "$release" =~ ^/var/www/siscapacitaciones-staging/releases/[a-fA-F0-9]{40}$ ]] || { echo 'Invalid staging release path.' >&2; exit 1; }
@@ -46,11 +50,12 @@ sudo -n install -d -m 0755 "$release"
 sudo -n chown "$(id -un):$(id -gn)" "$release"
 REMOTE_PREPARE
 
-rsync -az --delete --safe-links -e "ssh -i $ssh_dir/id_ed25519 -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$ssh_dir/known_hosts" front/dist/ "$target:$release/"
-ssh "${ssh_opts[@]}" "$target" chmod -R a+rX "$release"
-scp "${ssh_opts[@]}" ops/nginx/siscapacitaciones-staging.conf "$target:$remote_config"
+rsync_ssh="sshpass -e ssh -o BatchMode=no -o PreferredAuthentications=password,keyboard-interactive -o PubkeyAuthentication=no -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$ssh_dir/known_hosts"
+RSYNC_RSH="$rsync_ssh" rsync -az --delete --safe-links front/dist/ "$target:$release/"
+ssh_run "$target" chmod -R a+rX "$release"
+sshpass -e scp "${ssh_opts[@]}" ops/nginx/siscapacitaciones-staging.conf "$target:$remote_config"
 
-ssh "${ssh_opts[@]}" "$target" bash -s -- "$GIT_SHA" "$frontend_host" "$api_host" "$release" "$remote_config" <<'REMOTE_DEPLOY'
+ssh_run "$target" bash -s -- "$GIT_SHA" "$frontend_host" "$api_host" "$release" "$remote_config" <<'REMOTE_DEPLOY'
 set -Eeuo pipefail
 sha="$1"; frontend_host="$2"; api_host="$3"; release="$4"; candidate="$5"
 [[ "$sha" =~ ^[a-fA-F0-9]{40}$ ]] || { echo 'Invalid deployment SHA.' >&2; exit 1; }
@@ -111,7 +116,7 @@ echo "Staging frontend $sha is live; frontend assets and API 4043 proxy responde
 REMOTE_DEPLOY
 
 if ! node ops/scripts/verify-staging-frontend.mjs "$FRONTEND_URL" "$VITE_APP_URL" "$GIT_SHA"; then
-  ssh "${ssh_opts[@]}" "$target" bash -s -- "$GIT_SHA" <<'REMOTE_ROLLBACK'
+  ssh_run "$target" bash -s -- "$GIT_SHA" <<'REMOTE_ROLLBACK'
 set -Eeuo pipefail
 sha="$1"
 [[ "$sha" =~ ^[a-fA-F0-9]{40}$ ]] || { echo 'Invalid rollback SHA.' >&2; exit 1; }
@@ -137,7 +142,7 @@ REMOTE_ROLLBACK
   fail 'Public DNS/TLS/HTTP verification failed; the previous staging release and Nginx configuration were restored.'
 fi
 
-ssh "${ssh_opts[@]}" "$target" bash -s -- "$GIT_SHA" <<'REMOTE_CONFIRM'
+ssh_run "$target" bash -s -- "$GIT_SHA" <<'REMOTE_CONFIRM'
 set -Eeuo pipefail
 sha="$1"
 root=/var/www/siscapacitaciones-staging

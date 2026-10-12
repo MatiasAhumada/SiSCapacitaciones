@@ -54,12 +54,20 @@ jobs:
           mkdir -p ops/nginx
           node ops/scripts/render-staging-nginx.mjs ops/nginx/siscapacitaciones-staging.conf.template ops/nginx/siscapacitaciones-staging.conf "$FRONTEND_URL" "$VITE_APP_URL" "$GIT_SHA"
 
+      - name: Install password-based SSH client
+        working-directory: .
+        run: |
+          if ! command -v sshpass >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install --yes sshpass
+          fi
+
       - name: Publish isolated staging release and validate Nginx/HTTP
         working-directory: .
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
           VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
           VITE_APP_URL: ${{ secrets.VITE_APP_URL }}

@@ -15,11 +15,13 @@ Este ticket agrega un build y un despliegue manual del frontend administrativo a
 
 `.github/workflows/deploy-staging-frontend.yml` permite una ejecución `workflow_dispatch` únicamente desde `staging`. COD-1381 podrá incorporar el disparador automático una vez aprobada la activación. El job instala dependencias con `npm ci`, corre lint sin modificar el checkout, compila con `VITE_APP_URL`, y confirma que la URL seleccionada quedó dentro de los assets generados.
 
-Configurar estos secrets en GitHub Environment `staging`:
+El job puede resolver `VPS_HOST`, `VPS_USER` y `VPS_PASSWORD` desde secretos del repositorio o del Environment `staging` (un secreto de Environment con el mismo nombre prevalece). Configurar además estos secrets en GitHub Environment `staging`:
 
-- `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` y `VPS_KNOWN_HOSTS` (líneas `known_hosts` previamente confiables; no se aprende la clave del host durante el job).
+- `VPS_KNOWN_HOSTS` (líneas `known_hosts` previamente confiables; no se aprende la clave del host durante el job).
 - `FRONTEND_URL`: URL HTTPS del vhost frontend exclusivo de staging.
 - `VITE_APP_URL`: URL HTTPS del vhost de API exclusivo de staging, terminada en `/backend`.
+
+El workflow autentica SSH usando el secreto `VPS_PASSWORD` mediante `sshpass`; el runner instala esa herramienta durante el job. La cuenta SSH debe permitir autenticación por contraseña y conservar `sudo -n` para las operaciones administrativas. La verificación estricta de la identidad del VPS sigue dependiendo de `VPS_KNOWN_HOSTS`.
 
 Los dos vhosts deben tener DNS y certificados TLS ya instalados. La cuenta SSH requiere `rsync`, `curl`, Nginx, `systemctl`, y `sudo -n` para instalar la configuración/reload; puede escribir releases bajo `/var/www/siscapacitaciones-staging`. Los valores, permisos, herramientas y certificados se validan antes de activar; DNS/HTTPS públicos se validan inmediatamente después conservando el release anterior y, ante error, se restaura automáticamente.
 
